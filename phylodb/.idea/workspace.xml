@@ -2,9 +2,97 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/AnalysisController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/AncillaryController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/model/AncillaryInputModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/model/AncillaryOutputModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/repository/AncillaryCypherRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/model/IsolateOutputModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/repository/IsolateCypherRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/ProfileInputModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/ProfileOutputModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/repository/ProfileCypherRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/model/SchemaOutputModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/repository/SchemaCypherRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/AlleleController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/AlleleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/model/Allele.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/Allele.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/model/AlleleInputModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/AlleleInputModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/model/AlleleOutputModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/AlleleOutputModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/repository/AlleleCypherRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/repository/AlleleCypherRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/repository/AlleleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/repository/AlleleRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/allele/repository/AlleleRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/repository/AlleleRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/AncillaryController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/AncillaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/AncillaryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/model/Ancillary.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/model/Ancillary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/model/AncillaryInputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/model/AncillaryOutputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/repository/AncillaryCypherRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/repository/AncillaryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/repository/AncillaryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/ancillary/repository/AncillaryRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/ancillary/repository/AncillaryRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/CoordinateController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/CoordinateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/model/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/model/Coordinate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/model/CoordinateInputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/model/CoordinateOutputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/repository/CoordinateCypherRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/repository/CoordinateCypherRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/repository/CoordinateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/repository/CoordinateRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/coordinate/repository/CoordinateRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/repository/CoordinateRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/DistanceController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/DistanceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/AnalysisService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/model/Distance.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/model/DistanceInputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/model/DistanceOutputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/repository/DistanceCypherRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/repository/DistanceCypherRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/repository/DistanceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/repository/DistanceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/distance/repository/DistanceRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/repository/DistanceRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/CsvFileReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/FastaFileReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/FileReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/graph/Edge.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/graph/GraphFileReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/graph/NewickFileReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/graph/NexusFileReader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/file/graph/Vertice.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/IsolateController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/IsolateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/model/Isolate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/model/Isolate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/model/IsolateOutputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/repository/IsolateCypherRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/repository/IsolateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/repository/IsolateRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/isolate/repository/IsolateRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/repository/IsolateRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/LocusController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/LocusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/model/Locus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/model/Locus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/model/LocusOutputModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/model/LocusOutputModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/repository/LocusCypherRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/repository/LocusCypherRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/repository/LocusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/repository/LocusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/locus/repository/LocusRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/repository/LocusRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/ProfileController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/ProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/model/Profile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/Profile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/model/ProfileInputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/model/ProfileOutputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/repository/ProfileCypherRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/repository/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/repository/ProfileRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/profile/repository/ProfileRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/repository/ProfileRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/SchemaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/SchemaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/model/Part.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/model/Part.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/model/Schema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/model/Schema.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/model/SchemaOutputModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/repository/SchemaCypherRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/repository/SchemaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/repository/SchemaRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/schema/repository/SchemaRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/repository/SchemaRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,6 +128,14 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/job" />
+  </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="pt.ist.meic.phylodb.allele.repository" />
@@ -48,18 +144,13 @@
       <recent name="pt.ist.meic.phylodb.distance.repository" />
       <recent name="pt.ist.meic.phylodb.isolate.repository" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\main\java\pt\ist\meic\phylodb\job" />
+      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\main\java\pt\ist\meic\phylodb\phylogeny\taxon" />
+      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\main\java\pt\ist\meic\phylodb\typing\dataset" />
+      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\main\java\pt\ist\meic\phylodb\user" />
+      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\main\java\pt\ist\meic\phylodb\project\repository" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="PhylodbApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -80,6 +171,18 @@
         <item itemvalue="Application.PhylodbApplication" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -106,6 +209,24 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="574" y="114" key="#com.intellij.ide.util.MemberChooser" timestamp="1579710248863">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="574" y="114" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1579710248863" />
+    <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1579543992022">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1536.824@0.0.1536.824" timestamp="1579543992022" />
+    <state x="329" y="4" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1579710010117">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="329" y="4" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1579710010117" />
+    <state x="465" y="238" key="com.intellij.ide.util.TipDialog" timestamp="1579543456063">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="465" y="238" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1579543456063" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
