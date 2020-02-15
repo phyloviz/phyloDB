@@ -1,7 +1,14 @@
 package pt.ist.meic.phylodb.analysis.inference.repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import pt.ist.meic.phylodb.analysis.inference.model.Distance;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-public interface DistanceRepository extends Neo4jRepository<Distance, Long>, DistanceCypherRepository {
+@Repository
+public class DistanceRepository {
+
+	private Session session;
+
+	public DistanceRepository(Session session) {
+		this.session = session;
+	}
 }

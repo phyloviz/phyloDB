@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.phylogeny.locus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci")
@@ -14,7 +15,7 @@ public class LocusController {
 		this.service = service;
 	}
 
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity getLoci(
 			@PathVariable("taxon") String taxon,
 			@RequestParam("page") int page,
@@ -48,7 +49,7 @@ public class LocusController {
 	}
 
 	@PutMapping(path = "/{locus}")
-	public ResponseEntity deleteLocus(
+	public ResponseEntity putLocus(
 			@PathVariable("taxon") String taxon,
 			@PathVariable("locus") String locusId,
 			@RequestBody LocusInputModel locus

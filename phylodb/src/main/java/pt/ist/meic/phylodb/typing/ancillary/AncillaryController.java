@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.typing.ancillary;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.ist.meic.phylodb.typing.ancillary.model.AncillaryInputModel;
 
 @RestController
 @RequestMapping("/datasets/{dataset}/isolates/{isolate}/ancillary}")

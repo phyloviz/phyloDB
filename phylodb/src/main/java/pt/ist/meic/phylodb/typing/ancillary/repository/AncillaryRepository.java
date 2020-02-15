@@ -1,7 +1,14 @@
 package pt.ist.meic.phylodb.typing.ancillary.repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import pt.ist.meic.phylodb.typing.ancillary.model.Ancillary;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-public interface AncillaryRepository extends Neo4jRepository<Ancillary, Long>, AncillaryCypherRepository {
+@Repository
+public class AncillaryRepository {
+
+	private Session session;
+
+	public AncillaryRepository(Session session) {
+		this.session = session;
+	}
 }

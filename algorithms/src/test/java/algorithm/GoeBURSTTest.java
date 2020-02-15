@@ -1,6 +1,6 @@
 package algorithm;
 
-import algorithm.processing.GoeBURST;
+import algorithm.inference.InferenceProcedures;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.driver.v1.*;
@@ -16,7 +16,7 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class GoeBURSTTest {
 
 	@Rule
-	public Neo4jRule neo4j = new Neo4jRule().withProcedure(GoeBURST.class );
+	public Neo4jRule neo4j = new Neo4jRule().withProcedure(InferenceProcedures.class );
 
 	@Test
 	public void test() {

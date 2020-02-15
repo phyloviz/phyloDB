@@ -1,8 +1,14 @@
 package pt.ist.meic.phylodb.typing.schema.repository;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import pt.ist.meic.phylodb.typing.schema.model.Schema;
+@Repository
+public class SchemaRepository {
 
-public interface SchemaRepository  extends Neo4jRepository<Schema, Long>, SchemaCypherRepository {
+	private Session session;
+
+	public SchemaRepository(Session session) {
+		this.session = session;
+	}
 
 }

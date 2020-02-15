@@ -1,7 +1,14 @@
 package pt.ist.meic.phylodb.typing.isolate.repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-public interface IsolateRepository extends Neo4jRepository<Isolate, Long>, IsolateCypherRepository {
+@Repository
+public class IsolateRepository {
+
+	private Session session;
+
+	public IsolateRepository(Session session) {
+		this.session = session;
+	}
 }

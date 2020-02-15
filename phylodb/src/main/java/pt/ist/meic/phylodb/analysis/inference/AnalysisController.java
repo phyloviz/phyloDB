@@ -33,7 +33,7 @@ public class AnalysisController {
 
 
 	@PutMapping(path = "/{analysis}")
-	public ResponseEntity postAnalysis(
+	public ResponseEntity putAnalysis(
 			@PathVariable("dataset") String dataset,
 			@PathVariable("analysis") String analysis,
 			@RequestParam("file") MultipartFile file

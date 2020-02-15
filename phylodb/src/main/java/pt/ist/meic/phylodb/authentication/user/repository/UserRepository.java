@@ -1,10 +1,14 @@
 package pt.ist.meic.phylodb.authentication.user.repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import org.springframework.stereotype.Component;
-import pt.ist.meic.phylodb.authentication.user.model.User;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-@Component
-public interface UserRepository extends Neo4jRepository<User, Long>, UserCypherRepository {
+@Repository
+public class UserRepository {
 
+	private Session session;
+
+	public UserRepository(Session session) {
+		this.session = session;
+	}
 }

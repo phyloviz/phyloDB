@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
@@ -39,7 +40,7 @@ public class AlleleController {
 			@PathVariable("taxon") String taxon,
 			@PathVariable("locus") String locus,
 			@RequestBody(required = false) AlleleInputModel allele,
-			@RequestParam(value = "file", required = false) MultipartFile file,
+			@RequestParam(value = "file", required = false) MultipartFile file
 	) {
 		return null;
 	}

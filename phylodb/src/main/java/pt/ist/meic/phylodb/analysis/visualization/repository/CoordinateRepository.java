@@ -1,7 +1,14 @@
 package pt.ist.meic.phylodb.analysis.visualization.repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import pt.ist.meic.phylodb.analysis.visualization.model.Coordinate;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-public interface CoordinateRepository extends Neo4jRepository<Coordinate, Long>, CoordinateCypherRepository {
+@Repository
+public class CoordinateRepository {
+
+	private Session session;
+
+	public CoordinateRepository(Session session) {
+		this.session = session;
+	}
 }

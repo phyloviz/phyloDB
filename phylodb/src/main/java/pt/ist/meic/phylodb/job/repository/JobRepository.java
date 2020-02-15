@@ -1,8 +1,14 @@
 package pt.ist.meic.phylodb.job.repository;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import pt.ist.meic.phylodb.job.model.Job;
+@Repository
+public class JobRepository {
 
-public interface JobRepository extends Neo4jRepository<Job, Long>, JobCypherRepository {
+	private Session session;
+
+	public JobRepository(Session session) {
+		this.session = session;
+	}
 
 }

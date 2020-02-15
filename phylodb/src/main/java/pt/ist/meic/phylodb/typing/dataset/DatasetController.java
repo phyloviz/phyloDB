@@ -3,9 +3,7 @@ package pt.ist.meic.phylodb.typing.dataset;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
+import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 
 @RestController
 @RequestMapping("/datasets")
@@ -30,10 +28,16 @@ import java.util.Map;
 		return null;
 	}
 
-	// profile input model tem que trazer o isolate associado
+	@GetMapping(path = "/{dataset}/schemas", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity getDatasetSchema(
+			@PathVariable("dataset") String dataset
+	) {
+		return null;
+	}
+
 	@PostMapping(path = "")
 	public ResponseEntity postDataset(
-			@RequestParam("project") String project
+			@RequestBody DatasetInputModel dataset
 	) {
 		return null;
 	}

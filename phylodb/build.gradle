@@ -13,11 +13,12 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
-	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+	testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.2.RELEASE') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
+	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 }
 
 test {

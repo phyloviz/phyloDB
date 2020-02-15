@@ -31,7 +31,7 @@ public class VisualizationController {
 	}
 
 	@PutMapping(path = "/{visualization}")
-	public ResponseEntity postVisualization(
+	public ResponseEntity putVisualization(
 			@PathVariable("analysis") String analysis,
 			@PathVariable("visualization") String visualization,
 			@RequestParam("file") MultipartFile file

@@ -1,10 +1,14 @@
 package pt.ist.meic.phylodb.typing.dataset.repository;
 
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import org.springframework.stereotype.Component;
-import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
+import org.neo4j.ogm.session.Session;
+import org.springframework.stereotype.Repository;
 
-@Component
-public interface DatasetRepository extends Neo4jRepository<Dataset, Long>, DatasetCypherRepository {
+@Repository
+public class DatasetRepository {
 
+	private Session session;
+
+	public DatasetRepository(Session session) {
+		this.session = session;
+	}
 }

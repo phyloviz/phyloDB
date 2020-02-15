@@ -1,25 +1,23 @@
 package pt.ist.meic.phylodb.phylogeny.taxon.model;
 
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-
-@NodeEntity(label = "Taxon")
 public class Taxon {
 
-	@Id
-	@GeneratedValue
 	private Long id;
+	private String _id;
+	private String description;
 
-	@Property(name = "name")
-	private String name;
-
-	public String getName() {
-		return name;
+	public String get_id() {
+		return _id;
+	}
+	public String getDescription() {
+		return description;
 	}
 
 	public Taxon() {
+	}
+	public Taxon(String _id, String description) {
+		this._id = _id;
+		this.description = description;
 	}
 
 }

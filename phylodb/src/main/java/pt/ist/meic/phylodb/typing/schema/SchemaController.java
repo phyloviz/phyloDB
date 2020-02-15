@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/schemas")

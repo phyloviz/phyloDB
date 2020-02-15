@@ -5,8 +5,6 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 
-import java.util.UUID;
-
 @NodeEntity(label = "Dataset")
 public class Dataset {
 
@@ -14,14 +12,14 @@ public class Dataset {
 	@GeneratedValue
 	private Long id;
 
-	@Property(name = "identifier")
-	private UUID identifier;
+	@Property(name = "_id")
+	private String _id;
 
 	@Property(name = "name")
 	private String name;
 
-	public UUID getIdentifier() {
-		return identifier;
+	public String get_id() {
+		return _id;
 	}
 
 	public String getName() {
