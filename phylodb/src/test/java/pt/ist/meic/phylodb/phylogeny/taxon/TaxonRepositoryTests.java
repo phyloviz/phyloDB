@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
@@ -16,11 +17,20 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
+@AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TaxonRepositoryTests extends TaxonTests{
+public class TaxonRepositoryTests extends TaxonTests {
 
 	@Autowired
 	private TaxonRepository repository;
+
+	private static Stream<Arguments> validKeyParameters() {
+		return Stream.of(Arguments.of(IDS[0]), Arguments.of(IDS[1]));
+	}
+
+	private static Stream<Arguments> validAndNullKeyParameters() {
+		return Stream.of(Arguments.of(IDS[0]), null);
+	}
 
 	@ParameterizedTest
 	@ValueSource(ints = {0, 1, 2})
@@ -42,7 +52,7 @@ public class TaxonRepositoryTests extends TaxonTests{
 		arrange(IDS[0]);
 		List<Taxon> actual = repository.findAll(0);
 		assertEquals(1, actual.size());
-		assertEquals(IDS[0], actual.get(0).get_id());
+		assertEquals(IDS[0], actual.get(0).getId());
 	}
 
 	@ParameterizedTest
@@ -52,8 +62,8 @@ public class TaxonRepositoryTests extends TaxonTests{
 		int limit = 2;
 		List<Taxon> actual = repository.findAll(page);
 
-		for (int i = 0; i <  actual.size(); i++)
-			assertEquals(IDS[i + page * limit], actual.get(i).get_id());
+		for (int i = 0; i < actual.size(); i++)
+			assertEquals(IDS[i + page * limit], actual.get(i).getId());
 	}
 
 	@ParameterizedTest
@@ -61,10 +71,6 @@ public class TaxonRepositoryTests extends TaxonTests{
 	public void findAll_negativePage_null(int page) {
 		List<Taxon> actual = repository.findAll(page);
 		assertNull(actual);
-	}
-
-	private static Stream<Arguments> validKeyParameters() {
-		return Stream.of(Arguments.of(IDS[0]), Arguments.of(IDS[1]));
 	}
 
 	@ParameterizedTest
@@ -75,11 +81,7 @@ public class TaxonRepositoryTests extends TaxonTests{
 		Taxon actual = repository.find(key);
 
 		assertNotNull(actual);
-		assertEquals(key, actual.get_id());
-	}
-
-	private static Stream<Arguments> validAndNullKeyParameters() {
-		return Stream.of(Arguments.of(IDS[0]), null);
+		assertEquals(key, actual.getId());
 	}
 
 	@ParameterizedTest
@@ -139,4 +141,5 @@ public class TaxonRepositoryTests extends TaxonTests{
 		List<Taxon> after = repository.findAll(0);
 		assertEquals(before.size(), after.size());
 	}
+
 }

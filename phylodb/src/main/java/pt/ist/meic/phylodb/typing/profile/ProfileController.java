@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController("SequenceTypeController")
 @RequestMapping("/datasets/{dataset}/profiles")
-	public class ProfileController {
+public class ProfileController {
 
 	private ProfileService service;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	public ResponseEntity getProfiles(
 			@PathVariable("dataset") String dataset,
-			@RequestParam Map<String,String> params
+			@RequestParam Map<String, String> params
 	) {
 		return null;
 	}
@@ -70,4 +70,5 @@ import java.util.Map;
 	) {
 		return null;
 	}
+
 }

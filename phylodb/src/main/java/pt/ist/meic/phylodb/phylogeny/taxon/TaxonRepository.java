@@ -3,61 +3,67 @@ package pt.ist.meic.phylodb.phylogeny.taxon;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.utils.EntityRepository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Repository
-public class TaxonRepository {
+public class TaxonRepository extends EntityRepository<Taxon, String> {
 
-	private Session session;
+	public static final String GET_ALL = "(t:Taxon)";
+	public static final String GET = "(t:Taxon {id: $taxonKey})";
+	public static final String POST = "(t:Taxon {id: $taxonKey, description: $description})";
+	public static final String PUT = "t.description = $description";
 
 	public TaxonRepository(Session session) {
-		this.session = session;
+		super(session);
 	}
 
-	public List<Taxon> findAll(int page) {
-		int limit = 2;
-		if(page < 0 || limit <= 0)
-			return null;
-		Map<String, Object> params = new HashMap<>();
-		params.put("page", page * limit);
-		params.put("limit", limit);
-		String query = "MATCH (t:Taxon) RETURN t ORDER BY t._id SKIP $page LIMIT $limit;";
-		return StreamSupport.stream(session.query(Taxon.class, query, params).spliterator(), false)
-				.collect(Collectors.toList());
+	@Override
+	protected List<Taxon> getAll(Map<String, Object> params, Object... filters) {
+		return queryAll(Taxon.class, MATCH + PAGE, params, GET_ALL, "t", "t.id", filters);
 	}
 
-	public Taxon find(String key) {
-		if(key == null)
-			return null;
-		Map<String, Object> params = new HashMap<>();
-		params.put("key", key);
-		String query = "MATCH (t:Taxon {_id: $key}) RETURN t;";
-		return session.queryForObject(Taxon.class, query, params);
+	@Override
+	protected Taxon get(String key) {
+		Map<String, Object> params = new HashMap<String, Object>() {{
+			put("taxonKey", key);
+		}};
+		return query(Taxon.class, MATCH, params, GET, "t");
 	}
 
-	public void save(Taxon taxon) {
-		if(taxon == null)
-			return;
-		Map<String, Object> params = new HashMap<>();
-		params.put("key", taxon.get_id());
-		params.put("description", taxon.getDescription());
-		String query = "MERGE (t:Taxon {_id: $key}) SET t.description = $description;";
-		session.query(query, params);
-		session.clear();
+	@Override
+	protected boolean exists(Taxon taxon) {
+		return get(taxon.getId()) != null;
 	}
 
-	public void remove(String key) {
-		if(key == null)
-			return;
-		Map<String, Object> params = new HashMap<>();
-		params.put("key", key);
-		String query = "MATCH (t:Taxon {_id: $key}) DELETE t;";
-		session.query(query, params);
-		session.clear();
+	@Override
+	protected void create(Taxon taxon) {
+		Map<String, Object> params = new HashMap<String, Object>() {{
+			put("taxonKey", taxon.getId());
+			put("description", taxon.getDescription());
+		}};
+		execute(CREATE, params, POST);
 	}
+
+	@Override
+	protected void update(Taxon taxon) {
+		Map<String, Object> params = new HashMap<String, Object>() {{
+			put("taxonKey", taxon.getId());
+			put("description", taxon.getDescription());
+		}};
+		execute(UPDATE, params, GET, PUT);
+
+	}
+
+	@Override
+	protected void delete(String key) {
+		HashMap<String, Object> params = new HashMap<String, Object>() {{
+			put("taxonKey", key);
+		}};
+		execute(REMOVE, params, GET, "t");
+	}
+
 }

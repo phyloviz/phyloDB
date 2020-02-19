@@ -1,0 +1,41 @@
+package pt.ist.meic.phylodb.formatters.datasets;
+
+import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+public class FastaFormatter implements DatasetFormatter<Allele> {
+
+	@Override
+	public Dataset<Allele> parse(Stream<String> data) {
+		String[] raw = data.toArray(String[]::new);
+		List<Allele> alleles = new ArrayList<>();
+		String id = raw[0].substring(1);
+		StringBuilder sequence = new StringBuilder();
+		for (int i = 1; i < raw.length; i++) {
+			if (raw[i].startsWith(">")) {
+				alleles.add(new Allele(id, sequence.toString()));
+				id = raw[i].substring(1);
+				sequence = new StringBuilder();
+				continue;
+			}
+			sequence.append(raw[i]);
+		}
+		alleles.add(new Allele(id, sequence.toString()));
+		return new Dataset<>(alleles);
+	}
+
+	@Override
+	public String format(Dataset<Allele> data) {
+		StringBuilder rawAlleles = new StringBuilder();
+		for (Allele allele : data.getEntities())
+			rawAlleles.append(allele.getId())
+					.append("\n")
+					.append(allele.getSequence())
+					.append("\n");
+		return rawAlleles.toString();
+	}
+
+}

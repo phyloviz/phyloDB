@@ -36,14 +36,6 @@ public class SchemaController {
 		return null;
 	}
 
-	@PostMapping(path = "/")
-	public ResponseEntity postSchema(
-			@PathVariable("taxon") String taxon,
-			@RequestBody SchemaInputModel schema
-	) {
-		return null;
-	}
-
 	@PutMapping(path = "/{schema}")
 	public ResponseEntity putSchema(
 			@PathVariable("taxon") String taxon,
@@ -60,4 +52,5 @@ public class SchemaController {
 	) {
 		return null;
 	}
+
 }

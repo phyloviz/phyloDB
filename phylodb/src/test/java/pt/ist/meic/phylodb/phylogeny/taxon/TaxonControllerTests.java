@@ -11,12 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.utils.MockHttp;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
+import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.stream.Stream;
 
@@ -34,11 +34,16 @@ public class TaxonControllerTests extends TaxonTests {
 		return Stream.of(Arguments.of("0"), Arguments.of(""), null);
 	}
 
+	private static Stream<Arguments> saveTaxon_invalidParameters() {
+		return Stream.of(Arguments.of("teste", new TaxonInputModel("id", null)),
+				Arguments.of("teste", null));
+	}
+
 	@ParameterizedTest
 	@MethodSource("getTaxons_validKeyParameters")
 	public void getTaxons_validPageAndAbsentTaxonsInDB_ok(String page) throws Exception {
 		String uri = "/taxons";
-		if(page != null)
+		if (page != null)
 			uri = String.format(uri + "?page=%s", page);
 
 		MockHttpServletResponse response = http.get(uri);
@@ -52,7 +57,7 @@ public class TaxonControllerTests extends TaxonTests {
 	@MethodSource("getTaxons_validKeyParameters")
 	public void getTaxons_validPageAndExistingTaxonsInDB_ok(String page) throws Exception {
 		String uri = "/taxons";
-		if(page != null)
+		if (page != null)
 			uri = String.format(uri + "?page=%s", page);
 		arrange(IDS[0], IDS[1]);
 
@@ -69,7 +74,7 @@ public class TaxonControllerTests extends TaxonTests {
 	@ValueSource(strings = {"-1", "-500"})
 	public void getTaxons_invalidPage_badRequest(String page) throws Exception {
 		String uri = "/taxons";
-		if(page != null)
+		if (page != null)
 			uri = String.format(uri + "?page=%s", page);
 
 		MockHttpServletResponse response = http.get(uri);
@@ -119,11 +124,6 @@ public class TaxonControllerTests extends TaxonTests {
 		MockHttpServletResponse response = http.put(uri, new TaxonInputModel(IDS[0], null));
 
 		assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
-	}
-
-	private static Stream<Arguments> saveTaxon_invalidParameters() {
-		return Stream.of(Arguments.of("teste", new TaxonInputModel("id", null)),
-				Arguments.of("teste", null));
 	}
 
 	@ParameterizedTest

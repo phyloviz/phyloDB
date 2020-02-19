@@ -10,7 +10,7 @@ public class Part {
 	@GeneratedValue
 	private Long relationshipId;
 
-	@Property(name="part")
+	@Property(name = "part")
 	private String number;
 
 	@StartNode
@@ -32,4 +32,5 @@ public class Part {
 	public Locus getTo() {
 		return to;
 	}
+
 }

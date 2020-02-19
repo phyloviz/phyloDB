@@ -8,18 +8,16 @@ import java.util.Map;
 
 public class TaxonTests {
 
+	protected static final String[] IDS = {"Brucella spp.", "Escherichia/Shigella", "Salmonella", "Salmonella typhi", "Streptococcus pneumoniae", "teste"};
 	@Autowired
 	protected Session session;
-
-	protected static final String[] IDS = {"Brucella spp.", "Escherichia/Shigella", "Salmonella", "Salonella typhi", "Streptococcus pneumoniae", "teste"};
-
 
 	protected void arrangeWithRelationships(String id) {
 		Map<String, Object> params = new HashMap<String, Object>() {{
 			put("id", id);
 			put("description", null);
 		}};
-		session.query("CREATE (:Taxon {_id: $id, description: $description})-[:TEST]->(:teste)", params);
+		session.query("CREATE (:Taxon {id: $id, description: $description})-[:CONTAINS]->(:Locus)", params);
 	}
 
 	protected void arrange(String... ids) {
@@ -28,7 +26,7 @@ public class TaxonTests {
 				put("id", id);
 				put("description", null);
 			}};
-			session.query("CREATE (:Taxon {_id: $id, description: $description})", params);
+			session.query("CREATE (:Taxon {id: $id, description: $description})", params);
 		}
 	}
 

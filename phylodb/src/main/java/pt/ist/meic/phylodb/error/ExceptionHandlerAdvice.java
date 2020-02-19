@@ -19,6 +19,7 @@ public class ExceptionHandlerAdvice {
 	public final ResponseEntity handle(Exception ex) {
 		return handle(ex, Problem.SERVER, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+
 	private ResponseEntity handle(Exception ex, String type, HttpStatus status) {
 		ex.printStackTrace();
 		//LOG.info(ex.getMessage());

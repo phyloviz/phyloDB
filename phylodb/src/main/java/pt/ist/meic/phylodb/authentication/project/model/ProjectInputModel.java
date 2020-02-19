@@ -19,4 +19,5 @@ public class ProjectInputModel {
 	public List<String> getUsers() {
 		return users;
 	}
+
 }

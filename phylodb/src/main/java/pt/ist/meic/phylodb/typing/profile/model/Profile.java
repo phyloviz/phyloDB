@@ -5,7 +5,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 
-@NodeEntity(label="Profile")
+@NodeEntity(label = "Profile")
 public class Profile {
 
 	@Id
@@ -24,4 +24,5 @@ public class Profile {
 	public long getIdentifier() {
 		return identifier;
 	}
+
 }

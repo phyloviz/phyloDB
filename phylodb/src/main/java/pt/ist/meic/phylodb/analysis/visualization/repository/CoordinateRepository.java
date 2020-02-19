@@ -11,4 +11,5 @@ public class CoordinateRepository {
 	public CoordinateRepository(Session session) {
 		this.session = session;
 	}
+
 }

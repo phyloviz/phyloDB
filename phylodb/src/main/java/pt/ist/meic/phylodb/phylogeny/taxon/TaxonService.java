@@ -25,23 +25,24 @@ public class TaxonService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Taxon> getTaxon(String key){
-		return Optional.ofNullable(taxonRepository.find(key));
+	public Optional<Taxon> getTaxon(String id) {
+		return Optional.ofNullable(taxonRepository.find(id));
 	}
 
 	@Transactional
-	public boolean saveTaxon(String key, Taxon taxon) {
-		if(key == null || taxon == null || !key.equals(taxon.get_id()))
+	public boolean saveTaxon(String id, Taxon taxon) {
+		if (taxon == null || !taxon.getId().equals(id))
 			return false;
 		taxonRepository.save(taxon);
 		return true;
 	}
 
 	@Transactional
-	public boolean deleteTaxon(String key) {
-		if(key == null || !getTaxon(key).isPresent() || !locusRepository.findAll(key).isEmpty())
+	public boolean deleteTaxon(String id) {
+		if (!locusRepository.findAll(0, id).isEmpty())
 			return false;
-		taxonRepository.remove(key);
+		taxonRepository.remove(id);
 		return true;
 	}
+
 }

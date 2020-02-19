@@ -11,4 +11,5 @@ public class IsolateRepository {
 	public IsolateRepository(Session session) {
 		this.session = session;
 	}
+
 }

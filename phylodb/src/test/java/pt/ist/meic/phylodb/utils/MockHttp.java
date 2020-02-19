@@ -21,7 +21,7 @@ public class MockHttp {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	public <T> T parseResult(Class<T> _class,  MockHttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+	public <T> T parseResult(Class<T> _class, MockHttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
 		return objectMapper.readValue(response.getContentAsString(), _class);
 	}
 

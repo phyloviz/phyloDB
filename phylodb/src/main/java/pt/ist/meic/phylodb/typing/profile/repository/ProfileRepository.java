@@ -11,4 +11,5 @@ public class ProfileRepository {
 	public ProfileRepository(Session session) {
 		this.session = session;
 	}
+
 }

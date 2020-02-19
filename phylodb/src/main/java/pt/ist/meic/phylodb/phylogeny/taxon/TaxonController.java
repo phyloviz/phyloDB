@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/taxons")
-	public class TaxonController {
+public class TaxonController {
 
 	private TaxonService service;
 
@@ -25,7 +25,7 @@ import java.util.Optional;
 	}
 
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity getTaxons(@RequestParam(value = "page", defaultValue = "0") Integer page ) {
+	public ResponseEntity getTaxons(@RequestParam(value = "page", defaultValue = "0") Integer page) {
 		Optional<List<Taxon>> optional = service.getTaxons(page);
 		return optional.isPresent() ?
 				new ResponseEntity<>(new GetTaxonsOutputModel(optional.get()), HttpStatus.OK) :
@@ -58,4 +58,5 @@ import java.util.Optional;
 				new ResponseEntity<>(HttpStatus.NO_CONTENT) :
 				new ResponseEntity<>(new ErrorOutputModel(Problem.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
 	}
+
 }

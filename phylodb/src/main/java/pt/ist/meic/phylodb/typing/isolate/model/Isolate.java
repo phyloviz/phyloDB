@@ -5,14 +5,14 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 
-@NodeEntity(label="Isolate")
+@NodeEntity(label = "Isolate")
 public class Isolate {
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@Property(name="name")
+	@Property(name = "name")
 	private String name;
 
 	public Isolate() {
@@ -21,4 +21,5 @@ public class Isolate {
 	public String getName() {
 		return name;
 	}
+
 }

@@ -8,23 +8,27 @@ public class Job {
 	private boolean done;
 	private boolean cancelled;
 
+	public Job() {
+	}
+
 	public String getName() {
 		return name;
 	}
+
 	public long getDelay() {
 		return delay;
 	}
+
 	public long getRate() {
 		return rate;
 	}
+
 	public boolean isDone() {
 		return done;
 	}
+
 	public boolean isCancelled() {
 		return cancelled;
-	}
-
-	public Job() {
 	}
 
 }

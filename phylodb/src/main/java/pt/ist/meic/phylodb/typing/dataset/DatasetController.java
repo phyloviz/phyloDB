@@ -7,7 +7,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 
 @RestController
 @RequestMapping("/datasets")
-	public class DatasetController {
+public class DatasetController {
 
 	private DatasetService service;
 
@@ -56,4 +56,5 @@ import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 	) {
 		return null;
 	}
+
 }

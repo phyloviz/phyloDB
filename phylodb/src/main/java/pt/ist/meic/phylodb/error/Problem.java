@@ -12,4 +12,5 @@ public class Problem {
 	public static final String UNAUTHORIZED = "unauthorized";
 	public static final String FORBIDDEN = "forbidden";
 	public static final String BAD_REQUEST = "bad-request";
+
 }

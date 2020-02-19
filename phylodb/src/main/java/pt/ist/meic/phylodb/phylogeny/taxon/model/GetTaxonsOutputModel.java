@@ -7,6 +7,15 @@ public class GetTaxonsOutputModel {
 
 	private List<GetTaxonOutputModel> taxons;
 
+	public GetTaxonsOutputModel() {
+	}
+
+	public GetTaxonsOutputModel(List<Taxon> taxons) {
+		this.taxons = taxons.stream()
+				.map(GetTaxonOutputModel::new)
+				.collect(Collectors.toList());
+	}
+
 	public List<GetTaxonOutputModel> getTaxons() {
 		return taxons;
 	}
@@ -15,12 +24,4 @@ public class GetTaxonsOutputModel {
 		this.taxons = taxons;
 	}
 
-	public GetTaxonsOutputModel() {
-	}
-
-	public GetTaxonsOutputModel(List<Taxon> taxons) {
-		this.taxons = taxons.stream()
-			.map(GetTaxonOutputModel::new)
-			.collect(Collectors.toList());
-	}
 }

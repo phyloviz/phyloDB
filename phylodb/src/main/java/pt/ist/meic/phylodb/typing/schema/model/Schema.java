@@ -5,7 +5,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 
-@NodeEntity(label="Schema")
+@NodeEntity(label = "Schema")
 public class Schema {
 
 	@Id
@@ -33,4 +33,5 @@ public class Schema {
 	public String getDescription() {
 		return description;
 	}
+
 }

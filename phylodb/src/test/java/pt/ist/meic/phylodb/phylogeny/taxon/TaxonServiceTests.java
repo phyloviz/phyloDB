@@ -23,6 +23,24 @@ public class TaxonServiceTests extends TaxonTests {
 	@Autowired
 	private TaxonService service;
 
+	private static Stream<Arguments> validKeyParameters() {
+		return Stream.of(Arguments.of(IDS[0]), Arguments.of(IDS[1]));
+	}
+
+	private static Stream<Arguments> validAndNullKeyParameters() {
+		return Stream.of(Arguments.of(IDS[0]), null);
+	}
+
+	private static Stream<Arguments> save_invalidParameters() {
+		return Stream.of(Arguments.of(IDS[0], new Taxon(IDS[1], null)),
+				Arguments.of(null, new Taxon(IDS[1], null)),
+				Arguments.of(IDS[1], null));
+	}
+
+	private static Stream<Arguments> remove_invalidParameters() {
+		return Stream.of(Arguments.of(IDS[0]), null);
+	}
+
 	@ParameterizedTest
 	@ValueSource(ints = {0, 1, 2})
 	public void findAll_absentTaxonsAndPageZeroToN_emptyList(int page) {
@@ -46,7 +64,7 @@ public class TaxonServiceTests extends TaxonTests {
 		Optional<List<Taxon>> actual = service.getTaxons(0);
 		assertTrue(actual.isPresent());
 		assertEquals(1, actual.get().size());
-		assertEquals(IDS[0], actual.get().get(0).get_id());
+		assertEquals(IDS[0], actual.get().get(0).getId());
 	}
 
 	@ParameterizedTest
@@ -57,19 +75,15 @@ public class TaxonServiceTests extends TaxonTests {
 		Optional<List<Taxon>> actual = service.getTaxons(page);
 
 		assertTrue(actual.isPresent());
-		for (int i = 0; i <  actual.get().size(); i++)
-			assertEquals(IDS[i + page * limit], actual.get().get(i).get_id());
+		for (int i = 0; i < actual.get().size(); i++)
+			assertEquals(IDS[i + page * limit], actual.get().get(i).getId());
 	}
 
 	@ParameterizedTest
 	@ValueSource(ints = {-1, -2, -10})
 	public void findAll_negativePage_null(int page) {
-		Optional<List<Taxon>> actual =  service.getTaxons(page);
+		Optional<List<Taxon>> actual = service.getTaxons(page);
 		assertFalse(actual.isPresent());
-	}
-
-	private static Stream<Arguments> validKeyParameters() {
-		return Stream.of(Arguments.of(IDS[0]), Arguments.of(IDS[1]));
 	}
 
 	@ParameterizedTest
@@ -80,11 +94,7 @@ public class TaxonServiceTests extends TaxonTests {
 		Optional<Taxon> actual = service.getTaxon(key);
 
 		assertTrue(actual.isPresent());
-		assertEquals(key, actual.get().get_id());
-	}
-
-	private static Stream<Arguments> validAndNullKeyParameters() {
-		return Stream.of(Arguments.of(IDS[0]), null);
+		assertEquals(key, actual.get().getId());
 	}
 
 	@ParameterizedTest
@@ -118,12 +128,6 @@ public class TaxonServiceTests extends TaxonTests {
 		assertEquals(description, actual.get().getDescription());
 	}
 
-	private static Stream<Arguments> save_invalidParameters() {
-		return Stream.of(Arguments.of(IDS[0], new Taxon(IDS[1], null)),
-				Arguments.of(null, new Taxon(IDS[1], null)),
-				Arguments.of(IDS[1], null));
-	}
-
 	@ParameterizedTest
 	@MethodSource("save_invalidParameters")
 	public void save_invalidParameters_unmodified(String key, Taxon taxon) {
@@ -150,10 +154,6 @@ public class TaxonServiceTests extends TaxonTests {
 		Optional<Taxon> after = service.getTaxon(id);
 		assertTrue(before.isPresent());
 		assertFalse(after.isPresent());
-	}
-
-	private static Stream<Arguments> remove_invalidParameters() {
-		return Stream.of(Arguments.of(IDS[0]), null);
 	}
 
 	@ParameterizedTest

@@ -11,4 +11,5 @@ public class DistanceRepository {
 	public DistanceRepository(Session session) {
 		this.session = session;
 	}
+
 }
