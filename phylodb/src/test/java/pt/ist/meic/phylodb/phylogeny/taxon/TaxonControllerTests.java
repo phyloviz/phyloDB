@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;

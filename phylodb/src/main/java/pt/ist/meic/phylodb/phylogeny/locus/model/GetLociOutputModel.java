@@ -1,9 +1,14 @@
 package pt.ist.meic.phylodb.phylogeny.locus.model;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import pt.ist.meic.phylodb.mediatype.Json;
+import pt.ist.meic.phylodb.mediatype.Output;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetLociOutputModel {
+public class GetLociOutputModel implements Json, Output<Json> {
 
 	private List<GetLocusOutputModel> loci;
 
@@ -15,6 +20,12 @@ public class GetLociOutputModel {
 
 	public List<GetLocusOutputModel> getLoci() {
 		return loci;
+	}
+
+	@Override
+	public ResponseEntity<Json> toResponse() {
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(this);
 	}
 
 }

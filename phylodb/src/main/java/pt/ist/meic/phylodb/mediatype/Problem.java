@@ -1,6 +1,6 @@
-package pt.ist.meic.phylodb.error;
+package pt.ist.meic.phylodb.mediatype;
 
-public class Problem {
+public class Problem implements MediaType {
 
 	public static final String NOT_FOUND = "not-found";
 	public static final String NOT_ACCEPTABLE = "not-acceptable";
@@ -12,5 +12,22 @@ public class Problem {
 	public static final String UNAUTHORIZED = "unauthorized";
 	public static final String FORBIDDEN = "forbidden";
 	public static final String BAD_REQUEST = "bad-request";
+
+	private String message;
+
+	public Problem() {
+	}
+
+	public Problem(String message) {
+		this.message = message;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
 }

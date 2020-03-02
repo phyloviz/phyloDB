@@ -1,9 +1,14 @@
 package pt.ist.meic.phylodb.phylogeny.taxon.model;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import pt.ist.meic.phylodb.mediatype.Json;
+import pt.ist.meic.phylodb.mediatype.Output;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetTaxonsOutputModel {
+public class GetTaxonsOutputModel implements Json, Output<Json> {
 
 	private List<GetTaxonOutputModel> taxons;
 
@@ -24,4 +29,9 @@ public class GetTaxonsOutputModel {
 		this.taxons = taxons;
 	}
 
+	@Override
+	public ResponseEntity<Json> toResponse() {
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(this);
+	}
 }

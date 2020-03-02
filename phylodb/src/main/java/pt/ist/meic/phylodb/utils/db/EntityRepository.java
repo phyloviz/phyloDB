@@ -1,10 +1,10 @@
-package pt.ist.meic.phylodb.utils;
+package pt.ist.meic.phylodb.utils.db;
 
 import org.neo4j.ogm.session.Session;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static pt.ist.meic.phylodb.utils.db.Status.*;
 
 public abstract class EntityRepository<E, K> extends Repository {
 
@@ -12,7 +12,7 @@ public abstract class EntityRepository<E, K> extends Repository {
 		super(session);
 	}
 
-	protected abstract List<E> getAll(Map<String, Object> params, Object... filters);
+	protected abstract List<E> getAll(int page, int limit, Object... filters);
 
 	protected abstract E get(K key);
 
@@ -24,15 +24,10 @@ public abstract class EntityRepository<E, K> extends Repository {
 
 	protected abstract void delete(K key);
 
-	public List<E> findAll(int page, Object... filters) {
-		int limit = 2; //TODO
+	public List<E> findAll(int page, int limit, Object... filters) {
 		if (page < 0 || limit <= 0)
 			return null;
-		Map<String, Object> params = new HashMap<String, Object>() {{
-			put("page", page * limit);
-			put("limit", limit);
-		}};
-		return getAll(params, filters);
+		return getAll(page * limit, limit, filters);
 	}
 
 	public E find(K key) {
@@ -40,18 +35,20 @@ public abstract class EntityRepository<E, K> extends Repository {
 		return get(key);
 	}
 
-	public void save(E entity) {
-		if (entity == null) return;
+	public Status save(E entity) {
+		if (entity == null) return UNCHANGED;
 		if (exists(entity)) {
 			update(entity);
-			return;
+			return UPDATED;
 		}
 		create(entity);
+		return CREATED;
 	}
 
-	public void remove(K key) {
-		if (key == null) return;
+	public Status remove(K key) {
+		if (key == null) return UNCHANGED;
 		delete(key);
+		return DELETED;
 	}
 
 }

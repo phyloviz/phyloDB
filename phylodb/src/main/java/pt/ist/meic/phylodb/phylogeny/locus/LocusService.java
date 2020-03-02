@@ -5,9 +5,12 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
+import pt.ist.meic.phylodb.utils.service.StatusResult;
 
 import java.util.List;
 import java.util.Optional;
+
+import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @Service
 public class LocusService {
@@ -23,8 +26,8 @@ public class LocusService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Locus>> getLoci(String taxon, int page) {
-		return Optional.ofNullable(locusRepository.findAll(page, taxon));
+	public Optional<List<Locus>> getLoci(String taxon, int page, int limit) {
+		return Optional.ofNullable(locusRepository.findAll(page, limit, taxon));
 	}
 
 	@Transactional(readOnly = true)
@@ -33,20 +36,19 @@ public class LocusService {
 	}
 
 	@Transactional
-	public boolean saveLocus(String taxonId, String locusId, Locus locus) {
+	public StatusResult saveLocus(String taxonId, String locusId, Locus locus) {
 		if (locus == null || taxonRepository.find(taxonId) == null ||
 				!locus.getTaxonId().equals(taxonId) || !locus.getId().equals(locusId))
-			return false;
-		locusRepository.save(locus);
-		return true;
+			return new StatusResult(UNCHANGED);
+		return new StatusResult(locusRepository.save(locus));
 	}
 
 	@Transactional
-	public boolean deleteLocus(String taxon, String locus) {
-		if (!getLocus(taxon, locus).isPresent() || !alleleRepository.findAll(0, taxon, locus).isEmpty())
-			return false;
-		locusRepository.remove(new Locus.PrimaryKey(taxon, locus));
-		return true;
+	public StatusResult deleteLocus(String taxon, String locus) {
+		//todo
+		if (!getLocus(taxon, locus).isPresent() || !alleleRepository.findAll(0, 1, taxon, locus).isEmpty())
+			return new StatusResult(UNCHANGED);
+		return new StatusResult(locusRepository.remove(new Locus.PrimaryKey(taxon, locus)));
 	}
 
 }

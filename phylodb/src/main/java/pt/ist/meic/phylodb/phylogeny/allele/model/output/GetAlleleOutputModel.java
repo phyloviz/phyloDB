@@ -1,8 +1,13 @@
-package pt.ist.meic.phylodb.phylogeny.allele.model;
+package pt.ist.meic.phylodb.phylogeny.allele.model.output;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import pt.ist.meic.phylodb.mediatype.Json;
+import pt.ist.meic.phylodb.mediatype.Output;
+import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
-public class GetAlleleOutputModel {
+public class GetAlleleOutputModel implements Json, Output<Json> {
 
 	private String id;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,6 +35,12 @@ public class GetAlleleOutputModel {
 
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
+	}
+
+	@Override
+	public ResponseEntity<Json> toResponse() {
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(this);
 	}
 
 }

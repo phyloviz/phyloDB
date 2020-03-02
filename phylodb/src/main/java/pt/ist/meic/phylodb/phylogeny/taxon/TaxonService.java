@@ -4,9 +4,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.utils.service.StatusResult;
 
 import java.util.List;
 import java.util.Optional;
+
+import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @Service
 public class TaxonService {
@@ -20,8 +23,8 @@ public class TaxonService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Taxon>> getTaxons(int page) {
-		return Optional.ofNullable(taxonRepository.findAll(page));
+	public Optional<List<Taxon>> getTaxons(int page, int limit) {
+		return Optional.ofNullable(taxonRepository.findAll(page, limit));
 	}
 
 	@Transactional(readOnly = true)
@@ -30,19 +33,18 @@ public class TaxonService {
 	}
 
 	@Transactional
-	public boolean saveTaxon(String id, Taxon taxon) {
+	public StatusResult saveTaxon(String id, Taxon taxon) {
 		if (taxon == null || !taxon.getId().equals(id))
-			return false;
-		taxonRepository.save(taxon);
-		return true;
+			return new StatusResult(UNCHANGED);
+		return new StatusResult(taxonRepository.save(taxon));
 	}
 
 	@Transactional
-	public boolean deleteTaxon(String id) {
-		if (!locusRepository.findAll(0, id).isEmpty())
-			return false;
-		taxonRepository.remove(id);
-		return true;
+	public StatusResult deleteTaxon(String id) {
+		//todo
+		if (!locusRepository.findAll(0, 1, id).isEmpty())
+			return new StatusResult(UNCHANGED);
+		return new StatusResult(taxonRepository.remove(id));
 	}
 
 }

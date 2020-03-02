@@ -2,45 +2,47 @@ package pt.ist.meic.phylodb.phylogeny.allele;
 
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
-import pt.ist.meic.phylodb.formatters.datasets.Dataset;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.utils.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.Query;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class AlleleRepository extends EntityRepository<Allele, Allele.PrimaryKey> {
 
-	public static final String PATH = "(t:Taxon {id: $taxonKey})-[:CONTAINS]->(l:Locus {id: $locusKey})-[CONTAINS]->";
-	public static final String GET_ALL = PATH + "(a:Allele)";
-	public static final String GET = PATH + "(a:Allele {id: $alleleKey})";
-	public static final String POST = "(a:Allele {id: $alleleKey, sequence: $sequence})";
-	public static final String PUT = "a.sequence = $sequence";
+
+	private static final String RELATION = "-[:CONTAINS]->", PATH = LocusRepository.GET + RELATION;
+	public static final String VARIABLE = "a", LABEL = "Allele", ORDER = String.format("%s.id", VARIABLE),
+			GET_ALL = PATH + String.format("(%s:%s)", VARIABLE, LABEL),
+			GET = PATH + String.format("(%s:%s {id: $2})", VARIABLE, LABEL),
+			POST = String.format("(:%s {id: $2, sequence: $3})", LABEL),
+			PUT = String.format("%s.sequence = $3", VARIABLE),
+			POST_ALL = String.format("(:%s {%s})", LABEL, "id: $%s, sequence: $%s"),
+			PUT_ALL = String.format("%s.sequence = %s",VARIABLE, "$%s");
 
 	public AlleleRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected List<Allele> getAll(Map<String, Object> params, Object... filters) {
+	protected List<Allele> getAll(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
-		params.put("taxonKey", filters[0]);
-		params.put("locusKey", filters[1]);
-		return queryAll(Allele.class, MATCH + PAGE, params, GET_ALL, "a", "a.id");
+		Query query = new Query().match(GET_ALL)
+				.retrieve(VARIABLE)
+				.page(ORDER)
+				.parameters(filters[0], filters[1], page, limit);
+		return queryAll(Allele.class, query);
 	}
 
 	@Override
 	protected Allele get(Allele.PrimaryKey key) {
-		Map<String, Object> params = new HashMap<String, Object>() {{
-			put("taxonKey", key.getTaxonId());
-			put("locusKey", key.getLocusId());
-			put("alleleKey", key.getId());
-		}};
-		return query(Allele.class, MATCH, params, GET, "a");
+		Query query = new Query().match(GET)
+				.retrieve(VARIABLE)
+				.parameters(key.getTaxonId(), key.getLocusId(),  key.getId());
+		return query(Allele.class, query);
 	}
 
 	@Override
@@ -50,51 +52,58 @@ public class AlleleRepository extends EntityRepository<Allele, Allele.PrimaryKey
 
 	@Override
 	protected void create(Allele allele) {
-		Map<String, Object> params = new HashMap<String, Object>() {{
-			put("taxonKey", allele.getTaxonId());
-			put("locusKey", allele.getLocusId());
-			put("alleleKey", allele.getId());
-			put("sequence", allele.getSequence());
-		}};
-		execute(MATCH_AND_RELATE, params, LocusRepository.GET, "(l)-[:CONTAINS]->" + POST);
+		Query query = new Query().match(LocusRepository.GET)
+				.create('(' + LocusRepository.VARIABLE + ')' + RELATION + POST)
+				.parameters(allele.getTaxonId(),  allele.getLocusId(), allele.getId(), allele.getSequence());
+		execute(query);
 	}
 
 	@Override
 	protected void update(Allele allele) {
-		Map<String, Object> params = new HashMap<String, Object>() {{
-			put("taxonKey", allele.getTaxonId());
-			put("locusKey", allele.getLocusId());
-			put("alleleKey", allele.getId());
-			put("sequence", allele.getSequence());
-		}};
-		execute(UPDATE, params, GET, PUT);
+		Query query = new Query().update(GET, PUT)
+				.parameters(allele.getTaxonId(),  allele.getLocusId(), allele.getId(), allele.getSequence());
+		execute(query);
 	}
 
 	@Override
 	protected void delete(Allele.PrimaryKey key) {
-		Map<String, Object> params = new HashMap<String, Object>() {{
-			put("taxonKey", key.getTaxonId());
-			put("locusKey", key.getLocusId());
-			put("alleleKey", key.getId());
-		}};
-		execute(REMOVE, params, GET, "a");
+		Query query = new Query().remove(GET, VARIABLE)
+			.parameters(key.getTaxonId(), key.getLocusId(), key.getId());
+		execute(query);
 	}
 
-	public void saveAll(String taxon, String locus, Dataset<Allele> dataset) {
-		Map<String, Object> params = new HashMap<String, Object>() {{
-			put("taxonKey", taxon);
-			put("locusKey", locus);
-		}};
-		StringBuilder createAlleles = new StringBuilder();
-		List<Allele> alleles = dataset.getEntities();
-		for (int i = 0; i < alleles.size(); i++) {
-			createAlleles.append("(l)-[:CONTAINS]->(:Allele {id: $alleleKey").append(i)
-					.append(", sequence: $sequence").append(i).append("}),");
-			params.put("alleleKey" + i, alleles.get(i).getId());
-			params.put("sequence" + i, alleles.get(i).getSequence());
+	public void saveAllOnConflictUpdate(String taxon, String locus, List<Allele> alleles) {
+		Query query = new Query().match(LocusRepository.GET)
+				.parameters(taxon, locus)
+				.with(LocusRepository.VARIABLE);
+		for (int i = 0, p = 2; i < alleles.size(); i++) {
+			if(find(new Allele.PrimaryKey(taxon, locus, alleles.get(i).getId())) != null)
+				query.update(String.format('(' + LocusRepository.VARIABLE + ')' + RELATION + "(%s:%s {id: $%s})", VARIABLE, LABEL, p++), String.format(PUT_ALL, p++))
+						.parameters(alleles.get(i).getId(), alleles.get(i).getSequence());
+			else
+				query.create(String.format('(' + LocusRepository.VARIABLE + ')' + RELATION + POST_ALL, p++, p++))
+						.parameters(alleles.get(i).getId(), alleles.get(i).getSequence());
+			if(i != alleles.size() - 1)
+				query.with(LocusRepository.VARIABLE);
 		}
-		String parts = createAlleles.deleteCharAt(createAlleles.length() - 1).toString();
-		execute(MATCH_AND_RELATE, params, LocusRepository.GET, parts);
+		execute(query);
+	}
+
+	public void saveAllOnConflictSkip(String taxon, String locus, List<Allele> alleles) {
+		Query query = new Query().match(LocusRepository.GET)
+				.parameters(taxon, locus)
+				.with(LocusRepository.VARIABLE);
+		for (int i = 0, p = 2; i < alleles.size(); i++) {
+			if(find(new Allele.PrimaryKey(taxon, locus, alleles.get(i).getId())) != null) {
+				LOG.info("The allele " + alleles.get(i).getId() + " with sequence " + alleles.get(i).getSequence() + " could not be created since it already exists");
+				continue;
+			}
+			query.create(String.format('(' + LocusRepository.VARIABLE + ')' + RELATION + POST_ALL, p++, p++))
+					.parameters(alleles.get(i).getId(), alleles.get(i).getSequence());
+			if(i != alleles.size() - 1)
+				query.with(LocusRepository.VARIABLE);
+		}
+		execute(query);
 	}
 
 }
