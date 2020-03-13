@@ -10,15 +10,15 @@ import java.util.stream.Collectors;
 
 public class GetAllelesJsonOutputModel implements Json, GetAllelesOutputModel<Json> {
 
-	private List<GetAlleleOutputModel> alleles;
+	private List<SimpleAlleleModel> alleles;
 
 	public GetAllelesJsonOutputModel(List<Allele> alleles) {
 		this.alleles = alleles.stream()
-				.map(GetAlleleOutputModel::new)
+				.map(SimpleAlleleModel::new)
 				.collect(Collectors.toList());
 	}
 
-	public List<GetAlleleOutputModel> getAlleles() {
+	public List<SimpleAlleleModel> getAlleles() {
 		return alleles;
 	}
 
@@ -26,6 +26,20 @@ public class GetAllelesJsonOutputModel implements Json, GetAllelesOutputModel<Js
 	public ResponseEntity<Json> toResponse() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this);
+	}
+
+	private static class SimpleAlleleModel {
+
+		private String id;
+
+		public SimpleAlleleModel(Allele allele) {
+			this.id = allele.getId();
+		}
+
+		public String getId() {
+			return id;
+		}
+
 	}
 
 }

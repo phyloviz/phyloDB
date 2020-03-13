@@ -9,38 +9,43 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 public class GetAlleleOutputModel implements Json, Output<Json> {
 
-	private String id;
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String sequence;
+	private DetailedAlleleModel allele;
 
 	public GetAlleleOutputModel() {
 	}
 
-	public GetAlleleOutputModel(Allele locus) {
-		this.id = locus.getId();
-		this.sequence = locus.getSequence();
+	public GetAlleleOutputModel(Allele allele) {
+		this.allele = new DetailedAlleleModel(allele);
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getSequence() {
-		return sequence;
-	}
-
-	public void setSequence(String sequence) {
-		this.sequence = sequence;
+	public DetailedAlleleModel getAllele() {
+		return allele;
 	}
 
 	@Override
 	public ResponseEntity<Json> toResponse() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this);
+	}
+
+	private static class DetailedAlleleModel {
+
+		private String id;
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+		private String sequence;
+
+		public DetailedAlleleModel(Allele allele) {
+			this.id = allele.getId();
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getSequence() {
+			return sequence;
+		}
+
 	}
 
 }

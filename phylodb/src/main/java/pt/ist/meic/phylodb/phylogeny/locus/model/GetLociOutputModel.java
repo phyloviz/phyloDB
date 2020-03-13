@@ -10,15 +10,15 @@ import java.util.stream.Collectors;
 
 public class GetLociOutputModel implements Json, Output<Json> {
 
-	private List<GetLocusOutputModel> loci;
+	private List<SimpleLocusModel> loci;
 
 	public GetLociOutputModel(List<Locus> loci) {
 		this.loci = loci.stream()
-				.map(GetLocusOutputModel::new)
+				.map(SimpleLocusModel::new)
 				.collect(Collectors.toList());
 	}
 
-	public List<GetLocusOutputModel> getLoci() {
+	public List<SimpleLocusModel> getLoci() {
 		return loci;
 	}
 
@@ -26,6 +26,20 @@ public class GetLociOutputModel implements Json, Output<Json> {
 	public ResponseEntity<Json> toResponse() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this);
+	}
+
+	private static class SimpleLocusModel {
+
+		private String id;
+
+		public SimpleLocusModel(Locus locus) {
+			this.id = locus.getId();
+		}
+
+		public String getId() {
+			return id;
+		}
+
 	}
 
 }

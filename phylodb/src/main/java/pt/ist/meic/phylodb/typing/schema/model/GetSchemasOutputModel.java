@@ -1,4 +1,4 @@
-package pt.ist.meic.phylodb.phylogeny.taxon.model;
+package pt.ist.meic.phylodb.typing.schema.model;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,21 +8,18 @@ import pt.ist.meic.phylodb.mediatype.Output;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetTaxonsOutputModel implements Json, Output<Json> {
+public class GetSchemasOutputModel implements Json, Output<Json> {
 
-	private List<SimpleTaxonModel> taxons;
+	private List<SimpleSchemaModel> schemas;
 
-	public GetTaxonsOutputModel() {
-	}
-
-	public GetTaxonsOutputModel(List<Taxon> taxons) {
-		this.taxons = taxons.stream()
-				.map(SimpleTaxonModel::new)
+	public GetSchemasOutputModel(List<Schema> schemas) {
+		this.schemas = schemas.stream()
+				.map(SimpleSchemaModel::new)
 				.collect(Collectors.toList());
 	}
 
-	public List<SimpleTaxonModel> getTaxons() {
-		return taxons;
+	public List<SimpleSchemaModel> getSchemas() {
+		return schemas;
 	}
 
 	@Override
@@ -31,11 +28,12 @@ public class GetTaxonsOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class SimpleTaxonModel {
+	private static class SimpleSchemaModel {
+
 		private String id;
 
-		public SimpleTaxonModel(Taxon taxon) {
-			this.id = taxon.getId();
+		public SimpleSchemaModel(Schema schema) {
+			this.id = schema.getId();
 		}
 
 		public String getId() {
@@ -43,4 +41,5 @@ public class GetTaxonsOutputModel implements Json, Output<Json> {
 		}
 
 	}
+
 }

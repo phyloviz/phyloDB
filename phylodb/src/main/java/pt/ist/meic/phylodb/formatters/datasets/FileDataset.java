@@ -2,11 +2,11 @@ package pt.ist.meic.phylodb.formatters.datasets;
 
 import java.util.List;
 
-public class Dataset<T> {
+public class FileDataset<T> {
 
 	private List<T> entities;
 
-	public Dataset(List<T> entities) {
+	public FileDataset(List<T> entities) {
 		this.entities = entities;
 	}
 

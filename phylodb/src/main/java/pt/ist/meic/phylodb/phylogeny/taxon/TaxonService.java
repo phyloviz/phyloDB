@@ -2,7 +2,6 @@ package pt.ist.meic.phylodb.phylogeny.taxon;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.service.StatusResult;
 
@@ -15,11 +14,9 @@ import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 public class TaxonService {
 
 	private TaxonRepository taxonRepository;
-	private LocusRepository locusRepository;
 
-	public TaxonService(TaxonRepository taxonRepository, LocusRepository locusRepository) {
+	public TaxonService(TaxonRepository taxonRepository) {
 		this.taxonRepository = taxonRepository;
-		this.locusRepository = locusRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -41,8 +38,7 @@ public class TaxonService {
 
 	@Transactional
 	public StatusResult deleteTaxon(String id) {
-		//todo
-		if (!locusRepository.findAll(0, 1, id).isEmpty())
+		if (!getTaxon(id).isPresent())
 			return new StatusResult(UNCHANGED);
 		return new StatusResult(taxonRepository.remove(id));
 	}

@@ -1,28 +1,24 @@
 package pt.ist.meic.phylodb.typing.dataset.model;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Dataset {
+public class PostDatasetInputModel {
 
-	private String id;
 	private String description;
+	@JsonProperty(required = true)
 	private String taxonId;
+	@JsonProperty(required = true)
 	private String schemaId;
 
-	public Dataset() {
+	public PostDatasetInputModel() {
 	}
 
-	public Dataset(UUID id, String description, String taxonId, String schemaId) {
-		this.id = id.toString();
+	public PostDatasetInputModel(String description, String taxonId, String schemaId) {
 		this.description = description;
 		this.taxonId = taxonId;
 		this.schemaId = schemaId;
 	}
 
-
-	public UUID getId() {
-		return UUID.fromString(id);
-	}
 
 	public String getDescription() {
 		return description;
@@ -35,5 +31,4 @@ public class Dataset {
 	public String getSchemaId() {
 		return schemaId;
 	}
-
 }

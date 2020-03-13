@@ -25,19 +25,17 @@ public abstract class EntityRepository<E, K> extends Repository {
 	protected abstract void delete(K key);
 
 	public List<E> findAll(int page, int limit, Object... filters) {
-		if (page < 0 || limit <= 0)
-			return null;
-		return getAll(page * limit, limit, filters);
+		return (page < 0 || limit <= 0) ? null : getAll(page * limit, limit, filters);
 	}
 
 	public E find(K key) {
-		if (key == null) return null;
-		return get(key);
+		return key == null ? null : get(key);
 	}
 
 	public Status save(E entity) {
-		if (entity == null) return UNCHANGED;
-		if (exists(entity)) {
+		if (entity == null)
+			return UNCHANGED;
+		if(exists(entity)) {
 			update(entity);
 			return UPDATED;
 		}
@@ -46,7 +44,8 @@ public abstract class EntityRepository<E, K> extends Repository {
 	}
 
 	public Status remove(K key) {
-		if (key == null) return UNCHANGED;
+		if (key == null)
+			return UNCHANGED;
 		delete(key);
 		return DELETED;
 	}

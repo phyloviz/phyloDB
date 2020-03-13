@@ -11,7 +11,7 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.controller.PutOutputModel;
+import pt.ist.meic.phylodb.utils.controller.StatusOutputModel;
 import pt.ist.meic.phylodb.utils.service.StatusResult;
 
 import java.util.List;
@@ -38,8 +38,8 @@ public class TaxonController extends EntityController {
 	}
 
 	@GetMapping(path = "/{taxon}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getTaxon(@PathVariable("taxon") String taxon) {
-		Optional<Taxon> optional = service.getTaxon(taxon);
+	public ResponseEntity<?> getTaxon(@PathVariable("taxon") String taxonId) {
+		Optional<Taxon> optional = service.getTaxon(taxonId);
 		return !optional.isPresent() ?
 				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponse() :
 				new GetTaxonOutputModel(optional.get()).toResponse();
@@ -53,16 +53,17 @@ public class TaxonController extends EntityController {
 		StatusResult result = service.saveTaxon(taxonId, new Taxon(taxon.getId(), taxon.getDescription()));
 		return result.getStatus().equals(UNCHANGED) ?
 				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new PutOutputModel(result.getStatus()).toResponse();
+				new StatusOutputModel(result.getStatus()).toResponse();
 	}
 
 	@DeleteMapping(path = "/{taxon}")
 	public ResponseEntity<?> deleteTaxon(
-			@PathVariable("taxon") String taxon
+			@PathVariable("taxon") String taxonId
 	) {
-		return service.deleteTaxon(taxon).getStatus().equals(UNCHANGED) ?
+		StatusResult result = service.deleteTaxon(taxonId);
+		return result.getStatus().equals(UNCHANGED) ?
 				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponse() :
-				new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				new StatusOutputModel(result.getStatus()).toResponse();
 	}
 
 }

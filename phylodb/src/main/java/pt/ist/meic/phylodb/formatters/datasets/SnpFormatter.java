@@ -11,12 +11,12 @@ public class SnpFormatter implements DatasetFormatter<Profile> {
 	}
 
 	@Override
-	public Dataset<Profile> parse(Stream<String> data) {
+	public FileDataset<Profile> parse(Stream<String> data) {
 		return null;
 	}
 
 	@Override
-	public String format(Dataset<Profile> data) {
+	public String format(FileDataset<Profile> data) {
 		return null;
 	}
 

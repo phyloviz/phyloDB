@@ -11,31 +11,24 @@ import java.util.List;
 @Repository
 public class TaxonRepository extends EntityRepository<Taxon, String> {
 
-	public static final String VARIABLE = "t", LABEL = "Taxon", ORDER = String.format("%s.id", VARIABLE),
-			GET_ALL = String.format("(%s:%s)", VARIABLE, LABEL),
-			GET = String.format("(%s:%s {id: $0})", VARIABLE, LABEL),
-			POST = String.format("(:%s {id: $0, description: $1})", LABEL),
-			PUT = String.format("%s.description = $1", VARIABLE);
-
 	public TaxonRepository(Session session) {
 		super(session);
 	}
 
 	@Override
 	protected List<Taxon> getAll(int page, int limit, Object... filters) {
-		Query query = new Query().match(GET_ALL)
-				.retrieve(VARIABLE)
-				.page(ORDER)
-				.parameters(page, limit);
-		return queryAll(Taxon.class, query);
+		String statement = "MATCH (t:Taxon)\n" +
+				"WHERE NOT EXISTS(t.to)\n" +
+				"RETURN t SKIP $0 LIMIT $1";
+		return queryAll(Taxon.class, new Query(statement, page, limit));
 	}
 
 	@Override
 	protected Taxon get(String key) {
-		Query query = new Query().match(GET)
-				.retrieve(VARIABLE)
-				.parameters(key);
-		return query(Taxon.class, query);
+		String statement = "MATCH (t:Taxon {id: $0})\n" +
+				"WHERE NOT EXISTS(t.to)\n" +
+				"RETURN t";
+		return query(Taxon.class, new Query(statement, key));
 	}
 
 	@Override
@@ -45,23 +38,25 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 
 	@Override
 	protected void create(Taxon taxon) {
-		Query query = new Query().create(POST)
-				.parameters(taxon.getId(), taxon.getDescription());
-		execute(query);
+		String statement = "CREATE (t:Taxon {id: $0, description: $1, from: datetime()})";
+		execute(new Query(statement, taxon.getId(), taxon.getDescription()));
 	}
 
 	@Override
 	protected void update(Taxon taxon) {
-		Query query = new Query().update(GET, PUT)
-				.parameters(taxon.getId(), taxon.getDescription());
-		execute(query);
+		String statement = "MATCH (t:Taxon {id: $0}) WHERE NOT EXISTS(t.to)\n" +
+				"WITH t\n" +
+				"CALL apoc.refactor.cloneNodes([t], true) YIELD input, output\n" +
+				"SET t.description = $1, t.from = datetime(), output.to = datetime()";
+		execute(new Query(statement, taxon.getId(), taxon.getDescription()));
 	}
 
 	@Override
 	protected void delete(String key) {
-		Query query = new Query().remove(GET, VARIABLE)
-				.parameters(key);
-		execute(query);
+		String statement = "MATCH (t:Taxon {id: $0}) WHERE NOT EXISTS(t.to) SET t.to = datetime() WITH t\n" +
+				"MATCH (t)-[:CONTAINS]->(l:Locus) WHERE NOT EXISTS(l.to) SET l.to = datetime() WITH l\n" +
+				"MATCH (l)-[:CONTAINS]->(a:Allele) WHERE NOT EXISTS(a.to) SET a.to = datetime()";
+		execute(new Query(statement, key));
 	}
 
 }

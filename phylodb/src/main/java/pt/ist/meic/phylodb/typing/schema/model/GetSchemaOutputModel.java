@@ -1,4 +1,4 @@
-package pt.ist.meic.phylodb.phylogeny.locus.model;
+package pt.ist.meic.phylodb.typing.schema.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
@@ -6,15 +6,13 @@ import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.mediatype.Json;
 import pt.ist.meic.phylodb.mediatype.Output;
 
-public class GetLocusOutputModel implements Json, Output<Json> {
+public class GetSchemaOutputModel implements Json, Output<Json> {
 
-	private DetailedLocusModel locus;
+	private DetailedSchemaModel schema;
 
-	public GetLocusOutputModel() {
-	}
 
-	public GetLocusOutputModel(Locus locus) {
-		this.locus = new DetailedLocusModel(locus);
+	public GetSchemaOutputModel(Schema schema) {
+		this.schema = new DetailedSchemaModel(schema);
 	}
 
 	@Override
@@ -23,15 +21,17 @@ public class GetLocusOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class DetailedLocusModel {
+	private static class DetailedSchemaModel {
 
 		private String id;
 		@JsonInclude(JsonInclude.Include.NON_NULL)
 		private String description;
+		private String[] loci;
 
-		public DetailedLocusModel(Locus locus) {
-			this.id = locus.getId();
-			this.description = locus.getDescription();
+		public DetailedSchemaModel(Schema schema) {
+			this.id = schema.getId();
+			this.description = schema.getDescription();
+			this.loci = schema.getLociIds();
 		}
 
 		public String getId() {
@@ -42,5 +42,10 @@ public class GetLocusOutputModel implements Json, Output<Json> {
 			return description;
 		}
 
+		public String[] getLoci() {
+			return loci;
+		}
+
 	}
+
 }

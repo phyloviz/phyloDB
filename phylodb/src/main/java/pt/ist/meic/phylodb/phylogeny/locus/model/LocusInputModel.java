@@ -1,7 +1,10 @@
 package pt.ist.meic.phylodb.phylogeny.locus.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LocusInputModel {
 
+	@JsonProperty(required = true)
 	private String id;
 	private String description;
 

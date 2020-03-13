@@ -7,12 +7,12 @@ import java.util.stream.Stream;
 public class IsolatesFormatter implements DatasetFormatter<Isolate> {
 
 	@Override
-	public Dataset<Isolate> parse(Stream<String> data) {
+	public FileDataset<Isolate> parse(Stream<String> data) {
 		return null;
 	}
 
 	@Override
-	public String format(Dataset<Isolate> data) {
+	public String format(FileDataset<Isolate> data) {
 		return null;
 	}
 

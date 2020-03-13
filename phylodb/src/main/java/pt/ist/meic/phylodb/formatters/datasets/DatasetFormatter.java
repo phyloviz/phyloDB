@@ -6,7 +6,7 @@ import pt.ist.meic.phylodb.formatters.Writer;
 import java.util.HashMap;
 import java.util.Optional;
 
-public interface DatasetFormatter<T> extends Reader<Dataset<T>>, Writer<Dataset<T>> {
+public interface DatasetFormatter<T> extends Reader<FileDataset<T>>, Writer<FileDataset<T>> {
 	String FASTA = "fasta", MLST = "mlst", MLVA = "mlva", SNP = "snp";
 
 	static Optional<DatasetFormatter<?>> get(String format) {

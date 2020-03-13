@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class FastaFormatter implements DatasetFormatter<Allele> {
 
 	@Override
-	public Dataset<Allele> parse(Stream<String> data) {
+	public FileDataset<Allele> parse(Stream<String> data) {
 		String[] raw = data.toArray(String[]::new);
 		List<Allele> alleles = new ArrayList<>();
 		String id = raw[0].substring(1);
@@ -24,11 +24,11 @@ public class FastaFormatter implements DatasetFormatter<Allele> {
 			sequence.append(raw[i]);
 		}
 		alleles.add(new Allele(id, sequence.toString()));
-		return new Dataset<>(alleles);
+		return new FileDataset<>(alleles);
 	}
 
 	@Override
-	public String format(Dataset<Allele> data) {
+	public String format(FileDataset<Allele> data) {
 		StringBuilder rawAlleles = new StringBuilder();
 		for (Allele allele : data.getEntities())
 			rawAlleles.append(allele.getId())
