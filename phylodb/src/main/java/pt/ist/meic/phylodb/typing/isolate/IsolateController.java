@@ -16,7 +16,7 @@ public class IsolateController {
 		this.service = service;
 	}
 
-	// Filtered by ancillary data
+	// Filtered by perfil / ancillary data
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	public ResponseEntity getIsolates(
 			@PathVariable("dataset") String datasets,

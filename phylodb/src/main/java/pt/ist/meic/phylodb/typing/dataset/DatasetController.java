@@ -5,13 +5,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.mediatype.Problem;
+import pt.ist.meic.phylodb.output.mediatype.Problem;
+import pt.ist.meic.phylodb.output.model.StatusOutputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.*;
+import pt.ist.meic.phylodb.typing.dataset.model.input.PostDatasetInputModel;
+import pt.ist.meic.phylodb.typing.dataset.model.input.PutDatasetInputModel;
+import pt.ist.meic.phylodb.typing.dataset.model.output.GetDatasetOutputModel;
+import pt.ist.meic.phylodb.typing.dataset.model.output.GetDatasetsOutputModel;
 import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.controller.StatusOutputModel;
 import pt.ist.meic.phylodb.utils.service.StatusResult;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,10 +34,9 @@ public class DatasetController extends EntityController {
 	public ResponseEntity<?> getDatasets(
 			@RequestParam(value = "page", defaultValue = "0") Integer page
 	) {
-		Optional<List<Dataset>> optional = service.getDatasets(page, Integer.parseInt(jsonLimit));
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new GetDatasetsOutputModel(optional.get()).toResponse();
+		return page < 0 ?
+				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity() :
+				new GetDatasetsOutputModel(service.getDatasets(page, Integer.parseInt(jsonLimit)).get()).toResponseEntity();
 	}
 
 	@GetMapping(path = "/{dataset}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,29 +45,35 @@ public class DatasetController extends EntityController {
 	) {
 		Optional<Dataset> optional = service.getDataset(UUID.fromString(datasetId));
 		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponse() :
-				new GetDatasetOutputModel(optional.get()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new GetDatasetOutputModel(optional.get()).toResponseEntity();
 	}
 
 	@PostMapping(path = "")
 	public ResponseEntity<?> postDataset(
-			@RequestBody PostDatasetInputModel dataset
+			@RequestBody PostDatasetInputModel datasetInputModel
 	) {
-		StatusResult result = service.createDataset(dataset.getDescription(), dataset.getTaxonId(), dataset.getSchemaId());
+		Optional<Dataset> optionalDataset = datasetInputModel.toDomainEntity();
+		if(!optionalDataset.isPresent())
+			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
+		StatusResult result = service.createDataset(optionalDataset.get());
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus(), optionalDataset.get().getId()).toResponseEntity();
 	}
 
 	@PutMapping(path = "/{dataset}")
 	public ResponseEntity<?> putDataset(
 			@PathVariable("dataset") String datasetId,
-			@RequestBody PutDatasetInputModel dataset
+			@RequestBody PutDatasetInputModel datasetInputModel
 	) {
-		StatusResult result = service.updateDataset(UUID.fromString(datasetId), new Dataset(dataset.getId(), dataset.getDescription(), null, null));
+		Optional<Dataset> optionalDataset = datasetInputModel.toDomainEntity();
+		if(!optionalDataset.isPresent())
+			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
+		StatusResult result = service.updateDataset(optionalDataset.get());
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 	@DeleteMapping(path = "/{dataset}")
@@ -74,8 +82,8 @@ public class DatasetController extends EntityController {
 	) {
 		StatusResult result = service.deleteDataset(UUID.fromString(datasetId));
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 }

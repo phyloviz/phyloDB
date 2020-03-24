@@ -2,7 +2,7 @@ package pt.ist.meic.phylodb.phylogeny.allele.model.output;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.mediatype.Json;
+import pt.ist.meic.phylodb.output.mediatype.Json;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class GetAllelesJsonOutputModel implements Json, GetAllelesOutputModel<Js
 	}
 
 	@Override
-	public ResponseEntity<Json> toResponse() {
+	public ResponseEntity<Json> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this);
 	}

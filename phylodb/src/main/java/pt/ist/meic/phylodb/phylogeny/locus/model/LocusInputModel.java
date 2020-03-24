@@ -1,10 +1,11 @@
 package pt.ist.meic.phylodb.phylogeny.locus.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import pt.ist.meic.phylodb.input.Input;
 
-public class LocusInputModel {
+import java.util.Optional;
 
-	@JsonProperty(required = true)
+public class LocusInputModel implements Input<Locus> {
+
 	private String id;
 	private String description;
 
@@ -22,6 +23,11 @@ public class LocusInputModel {
 
 	public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public Optional<Locus> toDomainEntity(String... params) {
+		return !params[1].equals(id) ? Optional.empty() : Optional.of(new Locus(params[0], id, description));
 	}
 
 }

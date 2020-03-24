@@ -1,4 +1,4 @@
-package pt.ist.meic.phylodb.formatters.datasets;
+package pt.ist.meic.phylodb.formatters.dataset;
 
 import java.util.List;
 

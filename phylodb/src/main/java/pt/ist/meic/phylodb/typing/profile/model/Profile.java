@@ -1,28 +1,58 @@
 package pt.ist.meic.phylodb.typing.profile.model;
 
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
+import java.util.UUID;
 
-@NodeEntity(label = "Profile")
 public class Profile {
 
-	@Id
-	@GeneratedValue
-	private Long id;
-
-	@Property(name = "identifier")
-	private long identifier;
-
-	//@Relationship(type = "DISTANCES")
-	//private Set<Distance> distances;
+	private String datasetId;
+	private String id;
+	private String aka;
+	private String[] allelesIds;
 
 	public Profile() {
 	}
 
-	public long getIdentifier() {
-		return identifier;
+	public Profile(String datasetId, String id, String aka, String[] allelesIds) {
+		this.datasetId = datasetId;
+		this.id = id;
+		this.aka = aka;
+		this.allelesIds = allelesIds;
+	}
+
+	public String getDatasetId() {
+		return datasetId;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getAka() {
+		return aka;
+	}
+
+	public String[] getAllelesIds() {
+		return allelesIds;
+	}
+
+	public static class PrimaryKey {
+
+		private UUID datasetId;
+		private String id;
+
+		public PrimaryKey(UUID datasetId, String id) {
+			this.datasetId = datasetId;
+			this.id = id;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public UUID getDatasetId() {
+			return datasetId;
+		}
+
 	}
 
 }

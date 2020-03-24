@@ -5,16 +5,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.mediatype.Problem;
+import pt.ist.meic.phylodb.output.mediatype.Problem;
+import pt.ist.meic.phylodb.output.model.StatusOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.controller.StatusOutputModel;
 import pt.ist.meic.phylodb.utils.service.StatusResult;
 
-import java.util.List;
 import java.util.Optional;
 
 import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
@@ -31,29 +30,28 @@ public class TaxonController extends EntityController {
 
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getTaxons(@RequestParam(value = "page", defaultValue = "0") Integer page) {
-		Optional<List<Taxon>> optional = service.getTaxons(page, Integer.parseInt(jsonLimit));
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new GetTaxonsOutputModel(optional.get()).toResponse();
+		return page < 0 ?
+				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity() :
+				new GetTaxonsOutputModel(service.getTaxons(page, Integer.parseInt(jsonLimit)).get()).toResponseEntity();
 	}
 
 	@GetMapping(path = "/{taxon}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getTaxon(@PathVariable("taxon") String taxonId) {
 		Optional<Taxon> optional = service.getTaxon(taxonId);
 		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponse() :
-				new GetTaxonOutputModel(optional.get()).toResponse();
+				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponseEntity() :
+				new GetTaxonOutputModel(optional.get()).toResponseEntity();
 	}
 
 	@PutMapping(path = "/{taxon}")
 	public ResponseEntity<?> putTaxon(
 			@PathVariable("taxon") String taxonId,
-			@RequestBody TaxonInputModel taxon
+			@RequestBody TaxonInputModel taxonInputModel
 	) {
-		StatusResult result = service.saveTaxon(taxonId, new Taxon(taxon.getId(), taxon.getDescription()));
-		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+		Optional<Taxon> taxonOptional = taxonInputModel.toDomainEntity(taxonId);
+		return !taxonOptional.isPresent() ?
+				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity() :
+				new StatusOutputModel(service.saveTaxon(taxonOptional.get()).getStatus()).toResponseEntity();
 	}
 
 	@DeleteMapping(path = "/{taxon}")
@@ -62,8 +60,8 @@ public class TaxonController extends EntityController {
 	) {
 		StatusResult result = service.deleteTaxon(taxonId);
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 }

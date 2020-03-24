@@ -1,8 +1,8 @@
-package pt.ist.meic.phylodb.mediatype;
+package pt.ist.meic.phylodb.output;
 
 import org.springframework.http.ResponseEntity;
 
 public interface Output<T> {
 
-	ResponseEntity<T> toResponse();
+	ResponseEntity<T> toResponseEntity();
 }

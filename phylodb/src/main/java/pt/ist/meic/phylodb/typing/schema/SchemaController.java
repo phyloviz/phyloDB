@@ -5,16 +5,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.mediatype.Problem;
-import pt.ist.meic.phylodb.typing.schema.model.GetSchemaOutputModel;
-import pt.ist.meic.phylodb.typing.schema.model.GetSchemasOutputModel;
+import pt.ist.meic.phylodb.output.mediatype.Problem;
+import pt.ist.meic.phylodb.output.model.StatusOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
+import pt.ist.meic.phylodb.typing.schema.model.output.GetSchemaOutputModel;
+import pt.ist.meic.phylodb.typing.schema.model.output.GetSchemasOutputModel;
 import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.controller.StatusOutputModel;
 import pt.ist.meic.phylodb.utils.service.StatusResult;
 
-import java.util.List;
 import java.util.Optional;
 
 import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
@@ -34,10 +33,9 @@ public class SchemaController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@RequestParam(value = "page", defaultValue = "0") Integer page
 	) {
-		Optional<List<Schema>> optional = service.getSchemas(taxonId, page, Integer.parseInt(jsonLimit));
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new GetSchemasOutputModel(optional.get()).toResponse();
+		return page < 0 ?
+				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity() :
+				new GetSchemasOutputModel(service.getSchemas(taxonId, page, Integer.parseInt(jsonLimit)).get()).toResponseEntity();
 	}
 
 	@GetMapping(path = "/{schema}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,20 +45,23 @@ public class SchemaController extends EntityController {
 	) {
 		Optional<Schema> optional = service.getSchema(taxonId, schemaId);
 		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponse() :
-				new GetSchemaOutputModel(optional.get()).toResponse();
+				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponseEntity() :
+				new GetSchemaOutputModel(optional.get()).toResponseEntity();
 	}
 
 	@PutMapping(path = "/{schema}")
 	public ResponseEntity<?> putSchema(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("schema") String schemaId,
-			@RequestBody SchemaInputModel schema
+			@RequestBody SchemaInputModel schemaInputModel
 	) {
-		StatusResult result = service.saveSchema(taxonId, schemaId, new Schema(schema.getTaxon(), schema.getId(), schema.getDescription(), schema.getLoci()));
+		Optional<Schema> schemaOptional = schemaInputModel.toDomainEntity(taxonId, schemaId);
+		if(!schemaOptional.isPresent())
+			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
+		StatusResult result = service.saveSchema(schemaOptional.get());
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 	@DeleteMapping(path = "/{schema}")
@@ -70,8 +71,8 @@ public class SchemaController extends EntityController {
 	) {
 		StatusResult result = service.deleteSchema(taxonId, schemaId);
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 }

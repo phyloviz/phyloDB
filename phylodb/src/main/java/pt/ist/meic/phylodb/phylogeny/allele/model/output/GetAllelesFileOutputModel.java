@@ -4,8 +4,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.formatters.datasets.FileDataset;
-import pt.ist.meic.phylodb.formatters.datasets.FastaFormatter;
+import pt.ist.meic.phylodb.formatters.dataset.FileDataset;
+import pt.ist.meic.phylodb.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class GetAllelesFileOutputModel implements GetAllelesOutputModel<byte[]> 
 	}
 
 	@Override
-	public ResponseEntity<byte[]> toResponse() {
+	public ResponseEntity<byte[]> toResponseEntity() {
 		String fasta = new FastaFormatter().format(new FileDataset<>(alleles));
 		return ResponseEntity.status(HttpStatus.OK)
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)

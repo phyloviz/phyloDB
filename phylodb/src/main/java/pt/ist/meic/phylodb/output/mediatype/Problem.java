@@ -1,4 +1,4 @@
-package pt.ist.meic.phylodb.mediatype;
+package pt.ist.meic.phylodb.output.mediatype;
 
 public class Problem implements MediaType {
 

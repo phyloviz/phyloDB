@@ -3,8 +3,8 @@ package pt.ist.meic.phylodb.phylogeny.locus.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.mediatype.Json;
-import pt.ist.meic.phylodb.mediatype.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.Output;
 
 public class GetLocusOutputModel implements Json, Output<Json> {
 
@@ -18,7 +18,7 @@ public class GetLocusOutputModel implements Json, Output<Json> {
 	}
 
 	@Override
-	public ResponseEntity<Json> toResponse() {
+	public ResponseEntity<Json> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this);
 	}

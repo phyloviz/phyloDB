@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.exception.FileFormatException;
-import pt.ist.meic.phylodb.mediatype.Problem;
+import pt.ist.meic.phylodb.output.mediatype.Problem;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.output.GetAlleleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.output.GetAllelesOutputModel;
 import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.controller.StatusOutputModel;
+import pt.ist.meic.phylodb.output.model.StatusOutputModel;
 import pt.ist.meic.phylodb.utils.service.StatusResult;
 
 import java.util.List;
@@ -39,10 +39,12 @@ public class AlleleController extends EntityController {
 			@RequestHeader(value="Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 
 	) {
+		if (page < 0)
+			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
 		Optional<List<Allele>> optional = service.getAlleles(taxonId, locusId, page, Integer.parseInt(jsonLimit));
 		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				GetAllelesOutputModel.get(type).apply(optional.get()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				GetAllelesOutputModel.get(type).apply(optional.get()).toResponseEntity();
 	}
 
 	@GetMapping(path = "/{allele}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,8 +55,8 @@ public class AlleleController extends EntityController {
 	) {
 		Optional<Allele> optional = service.getAllele(taxonId, locusId, alleleId);
 		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponse() :
-				new GetAlleleOutputModel(optional.get()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new GetAlleleOutputModel(optional.get()).toResponseEntity();
 	}
 
 	@PutMapping(path = "/{allele}")
@@ -62,12 +64,15 @@ public class AlleleController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,
-			@RequestBody AlleleInputModel allele
+			@RequestBody AlleleInputModel input
 	) {
-		StatusResult result = service.saveAllele(taxonId, locusId, alleleId, new Allele(taxonId, locusId, allele.getId(), allele.getSequence()));
+		Optional<Allele> optionalAllele = input.toDomainEntity(taxonId, locusId, alleleId);
+		if (!optionalAllele.isPresent())
+			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
+		StatusResult result = service.saveAllele(optionalAllele.get());
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 	@PostMapping(path = "")
@@ -79,8 +84,8 @@ public class AlleleController extends EntityController {
 	) throws FileFormatException {
 		StatusResult result = service.saveAllelesOnConflictSkip(taxonId, locusId, file);
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 	@PutMapping(path = "")
@@ -92,8 +97,8 @@ public class AlleleController extends EntityController {
 	) throws FileFormatException {
 		StatusResult result = service.saveAllelesOnConflictUpdate(taxonId, locusId, file);
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 	@DeleteMapping(path = "/{allele}")
@@ -104,8 +109,8 @@ public class AlleleController extends EntityController {
 	) {
 		StatusResult result = service.deleteAllele(taxonId, locusId, alleleId);
 		return result.getStatus().equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponse() :
-				new StatusOutputModel(result.getStatus()).toResponse();
+				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
+				new StatusOutputModel(result.getStatus()).toResponseEntity();
 	}
 
 }

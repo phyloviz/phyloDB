@@ -4,9 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.error.exception.FileFormatException;
-import pt.ist.meic.phylodb.formatters.datasets.FileDataset;
-import pt.ist.meic.phylodb.formatters.datasets.DatasetFormatter;
-import pt.ist.meic.phylodb.formatters.datasets.FastaFormatter;
+import pt.ist.meic.phylodb.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
@@ -39,9 +37,8 @@ public class AlleleService {
 	}
 
 	@Transactional
-	public StatusResult saveAllele(String taxonId, String locusId, String alleleId, Allele allele) {
-		if (!allele.getTaxonId().equals(taxonId) || !allele.getLocusId().equals(locusId) ||
-				!allele.getId().equals(alleleId) || locusRepository.find(new Locus.PrimaryKey(taxonId, locusId)) == null)
+	public StatusResult saveAllele(Allele allele) {
+		if (locusRepository.find(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) == null)
 			return new StatusResult(UNCHANGED);
 		return new StatusResult(alleleRepository.save(allele));
 	}
@@ -57,7 +54,7 @@ public class AlleleService {
 	public StatusResult saveAllelesOnConflictUpdate(String taxonId, String locusId, MultipartFile file) throws FileFormatException {
 		if (locusRepository.find(new Locus.PrimaryKey(taxonId, locusId)) == null)
 			return new StatusResult(UNCHANGED);
-		alleleRepository.saveAllOnConflictUpdate(taxonId, locusId, readDataset(file).getEntities());
+		alleleRepository.saveAllOnConflictUpdate(taxonId, locusId, new FastaFormatter().read(file).getEntities());
 		return new StatusResult(UPDATED);
 	}
 
@@ -65,13 +62,8 @@ public class AlleleService {
 	public StatusResult saveAllelesOnConflictSkip(String taxonId, String locusId, MultipartFile file) throws FileFormatException {
 		if (locusRepository.find(new Locus.PrimaryKey(taxonId, locusId)) == null)
 			return new StatusResult(UNCHANGED);
-		alleleRepository.saveAllOnConflictSkip(taxonId, locusId, readDataset(file).getEntities());
+		alleleRepository.saveAllOnConflictSkip(taxonId, locusId, new FastaFormatter().read(file).getEntities());
 		return new StatusResult(CREATED);
-	}
-
-	private FileDataset<Allele> readDataset(MultipartFile file) throws FileFormatException {
-		FastaFormatter formatter = (FastaFormatter) DatasetFormatter.get(DatasetFormatter.FASTA).get();
-		return formatter.read(file);
 	}
 
 }

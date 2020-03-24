@@ -4,9 +4,11 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
+import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,15 +22,22 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 
 	@Override
 	protected List<Dataset> getAll(int page, int limit, Object... filters) {
-		String statement = "MATCH (d:Dataset)\n" +
-				"WHERE NOT EXISTS(d.to)\n" +
-				"RETURN d SKIP $0 LIMIT $1";
-		return queryAll(Dataset.class, new Query(statement, page, limit));
+		String statement = "MATCH (d:Dataset)-[:HAS]->(s:Schema)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
+				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(t.to)\n" +
+				"WITH d, s, t, collect(l) as loci\n" +
+				"RETURN d.id as datasetId, d.description as description, t.id as taxonId, s.id as schemaId SKIP $ LIMIT $";
+		Result r = query(new Query(statement, page, limit));
+		List<Dataset> datasets = new ArrayList<>();
+		while (r.iterator().hasNext()) {
+			Map<String, Object> row = r.iterator().next();
+			datasets.add(new Dataset(UUID.fromString((String)row.get("datasetId")), (String) row.get("description"), (String) row.get("taxonId"), (String) row.get("taxonId")));
+		}
+		return datasets;
 	}
 
 	@Override
 	protected Dataset get(UUID id) {
-		String statement = "MATCH (d:Dataset {id: $0})-[:HAS]->(s:Schema)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
+		String statement = "MATCH (d:Dataset {id: $})-[:HAS]->(s:Schema)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(t.to)\n" +
 				"WITH d, s, t, collect(l) as loci\n" +
 				"RETURN d.id as datasetId, d.description as description, t.id as taxonId, s.id as schemaId";
@@ -41,13 +50,16 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 
 	@Override
 	protected boolean exists(Dataset dataset) {
-		return get(dataset.getId()) != null;
+		String statement = "MATCH (d:Dataset {id: $})\n" +
+				"WHERE NOT EXISTS(d.to)\n" +
+				"RETURN d";
+		return query(Dataset.class, new Query(statement, dataset.getId())) != null;
 	}
 
 	@Override
 	protected void create(Dataset dataset) {
-		String statement = "CREATE (d:Dataset {id: $0, description: $1, from: datetime()}) WITH d\n" +
-				"MATCH (s:Schema {id: $2})-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $3})\n" +
+		String statement = "CREATE (d:Dataset {id: $, description: $, from: datetime()}) WITH d\n" +
+				"MATCH (s:Schema {id: $})-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
 				"WHERE NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(t.to)\n" +
 				"WITH d, s, t, collect(l) as loci\n" +
 				"CREATE (d)-[:HAS]->(s)";
@@ -57,19 +69,26 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 
 	@Override
 	protected void update(Dataset dataset) {
-		String statement = "MATCH (d:Dataset {id: $0})\n" +
+		String statement = "MATCH (d:Dataset {id: $})\n" +
 				"WHERE NOT EXISTS(d.to)\n" +
 				"CALL apoc.refactor.cloneNodes([d], true) YIELD input, output\n" +
-				"SET d.description = $1, d.from = datetime(), output.to = datetime()";
+				"SET output.description = $, output.from = datetime(), d.to = datetime()";
 		execute(new Query(statement, dataset.getId(), dataset.getDescription()));
 	}
 
 	@Override
 	protected void delete(UUID id) {
-		String statement = "MATCH (d:Dataset {id: $0})\n" +
-				"WHERE NOT EXISTS(d.to)\n" +
-				"SET d.to = datetime()";
+		String statement = "MATCH (d:Dataset {id: $}) WHERE NOT EXISTS(d.to) SET d.to = datetime() WITH d" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile) WHERE NOT EXISTS(p.to) SET p.to = datetime() WITH d" +
+				"MATCH (d)-[:CONTAINS]->(i:Isolate) WHERE NOT EXISTS(i.to) SET i.to = datetime()";
 		execute(new Query(statement, id));
+	}
+
+	public Schema getSchema(String datasetId) {
+		String statement = "MATCH (d:Dataset {id: $})-[:HAS]->(s:Schema)\n" +
+				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(s.to)\n" +
+				"RETURN s";
+		return query(Schema.class, new Query(statement, datasetId));
 	}
 
 }

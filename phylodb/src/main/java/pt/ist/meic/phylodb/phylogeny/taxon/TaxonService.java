@@ -30,9 +30,7 @@ public class TaxonService {
 	}
 
 	@Transactional
-	public StatusResult saveTaxon(String id, Taxon taxon) {
-		if (taxon == null || !taxon.getId().equals(id))
-			return new StatusResult(UNCHANGED);
+	public StatusResult saveTaxon(Taxon taxon) {
 		return new StatusResult(taxonRepository.save(taxon));
 	}
 

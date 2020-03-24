@@ -1,9 +1,10 @@
-package pt.ist.meic.phylodb.typing.dataset.model;
+package pt.ist.meic.phylodb.typing.dataset.model.output;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.mediatype.Json;
-import pt.ist.meic.phylodb.mediatype.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.Output;
+import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +25,7 @@ public class GetDatasetsOutputModel implements Json, Output<Json> {
 	}
 
 	@Override
-	public ResponseEntity<Json> toResponse() {
+	public ResponseEntity<Json> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(this);
 	}

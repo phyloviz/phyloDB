@@ -1,11 +1,11 @@
-package pt.ist.meic.phylodb.utils.controller;
+package pt.ist.meic.phylodb.output.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.mediatype.Json;
-import pt.ist.meic.phylodb.mediatype.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.Output;
 import pt.ist.meic.phylodb.utils.db.Status;
 
 import java.util.UUID;
@@ -31,7 +31,7 @@ public class StatusOutputModel implements Json, Output<Json> {
 	}
 
 	@Override
-	public ResponseEntity<Json> toResponse() {
+	public ResponseEntity<Json> toResponseEntity() {
 		return status.equals(Status.CREATED) ?
 				ResponseEntity.status(HttpStatus.CREATED).body(this) :
 				ResponseEntity.status(HttpStatus.NO_CONTENT).build();

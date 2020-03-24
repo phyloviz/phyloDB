@@ -36,9 +36,9 @@ public class SchemaService {
 	}
 
 	@Transactional
-	public StatusResult saveSchema(String taxonId, String schemaId, Schema schema) {
-		if (!schema.getTaxonId().equals(taxonId) || !schema.getId().equals(schemaId) ||
-				taxonRepository.find(taxonId) == null  || isCreateAndNotExistsAllLoci(schema))
+	public StatusResult saveSchema(Schema schema) {
+		if (!Schema.METHODS.contains(schema.getType()) || taxonRepository.find(schema.getTaxonId()) == null ||
+				!locusRepository.existsAll(schema.getTaxonId(), schema.getLociIds()))
 			return new StatusResult(UNCHANGED);
 		return new StatusResult(schemaRepository.save(schema));
 	}
@@ -48,11 +48,6 @@ public class SchemaService {
 		if (!getSchema(taxonId, schemaId).isPresent())
 			return new StatusResult(UNCHANGED);
 		return new StatusResult(schemaRepository.remove(new Schema.PrimaryKey(taxonId, schemaId)));
-	}
-
-	private boolean isCreateAndNotExistsAllLoci(Schema schema) {
-		return !getSchema(schema.getTaxonId(), schema.getId()).isPresent() && schema.getLociIds() != null &&
-				locusRepository.existsAll(schema.getTaxonId(), schema.getLociIds());
 	}
 
 }

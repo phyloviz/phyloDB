@@ -35,16 +35,15 @@ public class DatasetService {
 	}
 
 	@Transactional
-	public StatusResult createDataset(String description, String taxonId, String schemaId) {
-		if (schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId)) == null)
+	public StatusResult createDataset(Dataset dataset) {
+		if (schemaRepository.find(new Schema.PrimaryKey(dataset.getTaxonId(), dataset.getSchemaId())) == null)
 			return new StatusResult(UNCHANGED);
-		UUID id = UUID.randomUUID();
-		return new StatusResult(datasetRepository.save(new Dataset(id, description, taxonId, schemaId)), id);
+		return new StatusResult(datasetRepository.save(dataset));
 	}
 
 	@Transactional
-	public StatusResult updateDataset(UUID id, Dataset dataset) {
-		if (!dataset.getId().equals(id) || !getDataset(id).isPresent())
+	public StatusResult updateDataset(Dataset dataset) {
+		if (!getDataset(dataset.getId()).isPresent())
 			return new StatusResult(UNCHANGED);
 		return new StatusResult(datasetRepository.save(dataset));
 	}

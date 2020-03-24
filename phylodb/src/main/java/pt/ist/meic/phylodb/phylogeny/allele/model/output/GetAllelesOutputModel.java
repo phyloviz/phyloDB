@@ -1,7 +1,7 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model.output;
 
 import org.springframework.http.MediaType;
-import pt.ist.meic.phylodb.mediatype.Output;
+import pt.ist.meic.phylodb.output.Output;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.HashMap;

@@ -1,10 +1,11 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import pt.ist.meic.phylodb.input.Input;
 
-public class AlleleInputModel {
+import java.util.Optional;
 
-	@JsonProperty(required = true)
+public class AlleleInputModel implements Input<Allele> {
+
 	private String id;
 	private String sequence;
 
@@ -22,6 +23,11 @@ public class AlleleInputModel {
 
 	public String getSequence() {
 		return sequence;
+	}
+
+	@Override
+	public Optional<Allele> toDomainEntity(String... params) {
+		return !params[2].equals(id) ? Optional.empty() : Optional.of(new Allele(params[0], params[1], id, sequence));
 	}
 
 }

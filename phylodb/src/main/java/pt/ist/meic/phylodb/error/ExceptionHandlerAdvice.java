@@ -8,7 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pt.ist.meic.phylodb.error.exception.FileFormatException;
-import pt.ist.meic.phylodb.mediatype.Problem;
+import pt.ist.meic.phylodb.output.mediatype.Problem;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
@@ -30,7 +30,7 @@ public class ExceptionHandlerAdvice {
 		LOG.info(ex.getMessage());
 		//HttpHeaders headers = new HttpHeaders();
 		//headers.setContentType(MediaTypes.APPLICATION_PROBLEM_JSON);
-		return new ErrorOutputModel(type, status).toResponse();
+		return new ErrorOutputModel(type, status).toResponseEntity();
 	}
 
 }

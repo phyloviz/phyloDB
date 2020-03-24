@@ -33,9 +33,8 @@ public class LocusService {
 	}
 
 	@Transactional
-	public StatusResult saveLocus(String taxonId, String locusId, Locus locus) {
-		if (locus == null || !locus.getTaxonId().equals(taxonId) || !locus.getId().equals(locusId) ||
-				taxonRepository.find(taxonId) == null)
+	public StatusResult saveLocus(Locus locus) {
+		if (taxonRepository.find(locus.getTaxonId()) == null)
 			return new StatusResult(UNCHANGED);
 		return new StatusResult(locusRepository.save(locus));
 	}

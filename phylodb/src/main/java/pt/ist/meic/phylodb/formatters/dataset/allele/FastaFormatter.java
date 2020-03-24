@@ -1,12 +1,14 @@
-package pt.ist.meic.phylodb.formatters.datasets;
+package pt.ist.meic.phylodb.formatters.dataset.allele;
 
+import pt.ist.meic.phylodb.formatters.Formatter;
+import pt.ist.meic.phylodb.formatters.dataset.FileDataset;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class FastaFormatter implements DatasetFormatter<Allele> {
+public class FastaFormatter implements Formatter<Allele> {
 
 	@Override
 	public FileDataset<Allele> parse(Stream<String> data) {

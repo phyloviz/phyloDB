@@ -1,18 +1,30 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Schema {
+
+	public static final String MLST = "mlst", MLVA = "mlva", SNP = "snp";
+	public static final List<String> METHODS = new ArrayList<String>() {{
+		add(MLST);
+		add(MLVA);
+		add(SNP);
+	}};
 
 	private String taxonId;
 	private String id;
+	private String type;
 	private String description;
 	private String[] lociIds;
 
 	public Schema() {
 	}
 
-	public Schema(String taxonId, String id, String description, String[] lociId) {
+	public Schema(String taxonId, String id, String type, String description, String[] lociId) {
 		this.taxonId = taxonId;
 		this.id = id;
+		this.type = type;
 		this.description = description;
 		this.lociIds = lociId;
 	}
@@ -23,6 +35,10 @@ public class Schema {
 
 	public String getId() {
 		return id;
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	public String getDescription() {

@@ -19,13 +19,13 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 	protected List<Taxon> getAll(int page, int limit, Object... filters) {
 		String statement = "MATCH (t:Taxon)\n" +
 				"WHERE NOT EXISTS(t.to)\n" +
-				"RETURN t SKIP $0 LIMIT $1";
+				"RETURN t SKIP $ LIMIT $";
 		return queryAll(Taxon.class, new Query(statement, page, limit));
 	}
 
 	@Override
 	protected Taxon get(String key) {
-		String statement = "MATCH (t:Taxon {id: $0})\n" +
+		String statement = "MATCH (t:Taxon {id: $})\n" +
 				"WHERE NOT EXISTS(t.to)\n" +
 				"RETURN t";
 		return query(Taxon.class, new Query(statement, key));
@@ -38,22 +38,22 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 
 	@Override
 	protected void create(Taxon taxon) {
-		String statement = "CREATE (t:Taxon {id: $0, description: $1, from: datetime()})";
+		String statement = "CREATE (t:Taxon {id: $, description: $, from: datetime()})";
 		execute(new Query(statement, taxon.getId(), taxon.getDescription()));
 	}
 
 	@Override
 	protected void update(Taxon taxon) {
-		String statement = "MATCH (t:Taxon {id: $0}) WHERE NOT EXISTS(t.to)\n" +
+		String statement = "MATCH (t:Taxon {id: $}) WHERE NOT EXISTS(t.to)\n" +
 				"WITH t\n" +
 				"CALL apoc.refactor.cloneNodes([t], true) YIELD input, output\n" +
-				"SET t.description = $1, t.from = datetime(), output.to = datetime()";
+				"SET output.description = $, output.from = datetime(), t.to = datetime()";
 		execute(new Query(statement, taxon.getId(), taxon.getDescription()));
 	}
 
 	@Override
 	protected void delete(String key) {
-		String statement = "MATCH (t:Taxon {id: $0}) WHERE NOT EXISTS(t.to) SET t.to = datetime() WITH t\n" +
+		String statement = "MATCH (t:Taxon {id: $}) WHERE NOT EXISTS(t.to) SET t.to = datetime() WITH t\n" +
 				"MATCH (t)-[:CONTAINS]->(l:Locus) WHERE NOT EXISTS(l.to) SET l.to = datetime() WITH l\n" +
 				"MATCH (l)-[:CONTAINS]->(a:Allele) WHERE NOT EXISTS(a.to) SET a.to = datetime()";
 		execute(new Query(statement, key));

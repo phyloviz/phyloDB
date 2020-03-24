@@ -1,12 +1,11 @@
 package pt.ist.meic.phylodb.phylogeny.taxon.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import pt.ist.meic.phylodb.input.Input;
 
-import java.io.Serializable;
+import java.util.Optional;
 
-public class TaxonInputModel implements Serializable {
+public class TaxonInputModel implements Input<Taxon> {
 
-	@JsonProperty(required = true)
 	private String id;
 	private String description;
 
@@ -24,6 +23,11 @@ public class TaxonInputModel implements Serializable {
 
 	public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public Optional<Taxon> toDomainEntity(String... params) {
+		return !params[0].equals(id) ? Optional.empty() : Optional.of(new Taxon(id, description));
 	}
 
 }
