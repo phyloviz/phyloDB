@@ -6,11 +6,10 @@ import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Reference;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey> {
@@ -20,100 +19,132 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	@Override
-	protected List<Schema> getAll(int page, int limit, Object... filters) {
+	protected Result getAll(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(s:Schema {id: $})\n" +
-				"WHERE NOT EXISTS(t.to) AND NOT EXISTS(l.to) AND NOT EXISTS(s.to) WITH t, s, l\n" +
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
+				"WHERE s.deprecated = false AND NOT EXISTS(r.to) WITH t, s, sd, l\n" +
 				"ORDER BY h.part\n" +
-				"RETURN t.id as taxonId, s.id as id, s.type as type, s.description as description, collect(l.id) as lociId SKIP $ LIMIT $";
-		Result r = query(new Query(statement, filters[0], page, limit));
-		List<Schema> schemas = new ArrayList<>();
-		while (r.iterator().hasNext()) {
-			Map<String, Object> row = r.iterator().next();
-			schemas.add(new Schema((String)row.get("taxonId"), (String) row.get("id"), (String) row.get("type"), (String) row.get("description"), (String[]) row.get("lociId")));
+				"RETURN t.id as taxonId, s.id as id, s.deprecated as deprecated, r.version as version, " +
+				"collect([l.id, l.deprecated, h.version]) as lociIds, " +
+				"s.type as type, sd.description as description\n" +
+				"SKIP $ LIMIT $";
+		return query(new Query(statement, filters[0], page, limit));
+	}
+
+	@Override
+	protected Result get(Schema.PrimaryKey key, int version) {
+		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"WHERE " + where + " WITH t, s, sd, l\n" +
+				"ORDER BY h.part\n" +
+				"RETURN t.id as taxonId, s.id as id, s.deprecated as deprecated, r.version as version,\n" +
+				"s.type as type, sd.description as description, collect([l.id, l.deprecated, h.version]) as lociIds";
+		return query(new Query(statement, key.getTaxonId(), key.getId()));
+	}
+
+	@Override
+	protected Schema parse(Map<String, Object> row) {
+		List<Reference<String>> lociIds = Arrays.stream((Object[][]) row.get("lociIds"))
+				.map(a -> new Reference<>((String) a[0], (int) a[1], (boolean) a[2]))
+				.collect(Collectors.toList());
+		return new Schema((String) row.get("taxonId"),
+				(String) row.get("id"),
+				(int) row.get("version"),
+				(boolean) row.get("deprecated"),
+				(String) row.get("type"),
+				(String) row.get("description"),
+				lociIds);
+	}
+
+	@Override
+	protected boolean isPresent(Schema.PrimaryKey key) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"RETURN s.deprecated = false";
+		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
+	}
+
+	@Override
+	protected void store(Schema schema) {
+		Schema dbSchema = find(schema.getPrimaryKey(), CURRENT_VERSION_VALUE);
+		if (dbSchema != null)
+			put(schema);
+		post(schema);
+	}
+
+	@Override
+	protected void delete(Schema.PrimaryKey key) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"SET s.deprecated = true\n";
+		execute(new Query(statement, key.getTaxonId(), key.getId()));
+	}
+
+	public Schema find(String taxonId, String[] lociIds) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
+				"WHERE s.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WITH t, s, sd\n";
+		Query query = new Query(statement, taxonId);
+		for (int i = 0; i < lociIds.length; i++) {
+			query.appendQuery("MATCH (sd)-[:HAS {part: %s}]->(l%s:Locus {id: $}) WITH t, s, sd\n", i, i);
+			query.addParameter(lociIds[i]);
 		}
-		return schemas;
-	}
-
-	@Override
-	protected Schema get(Schema.PrimaryKey key) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(s:Schema {id: $})\n" +
-				"WHERE NOT EXISTS(t.to) AND NOT EXISTS(l.to) AND NOT EXISTS(s.to) WITH t, s, l\n" +
+		query.appendQuery("MATCH (sd)-[h:has]->(l:Locus)\n" +
 				"ORDER BY h.part\n" +
-				"RETURN t.id as taxonId, s.id as id, s.type as type, s.description as description, collect(l.id) as lociId";
-		Result r = query(new Query(statement, key.getTaxonId(), key.getId()));
-		if (!r.iterator().hasNext())
+				"RETURN t.id as taxonId, s.id as id, s.deprecated as deprecated, r.version as version,\n" +
+				"s.type as type, sd.description as description, collect(l.id) as lociId");
+		List<Object> params = new ArrayList<>();
+		params.add(taxonId);
+		params.addAll(Arrays.asList(lociIds));
+		Result result = query(new Query(statement, params));
+		if (!result.iterator().hasNext())
 			return null;
-		Map<String, Object> row = r.iterator().next();
-		return new Schema((String) row.get("taxonId"), (String) row.get("id"), (String) row.get("type"), (String) row.get("description"), (String[]) row.get("lociId"));
+		return parse(result.iterator().next());
 	}
 
-	@Override
-	protected boolean exists(Schema schema) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[:HAS]-(s:Schema {id: $})\n" +
-				"WHERE NOT EXISTS(t.to) AND NOT EXISTS(l.to) AND NOT EXISTS(s.to)\n" +
-				"WITH s, collect(l) as loci\n" +
-				"RETURN s";
-		return query(Schema.class, new Query(statement, schema.getTaxonId(), schema.getId())) != null;
+	public Schema find(UUID datasetId) {
+		String statement = "MATCH (d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+				"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)  WITH t, s, sd, l\n" +
+				"ORDER BY h.part\n" +
+				"WITH s, sd, t, collect(l) as loci\n" +
+				"RETURN t.id as taxonId, s.id as id, s.deprecated as deprecated, r2.version as version,\n" +
+				"s.type as type, sd.description as description, collect(l.id) as lociId";
+		Result result = query(new Query(statement, datasetId));
+		if(!result.iterator().hasNext())
+			return null;
+		return parse(result.iterator().next());
 	}
 
-	@Override
-	protected void create(Schema schema) {
-		String statement = "CREATE (s:Schema {id: $, description: $, type: $ from: datetime()}) WITH s\n " +
-				"MATCH (t:Taxon {id: $}) WHERE NOT EXISTS(t.to)\n";
+	private void post(Schema schema) {
+		String statement = "CREATE (s:Schema {id: $, type: $, deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version 1}]->(sd:SchemaDetails {description: $}) WITH sd\n " +
+				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false\n";
 		Query query = new Query(statement, schema.getId(), schema.getType(), schema.getDescription(), schema.getTaxonId());
 		composeLoci(schema, query);
 		execute(query);
 	}
 
-	@Override
-	protected void update(Schema schema) {
-		String statement = "MATCH (s:Schema {id: $})-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
-				"WHERE NOT EXISTS(t.to) AND NOT EXISTS(l.to) AND NOT EXISTS(s.to)\n" +
-				"WITH s, collect(l) as loci\n" +
-				"CALL apoc.refactor.cloneNodes([s], false) YIELD input, output\n" +
-				"SET output.description = $, output.from = datetime(), s.to = datetime()\n" +
-				"WITH s, t\n";
-		Query query = new Query(statement, schema.getId(), schema.getTaxonId(), schema.getDescription());
+	private void put(Schema schema) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"WHERE NOT EXISTS(r.to)\n" +
+				"SET s.deprecated = false, r.to = datetime() WITH a, r.version + 1 as v\n" +
+				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(:SchemaDetails {description: $})\n" +
+				"WITH t\n";
+		Query query = new Query(statement, schema.getTaxonId(), schema.getId(), schema.getDescription());
 		composeLoci(schema, query);
 		execute(query);
-}
-
-	@Override
-	protected void delete(Schema.PrimaryKey key) {
-		String statement = "MATCH (s:Schema {id: $})-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
-				"WHERE NOT EXISTS(t.to) AND NOT EXISTS(l.to) AND NOT EXISTS(s.to)\n" +
-				"WITH s, collect(l) as loci\n" +
-				"SET s.to = datetime()";
-		execute(new Query(statement, key.getId(), key.getTaxonId()));
-	}
-
-	public Schema find(String taxonId, String[] lociIds) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[:HAS]-(s:Schema)\n" +
-				"WHERE NOT EXISTS(t.to) AND NOT EXISTS(l.to) AND NOT EXISTS(s.to)\n" +
-				"WITH s, t\n";
-		Query query = new Query(statement, taxonId);
-		for (int i = 0; i < lociIds.length; i++) {
-			query.appendQuery("MATCH (s)-[:HAS {part: %s}]->(l%s:Locus {id: $})<-[:CONTAINS]-(t) WHERE NOT EXISTS(l%s.to) WITH s, t\n", i, i);
-			query.addParameter(lociIds[i]);
-		}
-		query.subQuery(query.length() - "WITH s, t\n".length());
-		query.appendQuery("\nRETURN s");
-		List<String> params = new ArrayList<>();
-		params.add(taxonId);
-		params.addAll(Arrays.asList(lociIds));
-		return query(Schema.class, new Query(statement, params));
 	}
 
 	private void composeLoci(Schema schema, Query query) {
-		String[] ids = schema.getLociIds();
+		String[] ids = schema.getLociIds().stream()
+				.map(Reference::getId)
+				.toArray(String[]::new);
 		for (int i = 0; i < ids.length; i++) {
-			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $}) WHERE NOT EXISTS(l%s.to)\n", i, i);
-			query.appendQuery("CREATE (s)-[:HAS {part: %s}]->(l%s) WITH s, t\n", i + 1, i);
-			query.addParameter(ids[i]);
+			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
+					"WHERE l%s.deprecated = false AND NOT EXISTS(r.to)\n" +
+					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l%s) WITH sd, t\n", i, i, i + 1, i)
+					.addParameter(ids[i]);
 		}
-		query.subQuery(query.length() - "WITH s, t\n".length());
+		query.subQuery(query.length() - "WITH sd, t\n".length());
 	}
 
 }

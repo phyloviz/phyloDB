@@ -1,9 +1,16 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.Reference;
 
-public class Schema {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+
+public class Schema extends Entity {
 
 	public static final String MLST = "mlst", MLVA = "mlva", SNP = "snp";
 	public static final List<String> METHODS = new ArrayList<String>() {{
@@ -16,17 +23,21 @@ public class Schema {
 	private String id;
 	private String type;
 	private String description;
-	private String[] lociIds;
+	private List<Reference<String>> lociIds;
 
-	public Schema() {
-	}
-
-	public Schema(String taxonId, String id, String type, String description, String[] lociId) {
+	public Schema(String taxonId, String id, int version, boolean deprecated, String type, String description, List<Reference<String>> lociIds) {
+		super(version, deprecated);
 		this.taxonId = taxonId;
 		this.id = id;
 		this.type = type;
 		this.description = description;
-		this.lociIds = lociId;
+		this.lociIds = lociIds;
+	}
+
+	public Schema(String taxonId, String id, String type, String description, String[] lociId) {
+		this(taxonId, id, -1, false, type, description,  Arrays.stream(lociId)
+				.map(i -> new Reference<>(i, CURRENT_VERSION_VALUE, false))
+				.collect(Collectors.toList()));
 	}
 
 	public String getTaxonId() {
@@ -45,7 +56,7 @@ public class Schema {
 		return description;
 	}
 
-	public String[] getLociIds() {
+	public List<Reference<String>> getLociIds() {
 		return lociIds;
 	}
 

@@ -1,8 +1,10 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model.output;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.model.OutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.List;
@@ -28,11 +30,13 @@ public class GetAllelesJsonOutputModel implements Json, GetAllelesOutputModel<Js
 				.body(this);
 	}
 
-	private static class SimpleAlleleModel {
+	@JsonPropertyOrder({"id", "version", "deprecated"})
+	private static class SimpleAlleleModel extends OutputModel {
 
 		private String id;
 
 		public SimpleAlleleModel(Allele allele) {
+			super(allele.isDeprecated(), allele.getVersion());
 			this.id = allele.getId();
 		}
 

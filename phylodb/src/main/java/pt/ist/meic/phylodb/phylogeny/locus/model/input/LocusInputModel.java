@@ -1,6 +1,7 @@
-package pt.ist.meic.phylodb.phylogeny.locus.model;
+package pt.ist.meic.phylodb.phylogeny.locus.model.input;
 
 import pt.ist.meic.phylodb.input.Input;
+import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 
 import java.util.Optional;
 

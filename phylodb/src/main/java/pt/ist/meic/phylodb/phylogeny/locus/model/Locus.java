@@ -1,17 +1,24 @@
 package pt.ist.meic.phylodb.phylogeny.locus.model;
 
-public class Locus {
+import pt.ist.meic.phylodb.utils.service.Entity;
+
+public class Locus extends Entity {
 
 	private String taxonId;
 	private String id;
 	private String description;
 
-	public Locus() {
+	public Locus(String taxonId, String id, int version, boolean deprecated, String description) {
+		super(version, deprecated);
+		this.taxonId = taxonId;
+		this.id = id;
+		this.description = description;
 	}
 
-	public Locus(String taxonId, String _id, String description) {
+	public Locus(String taxonId, String id, String description) {
+		super(-1, false);
 		this.taxonId = taxonId;
-		this.id = _id;
+		this.id = id;
 		this.description = description;
 	}
 

@@ -8,12 +8,14 @@ import pt.ist.meic.phylodb.error.exception.FileFormatException;
 import pt.ist.meic.phylodb.formatters.dataset.FileDataset;
 import pt.ist.meic.phylodb.formatters.dataset.SchemedFileDataset;
 import pt.ist.meic.phylodb.formatters.dataset.profile.ProfilesFormatter;
+import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.utils.db.Status;
+import pt.ist.meic.phylodb.utils.service.Reference;
 import pt.ist.meic.phylodb.utils.service.SchemaValidator;
-import pt.ist.meic.phylodb.utils.service.StatusResult;
 
 import java.util.*;
 
@@ -25,60 +27,69 @@ public class ProfileService {
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;
+	private LocusRepository locusRepository;
+	private SchemaRepository schemaRepository;
 
 	private Map<String, SchemaValidator<String, String, FileDataset<Profile>>> schemaExistanceValidator = new HashMap<>();
-	
-	public ProfileService(DatasetRepository datasetRepository, ProfileRepository profileRepository, SchemaRepository schemaRepository) {
+
+	public ProfileService(DatasetRepository datasetRepository, ProfileRepository profileRepository, LocusRepository locusRepository, SchemaRepository schemaRepository) {
 		this.datasetRepository = datasetRepository;
 		this.profileRepository = profileRepository;
-		this.schemaExistanceValidator.put(Schema.SNP, (t, s, f) -> schemaRepository.find(new Schema.PrimaryKey(t, s)) != null);
+		this.locusRepository = locusRepository;
+		this.schemaRepository = schemaRepository;
+		this.schemaExistanceValidator.put(Schema.SNP, (t, s, f) -> schemaRepository.exists(new Schema.PrimaryKey(t, s)));
 		this.schemaExistanceValidator.put(Schema.MLVA, (t, s, f) -> schemaRepository.find(t, ((SchemedFileDataset) f).getLociIds()) != null);
 		this.schemaExistanceValidator.put(Schema.MLST, (t, s, f) -> schemaRepository.find(t, ((SchemedFileDataset) f).getLociIds()) != null);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Pair<Schema, List<Profile>>> getProfiles(String datasetId, Map<String, String> filters, int page, int limit) {
+	public Optional<Pair<Schema, List<Profile>>> getProfiles(UUID datasetId, Map<String, String> filters, int page, int limit) {
 		List<Profile> profiles = profileRepository.findAll(page, limit, datasetId, filters);
-		Schema schema = datasetRepository.getSchema(datasetId);
+		Schema schema = schemaRepository.find(datasetId);
 		return Optional.of(new Pair<>(schema, profiles));
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Profile> getProfile(UUID datasetId, String profileId) {
-		return Optional.ofNullable(profileRepository.find(new Profile.PrimaryKey(datasetId, profileId)));
+	public Optional<Profile> getProfile(UUID datasetId, String profileId, int version) {
+		return Optional.ofNullable(profileRepository.find(new Profile.PrimaryKey(datasetId, profileId), version));
 	}
 
 	@Transactional
-	public StatusResult saveProfile(Profile profile) {
-		if (datasetRepository.find(UUID.fromString(profile.getDatasetId())) == null ||
-				datasetRepository.getSchema(profile.getDatasetId()).getLociIds().length != profile.getAllelesIds().length)
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(profileRepository.save(profile));
+	public Status saveProfile(Profile profile) {
+		if (!datasetRepository.exists(profile.getDatasetId())) return UNCHANGED;
+		Schema schema = schemaRepository.find(profile.getDatasetId());
+		String[] lociIds = schema.getLociIds().stream()
+				.map(Reference::getId)
+				.toArray(String[]::new);
+		if (locusRepository.anyMissing(schema.getTaxonId(), lociIds) ||
+				lociIds.length != profile.getAllelesIds().size())
+			return UNCHANGED;
+		return profileRepository.save(profile);
 	}
 
 	@Transactional
-	public StatusResult deleteProfile(UUID datasetId, String profileId) {
-		if (!getProfile(datasetId, profileId).isPresent())
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(profileRepository.remove(new Profile.PrimaryKey(datasetId, profileId)));
+	public Status deleteProfile(UUID datasetId, String profileId) {
+		if (!profileRepository.exists(new Profile.PrimaryKey(datasetId, profileId)))
+			return UNCHANGED;
+		return profileRepository.remove(new Profile.PrimaryKey(datasetId, profileId));
 	}
 
 	@Transactional
-	public StatusResult saveProfilesOnConflictSkip(UUID datasetId, String method, String taxonId, String schemaId, MultipartFile file) throws FileFormatException {
+	public Status saveProfilesOnConflictSkip(UUID datasetId, String method, String taxonId, String schemaId, MultipartFile file) throws FileFormatException {
 		FileDataset<Profile> dataset = getProfileDataset(method, taxonId, schemaId, file);
-		if(datasetRepository.find(datasetId) == null || dataset == null)
-			return new StatusResult(UNCHANGED);
+		if(!datasetRepository.exists(datasetId) || dataset == null)
+			return UNCHANGED;
 		profileRepository.saveAllOnConflictSkip(datasetId, dataset.getEntities());
-		return new StatusResult(UPDATED);
+		return UPDATED;
 	}
 
 	@Transactional
-	public StatusResult saveProfilesOnConflictUpdate(UUID datasetId, String method, String taxonId, String schemaId, MultipartFile file) throws FileFormatException {
+	public Status saveProfilesOnConflictUpdate(UUID datasetId, String method, String taxonId, String schemaId, MultipartFile file) throws FileFormatException {
 		FileDataset<Profile> dataset = getProfileDataset(method, taxonId, schemaId, file);
-		if(datasetRepository.find(datasetId) == null || dataset == null)
-			return new StatusResult(UNCHANGED);
+		if(!datasetRepository.exists(datasetId) || dataset == null)
+			return UNCHANGED;
 		profileRepository.saveAllOnConflictUpdate(datasetId, dataset.getEntities());
-		return new StatusResult(UPDATED);
+		return UPDATED;
 	}
 
 	private FileDataset<Profile> getProfileDataset(String method, String taxonId, String schemaId, MultipartFile file) throws FileFormatException {

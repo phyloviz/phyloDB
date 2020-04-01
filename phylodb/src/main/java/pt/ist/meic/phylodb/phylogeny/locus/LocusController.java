@@ -7,15 +7,16 @@ import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.output.mediatype.Problem;
 import pt.ist.meic.phylodb.output.model.StatusOutputModel;
-import pt.ist.meic.phylodb.phylogeny.locus.model.GetLociOutputModel;
-import pt.ist.meic.phylodb.phylogeny.locus.model.GetLocusOutputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.input.LocusInputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.output.GetLociOutputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.output.GetLocusOutputModel;
 import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.service.StatusResult;
+import pt.ist.meic.phylodb.utils.db.Status;
 
 import java.util.Optional;
 
+import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @RestController
@@ -40,9 +41,10 @@ public class LocusController extends EntityController {
 	@GetMapping(path = "/{locus}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getLocus(
 			@PathVariable("taxon") String taxonId,
-			@PathVariable("locus") String locusId
+			@PathVariable("locus") String locusId,
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
 	) {
-		Optional<Locus> optional = service.getLocus(taxonId, locusId);
+		Optional<Locus> optional = service.getLocus(taxonId, locusId, version);
 		return !optional.isPresent() ?
 				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponseEntity():
 				new GetLocusOutputModel(optional.get()).toResponseEntity();
@@ -57,10 +59,10 @@ public class LocusController extends EntityController {
 		Optional<Locus> locusOptional = locusInputModel.toDomainEntity(taxonId, locusId);
 		if (!locusOptional.isPresent())
 			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
-		StatusResult result = service.saveLocus(locusOptional.get());
-		return result.getStatus().equals(UNCHANGED) ?
+		Status result = service.saveLocus(locusOptional.get());
+		return result.equals(UNCHANGED) ?
 				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity():
-				new StatusOutputModel(result.getStatus()).toResponseEntity();
+				new StatusOutputModel(result).toResponseEntity();
 	}
 
 	@DeleteMapping(path = "/{locus}")
@@ -68,10 +70,10 @@ public class LocusController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId
 	) {
-		StatusResult result = service.deleteLocus(taxonId, locusId);
-		return result.getStatus().equals(UNCHANGED) ?
+		Status result = service.deleteLocus(taxonId, locusId);
+		return result.equals(UNCHANGED) ?
 				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result.getStatus()).toResponseEntity();
+				new StatusOutputModel(result).toResponseEntity();
 	}
 
 

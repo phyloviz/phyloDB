@@ -1,9 +1,12 @@
-package pt.ist.meic.phylodb.phylogeny.locus.model;
+package pt.ist.meic.phylodb.phylogeny.locus.model.output;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.output.mediatype.Json;
 import pt.ist.meic.phylodb.output.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.model.OutputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,11 +31,13 @@ public class GetLociOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class SimpleLocusModel {
+	@JsonPropertyOrder({"id", "version", "deprecated"})
+	private static class SimpleLocusModel extends OutputModel {
 
 		private String id;
 
 		public SimpleLocusModel(Locus locus) {
+			super(locus.isDeprecated(), locus.getVersion());
 			this.id = locus.getId();
 		}
 

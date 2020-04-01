@@ -1,10 +1,11 @@
 package pt.ist.meic.phylodb.typing.schema.model.output;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.output.mediatype.Json;
 import pt.ist.meic.phylodb.output.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.model.OutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 
 public class GetSchemaOutputModel implements Json, Output<Json> {
@@ -22,19 +23,20 @@ public class GetSchemaOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class DetailedSchemaModel {
+	@JsonPropertyOrder({"id", "version", "deprecated", "type", "description", "loci",})
+	private static class DetailedSchemaModel extends OutputModel {
 
 		private String id;
-		@JsonInclude(JsonInclude.Include.NON_NULL)
 		private String type;
 		private String description;
-		private String[] loci;
+		private Object[] loci;
 
 		public DetailedSchemaModel(Schema schema) {
+			super(schema.isDeprecated(), schema.getVersion());
 			this.id = schema.getId();
 			this.type = schema.getType();
 			this.description = schema.getDescription();
-			this.loci = schema.getLociIds();
+			this.loci = schema.getLociIds().toArray();
 		}
 
 		public String getId() {
@@ -49,7 +51,7 @@ public class GetSchemaOutputModel implements Json, Output<Json> {
 			return description;
 		}
 
-		public String[] getLoci() {
+		public Object[] getLoci() {
 			return loci;
 		}
 

@@ -1,23 +1,25 @@
 package pt.ist.meic.phylodb.typing.profile.model.output;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.output.mediatype.Json;
 import pt.ist.meic.phylodb.output.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.model.OutputModel;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 
 public class GetProfileOutputModel implements Json, Output<Json> {
 
-	private DetailedAlleleModel profile;
+	private DetailedProfileModel profile;
 
 	public GetProfileOutputModel() {
 	}
 
 	public GetProfileOutputModel(Profile profile) {
-		this.profile = new DetailedAlleleModel(profile);
+		this.profile = new DetailedProfileModel(profile);
 	}
 
-	public DetailedAlleleModel getProfile() {
+	public DetailedProfileModel getProfile() {
 		return profile;
 	}
 
@@ -27,16 +29,18 @@ public class GetProfileOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class DetailedAlleleModel {
+	@JsonPropertyOrder({ "id", "version", "deprecated", "aka", "alleles"})
+	private static class DetailedProfileModel extends OutputModel {
 
 		private String id;
 		private String aka;
-		private String[] alleles;
+		private Object[] alleles;
 
-		public DetailedAlleleModel(Profile profile) {
+		public DetailedProfileModel(Profile profile) {
+			super(profile.isDeprecated(), profile.getVersion());
 			this.id = profile.getId();
 			this.aka = profile.getAka();
-			this.alleles = profile.getAllelesIds();
+			this.alleles = profile.getAllelesIds().toArray();
 		}
 
 		public String getId() {
@@ -47,7 +51,7 @@ public class GetProfileOutputModel implements Json, Output<Json> {
 			return aka;
 		}
 
-		public String[] getAlleles() {
+		public Object[] getAlleles() {
 			return alleles;
 		}
 

@@ -1,9 +1,12 @@
-package pt.ist.meic.phylodb.phylogeny.taxon.model;
+package pt.ist.meic.phylodb.phylogeny.taxon.model.output;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.output.mediatype.Json;
 import pt.ist.meic.phylodb.output.Output;
+import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.model.OutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +34,12 @@ public class GetTaxonsOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class SimpleTaxonModel {
+	@JsonPropertyOrder({"id", "name", "version", "deprecated"})
+	private static class SimpleTaxonModel extends OutputModel {
 		private String id;
 
 		public SimpleTaxonModel(Taxon taxon) {
+			super(taxon.isDeprecated(), taxon.getVersion());
 			this.id = taxon.getId();
 		}
 

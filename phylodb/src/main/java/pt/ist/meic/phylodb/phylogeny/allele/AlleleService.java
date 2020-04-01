@@ -8,7 +8,7 @@ import pt.ist.meic.phylodb.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.service.StatusResult;
+import pt.ist.meic.phylodb.utils.db.Status;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,38 +32,36 @@ public class AlleleService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId) {
-		return Optional.ofNullable(alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId)));
+	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, int version) {
+		return Optional.ofNullable(alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId), version));
 	}
 
 	@Transactional
-	public StatusResult saveAllele(Allele allele) {
-		if (locusRepository.find(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) == null)
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(alleleRepository.save(allele));
+	public Status saveAllele(Allele allele) {
+		return locusRepository.exists(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) ?
+				alleleRepository.save(allele) :
+				UNCHANGED;
 	}
 
 	@Transactional
-	public StatusResult deleteAllele(String taxonId, String locusId, String alleleId) {
-		if (!getAllele(taxonId, locusId, alleleId).isPresent())
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(alleleRepository.remove(new Allele.PrimaryKey(taxonId, locusId, alleleId)));
+	public Status deleteAllele(String taxonId, String locusId, String alleleId) {
+		return alleleRepository.remove(new Allele.PrimaryKey(taxonId, locusId, alleleId));
 	}
 
 	@Transactional
-	public StatusResult saveAllelesOnConflictUpdate(String taxonId, String locusId, MultipartFile file) throws FileFormatException {
-		if (locusRepository.find(new Locus.PrimaryKey(taxonId, locusId)) == null)
-			return new StatusResult(UNCHANGED);
-		alleleRepository.saveAllOnConflictUpdate(taxonId, locusId, new FastaFormatter().read(file).getEntities());
-		return new StatusResult(UPDATED);
-	}
-
-	@Transactional
-	public StatusResult saveAllelesOnConflictSkip(String taxonId, String locusId, MultipartFile file) throws FileFormatException {
-		if (locusRepository.find(new Locus.PrimaryKey(taxonId, locusId)) == null)
-			return new StatusResult(UNCHANGED);
+	public Status saveAllelesOnConflictSkip(String taxonId, String locusId, MultipartFile file) throws FileFormatException {
+		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
+			return UNCHANGED;
 		alleleRepository.saveAllOnConflictSkip(taxonId, locusId, new FastaFormatter().read(file).getEntities());
-		return new StatusResult(CREATED);
+		return CREATED;
+	}
+
+	@Transactional
+	public Status saveAllelesOnConflictUpdate(String taxonId, String locusId, MultipartFile file) throws FileFormatException {
+		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
+			return UNCHANGED;
+		alleleRepository.saveAllOnConflictUpdate(taxonId, locusId, new FastaFormatter().read(file).getEntities());
+		return UPDATED;
 	}
 
 }

@@ -5,10 +5,6 @@ import org.neo4j.ogm.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 public abstract class Repository {
 
 	protected static final Logger LOG = LoggerFactory.getLogger(Repository.class);
@@ -16,12 +12,6 @@ public abstract class Repository {
 
 	protected Repository(Session session) {
 		this.session = session;
-	}
-
-	protected final <T> List<T> queryAll(Class<T> _class, Query query) {
-		LOG.info("\nQuery: " + query.getExpression() + "\nParameters: " + query.getParameters().toString());
-		return StreamSupport.stream(session.query(_class, query.getExpression(), query.getParameters()).spliterator(), false)
-				.collect(Collectors.toList());
 	}
 
 	protected final <T> T query(Class<T> _class, Query query) {

@@ -1,9 +1,11 @@
 package pt.ist.meic.phylodb.typing.dataset.model.output;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.output.mediatype.Json;
 import pt.ist.meic.phylodb.output.Output;
+import pt.ist.meic.phylodb.output.model.OutputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 
 import java.util.List;
@@ -30,11 +32,13 @@ public class GetDatasetsOutputModel implements Json, Output<Json> {
 				.body(this);
 	}
 
-	private static class SimpleSchemaModel {
+	@JsonPropertyOrder({ "id", "version", "deprecated" })
+	private static class SimpleSchemaModel extends OutputModel {
 
 		private UUID id;
 
 		public SimpleSchemaModel(Dataset dataset) {
+			super(dataset.isDeprecated(), dataset.getVersion());
 			this.id = dataset.getId();
 		}
 

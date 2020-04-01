@@ -12,9 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.output.GetTaxonOutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.output.GetTaxonsOutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.input.TaxonInputModel;
 import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.stream.Stream;

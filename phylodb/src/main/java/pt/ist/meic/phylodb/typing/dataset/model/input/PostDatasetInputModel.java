@@ -4,7 +4,6 @@ import pt.ist.meic.phylodb.input.Input;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class PostDatasetInputModel implements Input<Dataset> {
 
@@ -37,7 +36,7 @@ public class PostDatasetInputModel implements Input<Dataset> {
 	@Override
 	public Optional<Dataset> toDomainEntity(String... params) {
 		return taxonId == null || schemaId == null ? Optional.empty() :
-				Optional.of(new Dataset(UUID.randomUUID(), description, taxonId, schemaId));
+				Optional.of(new Dataset(description, taxonId, schemaId));
 	}
 
 }

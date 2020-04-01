@@ -1,6 +1,7 @@
-package pt.ist.meic.phylodb.phylogeny.allele.model;
+package pt.ist.meic.phylodb.phylogeny.allele.model.input;
 
 import pt.ist.meic.phylodb.input.Input;
+import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.Optional;
 

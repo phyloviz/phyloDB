@@ -6,9 +6,14 @@ import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Reference;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 @Repository
 public class ProfileRepository extends EntityRepository<Profile, Profile.PrimaryKey> {
@@ -18,79 +23,78 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 	}
 
 	@Override
-	protected List<Profile> getAll(int page, int limit, Object... filters) {
+	protected Result getAll(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
-		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(p:Profile)\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(p.to)\n" +
-				"MATCH (d)-[:HAS]->(s:Schema)-[h:HAS]->(l:Locus)-[:CONTAINS]->(a)<-[:HAS]-(p)\n" +
-				"WHERE NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(a.to)\n" +
-				"WITH p, a\n" +
+		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)\n" +
+				"WHERE d.deprecated = false AND p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WITH d, p, h, a\n" +
 				"ORDER BY h.part\n" +
-				"RETURN p.id as id, p.aka as aka, collect(a) as alleles SKIP $ LIMIT $";
-		Result r = query(new Query(statement, filters[0], page, limit));
-		List<Profile> profiles = new ArrayList<>();
-		while (r.iterator().hasNext()) {
-			Map<String, Object> row = r.iterator().next();
-			profiles.add(new Profile((String) filters[0], (String)row.get("id"), (String) row.get("aka"), (String[]) row.get("alleles")));
-		}
-		return profiles;
+				"RETURN d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated, " +
+				"collect([a.id, a.deprecated, h.version]) as alleleIds, p.aka as aka\n" +
+				"SKIP $ LIMIT $";
+		return query(new Query(statement, filters[0], page, limit));
 	}
 
 	@Override
-	protected Profile get(Profile.PrimaryKey key) {
-		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(p.to)\n" +
-				"MATCH (d)-[:HAS]->(s:Schema)-[h:HAS]->(l:Locus)-[:CONTAINS]->(a)<-[:HAS]-(p)\n" +
-				"WHERE NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(a.to)\n" +
-				"WITH p, a\n" +
+	protected Result get(Profile.PrimaryKey key, int version) {
+		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)\n" +
+				"WHERE " + where + "\n" +
+				"WITH d, p, h, a\n" +
 				"ORDER BY h.part\n" +
-				"RETURN p.id as id, p.aka as aka, collect(a) as alleles";
-		Result r = query(new Query(statement, key.getDatasetId(), key.getId()));
-		if (!r.iterator().hasNext())
-			return null;
-		Map<String, Object> row = r.iterator().next();
-		return new Profile(key.getDatasetId().toString(), (String)row.get("id"), (String) row.get("aka"), (String[]) row.get("alleles"));
+				"RETURN d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated, " +
+				"p.aka as aka, collect([a.id, a.deprecated, h.version]) as alleleIds";
+		return query(new Query(statement, key.getDatasetId(), key.getId()));
 
 	}
 
 	@Override
-	protected boolean exists(Profile profile) {
+	protected Profile parse(Map<String, Object> row) {
+		List<Reference<String>> alleleIds = Arrays.stream((Object[][]) row.get("alleleIds"))
+				.map(a -> new Reference<>((String) a[0], (int) a[1], (boolean) a[2]))
+				.collect(Collectors.toList());
+		return new Profile(UUID.fromString(row.get("datasetId").toString()),
+				(String)row.get("id"),
+				(int) row.get("version"),
+				(boolean) row.get("deprecated"),
+				(String) row.get("aka"),
+				alleleIds
+		);
+	}
+
+	@Override
+	protected boolean isPresent(Profile.PrimaryKey key) {
 		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(p.to)\n" +
-				"RETURN p";
-		return query(Profile.class, new Query(statement, profile.getDatasetId(), profile.getId())) != null;
+				"WHERE d.deprecated = false\n" +
+				"RETURN p.to = false";
+		return query(Profile.class, new Query(statement, key.getDatasetId(), key.getId())) != null;
 	}
 
 	@Override
-	protected void create(Profile profile) {
-		Query query = new Query("MATCH (d:Dataset {id: $}) WHERE NOT EXISTS(d.to)\n", profile.getDatasetId());
-		composeCreate(query, profile);
-		execute(query);
-	}
-
-	@Override
-	protected void update(Profile profile) {
-		Query query = new Query("MATCH (d:Dataset {id: $}) WHERE NOT EXISTS(d.to)\n", profile.getDatasetId());
-		composeUpdate(query, profile);
+	protected void store(Profile profile) {
+		Query query = new Query("MATCH (d:Dataset {id: $}) WHERE d.deprecated = false\n", profile.getDatasetId());
+		composeStore(query, profile);
 		execute(query);
 	}
 
 	@Override
 	protected void delete(Profile.PrimaryKey key) {
 		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(p.to)\n" +
-				"SET p.to = datetime()";
+				"SET p.deprecated = true";
 		execute(new Query(statement, key.getDatasetId(), key.getId()));
 	}
 
 	public void saveAllOnConflictSkip(UUID datasetId, List<Profile> entities) {
 		saveAll(datasetId, entities, (q, p) -> {
-			if (exists(p)) {
-				LOG.info(String.format("The profile %s could not be created with the alleles %s since it already existed", p.getId(), Arrays.toString(p.getAllelesIds())));
+			if (exists(p.getPrimaryKey())) {
+				String alleles = p.getAllelesIds().stream()
+						.map(Reference::getId)
+						.reduce("", (a, c) -> a + ',' + c);
+				LOG.info(String.format("The profile %s could not be created with the alleles %s since it already existed", p.getId(), alleles));
 				return 0;
 			} else {
-				composeCreate(q, p);
+				composeStore(q, p);
 				q.appendQuery("WITH d\n");
 				return 1;
 			}
@@ -99,50 +103,46 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 
 	public void saveAllOnConflictUpdate(UUID datasetId, List<Profile> entities) {
 		saveAll(datasetId, entities, (q, p) -> {
-			if (exists(p)) {
-				composeUpdate(q, p);
-			} else {
-				composeCreate(q, p);
-				q.appendQuery("WITH d\n");
-			}
+			composeStore(q, p);
 			q.appendQuery("WITH d\n");
 			return 1;
 		});
 	}
 
-	private void composeCreate(Query query, Profile profile) {
-		String statement = "CREATE (d)-[:CONTAINS]->(p:Profile {id: $, aka: $, from: datetime()}) WITH d, p\n" +
-				"MATCH (d)-[:HAS]->(s:Schema) WHERE NOT EXISTS(s.to)\n" +
-				"WITH d, s, p\n";
-		query.appendQuery(statement).addParameter(profile.getId(), profile.getAka());
-		composeAlleles(query, profile);
-	}
-
-	private void composeUpdate(Query query, Profile profile) {
-		String statement = "MATCH (d)-[:CONTAINS]->(p:Profile {id: $})\n" +
-				"CALL apoc.refactor.cloneNodes([p], false) YIELD input, output\n" +
-				"SET output.aka = $, output.from = datetime(), p.to = datetime() WITH d, output as p\n" +
-				"CREATE (d)-[:CONTAINS]->(p) WITH d, p\n" +
-				"MATCH (d)-[:HAS]->(s:Schema) WHERE NOT EXISTS(s.to)\n" +
-				"WITH d, s, p\n";
+	private void composeStore(Query query, Profile profile) {
+		String statement = "MERGE (d)-[:CONTAINS]->(p:Profile {id: $}) SET p.deprecated = false WITH d, p\n" +
+				"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
+				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WITH d, p, COALESCE(r.version, 0) + 1 as v\n" +
+				"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProfileDetails {aka: $})\n" +
+				"WITH d, p\n";
 		query.appendQuery(statement).addParameter(profile.getId(), profile.getAka());
 		composeAlleles(query, profile);
 	}
 
 	private void composeAlleles(Query query, Profile profile) {
-		String[] allelesIds = profile.getAllelesIds();
-		for (int i = 0; i < profile.getAllelesIds().length; i++) {
-			query.appendQuery("MATCH (s)-[:HAS {part: %s}]->(l:Locus) WHERE NOT EXISTS(l.to)\n", i)
-					.appendQuery("MERGE (l)-[:CONTAINS]->(a:Allele {id: $}) WHERE NOT EXISTS(a.to) ON CREATE SET a.from = datetime() WITH d, s, p, a\n")
-					.appendQuery("CREATE (p)-[:HAS]->(a) WITH d, s, p\n")
+		String statement = "MATCH (d)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+				"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+				"WITH d, p, sd";
+		query.appendQuery(statement);
+		String[] allelesIds = profile.getAllelesIds().stream()
+				.map(Reference::getId)
+				.toArray(String[]::new);
+		for (int i = 0; i < allelesIds.length; i++) {
+			query.appendQuery("MATCH (sd)-[:HAS {part: %s}]->(l:Locus)\n", i)
+					.appendQuery("MERGE (l)-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(:AlleleDetails) WHERE NOT EXISTS (r.to)\n")
+					.appendQuery("ON CREATE SET a.deprecated = null, r.from = datetime(), r.version = COALESCE(r.version, 0) + 1\n")
+					.appendQuery("WITH d, p, sd, a, r\n")
+					.appendQuery("CREATE (p)-[:HAS {part: %s, version: r.version}]->(a) WITH d, s, p\n", i)
+					.appendQuery("WITH d, p, sd")
 					.addParameter(allelesIds[i]);
 		}
-		query.subQuery(query.length() - "WITH d, s, p\n".length());
+		query.subQuery(query.length() - "WITH d, p, sd\n".length());
 	}
 
 	private void saveAll(UUID datasetId, List<Profile> entities, BiFunction<Query, Profile, Integer> compose) {
 		String statement = "MATCH (d:Dataset {id: $}))\n" +
-				"WHERE NOT EXISTS(d.to)\n" +
+				"WHERE d.deprecated = false\n" +
 				"WITH d\n";
 		Query query = new Query(statement, datasetId);
 		int execute = 0;

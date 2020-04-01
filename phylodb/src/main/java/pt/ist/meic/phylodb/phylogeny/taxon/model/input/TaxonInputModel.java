@@ -1,6 +1,7 @@
-package pt.ist.meic.phylodb.phylogeny.taxon.model;
+package pt.ist.meic.phylodb.phylogeny.taxon.model.input;
 
 import pt.ist.meic.phylodb.input.Input;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 
 import java.util.Optional;
 

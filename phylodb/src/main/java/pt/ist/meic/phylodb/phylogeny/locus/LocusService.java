@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
-import pt.ist.meic.phylodb.utils.service.StatusResult;
+import pt.ist.meic.phylodb.utils.db.Status;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,22 +28,18 @@ public class LocusService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Locus> getLocus(String taxonId, String locusId) {
-		return Optional.ofNullable(locusRepository.find(new Locus.PrimaryKey(taxonId, locusId)));
+	public Optional<Locus> getLocus(String taxonId, String locusId, int version) {
+		return Optional.ofNullable(locusRepository.find(new Locus.PrimaryKey(taxonId, locusId), version));
 	}
 
 	@Transactional
-	public StatusResult saveLocus(Locus locus) {
-		if (taxonRepository.find(locus.getTaxonId()) == null)
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(locusRepository.save(locus));
+	public Status saveLocus(Locus locus) {
+		return taxonRepository.exists(locus.getTaxonId()) ? locusRepository.save(locus) : UNCHANGED;
 	}
 
 	@Transactional
-	public StatusResult deleteLocus(String taxonId, String locusId) {
-		if (!getLocus(taxonId, locusId).isPresent())
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(locusRepository.remove(new Locus.PrimaryKey(taxonId, locusId)));
+	public Status deleteLocus(String taxonId, String locusId) {
+		return locusRepository.remove(new Locus.PrimaryKey(taxonId, locusId));
 	}
 
 }

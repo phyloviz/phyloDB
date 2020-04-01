@@ -1,8 +1,10 @@
 package pt.ist.meic.phylodb.typing.profile.model.output;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.output.mediatype.Json;
+import pt.ist.meic.phylodb.output.model.OutputModel;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 
@@ -33,11 +35,13 @@ public class GetProfilesJsonOutputModel implements Json, GetProfilesOutputModel<
 				.body(this);
 	}
 
-	private static class SimpleProfileModel {
+	@JsonPropertyOrder({"id", "version", "deprecated"})
+	private static class SimpleProfileModel extends OutputModel {
 
 		private String id;
 
 		public SimpleProfileModel(Profile profile) {
+			super(profile.isDeprecated(), profile.getVersion());
 			this.id = profile.getId();
 		}
 
@@ -46,4 +50,5 @@ public class GetProfilesJsonOutputModel implements Json, GetProfilesOutputModel<
 		}
 
 	}
+
 }

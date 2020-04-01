@@ -7,9 +7,8 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Reference;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,74 +20,70 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 	}
 
 	@Override
-	protected List<Dataset> getAll(int page, int limit, Object... filters) {
-		String statement = "MATCH (d:Dataset)-[:HAS]->(s:Schema)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(t.to)\n" +
-				"WITH d, s, t, collect(l) as loci\n" +
-				"RETURN d.id as datasetId, d.description as description, t.id as taxonId, s.id as schemaId SKIP $ LIMIT $";
-		Result r = query(new Query(statement, page, limit));
-		List<Dataset> datasets = new ArrayList<>();
-		while (r.iterator().hasNext()) {
-			Map<String, Object> row = r.iterator().next();
-			datasets.add(new Dataset(UUID.fromString((String)row.get("datasetId")), (String) row.get("description"), (String) row.get("taxonId"), (String) row.get("taxonId")));
-		}
-		return datasets;
+	protected Result getAll(int page, int limit, Object... filters) {
+		String statement = "MATCH (d:Dataset)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+				"WHERE d.deprecated = false AND NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
+				"WITH d, dd, s, t, collect(l) as loci\n" +
+				"RETURN d.id as datasetId, d.deprecated as deprecated, r1.version as version, " +
+				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
+				"SKIP $ LIMIT $";
+		return query(new Query(statement, page, limit));
 	}
 
 	@Override
-	protected Dataset get(UUID id) {
-		String statement = "MATCH (d:Dataset {id: $})-[:HAS]->(s:Schema)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(t.to)\n" +
-				"WITH d, s, t, collect(l) as loci\n" +
-				"RETURN d.id as datasetId, d.description as description, t.id as taxonId, s.id as schemaId";
-		Result r = query(new Query(statement, id));
-		if (!r.iterator().hasNext())
-			return null;
-		Map<String, Object> row = r.iterator().next();
-		return new Dataset(UUID.fromString((String) row.get("datasetId")), (String) row.get("description"), (String) row.get("taxonId"), (String) row.get("schemaId"));
+	protected Result get(UUID id, int version) {
+		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String statement = "MATCH (d:Dataset {id: $})-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+				"WHERE r2.version = h.version AND " + where + "\n" +
+				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
+				"WITH d, dd, s, t, collect(l) as loci\n" +
+				"RETURN d.id as datasetId, d.deprecated as deprecated, r1.version as version, " +
+				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated";
+		return query(new Query(statement, id));
 	}
 
 	@Override
-	protected boolean exists(Dataset dataset) {
+	protected Dataset parse(Map<String, Object> row) {
+		Reference<Schema.PrimaryKey> schema = new Reference<>(new Schema.PrimaryKey((String) row.get("taxonId"),
+				(String) row.get("schemaId")),
+				(int) row.get("schemaVersion"),
+				(boolean) row.get("schemaDeprecated"));
+		return new Dataset(UUID.fromString(row.get("datasetId").toString()),
+				(int) row.get("version"),
+				(boolean)row.get("deprecated"),
+				(String) row.get("description"),
+				schema);
+	}
+
+	@Override
+	protected boolean isPresent(UUID key) {
 		String statement = "MATCH (d:Dataset {id: $})\n" +
-				"WHERE NOT EXISTS(d.to)\n" +
-				"RETURN d";
-		return query(Dataset.class, new Query(statement, dataset.getId())) != null;
+				"RETURN d.deprecated = false";
+		return query(Boolean.class, new Query(statement, key));
 	}
 
 	@Override
-	protected void create(Dataset dataset) {
-		String statement = "CREATE (d:Dataset {id: $, description: $, from: datetime()}) WITH d\n" +
-				"MATCH (s:Schema {id: $})-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
-				"WHERE NOT EXISTS(s.to) AND NOT EXISTS(l.to) AND NOT EXISTS(t.to)\n" +
-				"WITH d, s, t, collect(l) as loci\n" +
-				"CREATE (d)-[:HAS]->(s)";
-		Query query = new Query(statement, dataset.getId(), dataset.getDescription(), dataset.getSchemaId(), dataset.getTaxonId());
+	protected void store(Dataset dataset) {
+		String statement = "MERGE (d:Dataset {id : $}) SET a.deprecated = false, WITH d\n" +
+				"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
+				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WITH d, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+				"CREATE (d)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(dd:DatasetDetails {description: $}) WITH dd\n" +
+				"MATCH (s:Schema {id: $})-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
+				"WHERE NOT EXISTS(r.to)\n" +
+				"WITH dd, s, r\n" +
+				"CREATE (dd)-[:HAS {version: r.version}]->(s)";
+		Schema.PrimaryKey schemaKey = dataset.getSchema().getId();
+		Query query = new Query(statement, dataset.getId(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
 		execute(query);
 	}
 
 	@Override
-	protected void update(Dataset dataset) {
-		String statement = "MATCH (d:Dataset {id: $})\n" +
-				"WHERE NOT EXISTS(d.to)\n" +
-				"CALL apoc.refactor.cloneNodes([d], true) YIELD input, output\n" +
-				"SET output.description = $, output.from = datetime(), d.to = datetime()";
-		execute(new Query(statement, dataset.getId(), dataset.getDescription()));
-	}
-
-	@Override
 	protected void delete(UUID id) {
-		String statement = "MATCH (d:Dataset {id: $}) WHERE NOT EXISTS(d.to) SET d.to = datetime() WITH d" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile) WHERE NOT EXISTS(p.to) SET p.to = datetime() WITH d" +
-				"MATCH (d)-[:CONTAINS]->(i:Isolate) WHERE NOT EXISTS(i.to) SET i.to = datetime()";
+		String statement = "MATCH (d:Dataset {id: $}) SET d.deprecated = true WITH d\n" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile) SET p.deprecated = true WITH d\n" +
+				"MATCH (d)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true";
 		execute(new Query(statement, id));
 	}
-
-	public Schema getSchema(String datasetId) {
-		String statement = "MATCH (d:Dataset {id: $})-[:HAS]->(s:Schema)\n" +
-				"WHERE NOT EXISTS(d.to) AND NOT EXISTS(s.to)\n" +
-				"RETURN s";
-		return query(Schema.class, new Query(statement, datasetId));
-	}
-
 }

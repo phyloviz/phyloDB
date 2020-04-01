@@ -3,9 +3,9 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.StatusResult;
+import pt.ist.meic.phylodb.utils.db.Status;
+import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,39 +15,39 @@ import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 @Service
 public class SchemaService {
 
-	private TaxonRepository taxonRepository;
 	private LocusRepository locusRepository;
 	private SchemaRepository schemaRepository;
 
-	public SchemaService(TaxonRepository taxonRepository, LocusRepository locusRepository, SchemaRepository schemaRepository) {
-		this.taxonRepository = taxonRepository;
+	public SchemaService(LocusRepository locusRepository, SchemaRepository schemaRepository) {
 		this.locusRepository = locusRepository;
 		this.schemaRepository = schemaRepository;
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Schema>> getSchemas(String taxonId, Integer page, int limit) {
+	public Optional<List<Schema>> getSchemas(String taxonId, int page, int limit) {
 		return Optional.ofNullable(schemaRepository.findAll(page, limit, taxonId));
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Schema> getSchema(String taxonId, String schemaId) {
-		return Optional.ofNullable(schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId)));
+	public Optional<Schema> getSchema(String taxonId, String schemaId, int version) {
+		return Optional.ofNullable(schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId), version));
 	}
 
 	@Transactional
-	public StatusResult saveSchema(Schema schema) {
-		if (!Schema.METHODS.contains(schema.getType()) || taxonRepository.find(schema.getTaxonId()) == null ||
-				!locusRepository.existsAll(schema.getTaxonId(), schema.getLociIds()))
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(schemaRepository.save(schema));
+	public Status saveSchema(Schema schema) {
+		String[] lociIds = schema.getLociIds().stream()
+				.map(Reference::getId)
+				.toArray(String[]::new);
+		Schema dbSchema = schemaRepository.find(schema.getTaxonId(), lociIds);
+		if (locusRepository.anyMissing(schema.getTaxonId(), lociIds) ||
+				(dbSchema != null && !dbSchema.getId().equals(schema.getId())))
+			return UNCHANGED;
+		return schemaRepository.save(schema);
 	}
 
 	@Transactional
-	public StatusResult deleteSchema(String taxonId, String schemaId) {
-		if (!getSchema(taxonId, schemaId).isPresent())
-			return new StatusResult(UNCHANGED);
-		return new StatusResult(schemaRepository.remove(new Schema.PrimaryKey(taxonId, schemaId)));
+	public Status deleteSchema(String taxonId, String schemaId) {
+		return schemaRepository.remove(new Schema.PrimaryKey(taxonId, schemaId));
 	}
 
 }
