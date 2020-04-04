@@ -12,6 +12,8 @@ public class Problem implements MediaType {
 	public static final String UNAUTHORIZED = "unauthorized";
 	public static final String FORBIDDEN = "forbidden";
 	public static final String BAD_REQUEST = "bad-request";
+	public static final String INVALID_REQUEST = "invalid_request";
+	public static final String INVALID_TOKEN = "invalid_token";
 
 	private String message;
 

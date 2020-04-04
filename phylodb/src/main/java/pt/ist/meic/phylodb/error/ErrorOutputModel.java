@@ -2,11 +2,10 @@ package pt.ist.meic.phylodb.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.output.mediatype.MediaType;
 import pt.ist.meic.phylodb.output.Output;
 import pt.ist.meic.phylodb.output.mediatype.Problem;
 
-public class ErrorOutputModel implements Output {
+public class ErrorOutputModel implements Output<Problem> {
 
 	private String message;
 	private HttpStatus status;
@@ -20,7 +19,7 @@ public class ErrorOutputModel implements Output {
 	}
 
 	@Override
-	public ResponseEntity<MediaType> toResponseEntity() {
+	public ResponseEntity<Problem> toResponseEntity() {
 		return ResponseEntity.status(status)
 				.body(new Problem(message));
 	}
