@@ -1,14 +1,19 @@
 package pt.ist.meic.phylodb.utils.service;
 
+public abstract class Entity<K> {
 
-public abstract class Entity {
-
+	protected K id;
 	protected int version;
 	protected boolean deprecated;
 
-	public Entity(int version, boolean deprecated) {
+	public Entity(K id, int version, boolean deprecated) {
+		this.id = id;
 		this.version = version;
 		this.deprecated = deprecated;
+	}
+
+	public K getPrimaryKey() {
+		return id;
 	}
 
 	public int getVersion() {

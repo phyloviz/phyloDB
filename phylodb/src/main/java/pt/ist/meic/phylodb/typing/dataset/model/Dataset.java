@@ -8,31 +8,19 @@ import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
-public class Dataset extends Entity {
+public class Dataset extends Entity<UUID> {
 
-	private UUID id;
-	private String description;
-	private Reference<Schema.PrimaryKey> schema;
-
+	private final String description;
+	private final Reference<Schema.PrimaryKey> schema;
 
 	public Dataset(UUID id, int version, boolean deprecated, String description, Reference<Schema.PrimaryKey> schema) {
-		super(version, deprecated);
-		this.id = id;
-		this.schema = schema;
+		super(id, version, deprecated);
 		this.description = description;
+		this.schema = schema;
 	}
 
-	public Dataset(UUID id, String taxonId, String schemaId, String description) {
+	public Dataset(UUID id, String description, String taxonId, String schemaId) {
 		this(id, CURRENT_VERSION_VALUE, false, description, new Reference<>(new Schema.PrimaryKey(taxonId, schemaId), CURRENT_VERSION_VALUE, false));
-	}
-
-	public Dataset(String description, String taxonId, String schemaId) {
-		this(UUID.randomUUID(), description, taxonId, schemaId);
-	}
-
-
-	public UUID getId() {
-		return id;
 	}
 
 	public String getDescription() {

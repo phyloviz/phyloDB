@@ -51,7 +51,7 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 				(boolean) row.get("schemaDeprecated"));
 		return new Dataset(UUID.fromString(row.get("datasetId").toString()),
 				(int) row.get("version"),
-				(boolean)row.get("deprecated"),
+				(boolean) row.get("deprecated"),
 				(String) row.get("description"),
 				schema);
 	}
@@ -74,8 +74,8 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 				"WHERE NOT EXISTS(r.to)\n" +
 				"WITH dd, s, r\n" +
 				"CREATE (dd)-[:HAS {version: r.version}]->(s)";
-		Schema.PrimaryKey schemaKey = dataset.getSchema().getId();
-		Query query = new Query(statement, dataset.getId(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
+		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
+		Query query = new Query(statement, dataset.getPrimaryKey(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
 		execute(query);
 	}
 
@@ -86,4 +86,5 @@ public class DatasetRepository extends EntityRepository<Dataset, UUID> {
 				"MATCH (d)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true";
 		execute(new Query(statement, id));
 	}
+
 }

@@ -7,14 +7,10 @@ import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
-import pt.ist.meic.phylodb.utils.db.Status;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static pt.ist.meic.phylodb.utils.db.Status.CREATED;
-import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @Service
 public class DatasetService {
@@ -31,31 +27,31 @@ public class DatasetService {
 
 	@Transactional(readOnly = true)
 	public Optional<List<Dataset>> getDatasets(int page, int limit) {
-		return Optional.ofNullable(datasetRepository.findAll(page, limit));
+		return datasetRepository.findAll(page, limit);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<Dataset> getDataset(UUID id, int version) {
-		return Optional.ofNullable(datasetRepository.find(id, version));
+		return datasetRepository.find(id, version);
 	}
 
 	@Transactional
-	public Status saveDataset(Dataset dataset) {
-		Schema.PrimaryKey schemaKey = dataset.getSchema().getId();
-		if(!schemaRepository.exists(schemaKey))
-			return UNCHANGED;
-		Dataset dbDataset = datasetRepository.find(dataset.getId(), EntityRepository.CURRENT_VERSION_VALUE);
-		if (dbDataset == null) {
+	public boolean saveDataset(Dataset dataset) {
+		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
+		if (!schemaRepository.exists(schemaKey))
+			return false;
+		Optional<Dataset> dbDataset = datasetRepository.find(dataset.getPrimaryKey(), EntityRepository.CURRENT_VERSION_VALUE);
+		if (!dbDataset.isPresent()) {
 			datasetRepository.save(dataset);
-			return CREATED;
-		} else if(!schemaKey.equals(dbDataset.getSchema().getId()) &&
-				profileRepository.findAll(0, 1, dataset.getId()).size() > 0)
-			return UNCHANGED;
+			return true;
+		} else if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) &&
+				profileRepository.findAll(0, 1, dataset.getPrimaryKey()).get().size() > 0)
+			return false;
 		return datasetRepository.save(dataset);
 	}
 
 	@Transactional
-	public Status deleteDataset(UUID id) {
+	public boolean deleteDataset(UUID id) {
 		return datasetRepository.remove(id);
 	}
 

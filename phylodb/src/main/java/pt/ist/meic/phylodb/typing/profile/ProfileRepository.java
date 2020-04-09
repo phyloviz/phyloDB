@@ -4,7 +4,7 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
@@ -12,11 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Repository
-public class ProfileRepository extends EntityRepository<Profile, Profile.PrimaryKey> {
+public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryKey> {
 
 	public ProfileRepository(Session session) {
 		super(session);
@@ -55,7 +54,7 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 				.map(a -> new Reference<>((String) a[0], (int) a[1], (boolean) a[2]))
 				.collect(Collectors.toList());
 		return new Profile(UUID.fromString(row.get("datasetId").toString()),
-				(String)row.get("id"),
+				(String) row.get("id"),
 				(int) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("aka"),
@@ -85,28 +84,23 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 		execute(new Query(statement, key.getDatasetId(), key.getId()));
 	}
 
-	public void saveAllOnConflictSkip(UUID datasetId, List<Profile> entities) {
-		saveAll(datasetId, entities, (q, p) -> {
-			if (exists(p.getPrimaryKey())) {
-				String alleles = p.getAllelesIds().stream()
-						.map(Reference::getId)
-						.reduce("", (a, c) -> a + ',' + c);
-				LOG.info(String.format("The profile %s could not be created with the alleles %s since it already existed", p.getId(), alleles));
-				return 0;
-			} else {
-				composeStore(q, p);
-				q.appendQuery("WITH d\n");
-				return 1;
-			}
-		});
+	@Override
+	protected Query init(String... params) {
+		String statement = "MATCH (d:Dataset {id: $}))\n" +
+				"WHERE d.deprecated = false\n" +
+				"WITH d\n";
+		return new Query(statement, params[0]);
 	}
 
-	public void saveAllOnConflictUpdate(UUID datasetId, List<Profile> entities) {
-		saveAll(datasetId, entities, (q, p) -> {
-			composeStore(q, p);
-			q.appendQuery("WITH d\n");
-			return 1;
-		});
+	@Override
+	protected void batch(Query query, Profile entity) {
+		composeStore(query, entity);
+		query.appendQuery("WITH d\n");
+	}
+
+	@Override
+	protected void arrange(Query query) {
+		query.subQuery(query.length() - "WITH d\n".length());
 	}
 
 	private void composeStore(Query query, Profile profile) {
@@ -116,7 +110,7 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 				"WITH d, p, COALESCE(r.version, 0) + 1 as v\n" +
 				"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProfileDetails {aka: $})\n" +
 				"WITH d, p\n";
-		query.appendQuery(statement).addParameter(profile.getId(), profile.getAka());
+		query.appendQuery(statement).addParameter(profile.getPrimaryKey(), profile.getAka());
 		composeAlleles(query, profile);
 	}
 
@@ -125,9 +119,7 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 				"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
 				"WITH d, p, sd";
 		query.appendQuery(statement);
-		String[] allelesIds = profile.getAllelesIds().stream()
-				.map(Reference::getId)
-				.toArray(String[]::new);
+		String[] allelesIds = profile.getAllelesids().toArray(new String[0]);
 		for (int i = 0; i < allelesIds.length; i++) {
 			query.appendQuery("MATCH (sd)-[:HAS {part: %s}]->(l:Locus)\n", i)
 					.appendQuery("MERGE (l)-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(:AlleleDetails) WHERE NOT EXISTS (r.to)\n")
@@ -138,20 +130,6 @@ public class ProfileRepository extends EntityRepository<Profile, Profile.Primary
 					.addParameter(allelesIds[i]);
 		}
 		query.subQuery(query.length() - "WITH d, p, sd\n".length());
-	}
-
-	private void saveAll(UUID datasetId, List<Profile> entities, BiFunction<Query, Profile, Integer> compose) {
-		String statement = "MATCH (d:Dataset {id: $}))\n" +
-				"WHERE d.deprecated = false\n" +
-				"WITH d\n";
-		Query query = new Query(statement, datasetId);
-		int execute = 0;
-		for (Profile profile : entities)
-			execute += compose.apply(query, profile);
-		if(execute == 0)
-			return;
-		query.subQuery(query.length() - "WITH d\n".length());
-		execute(query);
 	}
 
 }

@@ -66,8 +66,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 
 	@Override
 	protected void store(Schema schema) {
-		Schema dbSchema = find(schema.getPrimaryKey(), CURRENT_VERSION_VALUE);
-		if (dbSchema != null)
+		if (!find(schema.getPrimaryKey(), CURRENT_VERSION_VALUE).isPresent())
 			put(schema);
 		post(schema);
 	}
@@ -79,9 +78,10 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		execute(new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
-	public Schema find(String taxonId, String[] lociIds) {
+	public Optional<Schema> find(String taxonId, String[] lociIds, int version) {
+		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
-				"WHERE s.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE s.deprecated = false AND  " + where + "\n" +
 				"WITH t, s, sd\n";
 		Query query = new Query(statement, taxonId);
 		for (int i = 0; i < lociIds.length; i++) {
@@ -97,11 +97,11 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		params.addAll(Arrays.asList(lociIds));
 		Result result = query(new Query(statement, params));
 		if (!result.iterator().hasNext())
-			return null;
-		return parse(result.iterator().next());
+			return Optional.empty();
+		return Optional.of(parse(result.iterator().next()));
 	}
 
-	public Schema find(UUID datasetId) {
+	public Optional<Schema> find(UUID datasetId) {
 		String statement = "MATCH (d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
 				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)  WITH t, s, sd, l\n" +
@@ -110,15 +110,15 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				"RETURN t.id as taxonId, s.id as id, s.deprecated as deprecated, r2.version as version,\n" +
 				"s.type as type, sd.description as description, collect(l.id) as lociId";
 		Result result = query(new Query(statement, datasetId));
-		if(!result.iterator().hasNext())
-			return null;
-		return parse(result.iterator().next());
+		if (!result.iterator().hasNext())
+			return Optional.empty();
+		return Optional.of(parse(result.iterator().next()));
 	}
 
 	private void post(Schema schema) {
 		String statement = "CREATE (s:Schema {id: $, type: $, deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version 1}]->(sd:SchemaDetails {description: $}) WITH sd\n " +
 				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false\n";
-		Query query = new Query(statement, schema.getId(), schema.getType(), schema.getDescription(), schema.getTaxonId());
+		Query query = new Query(statement, schema.getPrimaryKey(), schema.getType(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
 		composeLoci(schema, query);
 		execute(query);
 	}
@@ -129,14 +129,14 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				"SET s.deprecated = false, r.to = datetime() WITH a, r.version + 1 as v\n" +
 				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(:SchemaDetails {description: $})\n" +
 				"WITH t\n";
-		Query query = new Query(statement, schema.getTaxonId(), schema.getId(), schema.getDescription());
+		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey(), schema.getDescription());
 		composeLoci(schema, query);
 		execute(query);
 	}
 
 	private void composeLoci(Schema schema, Query query) {
 		String[] ids = schema.getLociIds().stream()
-				.map(Reference::getId)
+				.map(Reference::getPrimaryKey)
 				.toArray(String[]::new);
 		for (int i = 0; i < ids.length; i++) {
 			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +

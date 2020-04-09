@@ -38,9 +38,9 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 
 	@Override
 	protected Taxon parse(Map<String, Object> row) {
-		return new Taxon((String)row.get("id"),
+		return new Taxon((String) row.get("id"),
 				(int) row.get("version"),
-				(boolean)row.get("deprecated"),
+				(boolean) row.get("deprecated"),
 				(String) row.get("description"));
 	}
 
@@ -58,7 +58,7 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH t, COALESCE(MAX(r.version), 0) + 1 as v" +
 				"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $})";
-		execute(new Query(statement, taxon.getId(), taxon.getDescription()));
+		execute(new Query(statement, taxon.getPrimaryKey(), taxon.getDescription()));
 	}
 
 	@Override

@@ -1,31 +1,28 @@
 package pt.ist.meic.phylodb.typing.isolate;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.error.exception.FileFormatException;
-import pt.ist.meic.phylodb.output.mediatype.Problem;
-import pt.ist.meic.phylodb.output.model.StatusOutputModel;
+import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
+import pt.ist.meic.phylodb.io.output.FileOutputModel;
+import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
+import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
-import pt.ist.meic.phylodb.typing.isolate.model.input.IsolateInputModel;
-import pt.ist.meic.phylodb.typing.isolate.model.output.GetIsolateOutputModel;
-import pt.ist.meic.phylodb.typing.isolate.model.output.GetIsolatesOutputModel;
-import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.db.Status;
+import pt.ist.meic.phylodb.typing.isolate.model.IsolateInputModel;
+import pt.ist.meic.phylodb.typing.isolate.model.IsolateOutputModel;
+import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
 import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
-import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @RestController
 @RequestMapping("/datasets/{dataset}/isolates")
-public class IsolateController extends EntityController {
+public class IsolateController extends Controller<Isolate> {
 
 	private IsolateService service;
 
@@ -33,79 +30,64 @@ public class IsolateController extends EntityController {
 		this.service = service;
 	}
 
+	@Authorized
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	public ResponseEntity<?> getIsolates(
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestHeader(value="Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
+			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
-		if (page < 0)
-			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
-		Optional<List<Isolate>> optional = service.getIsolates(datasetId, page, Integer.parseInt(jsonLimit));
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				GetIsolatesOutputModel.get(type).apply(optional.get()).toResponseEntity();
+		return getAll(type, l -> service.getIsolates(datasetId, page, l),
+				MultipleOutputModel::new,
+				(i) -> new FileOutputModel("isolates.txt", new IsolatesFormatter().format(i)));
 	}
 
+	@Authorized
 	@GetMapping(path = "/{isolate}/", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolate(
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
 	) {
-		Optional<Isolate> optional = service.getIsolate(datasetId, isolateId, version);
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponseEntity() :
-				new GetIsolateOutputModel(optional.get()).toResponseEntity();
+		return get(() -> service.getIsolate(datasetId, isolateId, version), IsolateOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
+	@Authorized
 	@PutMapping(path = "/{isolate}")
 	public ResponseEntity<?> putIsolate(
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId,
-			@RequestBody IsolateInputModel isolateInputModel
+			@RequestBody IsolateInputModel input
 	) {
-		Optional<Isolate> optionalIsolate = isolateInputModel.toDomainEntity(datasetId.toString(), isolateId);
-		if (!optionalIsolate.isPresent())
-			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
-		Status result = service.saveIsolate(optionalIsolate.get());
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+		return put(() -> input.toDomainEntity(datasetId.toString(), isolateId), service::saveIsolate);
 	}
 
+	@Authorized
 	@DeleteMapping(path = "/{isolate}")
 	public ResponseEntity<?> deleteIsolate(
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId
-	) {
-		Status result = service.deleteIsolate(datasetId, isolateId);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.deleteIsolate(datasetId, isolateId));
 	}
 
+	@Authorized
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postIsolates(
 			@PathVariable("dataset") UUID datasetId,
 			@RequestBody MultipartFile file
-	) throws FileFormatException {
-		Status result = service.saveIsolatesOnConflictSkip(datasetId, file);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.saveIsolatesOnConflictSkip(datasetId, file));
 	}
 
+	@Authorized
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putIsolates(
 			@PathVariable("dataset") UUID datasetId,
 			@RequestBody MultipartFile file
 
-	) throws FileFormatException {
-		Status result = service.saveIsolatesOnConflictUpdate(datasetId, file);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.saveIsolatesOnConflictUpdate(datasetId, file));
 	}
 
 }

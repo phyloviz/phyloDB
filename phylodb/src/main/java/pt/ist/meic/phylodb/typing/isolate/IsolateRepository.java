@@ -5,17 +5,15 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 @Repository
-public class IsolateRepository extends EntityRepository<Isolate, Isolate.PrimaryKey> {
+public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryKey> {
 
 	public IsolateRepository(Session session) {
 		super(session);
@@ -82,27 +80,23 @@ public class IsolateRepository extends EntityRepository<Isolate, Isolate.Primary
 		execute(new Query(statement, key.getDatasetId(), key.getId()));
 	}
 
-	public void saveAllOnConflictSkip(UUID datasetId, List<Isolate> isolates) {
-		saveAll(datasetId, isolates, (q, i) -> {
-			if(isPresent(new Isolate.PrimaryKey(datasetId, i.getId()))) {
-				LOG.info("The isolate " + i.getId() + " could not be created since it already exists");
-				return 0;
-			} else {
-				Reference<String> profile = i.getProfile();
-				composeStore(q, new Isolate(datasetId, i.getId(), i.getDescription(), i.getAncillaries(), profile.getId()));
-				q.appendQuery("WITH d\n");
-				return 1;
-			}
-		});
+	@Override
+	protected Query init(String... params) {
+		String statement = "MATCH (d:Dataset {id: $})\n" +
+				"WHERE d.deprecated = false\n" +
+				"WITH d\n";
+		return new Query(statement, params[0]);
 	}
 
-	public void saveAllOnConflictUpdate(UUID datasetId, List<Isolate> isolates) {
-		saveAll(datasetId, isolates, (q, i) -> {
-			Reference<String> profile = i.getProfile();
-			composeStore(q, new Isolate(datasetId, i.getId(), i.getDescription(), i.getAncillaries(), profile.getId()));
-			q.appendQuery("WITH d\n");
-			return 1;
-		});
+	@Override
+	protected void batch(Query query, Isolate isolate) {
+		composeStore(query, isolate);
+		query.appendQuery("WITH d\n");
+	}
+
+	@Override
+	protected void arrange(Query query) {
+		query.subQuery(query.length() - "WITH d\n".length());
 	}
 
 	private void composeStore(Query query, Isolate isolate) {
@@ -111,13 +105,13 @@ public class IsolateRepository extends EntityRepository<Isolate, Isolate.Primary
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH d, i, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (i)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(id:IsolateDetails {description: $})\n";
-		query.appendQuery(statement).addParameter(isolate.getId(), isolate.getDescription());
+		query.appendQuery(statement).addParameter(isolate.getPrimaryKey(), isolate.getDescription());
 		composeProfile(query, isolate);
 		composeAncillary(query, isolate);
 	}
 
 	private void composeProfile(Query query, Isolate isolate) {
-		if(isolate.getProfile() == null) return;
+		if (isolate.getProfile() == null) return;
 		String statement = "WITH d, id\n" +
 				"MATCH (p:Profile {id: $}-[r:CONTAINS_DETAILS]->(pd:ProfileDetails))\n" +
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
@@ -135,20 +129,6 @@ public class IsolateRepository extends EntityRepository<Isolate, Isolate.Primary
 					.addParameter(ancillary.getKey(), ancillary.getValue());
 		}
 		query.subQuery(query.length() - "WITH d, id\n".length());
-	}
-
-	private void saveAll(UUID datasetId, List<Isolate> isolates, BiFunction<Query, Isolate, Integer> compose) {
-		String statement = "MATCH (d:Dataset {id: $})\n" +
-				"WHERE d.deprecated = false\n" +
-				"WITH d\n";
-		Query query = new Query(statement, datasetId);
-		int toExecute = 0;
-		for (Isolate isolate : isolates)
-			toExecute += compose.apply(query, isolate);
-		if(toExecute != 0) {
-			query.subQuery(query.length() - "WITH d\n".length());
-			execute(query);
-		}
 	}
 
 }

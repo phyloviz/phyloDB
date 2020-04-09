@@ -1,27 +1,32 @@
 package pt.ist.meic.phylodb.error;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import pt.ist.meic.phylodb.output.Output;
-import pt.ist.meic.phylodb.output.mediatype.Problem;
+import pt.ist.meic.phylodb.io.output.OutputModel;
 
-public class ErrorOutputModel implements Output<Problem> {
+public class ErrorOutputModel implements OutputModel {
 
-	private String message;
-	private HttpStatus status;
+	private static final String URI = "/problems/%s";
 
-	public ErrorOutputModel() {
+	private final String message;
+	private final HttpStatus status;
+
+	public ErrorOutputModel(Problem problem) {
+		this.message = String.format(URI, problem.getMessage());
+		this.status = problem.getStatus();
 	}
 
-	public ErrorOutputModel(String message, HttpStatus status) {
-		this.message = message;
-		this.status = status;
+	public String getMessage() {
+		return message;
 	}
 
 	@Override
-	public ResponseEntity<Problem> toResponseEntity() {
-		return ResponseEntity.status(status)
-				.body(new Problem(message));
+	public ResponseEntity<ErrorOutputModel> toResponseEntity() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PROBLEM_JSON);
+		return ResponseEntity.status(status).headers(headers).body(this);
 	}
 
 }

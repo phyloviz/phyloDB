@@ -31,7 +31,6 @@ public class AnalysisController {
 		return null;
 	}
 
-
 	@PutMapping(path = "/{analysis}")
 	public ResponseEntity putAnalysis(
 			@PathVariable("dataset") String dataset,

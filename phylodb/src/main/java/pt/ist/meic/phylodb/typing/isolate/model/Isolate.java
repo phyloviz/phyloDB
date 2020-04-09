@@ -3,29 +3,28 @@ package pt.ist.meic.phylodb.typing.isolate.model;
 import pt.ist.meic.phylodb.utils.service.Entity;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
-public class Isolate extends Entity {
+public class Isolate extends Entity<Isolate.PrimaryKey> {
 
-	private UUID datasetId;
-	private String id;
-	private String description;
-	private Ancillary[] ancillaries;
-	private Reference<String> profile;
+	private final String description;
+	private final Ancillary[] ancillaries;
+	private final Reference<String> profile;
 
 	public Isolate(UUID datasetId, String id, int version, boolean deprecated, String description, Ancillary[] ancillaries, Reference<String> profile) {
-		super(version, deprecated);
-		this.datasetId = datasetId;
-		this.id = id;
+		super(new PrimaryKey(datasetId, id), version, deprecated);
 		this.description = description;
 		this.profile = profile;
 		this.ancillaries = ancillaries;
 	}
 
 	public Isolate(UUID datasetId, String id, String description, Ancillary[] ancillaries, String profileId) {
-		this(datasetId, id, CURRENT_VERSION_VALUE, false, description, ancillaries, new Reference<>(profileId, CURRENT_VERSION_VALUE, false));
+		this(datasetId, id, CURRENT_VERSION_VALUE, false, description, ancillaries,
+				profileId == null ? null : new Reference<>(profileId, CURRENT_VERSION_VALUE, false));
 	}
 
 	public Isolate(String id, String description, Ancillary[] ancillaries, String profileId) {
@@ -33,11 +32,7 @@ public class Isolate extends Entity {
 	}
 
 	public UUID getDatasetId() {
-		return datasetId;
-	}
-
-	public String getId() {
-		return id;
+		return id.getDatasetId();
 	}
 
 	public String getDescription() {
@@ -52,14 +47,18 @@ public class Isolate extends Entity {
 		return ancillaries;
 	}
 
-	public PrimaryKey getPrimaryKey() {
-		return new PrimaryKey(datasetId, id);
+	@Override
+	public String toString() {
+		String ancillaries = Arrays.stream(this.ancillaries)
+				.map(Ancillary::toString)
+				.collect(Collectors.joining(","));
+		return String.format("Isolate %s from dataset %s with description %s and ancillary %s", id.getId(), id.getDatasetId(), getDescription(), ancillaries);
 	}
 
 	public static class PrimaryKey {
 
-		private UUID datasetId;
-		private String id;
+		private final UUID datasetId;
+		private final String id;
 
 		public PrimaryKey(UUID datasetId, String id) {
 			this.datasetId = datasetId;

@@ -1,27 +1,25 @@
 package pt.ist.meic.phylodb.phylogeny.locus;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.output.mediatype.Problem;
-import pt.ist.meic.phylodb.output.model.StatusOutputModel;
+import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.phylogeny.locus.model.input.LocusInputModel;
-import pt.ist.meic.phylodb.phylogeny.locus.model.output.GetLociOutputModel;
-import pt.ist.meic.phylodb.phylogeny.locus.model.output.GetLocusOutputModel;
-import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.db.Status;
+import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
+import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import java.util.Optional;
+import java.io.IOException;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
-import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci")
-public class LocusController extends EntityController {
+public class LocusController extends Controller<Locus> {
 	private LocusService service;
 
 	public LocusController(LocusService service) {
@@ -33,9 +31,8 @@ public class LocusController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		return page < 0 ?
-				new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity() :
-				new GetLociOutputModel(service.getLoci(taxonId, page, Integer.parseInt(jsonLimit)).get()).toResponseEntity();
+		String type = MediaType.APPLICATION_JSON_VALUE;
+		return getAll(type, l -> service.getLoci(taxonId, page, l), MultipleOutputModel::new, null);
 	}
 
 	@GetMapping(path = "/{locus}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -44,37 +41,26 @@ public class LocusController extends EntityController {
 			@PathVariable("locus") String locusId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
 	) {
-		Optional<Locus> optional = service.getLocus(taxonId, locusId, version);
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.NOT_FOUND, HttpStatus.NOT_FOUND).toResponseEntity():
-				new GetLocusOutputModel(optional.get()).toResponseEntity();
+		return get(() -> service.getLocus(taxonId, locusId, version), LocusOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
+	@Authorized(Role.ADMIN)
 	@PutMapping(path = "/{locus}")
 	public ResponseEntity<?> putLocus(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
-			@RequestBody LocusInputModel locusInputModel
+			@RequestBody LocusInputModel input
 	) {
-		Optional<Locus> locusOptional = locusInputModel.toDomainEntity(taxonId, locusId);
-		if (!locusOptional.isPresent())
-			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
-		Status result = service.saveLocus(locusOptional.get());
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity():
-				new StatusOutputModel(result).toResponseEntity();
+		return put(() -> input.toDomainEntity(taxonId, locusId), service::saveLocus);
 	}
 
+	@Authorized(Role.ADMIN)
 	@DeleteMapping(path = "/{locus}")
 	public ResponseEntity<?> deleteLocus(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId
-	) {
-		Status result = service.deleteLocus(taxonId, locusId);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.deleteLocus(taxonId, locusId));
 	}
-
 
 }

@@ -64,7 +64,7 @@ public class TaxonServiceTests extends TaxonTests {
 		Optional<List<Taxon>> actual = service.getTaxons(0);
 		assertTrue(actual.isPresent());
 		assertEquals(1, actual.get().size());
-		assertEquals(IDS[0], actual.get().get(0).getId());
+		assertEquals(IDS[0], actual.get().get(0).getPrimaryKey());
 	}
 
 	@ParameterizedTest
@@ -76,7 +76,7 @@ public class TaxonServiceTests extends TaxonTests {
 
 		assertTrue(actual.isPresent());
 		for (int i = 0; i < actual.get().size(); i++)
-			assertEquals(IDS[i + page * limit], actual.get().get(i).getId());
+			assertEquals(IDS[i + page * limit], actual.get().get(i).getPrimaryKey());
 	}
 
 	@ParameterizedTest
@@ -94,7 +94,7 @@ public class TaxonServiceTests extends TaxonTests {
 		Optional<Taxon> actual = service.getTaxon(key);
 
 		assertTrue(actual.isPresent());
-		assertEquals(key, actual.get().getId());
+		assertEquals(key, actual.get().getPrimaryKey());
 	}
 
 	@ParameterizedTest

@@ -52,7 +52,7 @@ public class TaxonRepositoryTests extends TaxonTests {
 		arrange(IDS[0]);
 		List<Taxon> actual = repository.findAll(0);
 		assertEquals(1, actual.size());
-		assertEquals(IDS[0], actual.get(0).getId());
+		assertEquals(IDS[0], actual.get(0).getPrimaryKey());
 	}
 
 	@ParameterizedTest
@@ -63,7 +63,7 @@ public class TaxonRepositoryTests extends TaxonTests {
 		List<Taxon> actual = repository.findAll(page);
 
 		for (int i = 0; i < actual.size(); i++)
-			assertEquals(IDS[i + page * limit], actual.get(i).getId());
+			assertEquals(IDS[i + page * limit], actual.get(i).getPrimaryKey());
 	}
 
 	@ParameterizedTest
@@ -81,7 +81,7 @@ public class TaxonRepositoryTests extends TaxonTests {
 		Taxon actual = repository.find(key);
 
 		assertNotNull(actual);
-		assertEquals(key, actual.getId());
+		assertEquals(key, actual.getPrimaryKey());
 	}
 
 	@ParameterizedTest

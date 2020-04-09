@@ -7,7 +7,10 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -65,7 +68,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH l, COALESCE(MAX(r.version), 0) + 1 as v" +
 				"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $})";
-		execute(new Query(statement, locus.getTaxonId(), locus.getId(), locus.getDescription()));
+		execute(new Query(statement, locus.getTaxonId(), locus.getPrimaryKey(), locus.getDescription()));
 	}
 
 	@Override

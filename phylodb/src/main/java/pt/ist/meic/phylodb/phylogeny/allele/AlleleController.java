@@ -1,30 +1,26 @@
 package pt.ist.meic.phylodb.phylogeny.allele;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.error.exception.FileFormatException;
-import pt.ist.meic.phylodb.output.mediatype.Problem;
-import pt.ist.meic.phylodb.output.model.StatusOutputModel;
+import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
+import pt.ist.meic.phylodb.io.output.FileOutputModel;
+import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
-import pt.ist.meic.phylodb.phylogeny.allele.model.input.AlleleInputModel;
-import pt.ist.meic.phylodb.phylogeny.allele.model.output.GetAlleleOutputModel;
-import pt.ist.meic.phylodb.phylogeny.allele.model.output.GetAllelesOutputModel;
-import pt.ist.meic.phylodb.utils.controller.EntityController;
-import pt.ist.meic.phylodb.utils.db.Status;
+import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
+import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleOutputModel;
+import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
-import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
-public class AlleleController extends EntityController {
+public class AlleleController extends Controller<Allele> {
 
 	private AlleleService service;
 
@@ -37,15 +33,11 @@ public class AlleleController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestHeader(value="Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
-
+			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
-		if (page < 0)
-			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
-		Optional<List<Allele>> optional = service.getAlleles(taxonId, locusId, page, Integer.parseInt(jsonLimit));
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				GetAllelesOutputModel.get(type).apply(optional.get()).toResponseEntity();
+		return getAll(type, l -> service.getAlleles(taxonId, locusId, page, l),
+				MultipleOutputModel::new,
+				(a) -> new FileOutputModel("alleles.fasta", new FastaFormatter().format(a)));
 	}
 
 	@GetMapping(path = "/{allele}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,10 +47,7 @@ public class AlleleController extends EntityController {
 			@PathVariable("allele") String alleleId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
 	) {
-		Optional<Allele> optional = service.getAllele(taxonId, locusId, alleleId, version);
-		return !optional.isPresent() ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new GetAlleleOutputModel(optional.get()).toResponseEntity();
+		return get(() -> service.getAllele(taxonId, locusId, alleleId, version), AlleleOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
 	@PutMapping(path = "/{allele}")
@@ -66,15 +55,9 @@ public class AlleleController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,
-			@RequestBody AlleleInputModel alleleInputModel
+			@RequestBody AlleleInputModel input
 	) {
-		Optional<Allele> optionalAllele = alleleInputModel.toDomainEntity(taxonId, locusId, alleleId);
-		if (!optionalAllele.isPresent())
-			return new ErrorOutputModel(Problem.BAD_REQUEST, HttpStatus.BAD_REQUEST).toResponseEntity();
-		Status result = service.saveAllele(optionalAllele.get());
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+		return put(() -> input.toDomainEntity(taxonId, locusId, alleleId), service::saveAllele);
 	}
 
 	@DeleteMapping(path = "/{allele}")
@@ -82,11 +65,8 @@ public class AlleleController extends EntityController {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId
-	) {
-		Status result = service.deleteAllele(taxonId, locusId, alleleId);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.deleteAllele(taxonId, locusId, alleleId));
 	}
 
 	@PostMapping(path = "/files")
@@ -95,11 +75,8 @@ public class AlleleController extends EntityController {
 			@PathVariable("locus") String locusId,
 			@RequestBody MultipartFile file
 
-	) throws FileFormatException {
-		Status result = service.saveAllelesOnConflictSkip(taxonId, locusId, file);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.saveAllelesOnConflictSkip(taxonId, locusId, file));
 	}
 
 	@PutMapping(path = "/files")
@@ -108,11 +85,8 @@ public class AlleleController extends EntityController {
 			@PathVariable("locus") String locusId,
 			@RequestBody MultipartFile file
 
-	) throws FileFormatException {
-		Status result = service.saveAllelesOnConflictUpdate(taxonId, locusId, file);
-		return result.equals(UNCHANGED) ?
-				new ErrorOutputModel(Problem.UNAUTHORIZED, HttpStatus.UNAUTHORIZED).toResponseEntity() :
-				new StatusOutputModel(result).toResponseEntity();
+	) throws IOException {
+		return status(() -> service.saveAllelesOnConflictUpdate(taxonId, locusId, file));
 	}
 
 }

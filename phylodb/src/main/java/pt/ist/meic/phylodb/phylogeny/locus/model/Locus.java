@@ -2,46 +2,31 @@ package pt.ist.meic.phylodb.phylogeny.locus.model;
 
 import pt.ist.meic.phylodb.utils.service.Entity;
 
-public class Locus extends Entity {
+public class Locus extends Entity<Locus.PrimaryKey> {
 
-	private String taxonId;
-	private String id;
-	private String description;
+	private final String description;
 
 	public Locus(String taxonId, String id, int version, boolean deprecated, String description) {
-		super(version, deprecated);
-		this.taxonId = taxonId;
-		this.id = id;
+		super(new PrimaryKey(taxonId, id), version, deprecated);
 		this.description = description;
 	}
 
 	public Locus(String taxonId, String id, String description) {
-		super(-1, false);
-		this.taxonId = taxonId;
-		this.id = id;
-		this.description = description;
-	}
-
-	public String getId() {
-		return id;
+		this(taxonId, id, -1, false, description);
 	}
 
 	public String getTaxonId() {
-		return taxonId;
+		return id.getTaxonId();
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public PrimaryKey getPrimaryKey() {
-		return new PrimaryKey(taxonId, id);
-	}
-
 	public static class PrimaryKey {
 
-		private String taxonId;
-		private String id;
+		private final String taxonId;
+		private final String id;
 
 		public PrimaryKey(String taxonId, String id) {
 			this.taxonId = taxonId;

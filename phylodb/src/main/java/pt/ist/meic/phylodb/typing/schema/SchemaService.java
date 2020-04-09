@@ -3,14 +3,13 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
+import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.Status;
+import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.List;
 import java.util.Optional;
-
-import static pt.ist.meic.phylodb.utils.db.Status.UNCHANGED;
 
 @Service
 public class SchemaService {
@@ -25,28 +24,28 @@ public class SchemaService {
 
 	@Transactional(readOnly = true)
 	public Optional<List<Schema>> getSchemas(String taxonId, int page, int limit) {
-		return Optional.ofNullable(schemaRepository.findAll(page, limit, taxonId));
+		return schemaRepository.findAll(page, limit, taxonId);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<Schema> getSchema(String taxonId, String schemaId, int version) {
-		return Optional.ofNullable(schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId), version));
+		return schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId), version);
 	}
 
 	@Transactional
-	public Status saveSchema(Schema schema) {
+	public boolean saveSchema(Schema schema) {
 		String[] lociIds = schema.getLociIds().stream()
-				.map(Reference::getId)
+				.map(Reference::getPrimaryKey)
 				.toArray(String[]::new);
-		Schema dbSchema = schemaRepository.find(schema.getTaxonId(), lociIds);
-		if (locusRepository.anyMissing(schema.getTaxonId(), lociIds) ||
-				(dbSchema != null && !dbSchema.getId().equals(schema.getId())))
-			return UNCHANGED;
+		Optional<Schema> dbSchema = schemaRepository.find(schema.getPrimaryKey().getTaxonId(), lociIds, EntityRepository.CURRENT_VERSION_VALUE);
+		if (!Method.exists(schema.getType()) || locusRepository.anyMissing(schema.getPrimaryKey().getTaxonId(), lociIds) ||
+				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
+			return false;
 		return schemaRepository.save(schema);
 	}
 
 	@Transactional
-	public Status deleteSchema(String taxonId, String schemaId) {
+	public boolean deleteSchema(String taxonId, String schemaId) {
 		return schemaRepository.remove(new Schema.PrimaryKey(taxonId, schemaId));
 	}
 

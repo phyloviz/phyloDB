@@ -6,10 +6,9 @@ import org.neo4j.ogm.session.Session;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static pt.ist.meic.phylodb.utils.db.Status.*;
 
 public abstract class EntityRepository<E, K> extends Repository {
 
@@ -32,39 +31,39 @@ public abstract class EntityRepository<E, K> extends Repository {
 
 	protected abstract E parse(Map<String, Object> row);
 
-	public List<E> findAll(int page, int limit, Object... filters) {
-		if(page < 0 || limit < 0) return null;
+	public Optional<List<E>> findAll(int page, int limit, Object... filters) {
+		if (page < 0 || limit < 0) return Optional.empty();
 		Result result = getAll(page * limit, limit, filters);
-		if(result == null) return null;
-		return StreamSupport.stream(result.spliterator(), false)
+		if (result == null) return Optional.empty();
+		return Optional.of(StreamSupport.stream(result.spliterator(), false)
 				.map(this::parse)
-				.collect(Collectors.toList());
+				.collect(Collectors.toList()));
 	}
 
-	public E find(K key, int version) {
-		if(key == null) return null;
+	public Optional<E> find(K key, int version) {
+		if (key == null) return Optional.empty();
 		Result result = get(key, version);
-		if(result == null) return null;
+		if (result == null) return Optional.empty();
 		Iterator<Map<String, Object>> it = result.iterator();
-		return !it.hasNext() ? null : parse(it.next());
+		return !it.hasNext() ? Optional.empty() : Optional.of(parse(it.next()));
 	}
 
 	public boolean exists(K key) {
 		return key != null && isPresent(key);
 	}
 
-	public Status save(E entity) {
+	public boolean save(E entity) {
 		if (entity == null)
-			return UNCHANGED;
+			return false;
 		store(entity);
-		return UPDATED;
+		return true;
 	}
 
-	public Status remove(K key) {
+	public boolean remove(K key) {
 		if (!isPresent(key))
-			return UNCHANGED;
+			return false;
 		delete(key);
-		return DELETED;
+		return true;
 	}
 
 }

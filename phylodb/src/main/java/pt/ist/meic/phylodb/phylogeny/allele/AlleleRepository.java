@@ -4,15 +4,13 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 
-import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 @Repository
-public class AlleleRepository extends EntityRepository<Allele, Allele.PrimaryKey> {
+public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey> {
 
 	public AlleleRepository(Session session) {
 		super(session);
@@ -61,7 +59,7 @@ public class AlleleRepository extends EntityRepository<Allele, Allele.PrimaryKey
 	@Override
 	protected void store(Allele allele) {
 		Query query = new Query("MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
-				"WHERE t.deprecated = false AND l.deprecated = false\n", allele.getTaxonId(),  allele.getLocusId(), allele.getId());
+				"WHERE t.deprecated = false AND l.deprecated = false\n", allele.getTaxonId(), allele.getLocusId(), allele.getPrimaryKey());
 		composeStore(query, allele);
 		execute(query);
 	}
@@ -73,25 +71,23 @@ public class AlleleRepository extends EntityRepository<Allele, Allele.PrimaryKey
 		execute(new Query(statement, key.getTaxonId(), key.getLocusId(), key.getId()));
 	}
 
-	public void saveAllOnConflictSkip(String taxon, String locus, List<Allele> alleles) {
-		saveAll(taxon, locus, alleles, (q, a) -> {
-			if(isPresent(a.getPrimaryKey())) {
-				LOG.info("The allele " + a.getId() + " with sequence " + a.getSequence() + " could not be created since it already exists");
-				return 0;
-			} else {
-				composeStore(q, new Allele(taxon, locus, a.getId(), a.getSequence()));
-				q.appendQuery("WITH l\n");
-				return 1;
-			}
-		});
+	@Override
+	protected Query init(String... params) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
+				"WHERE t.deprecated = false AND l.deprecated = false\n" +
+				"WITH l\n";
+		return new Query(statement, params[0], params[1]);
 	}
 
-	public void saveAllOnConflictUpdate(String taxon, String locus, List<Allele> alleles) {
-		saveAll(taxon, locus, alleles, (q, a) -> {
-			composeStore(q, new Allele(taxon, locus, a.getId(), a.getSequence()));
-			q.appendQuery("WITH l\n");
-			return 1;
-		});
+	@Override
+	protected void batch(Query query, Allele allele) {
+		composeStore(query, allele);
+		query.appendQuery("WITH l\n");
+	}
+
+	@Override
+	protected void arrange(Query query) {
+		query.subQuery(query.length() - "WITH l\n".length());
 	}
 
 	private void composeStore(Query query, Allele allele) {
@@ -100,21 +96,7 @@ public class AlleleRepository extends EntityRepository<Allele, Allele.PrimaryKey
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH l, a, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (a)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ad:AlleleDetails {sequence: $}) ";
-		query.appendQuery(statement).addParameter(allele.getId(), allele.getSequence());
-	}
-
-	private void saveAll(String taxon, String locus, List<Allele> alleles, BiFunction<Query, Allele, Integer> compose) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
-				"WHERE t.deprecated = false AND l.deprecated = false\n" +
-				"WITH l\n";
-		Query query = new Query(statement, taxon, locus);
-		int toExecute = 0;
-		for (Allele allele : alleles)
-			toExecute += compose.apply(query, allele);
-		if(toExecute != 0) {
-			query.subQuery(query.length() - "WITH l\n".length());
-			execute(query);
-		}
+		query.appendQuery(statement).addParameter(allele.getPrimaryKey(), allele.getSequence());
 	}
 
 }

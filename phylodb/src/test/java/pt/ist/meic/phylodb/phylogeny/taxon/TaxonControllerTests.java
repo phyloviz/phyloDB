@@ -12,9 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.output.GetTaxonOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.output.GetTaxonsOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.input.TaxonInputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
 import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.stream.Stream;
@@ -91,7 +90,7 @@ public class TaxonControllerTests extends TaxonTests {
 		MockHttpServletResponse response = http.get(uri);
 
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		GetTaxonOutputModel result = http.parseResult(GetTaxonOutputModel.class, response);
+		TaxonOutputModel result = http.parseResult(TaxonOutputModel.class, response);
 		assertEquals(IDS[0], result.getId());
 	}
 

@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.typing.profile.model;
 
+import org.apache.logging.log4j.util.Strings;
 import pt.ist.meic.phylodb.utils.service.Entity;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
@@ -10,17 +11,13 @@ import java.util.stream.Collectors;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
-public class Profile extends Entity {
+public class Profile extends Entity<Profile.PrimaryKey> {
 
-	private UUID datasetId;
-	private String id;
-	private String aka;
-	private List<Reference<String>> allelesIds;
+	private final String aka;
+	private final List<Reference<String>> allelesIds;
 
 	public Profile(UUID datasetId, String id, int version, boolean deprecated, String aka, List<Reference<String>> allelesIds) {
-		super(version, deprecated);
-		this.datasetId = datasetId;
-		this.id = id;
+		super(new PrimaryKey(datasetId, id), version, deprecated);
 		this.aka = aka;
 		this.allelesIds = allelesIds;
 	}
@@ -31,31 +28,34 @@ public class Profile extends Entity {
 				.collect(Collectors.toList()));
 	}
 
-
 	public UUID getDatasetId() {
-		return datasetId;
-	}
-
-	public String getId() {
-		return id;
+		return id.getDatasetId();
 	}
 
 	public String getAka() {
 		return aka;
 	}
 
-	public List<Reference<String>> getAllelesIds() {
+	public List<Reference<String>> getAllelesReferences() {
 		return allelesIds;
 	}
 
-	public PrimaryKey getPrimaryKey() {
-		return new PrimaryKey(datasetId, id);
+	public List<String> getAllelesids() {
+		return allelesIds.stream()
+				.map(Entity::getPrimaryKey)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public String toString() {
+		String alleles = Strings.join(getAllelesids(), ',');
+		return String.format("Profile %s from dataset %s with aka %s and alleles %s", id.getId(), id.getDatasetId(), getAka(), alleles);
 	}
 
 	public static class PrimaryKey {
 
-		private UUID datasetId;
-		private String id;
+		private final UUID datasetId;
+		private final String id;
 
 		public PrimaryKey(UUID datasetId, String id) {
 			this.datasetId = datasetId;

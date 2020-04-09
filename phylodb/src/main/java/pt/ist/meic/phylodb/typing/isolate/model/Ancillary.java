@@ -4,11 +4,8 @@ import java.util.Objects;
 
 public class Ancillary {
 
-	private String key;
-	private String value;
-
-	public Ancillary() {
-	}
+	private final String key;
+	private final String value;
 
 	public Ancillary(String key, String value) {
 		this.key = key;
@@ -21,6 +18,11 @@ public class Ancillary {
 
 	public String getValue() {
 		return value;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s: %s", key, value);
 	}
 
 	@Override
