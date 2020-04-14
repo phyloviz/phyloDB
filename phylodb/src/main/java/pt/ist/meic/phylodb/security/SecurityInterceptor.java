@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class SecurityInterceptor implements HandlerInterceptor {
 
-	protected static final String ID = "id", ROLE = "role";
+	public static final String PROVIDER = "provider", ID = "id", ROLE = "role";
 
 	@Override
 	public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) {

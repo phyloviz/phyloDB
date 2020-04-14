@@ -51,7 +51,11 @@ public abstract class Controller<T extends Entity<?>> {
 		return execute(input, o -> output(map.apply(o), (UUID) o.getPrimaryKey()), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
-	public ResponseEntity<?> status(Getter<Boolean> input) throws IOException {
+	public ResponseEntity<?> fileStatus(Getter<Boolean> input) throws IOException {
+		return output(input.get()).toResponseEntity();
+	}
+
+	public ResponseEntity<?> status(Supplier<Boolean> input) {
 		return output(input.get()).toResponseEntity();
 	}
 

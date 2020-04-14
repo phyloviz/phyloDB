@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
 import pt.ist.meic.phylodb.security.authentication.TokenInfo;
+import pt.ist.meic.phylodb.security.authentication.user.UserService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

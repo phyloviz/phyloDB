@@ -10,10 +10,9 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/taxons")
@@ -41,7 +40,7 @@ public class TaxonController extends Controller<Taxon> {
 		return get(() -> service.getTaxon(taxonId, version), TaxonOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(Role.ADMIN)
+	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
 	@PutMapping(path = "/{taxon}")
 	public ResponseEntity<?> saveTaxon(
 			@PathVariable("taxon") String taxonId,
@@ -50,11 +49,11 @@ public class TaxonController extends Controller<Taxon> {
 		return put(() -> input.toDomainEntity(taxonId), service::saveTaxon);
 	}
 
-	@Authorized(Role.ADMIN)
+	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
 	@DeleteMapping(path = "/{taxon}")
 	public ResponseEntity<?> deleteTaxon(
 			@PathVariable("taxon") String taxonId
-	) throws IOException {
+	) {
 		return status(() -> service.deleteTaxon(taxonId));
 	}
 

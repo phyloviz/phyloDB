@@ -3,6 +3,8 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
+import pt.ist.meic.phylodb.typing.Method;
+import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
@@ -52,21 +54,21 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				(String) row.get("id"),
 				(int) row.get("version"),
 				(boolean) row.get("deprecated"),
-				(String) row.get("type"),
+				Method.valueOf((String) row.get("type")),
 				(String) row.get("description"),
 				lociIds);
 	}
 
 	@Override
 	protected boolean isPresent(Schema.PrimaryKey key) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
-				"RETURN s.deprecated = false";
+		String statement = "OPTIONAL MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"RETURN COALESCE(s.deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
 	@Override
 	protected void store(Schema schema) {
-		if (!find(schema.getPrimaryKey(), CURRENT_VERSION_VALUE).isPresent())
+		if (isPresent(schema.getPrimaryKey()))
 			put(schema);
 		post(schema);
 	}
@@ -101,15 +103,15 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		return Optional.of(parse(result.iterator().next()));
 	}
 
-	public Optional<Schema> find(UUID datasetId) {
-		String statement = "MATCH (d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+	public Optional<Schema> find(Dataset.PrimaryKey key) {
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
 				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)  WITH t, s, sd, l\n" +
 				"ORDER BY h.part\n" +
 				"WITH s, sd, t, collect(l) as loci\n" +
 				"RETURN t.id as taxonId, s.id as id, s.deprecated as deprecated, r2.version as version,\n" +
 				"s.type as type, sd.description as description, collect(l.id) as lociId";
-		Result result = query(new Query(statement, datasetId));
+		Result result = query(new Query(statement, key.getProjectId(), key.getId()));
 		if (!result.iterator().hasNext())
 			return Optional.empty();
 		return Optional.of(parse(result.iterator().next()));

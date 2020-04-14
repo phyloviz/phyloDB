@@ -10,10 +10,9 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
-
-import java.io.IOException;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
@@ -44,7 +43,7 @@ public class LocusController extends Controller<Locus> {
 		return get(() -> service.getLocus(taxonId, locusId, version), LocusOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(Role.ADMIN)
+	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
 	@PutMapping(path = "/{locus}")
 	public ResponseEntity<?> putLocus(
 			@PathVariable("taxon") String taxonId,
@@ -54,12 +53,12 @@ public class LocusController extends Controller<Locus> {
 		return put(() -> input.toDomainEntity(taxonId, locusId), service::saveLocus);
 	}
 
-	@Authorized(Role.ADMIN)
+	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
 	@DeleteMapping(path = "/{locus}")
 	public ResponseEntity<?> deleteLocus(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId
-	) throws IOException {
+	) {
 		return status(() -> service.deleteLocus(taxonId, locusId));
 	}
 

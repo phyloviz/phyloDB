@@ -3,7 +3,6 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.service.Reference;
@@ -38,7 +37,7 @@ public class SchemaService {
 				.map(Reference::getPrimaryKey)
 				.toArray(String[]::new);
 		Optional<Schema> dbSchema = schemaRepository.find(schema.getPrimaryKey().getTaxonId(), lociIds, EntityRepository.CURRENT_VERSION_VALUE);
-		if (!Method.exists(schema.getType()) || locusRepository.anyMissing(schema.getPrimaryKey().getTaxonId(), lociIds) ||
+		if (locusRepository.anyMissing(schema.getPrimaryKey().getTaxonId(), lociIds) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
 			return false;
 		return schemaRepository.save(schema);

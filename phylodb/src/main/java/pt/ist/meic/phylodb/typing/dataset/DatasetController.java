@@ -7,18 +7,19 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
-@RequestMapping("/datasets")
+@RequestMapping("projects/{project}/datasets")
 public class DatasetController extends Controller<Dataset> {
 
 	private DatasetService service;
@@ -27,47 +28,52 @@ public class DatasetController extends Controller<Dataset> {
 		this.service = service;
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getDatasets(
+			@PathVariable("project") UUID projectId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getDatasets(page, l), MultipleOutputModel::new, null);
+		return getAll(type, l -> service.getDatasets(projectId, page, l), MultipleOutputModel::new, null);
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.READ)
 	@GetMapping(path = "/{dataset}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getDataset(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
 	) {
-		return get(() -> service.getDataset(datasetId, version), DatasetOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getDataset(projectId, datasetId, version), DatasetOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postDataset(
+			@PathVariable("project") UUID projectId,
 			@RequestBody DatasetInputModel input
 	) {
-		return post(input::toDomainEntity, d -> service.saveDataset(d));
+		return post(() -> input.toDomainEntity(projectId.toString()), service::saveDataset);
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PutMapping(path = "/{dataset}")
 	public ResponseEntity<?> putDataset(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestBody DatasetInputModel input
 	) {
-		return put(() -> input.toDomainEntity(datasetId.toString()), service::saveDataset);
+		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString()), service::saveDataset);
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@DeleteMapping(path = "/{dataset}")
 	public ResponseEntity<?> deleteDataset(
-			@PathVariable("dataset") String datasetId
-	) throws IOException {
-		return status(() -> service.deleteDataset(UUID.fromString(datasetId)));
+			@PathVariable("project") UUID projectId,
+			@PathVariable("dataset") UUID datasetId
+	) {
+		return status(() -> service.deleteDataset(projectId, datasetId));
 	}
 
 }

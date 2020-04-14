@@ -12,6 +12,7 @@ import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,13 +27,13 @@ public class AlleleService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Allele>> getAlleles(String taxonId, String locusId, int page, int limit) {
-		return alleleRepository.findAll(page, limit, taxonId, locusId);
+	public Optional<List<Allele>> getAlleles(String taxonId, String locusId, UUID project, int page, int limit) {
+		return alleleRepository.findAll(page, limit, taxonId, locusId, project);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, int version) {
-		return alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId), version);
+	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, UUID project, int version) {
+		return alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId, project), version);
 	}
 
 	@Transactional
@@ -42,27 +43,27 @@ public class AlleleService {
 	}
 
 	@Transactional
-	public boolean deleteAllele(String taxonId, String locusId, String alleleId) {
-		return alleleRepository.remove(new Allele.PrimaryKey(taxonId, locusId, alleleId));
+	public boolean deleteAllele(String taxonId, String locusId, String alleleId, UUID project) {
+		return alleleRepository.remove(new Allele.PrimaryKey(taxonId, locusId, alleleId, project));
 	}
 
 	@Transactional
-	public boolean saveAllelesOnConflictSkip(String taxonId, String locusId, MultipartFile file) throws IOException {
-		return saveAll(taxonId, locusId, BatchRepository.SKIP, file);
+	public boolean saveAllelesOnConflictSkip(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
+		return saveAll(taxonId, locusId, project, BatchRepository.SKIP, file);
 	}
 
 	@Transactional
-	public boolean saveAllelesOnConflictUpdate(String taxonId, String locusId, MultipartFile file) throws IOException {
-		return saveAll(taxonId, locusId, BatchRepository.UPDATE, file);
+	public boolean saveAllelesOnConflictUpdate(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
+		return saveAll(taxonId, locusId, project, BatchRepository.UPDATE, file);
 	}
 
-	private boolean saveAll(String taxonId, String locusId, String conflict, MultipartFile file) throws IOException {
+	private boolean saveAll(String taxonId, String locusId, UUID project, String conflict, MultipartFile file) throws IOException {
 		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
 			return false;
 		List<Allele> alleles = new FastaFormatter().parse(file).stream()
-				.map(a -> new Allele(taxonId, locusId, a.getPrimaryKey().getId(), a.getSequence()))
+				.map(a -> new Allele(taxonId, locusId, a.getPrimaryKey().getId(), a.getSequence(), project))
 				.collect(Collectors.toList());
-		return alleleRepository.saveAll(alleles, conflict, taxonId, locusId);
+		return alleleRepository.saveAll(alleles, conflict, taxonId, locusId, project.toString());
 	}
 
 }

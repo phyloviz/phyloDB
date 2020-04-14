@@ -8,19 +8,19 @@ import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
-public class Dataset extends Entity<UUID> {
+public class Dataset extends Entity<Dataset.PrimaryKey> {
 
 	private final String description;
 	private final Reference<Schema.PrimaryKey> schema;
 
-	public Dataset(UUID id, int version, boolean deprecated, String description, Reference<Schema.PrimaryKey> schema) {
-		super(id, version, deprecated);
+	public Dataset(UUID projectId, UUID id, int version, boolean deprecated, String description, Reference<Schema.PrimaryKey> schema) {
+		super(new PrimaryKey(projectId, id), version, deprecated);
 		this.description = description;
 		this.schema = schema;
 	}
 
-	public Dataset(UUID id, String description, String taxonId, String schemaId) {
-		this(id, CURRENT_VERSION_VALUE, false, description, new Reference<>(new Schema.PrimaryKey(taxonId, schemaId), CURRENT_VERSION_VALUE, false));
+	public Dataset(UUID projectId, UUID id, String description, String taxonId, String schemaId) {
+		this(projectId, id, CURRENT_VERSION_VALUE, false, description, new Reference<>(new Schema.PrimaryKey(taxonId, schemaId), CURRENT_VERSION_VALUE, false));
 	}
 
 	public String getDescription() {
@@ -29,6 +29,26 @@ public class Dataset extends Entity<UUID> {
 
 	public Reference<Schema.PrimaryKey> getSchema() {
 		return schema;
+	}
+
+	public static class PrimaryKey {
+
+		private final UUID projectId;
+		private final UUID id;
+
+		public PrimaryKey(UUID projectId, UUID id) {
+			this.projectId = projectId;
+			this.id = id;
+		}
+
+		public UUID getProjectId() {
+			return projectId;
+		}
+
+		public UUID getId() {
+			return id;
+		}
+
 	}
 
 }

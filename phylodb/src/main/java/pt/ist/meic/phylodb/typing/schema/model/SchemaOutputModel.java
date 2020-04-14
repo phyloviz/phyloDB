@@ -10,7 +10,7 @@ public class SchemaOutputModel extends SingleOutputModel {
 
 	public SchemaOutputModel(Schema schema) {
 		super(schema.getPrimaryKey().getId(), schema.getVersion(), schema.isDeprecated());
-		this.type = schema.getType();
+		this.type = schema.getType().getName();
 		this.description = schema.getDescription();
 		this.loci = schema.getLociIds().toArray();
 	}

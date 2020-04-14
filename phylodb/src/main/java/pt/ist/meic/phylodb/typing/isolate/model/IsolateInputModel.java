@@ -38,9 +38,9 @@ public class IsolateInputModel implements InputModel<Isolate> {
 
 	@Override
 	public Optional<Isolate> toDomainEntity(String... params) {
-		if (!params[1].equals(id)) return Optional.empty();
+		if (!params[2].equals(id)) return Optional.empty();
 		Ancillary[] ancillaries = this.ancillaries == null ? new Ancillary[0] : this.ancillaries;
-		return Optional.of(new Isolate(UUID.fromString(params[0]), id, description, (Ancillary[]) Arrays.stream(ancillaries).distinct().toArray(), profileId));
+		return Optional.of(new Isolate(UUID.fromString(params[0]), UUID.fromString(params[1]), id, description, (Ancillary[]) Arrays.stream(ancillaries).distinct().toArray(), profileId));
 	}
 
 }

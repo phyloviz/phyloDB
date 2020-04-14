@@ -7,20 +7,14 @@ import java.util.UUID;
 
 public class ProfileInputModel implements InputModel<Profile> {
 
-	private final UUID datasetId;
 	private final String id;
 	private final String aka;
 	private final String[] alleles;
 
-	public ProfileInputModel(UUID datasetId, String id, String aka, String[] alleles) {
-		this.datasetId = datasetId;
+	public ProfileInputModel(String id, String aka, String[] alleles) {
 		this.id = id;
 		this.aka = aka;
 		this.alleles = alleles;
-	}
-
-	public UUID getDatasetId() {
-		return datasetId;
 	}
 
 	public String getId() {
@@ -37,8 +31,8 @@ public class ProfileInputModel implements InputModel<Profile> {
 
 	@Override
 	public Optional<Profile> toDomainEntity(String... params) {
-		return !params[0].equals(datasetId.toString()) || !params[1].equals(id) || alleles == null ? Optional.empty() :
-				Optional.of(new Profile(datasetId, id, aka, alleles));
+		return !params[2].equals(id) || alleles == null ? Optional.empty() :
+				Optional.of(new Profile(UUID.fromString(params[0]), UUID.fromString(params[1]), id, aka, alleles));
 	}
 
 }

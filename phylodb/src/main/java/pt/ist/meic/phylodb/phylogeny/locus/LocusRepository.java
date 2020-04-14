@@ -53,9 +53,8 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 
 	@Override
 	protected boolean isPresent(Locus.PrimaryKey key) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
-				"WHERE t.deprecated = false\n" +
-				"RETURN l.deprecated = false";
+		String statement = "OPTIONAL MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
+				"RETURN COALESCE(l.deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
 	}
 

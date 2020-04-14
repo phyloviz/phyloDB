@@ -19,7 +19,7 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 
 	protected abstract void batch(Query query, T entity);
 
-	protected abstract void arrange(Query query);
+	protected abstract void arrange(Query query, String... params);
 
 	public boolean saveAll(List<T> entities, String flag, String... params) {
 		if (params.length == 0)
@@ -34,7 +34,7 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 		}
 		if (toExecute == 0)
 			return true;
-		arrange(query);
+		arrange(query, params);
 		execute(query);
 		return true;
 	}

@@ -15,7 +15,7 @@ public class MlFormatter extends ProfilesFormatter {
 		String[] columns = line.split("\\t");
 		if (!Arrays.stream(columns).allMatch(c -> c.matches("^\\d+$")) || columns.length != loci)
 			return false;
-		add.accept(new Profile(datasetId, columns[0], null, Arrays.copyOfRange(columns, 1, columns.length)));
+		add.accept(new Profile(projectId, datasetId, columns[0], null, Arrays.copyOfRange(columns, 1, columns.length)));
 		return true;
 	}
 

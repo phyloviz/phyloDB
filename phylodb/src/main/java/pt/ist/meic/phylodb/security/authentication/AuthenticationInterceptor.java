@@ -3,6 +3,9 @@ package pt.ist.meic.phylodb.security.authentication;
 import org.springframework.http.HttpHeaders;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.SecurityInterceptor;
+import pt.ist.meic.phylodb.security.authentication.user.UserService;
+import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.authorization.Role;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +13,7 @@ import java.io.IOException;
 
 public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 
-	private static final String PROVIDER = "provider", AUTHENTICATION_SCHEME = "Bearer";
+	private static final String AUTHENTICATION_SCHEME = "Bearer";
 
 	private UserService userService;
 	private String provider;
@@ -37,8 +40,9 @@ public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 			if (!info.isValid())
 				return handleProblem(res, Problem.INVALID_TOKEN);
 			String id = info.getId();
-			userService.createIfAbsent(id, provider);
+			userService.createUser(new User(id, provider, Role.USER));
 			req.setAttribute(ID, id);
+			req.setAttribute(PROVIDER, provider);
 			return true;
 		} catch (IOException ignored) {
 			return handleProblem(res, Problem.INVALID_TOKEN);

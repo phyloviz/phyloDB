@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.io.formatters.dataset.profile.ProfilesFormatter;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
+import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
@@ -16,7 +17,6 @@ import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,20 +36,21 @@ public class ProfileService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Pair<Schema, List<Profile>>> getProfiles(UUID datasetId, Map<String, String> filters, int page, int limit) {
-		return profileRepository.findAll(page, limit, datasetId, filters)
-				.flatMap(p -> schemaRepository.find(datasetId).map(s -> new Pair<>(s, p)));
+	public Optional<Pair<Schema, List<Profile>>> getProfiles(UUID projectId, UUID datasetId, int page, int limit) {
+		return profileRepository.findAll(page, limit, projectId, datasetId)
+				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Profile> getProfile(UUID datasetId, String profileId, int version) {
-		return profileRepository.find(new Profile.PrimaryKey(datasetId, profileId), version);
+	public Optional<Profile> getProfile(UUID projectId, UUID datasetId, String profileId, int version) {
+		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
 	}
 
 	@Transactional
 	public boolean saveProfile(Profile profile) {
-		Optional<Schema> optional = schemaRepository.find(profile.getDatasetId());
-		if (!datasetRepository.exists(profile.getDatasetId()) || !optional.isPresent())
+		Dataset.PrimaryKey datasetKey = new Dataset.PrimaryKey(profile.getPrimaryKey().getProjectId(), profile.getPrimaryKey().getDatasetId());
+		Optional<Schema> optional = schemaRepository.find(datasetKey);
+		if (!datasetRepository.exists(datasetKey) || !optional.isPresent())
 			return false;
 		Schema schema = optional.get();
 		String[] lociIds = schema.getLociIds().stream()
@@ -61,28 +62,28 @@ public class ProfileService {
 	}
 
 	@Transactional
-	public boolean deleteProfile(UUID datasetId, String profileId) {
-		return profileRepository.remove(new Profile.PrimaryKey(datasetId, profileId));
+	public boolean deleteProfile(UUID projectId, UUID datasetId, String profileId) {
+		return profileRepository.remove(new Profile.PrimaryKey(projectId, datasetId, profileId));
 	}
 
 	@Transactional
-	public boolean saveProfilesOnConflictSkip(UUID datasetId, MultipartFile file) throws IOException {
-		return saveAll(datasetId, BatchRepository.SKIP, file);
+	public boolean saveProfilesOnConflictSkip(UUID projectId, UUID datasetId, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, BatchRepository.SKIP, file);
 	}
 
 	@Transactional
-	public boolean saveProfilesOnConflictUpdate(UUID datasetId, MultipartFile file) throws IOException {
-		return saveAll(datasetId, BatchRepository.UPDATE, file);
+	public boolean saveProfilesOnConflictUpdate(UUID projectId, UUID datasetId, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, BatchRepository.UPDATE, file);
 	}
 
-	private boolean saveAll(UUID datasetId, String conflict, MultipartFile file) throws IOException {
-		Optional<Schema> optional = datasetRepository.find(datasetId, EntityRepository.CURRENT_VERSION_VALUE)
+	private boolean saveAll(UUID projectId, UUID datasetId, String conflict, MultipartFile file) throws IOException {
+		Optional<Schema> optional = datasetRepository.find(new Dataset.PrimaryKey(projectId, datasetId), EntityRepository.CURRENT_VERSION_VALUE)
 				.flatMap(d -> schemaRepository.find(d.getSchema().getPrimaryKey(), d.getSchema().getVersion()));
 		if (!optional.isPresent())
 			return false;
 		Schema schema = optional.get();
-		List<Profile> profiles = ProfilesFormatter.get(schema.getType())
-				.parse(file, datasetId, schema);
+		List<Profile> profiles = ProfilesFormatter.get(schema.getType().getName())
+				.parse(file, projectId, datasetId, schema);
 		return profileRepository.saveAll(profiles, conflict, datasetId.toString());
 	}
 

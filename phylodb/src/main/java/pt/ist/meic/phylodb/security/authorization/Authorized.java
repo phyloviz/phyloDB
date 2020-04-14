@@ -9,6 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Authorized {
 
-	Role value() default Role.USER;
+	Role role();
+
+	Permission permission();
+
+	boolean required() default true;
 
 }

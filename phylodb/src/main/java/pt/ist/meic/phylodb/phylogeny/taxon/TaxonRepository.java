@@ -46,8 +46,8 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 
 	@Override
 	protected boolean isPresent(String key) {
-		String statement = "MATCH (t:Taxon {id: $})\n" +
-				"RETURN t.deprecated = false";
+		String statement = "OPTIONAL MATCH (t:Taxon {id: $})\n" +
+				"RETURN COALESCE(t.deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key));
 	}
 

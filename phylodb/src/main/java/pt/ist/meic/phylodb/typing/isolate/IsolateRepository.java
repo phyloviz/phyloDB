@@ -9,6 +9,7 @@ import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,71 +22,77 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 
 	@Override
 	protected Result getAll(int page, int limit, Object... filters) {
-		if (filters == null || filters.length != 1)
+		if (filters == null || filters.length != 2)
 			return null;
-		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(i:Isolate)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
-				"WHERE d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"MATCH (p:Profile)<-[h:HAS]-(id)-[:HAS]->(a:Ancillary) WITH d, r, i, id, h, p, collect(a) as ancillary\n" +
-				"RETURN d.id as datasetId, i.id as id, i.deprecated, r.version as version, " +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
+				"WHERE pj.deprecated = false, d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"OPTIONAL MATCH (p:Profile)<-[h:HAS]-(id)-[:HAS]->(a:Ancillary) WITH pj, d, r, i, id, h, p, collect([a.key, a.value]) as ancillary\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated, r.version as version, " +
 				"p.id as profileId, p.deprecated as profileDeprecated, h.version as profileVersion, " +
 				"id.description as description.id as id, ancillary as ancillaries\n" +
 				"SKIP $ LIMIT $";
-		return query(new Query(statement, filters[0], page, limit));
+		return query(new Query(statement, filters[0], filters[1], page, limit));
 	}
 
 	@Override
 	protected Result get(Isolate.PrimaryKey key, int version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
-		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
 				"WHERE " + where + "\n" +
-				"MATCH (p:Profile)<-[:HAS]-(id)-[:HAS]->(a:Ancillary) WITH d, r, i, id, p, collect(a) as ancillary\n" +
-				"RETURN d.id as datasetId, i.id as id, i.deprecated, r.version as version, " +
+				"OPTIONAL MATCH (p:Profile)<-[:HAS]-(id)-[:HAS]->(a:Ancillary) WITH pj, d, r, i, id, p, collect([a.key, a.value]) as ancillary\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated, r.version as version, " +
 				"p.id as profileId, p.deprecated as profileDeprecated, h.version as profileVersion, " +
 				"d.description as description.id as id, ancillary as ancillaries";
-		return query(new Query(statement, key.getDatasetId(), key.getId(), version));
+		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), version));
 	}
 
 	@Override
 	protected Isolate parse(Map<String, Object> row) {
-		Reference<String> profile = new Reference<>((String) row.get("profileId"), (int) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
-		return new Isolate(UUID.fromString(row.get("datasetId").toString()),
+		Reference<String> profile = null;
+		if(row.get("profileId") != null )
+			profile = new Reference<>((String) row.get("profileId"), (int) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
+		Ancillary[] ancillaries = Arrays.stream((Object[][])row.get("ancillaries"))
+				.map(a -> new Ancillary((String)a[0], (String)a[1]))
+				.toArray(Ancillary[]::new);
+		return new Isolate(UUID.fromString(row.get("projectId").toString()),
+				UUID.fromString(row.get("datasetId").toString()),
 				(String) row.get("id"),
 				(int) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("description"),
-				(Ancillary[]) row.get("ancillaries"),
+				ancillaries,
 				profile);
 	}
 
 	@Override
 	protected boolean isPresent(Isolate.PrimaryKey key) {
-		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})\n" +
-				"WHERE d.deprecated = false\n" +
-				"RETURN i.deprecated = false";
-		return query(Boolean.class, new Query(statement, key.getDatasetId(), key.getId()));
+		String statement = "OPTIONAL MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})\n" +
+				"RETURN COALESCE(i.deprecated = false, false)";
+		return query(Boolean.class, new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 
 	@Override
 	protected void store(Isolate isolate) {
-		Query query = new Query("MATCH (d:Dataset {id: $}) d.deprecated = false\n", isolate.getDatasetId());
+		Isolate.PrimaryKey key = isolate.getPrimaryKey();
+		Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 		composeStore(query, isolate);
 		execute(query);
 	}
 
 	@Override
 	protected void delete(Isolate.PrimaryKey key) {
-		String statement = "MATCH (d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})\n" +
-				"WHERE d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"SET a.deprecated = true";
-		execute(new Query(statement, key.getDatasetId(), key.getId()));
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})\n" +
+				"WHERE p.deprecated = false AND d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"SET i.deprecated = true";
+		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 
 	@Override
 	protected Query init(String... params) {
-		String statement = "MATCH (d:Dataset {id: $})\n" +
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
 				"WHERE d.deprecated = false\n" +
 				"WITH d\n";
-		return new Query(statement, params[0]);
+		return new Query(statement, params[0], params[1]);
 	}
 
 	@Override
@@ -95,7 +102,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected void arrange(Query query) {
+	protected void arrange(Query query, String... params) {
 		query.subQuery(query.length() - "WITH d\n".length());
 	}
 

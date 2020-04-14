@@ -15,20 +15,20 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 	private final Ancillary[] ancillaries;
 	private final Reference<String> profile;
 
-	public Isolate(UUID datasetId, String id, int version, boolean deprecated, String description, Ancillary[] ancillaries, Reference<String> profile) {
-		super(new PrimaryKey(datasetId, id), version, deprecated);
+	public Isolate(UUID projectId, UUID datasetId, String id, int version, boolean deprecated, String description, Ancillary[] ancillaries, Reference<String> profile) {
+		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.description = description;
 		this.profile = profile;
 		this.ancillaries = ancillaries;
 	}
 
-	public Isolate(UUID datasetId, String id, String description, Ancillary[] ancillaries, String profileId) {
-		this(datasetId, id, CURRENT_VERSION_VALUE, false, description, ancillaries,
+	public Isolate(UUID projectId,UUID datasetId, String id, String description, Ancillary[] ancillaries, String profileId) {
+		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, description, ancillaries,
 				profileId == null ? null : new Reference<>(profileId, CURRENT_VERSION_VALUE, false));
 	}
 
 	public Isolate(String id, String description, Ancillary[] ancillaries, String profileId) {
-		this(null, id, description, ancillaries, profileId);
+		this(null, null, id, description, ancillaries, profileId);
 	}
 
 	public UUID getDatasetId() {
@@ -57,16 +57,21 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 
 	public static class PrimaryKey {
 
+		private final UUID projectId;
 		private final UUID datasetId;
 		private final String id;
 
-		public PrimaryKey(UUID datasetId, String id) {
+		public PrimaryKey(UUID projectId, UUID datasetId, String id) {
+			this.projectId = projectId;
 			this.datasetId = datasetId;
 			this.id = id;
 		}
 
 		public UUID getDatasetId() {
 			return datasetId;
+		}
+		public UUID getProjectId() {
+			return projectId;
 		}
 
 		public String getId() {

@@ -26,13 +26,13 @@ public class DatasetService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Dataset>> getDatasets(int page, int limit) {
-		return datasetRepository.findAll(page, limit);
+	public Optional<List<Dataset>> getDatasets(UUID projectId, int page, int limit) {
+		return datasetRepository.findAll(page, limit, projectId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Dataset> getDataset(UUID id, int version) {
-		return datasetRepository.find(id, version);
+	public Optional<Dataset> getDataset(UUID projectId, UUID id, int version) {
+		return datasetRepository.find(new Dataset.PrimaryKey(projectId, id), version);
 	}
 
 	@Transactional
@@ -51,8 +51,8 @@ public class DatasetService {
 	}
 
 	@Transactional
-	public boolean deleteDataset(UUID id) {
-		return datasetRepository.remove(id);
+	public boolean deleteDataset(UUID projectId, UUID id) {
+		return datasetRepository.remove(new Dataset.PrimaryKey(projectId, id));
 	}
 
 }

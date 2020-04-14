@@ -16,14 +16,14 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 	private final String aka;
 	private final List<Reference<String>> allelesIds;
 
-	public Profile(UUID datasetId, String id, int version, boolean deprecated, String aka, List<Reference<String>> allelesIds) {
-		super(new PrimaryKey(datasetId, id), version, deprecated);
+	public Profile(UUID projectId, UUID datasetId, String id, int version, boolean deprecated, String aka, List<Reference<String>> allelesIds) {
+		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.aka = aka;
 		this.allelesIds = allelesIds;
 	}
 
-	public Profile(UUID datasetId, String id, String aka, String[] allelesIds) {
-		this(datasetId, id, CURRENT_VERSION_VALUE, false, aka, Arrays.stream(allelesIds)
+	public Profile(UUID projectId, UUID datasetId, String id, String aka, String[] allelesIds) {
+		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, aka, Arrays.stream(allelesIds)
 				.map(i -> new Reference<>(i, CURRENT_VERSION_VALUE, false))
 				.collect(Collectors.toList()));
 	}
@@ -54,20 +54,26 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 
 	public static class PrimaryKey {
 
+		private final UUID projectId;
 		private final UUID datasetId;
 		private final String id;
 
-		public PrimaryKey(UUID datasetId, String id) {
+		public PrimaryKey(UUID projectId, UUID datasetId, String id) {
+			this.projectId = projectId;
 			this.datasetId = datasetId;
 			this.id = id;
 		}
 
-		public String getId() {
-			return id;
+		public UUID getProjectId() {
+			return projectId;
 		}
 
 		public UUID getDatasetId() {
 			return datasetId;
+		}
+
+		public String getId() {
+			return id;
 		}
 
 	}

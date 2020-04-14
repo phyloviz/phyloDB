@@ -10,6 +10,8 @@ import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.isolate.model.IsolateInputModel;
 import pt.ist.meic.phylodb.typing.isolate.model.IsolateOutputModel;
@@ -21,7 +23,7 @@ import java.util.UUID;
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
-@RequestMapping("/datasets/{dataset}/isolates")
+@RequestMapping("projects/{project}/datasets/{dataset}/isolates")
 public class IsolateController extends Controller<Isolate> {
 
 	private IsolateService service;
@@ -30,64 +32,70 @@ public class IsolateController extends Controller<Isolate> {
 		this.service = service;
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
 	public ResponseEntity<?> getIsolates(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
-		return getAll(type, l -> service.getIsolates(datasetId, page, l),
+		return getAll(type, l -> service.getIsolates(projectId, datasetId, page, l),
 				MultipleOutputModel::new,
 				(i) -> new FileOutputModel("isolates.txt", new IsolatesFormatter().format(i)));
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.READ)
 	@GetMapping(path = "/{isolate}/", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolate(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
 	) {
-		return get(() -> service.getIsolate(datasetId, isolateId, version), IsolateOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), IsolateOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PutMapping(path = "/{isolate}")
 	public ResponseEntity<?> putIsolate(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId,
 			@RequestBody IsolateInputModel input
 	) {
-		return put(() -> input.toDomainEntity(datasetId.toString(), isolateId), service::saveIsolate);
+		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), isolateId), service::saveIsolate);
 	}
 
-	@Authorized
-	@DeleteMapping(path = "/{isolate}")
-	public ResponseEntity<?> deleteIsolate(
-			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("isolate") String isolateId
-	) throws IOException {
-		return status(() -> service.deleteIsolate(datasetId, isolateId));
-	}
-
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postIsolates(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestBody MultipartFile file
 	) throws IOException {
-		return status(() -> service.saveIsolatesOnConflictSkip(datasetId, file));
+		return fileStatus(() -> service.saveIsolatesOnConflictSkip(projectId, datasetId, file));
 	}
 
-	@Authorized
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putIsolates(
+			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestBody MultipartFile file
 
 	) throws IOException {
-		return status(() -> service.saveIsolatesOnConflictUpdate(datasetId, file));
+		return fileStatus(() -> service.saveIsolatesOnConflictUpdate(projectId, datasetId, file));
+	}
+
+	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@DeleteMapping(path = "/{isolate}")
+	public ResponseEntity<?> deleteIsolate(
+			@PathVariable("project") UUID projectId,
+			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("isolate") String isolateId
+	) {
+		return status(() -> service.deleteIsolate(projectId, datasetId, isolateId));
 	}
 
 }

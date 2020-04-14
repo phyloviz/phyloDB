@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
+import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
@@ -30,43 +31,44 @@ public class IsolateService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Isolate>> getIsolates(UUID datasetId, int page, int limit) {
-		return isolateRepository.findAll(page, limit, datasetId);
+	public Optional<List<Isolate>> getIsolates(UUID projectId, UUID datasetId, int page, int limit) {
+		return isolateRepository.findAll(page, limit, projectId, datasetId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Isolate> getIsolate(UUID datasetId, String isolateId, int version) {
-		return isolateRepository.find(new Isolate.PrimaryKey(datasetId, isolateId), version);
+	public Optional<Isolate> getIsolate(UUID projectId,UUID datasetId, String isolateId, int version) {
+		return isolateRepository.find(new Isolate.PrimaryKey(projectId, datasetId, isolateId), version);
 	}
 
 	@Transactional
 	public boolean saveIsolate(Isolate isolate) {
-		if (!datasetRepository.exists(isolate.getDatasetId()) || isolate.getProfile() != null &&
-				!profileRepository.exists(new Profile.PrimaryKey(isolate.getDatasetId(), isolate.getProfile().getPrimaryKey())))
+		Isolate.PrimaryKey key = isolate.getPrimaryKey();
+		if (!datasetRepository.exists(new Dataset.PrimaryKey(key.getProjectId(), key.getDatasetId())) || isolate.getProfile() != null &&
+				!profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), isolate.getDatasetId(), isolate.getProfile().getPrimaryKey())))
 			return false;
 		return isolateRepository.save(isolate);
 	}
 
 	@Transactional
-	public boolean deleteIsolate(UUID datasetId, String isolateId) {
-		return isolateRepository.remove(new Isolate.PrimaryKey(datasetId, isolateId));
+	public boolean deleteIsolate(UUID projectId,UUID datasetId, String isolateId) {
+		return isolateRepository.remove(new Isolate.PrimaryKey(projectId, datasetId, isolateId));
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictSkip(UUID datasetId, MultipartFile file) throws IOException {
-		return saveAll(datasetId, BatchRepository.SKIP, file);
+	public boolean saveIsolatesOnConflictSkip(UUID projectId,UUID datasetId, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, BatchRepository.SKIP, file);
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictUpdate(UUID datasetId, MultipartFile file) throws IOException {
-		return saveAll(datasetId, BatchRepository.UPDATE, file);
+	public boolean saveIsolatesOnConflictUpdate(UUID projectId,UUID datasetId, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, BatchRepository.UPDATE, file);
 	}
 
-	private boolean saveAll(UUID datasetId, String conflict, MultipartFile file) throws IOException {
-		if (!datasetRepository.exists(datasetId))
+	private boolean saveAll(UUID projectId,UUID datasetId, String conflict, MultipartFile file) throws IOException {
+		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return false;
 		List<Isolate> isolates = new IsolatesFormatter().parse(file).stream()
-				.map(i -> new Isolate(datasetId, i.getPrimaryKey().getId(), null, i.getAncillaries(), i.getProfile().getPrimaryKey()))
+				.map(i -> new Isolate(projectId, datasetId, i.getPrimaryKey().getId(), null, i.getAncillaries(), i.getProfile().getPrimaryKey()))
 				.collect(Collectors.toList());
 		return isolateRepository.saveAll(isolates, conflict, datasetId.toString());
 	}

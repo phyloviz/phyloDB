@@ -1,6 +1,7 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
 import pt.ist.meic.phylodb.io.input.InputModel;
+import pt.ist.meic.phylodb.typing.Method;
 
 import java.util.Optional;
 
@@ -42,8 +43,8 @@ public class SchemaInputModel implements InputModel<Schema> {
 
 	@Override
 	public Optional<Schema> toDomainEntity(String... params) {
-		return !params[0].equals(id) || taxon == null || loci == null ? Optional.empty() :
-				Optional.of(new Schema(taxon, id, type, description, loci));
+		return !params[0].equals(id) || taxon == null || loci == null || !Method.exists(type) ? Optional.empty() :
+				Optional.of(new Schema(taxon, id, Method.valueOf(type), description, loci));
 	}
 
 }

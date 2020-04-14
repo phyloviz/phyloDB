@@ -7,13 +7,12 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
-
-import java.io.IOException;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
@@ -44,7 +43,7 @@ public class SchemaController extends Controller<Schema> {
 		return get(() -> service.getSchema(taxonId, schemaId, version), SchemaOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(Role.ADMIN)
+	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
 	@PutMapping(path = "/{schema}")
 	public ResponseEntity<?> putSchema(
 			@PathVariable("taxon") String taxonId,
@@ -54,12 +53,12 @@ public class SchemaController extends Controller<Schema> {
 		return put(() -> input.toDomainEntity(taxonId, schemaId), service::saveSchema);
 	}
 
-	@Authorized(Role.ADMIN)
+	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
 	@DeleteMapping(path = "/{schema}")
 	public ResponseEntity<?> deleteSchema(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("schema") String schemaId
-	) throws IOException {
+	) {
 		return status(() -> service.deleteSchema(taxonId, schemaId));
 	}
 

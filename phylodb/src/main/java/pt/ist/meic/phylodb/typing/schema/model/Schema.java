@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
+import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.utils.service.Entity;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
@@ -11,24 +12,24 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALU
 
 public class Schema extends Entity<Schema.PrimaryKey> {
 
-	private final String type;
+	private final Method type;
 	private final String description;
 	private final List<Reference<String>> lociIds;
 
-	public Schema(String taxonId, String id, int version, boolean deprecated, String type, String description, List<Reference<String>> lociIds) {
+	public Schema(String taxonId, String id, int version, boolean deprecated, Method type, String description, List<Reference<String>> lociIds) {
 		super(new PrimaryKey(taxonId, id), version, deprecated);
 		this.type = type;
 		this.description = description;
 		this.lociIds = lociIds;
 	}
 
-	public Schema(String taxonId, String id, String type, String description, String[] lociId) {
+	public Schema(String taxonId, String id, Method type, String description, String[] lociId) {
 		this(taxonId, id, -1, false, type, description, Arrays.stream(lociId)
 				.map(i -> new Reference<>(i, CURRENT_VERSION_VALUE, false))
 				.collect(Collectors.toList()));
 	}
 
-	public String getType() {
+	public Method getType() {
 		return type;
 	}
 
