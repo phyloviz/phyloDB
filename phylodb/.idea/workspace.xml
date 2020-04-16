@@ -2,29 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../docs/test cases/formatter/FastaFormatterTests.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/test cases/formatter/FastaFormatterTests.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docs/test cases/formatter/MlstFormatterTests.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docs/test cases/formatter/MlvaFormatterTests.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docs/test cases/formatter/SnpFormatterTests.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/test cases/formatter/SnpFormatterTests.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/Formatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/Formatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/allele/FastaFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/allele/FastaFormatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/isolate/IsolatesFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/isolate/IsolatesFormatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/profile/MlFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/profile/MlFormatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/profile/ProfilesFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/profile/ProfilesFormatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/profile/SnpFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/profile/SnpFormatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/Allele.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/Allele.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/model/Isolate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/model/Isolate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/Profile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/Profile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/PhylodbApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonControllerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonControllerTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonRepositoryTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonServiceTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,7 +84,20 @@
       <recent name="pt.ist.meic.phylodb.phylogeny.taxon.model" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.pt.ist.meic.phylodb.formatters in phylodb.test">
+  <component name="RunManager" selected="Application.PhylodbApplication">
+    <configuration name="PhylodbApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.PhylodbApplication" />
+      <module name="phylodb.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="IsolatesFormatterTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
       <extension name="coverage">
@@ -117,22 +109,6 @@
       <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
       <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.IsolatesFormatterTests" />
       <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="IsolatesFormatterTests.format_fileWithAllHeadersAndIsolate" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.formatters.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.IsolatesFormatterTests" />
-      <option name="METHOD_NAME" value="format_fileWithAllHeadersAndIsolate" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -153,22 +129,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IsolatesFormatterTests.format_fileWithIdAndAncillaryHeadersAndIsolates" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.formatters.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.IsolatesFormatterTests" />
-      <option name="METHOD_NAME" value="format_fileWithIdAndAncillaryHeadersAndIsolates" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="pt.ist.meic.phylodb.formatters in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
       <extension name="coverage">
@@ -183,20 +143,34 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="resources.formatters in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="resources.formatters.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="resources.formatters" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
-      <item itemvalue="JUnit.IsolatesFormatterTests.format_fileWithAllHeadersAndIsolate" />
-      <item itemvalue="JUnit.IsolatesFormatterTests.format_fileWithIdAndAncillaryHeadersAndIsolates" />
       <item itemvalue="JUnit.IsolatesFormatterTests.format_fileWithIdAndAncillaryHeadersAndIsolate" />
       <item itemvalue="JUnit.IsolatesFormatterTests" />
       <item itemvalue="JUnit.pt.ist.meic.phylodb.formatters in phylodb.test" />
+      <item itemvalue="JUnit.resources.formatters in phylodb.test" />
+      <item itemvalue="Application.PhylodbApplication" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.PhylodbApplication" />
         <item itemvalue="JUnit.pt.ist.meic.phylodb.formatters in phylodb.test" />
+        <item itemvalue="JUnit.resources.formatters in phylodb.test" />
         <item itemvalue="JUnit.IsolatesFormatterTests" />
         <item itemvalue="JUnit.IsolatesFormatterTests.format_fileWithIdAndAncillaryHeadersAndIsolate" />
-        <item itemvalue="JUnit.IsolatesFormatterTests.format_fileWithIdAndAncillaryHeadersAndIsolates" />
-        <item itemvalue="JUnit.IsolatesFormatterTests.format_fileWithAllHeadersAndIsolate" />
       </list>
     </recent_temporary>
   </component>
@@ -296,46 +270,46 @@
     </state>
     <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1581341617942" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1581373830246" />
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1587071327938">
+    <state width="1493" height="274" key="GridCell.Tab.0.bottom" timestamp="1587075108445">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683121" />
-    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587071327938" />
-    <state width="1493" height="210" key="GridCell.Tab.0.center" timestamp="1587071327937">
+    <state width="1493" height="274" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587075108445" />
+    <state width="1493" height="274" key="GridCell.Tab.0.center" timestamp="1587075108445">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683121" />
-    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1587071327937" />
-    <state width="1493" height="210" key="GridCell.Tab.0.left" timestamp="1587071327937">
+    <state width="1493" height="274" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1587075108445" />
+    <state width="1493" height="274" key="GridCell.Tab.0.left" timestamp="1587075108445">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683121" />
-    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1587071327937" />
-    <state width="1493" height="210" key="GridCell.Tab.0.right" timestamp="1587071327937">
+    <state width="1493" height="274" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1587075108445" />
+    <state width="1493" height="274" key="GridCell.Tab.0.right" timestamp="1587075108445">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683121" />
-    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1587071327937" />
-    <state width="1493" height="274" key="GridCell.Tab.1.bottom" timestamp="1587071283318">
+    <state width="1493" height="274" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1587075108445" />
+    <state width="1493" height="274" key="GridCell.Tab.1.bottom" timestamp="1587075108349">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683122" />
-    <state width="1493" height="274" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587071283318" />
-    <state width="1493" height="274" key="GridCell.Tab.1.center" timestamp="1587071283318">
+    <state width="1493" height="274" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587075108349" />
+    <state width="1493" height="274" key="GridCell.Tab.1.center" timestamp="1587075108349">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683122" />
-    <state width="1493" height="274" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1587071283318" />
-    <state width="1493" height="274" key="GridCell.Tab.1.left" timestamp="1587071283318">
+    <state width="1493" height="274" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1587075108349" />
+    <state width="1493" height="274" key="GridCell.Tab.1.left" timestamp="1587075108348">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683121" />
-    <state width="1493" height="274" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1587071283318" />
-    <state width="1493" height="274" key="GridCell.Tab.1.right" timestamp="1587071283318">
+    <state width="1493" height="274" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1587075108348" />
+    <state width="1493" height="274" key="GridCell.Tab.1.right" timestamp="1587075108349">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="365" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586010683122" />
-    <state width="1493" height="274" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1587071283318" />
+    <state width="1493" height="274" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1587075108349" />
     <state x="620" y="360" key="ReplaceDuplicatesPrompt" timestamp="1586209817390">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
