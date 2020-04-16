@@ -1,25 +1,12 @@
 package pt.ist.meic.phylodb.phylogeny.taxon;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TaxonServiceTests extends TaxonTests {
-
+/*
 	@Autowired
 	private TaxonService service;
 
@@ -183,5 +170,5 @@ public class TaxonServiceTests extends TaxonTests {
 		assertTrue(after.isPresent());
 		assertEquals(before.get().size(), after.get().size());
 	}
-
+*/
 }

@@ -28,7 +28,7 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 	protected boolean init(Iterator<String> it, Object... params) {
 		this.projectId = (UUID) params[0];
 		this.datasetId = (UUID) params[1];
-		this.loci = ((Schema) params[1]).getLociIds().stream()
+		this.loci = ((Schema) params[2]).getLociIds().stream()
 				.map(Entity::getPrimaryKey)
 				.count();
 		return true;

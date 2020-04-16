@@ -27,10 +27,6 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 				profileId == null ? null : new Reference<>(profileId, CURRENT_VERSION_VALUE, false));
 	}
 
-	public Isolate(String id, String description, Ancillary[] ancillaries, String profileId) {
-		this(null, null, id, description, ancillaries, profileId);
-	}
-
 	public UUID getDatasetId() {
 		return id.getDatasetId();
 	}

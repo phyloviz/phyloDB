@@ -11,7 +11,7 @@ public class SnpFormatter extends ProfilesFormatter {
 	}
 
 	@Override
-	protected boolean parse(String line, Consumer<Profile> add) {
+	protected boolean parse(String line, boolean last, Consumer<Profile> add) {
 		String[] columns = line.split("\\t", 2);
 		if (columns.length != 2 || !columns[0].matches("^\\d+$") || !columns[1].matches("^[01]+$") || columns[1].length() != loci)
 			return false;
@@ -21,9 +21,10 @@ public class SnpFormatter extends ProfilesFormatter {
 
 	@Override
 	public String format(List<Profile> data, Object... params) {
-		return data.stream()
-				.map(p -> p.getPrimaryKey() + "\\t" + String.join("\\t", p.getAllelesids()))
+		String formatted = data.stream()
+				.map(p -> p.getPrimaryKey().getId() + "\t" + String.join("", p.getAllelesIds()))
 				.reduce("", (a, c) -> a + c + "\n");
+		return formatted.length() > 0 ? formatted.substring(0, formatted.length() - "\n".length()) : "";
 	}
 
 }

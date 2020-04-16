@@ -1,0 +1,2 @@
+ST	uvrA	gyrB	ftsY	tuf	gap
+1	1	1	1	1	1

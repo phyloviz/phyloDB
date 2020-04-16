@@ -40,7 +40,7 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 		return allelesIds;
 	}
 
-	public List<String> getAllelesids() {
+	public List<String> getAllelesIds() {
 		return allelesIds.stream()
 				.map(Entity::getPrimaryKey)
 				.collect(Collectors.toList());
@@ -48,7 +48,7 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 
 	@Override
 	public String toString() {
-		String alleles = Strings.join(getAllelesids(), ',');
+		String alleles = Strings.join(getAllelesIds(), ',');
 		return String.format("Profile %s from dataset %s with aka %s and alleles %s", id.getId(), id.getDatasetId(), getAka(), alleles);
 	}
 

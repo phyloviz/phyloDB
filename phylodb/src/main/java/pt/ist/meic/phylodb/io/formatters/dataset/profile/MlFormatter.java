@@ -11,9 +11,9 @@ import java.util.function.Consumer;
 public class MlFormatter extends ProfilesFormatter {
 
 	@Override
-	protected boolean parse(String line, Consumer<Profile> add) {
+	protected boolean parse(String line, boolean last, Consumer<Profile> add) {
 		String[] columns = line.split("\\t");
-		if (!Arrays.stream(columns).allMatch(c -> c.matches("^\\d+$")) || columns.length != loci)
+		if (!Arrays.stream(columns).allMatch(c -> c.matches("^\\d+$")) || columns.length != loci + 1)
 			return false;
 		add.accept(new Profile(projectId, datasetId, columns[0], null, Arrays.copyOfRange(columns, 1, columns.length)));
 		return true;
@@ -21,14 +21,14 @@ public class MlFormatter extends ProfilesFormatter {
 
 	@Override
 	public String format(List<Profile> data, Object... params) {
-		StringBuilder raw = new StringBuilder("ST\\t");
+		StringBuilder raw = new StringBuilder("ST\t");
 		String[] lociIds = ((Schema) params[0]).getLociIds().stream().map(Entity::getPrimaryKey).toArray(String[]::new);
-		raw.append(String.join("\\t", lociIds)).append("\n");
+		raw.append(String.join("\t", lociIds)).append("\n");
 		for (Profile profile : data)
-			raw.append(profile.getPrimaryKey().getId()).append("\\t")
-					.append(String.join("\\t", profile.getAllelesids()))
+			raw.append(profile.getPrimaryKey().getId()).append("\t")
+					.append(String.join("\t", profile.getAllelesIds()))
 					.append("\n");
-		return raw.toString();
+		return raw.substring(0, raw.length() - "\n".length());
 	}
 
 }

@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AlleleService {
@@ -60,9 +59,7 @@ public class AlleleService {
 	private boolean saveAll(String taxonId, String locusId, UUID project, String conflict, MultipartFile file) throws IOException {
 		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
 			return false;
-		List<Allele> alleles = new FastaFormatter().parse(file).stream()
-				.map(a -> new Allele(taxonId, locusId, a.getPrimaryKey().getId(), a.getSequence(), project))
-				.collect(Collectors.toList());
+		List<Allele> alleles = new FastaFormatter().parse(file, taxonId, locusId, project);
 		return alleleRepository.saveAll(alleles, conflict, taxonId, locusId, project.toString());
 	}
 

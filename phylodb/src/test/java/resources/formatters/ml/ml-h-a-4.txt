@@ -1,0 +1,5 @@
+ST	uvrA	gyrB	ftsY	tuf	gap
+1	1	 	1	1	1
+2	4	1	1	3	3
+3	3	1	b	4	4
+4	4	1	1	2	3

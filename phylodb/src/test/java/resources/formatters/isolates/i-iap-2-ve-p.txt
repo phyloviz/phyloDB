@@ -1,0 +1,3 @@
+id	isolate	country	continent	ST
+1	AU13161	USA	North America	102
+2	LMG 1231T	Unknown	Europe	102

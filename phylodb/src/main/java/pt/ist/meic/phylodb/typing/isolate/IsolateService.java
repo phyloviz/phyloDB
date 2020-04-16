@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class IsolateService {
@@ -67,9 +66,7 @@ public class IsolateService {
 	private boolean saveAll(UUID projectId,UUID datasetId, String conflict, MultipartFile file) throws IOException {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return false;
-		List<Isolate> isolates = new IsolatesFormatter().parse(file).stream()
-				.map(i -> new Isolate(projectId, datasetId, i.getPrimaryKey().getId(), null, i.getAncillaries(), i.getProfile().getPrimaryKey()))
-				.collect(Collectors.toList());
+		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId);
 		return isolateRepository.saveAll(isolates, conflict, datasetId.toString());
 	}
 

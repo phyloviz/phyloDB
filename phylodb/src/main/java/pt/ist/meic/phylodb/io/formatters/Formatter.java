@@ -19,7 +19,7 @@ public abstract class Formatter<T> {
 
 	protected abstract boolean init(Iterator<String> it, Object... params);
 
-	protected abstract boolean parse(String line, Consumer<T> add);
+	protected abstract boolean parse(String line, boolean last, Consumer<T> add);
 
 	public abstract String format(List<T> entities, Object... params);
 
@@ -35,7 +35,7 @@ public abstract class Formatter<T> {
 				return entities;
 			while (it.hasNext()) {
 				count++;
-				if (!parse(it.next(), entities::add))
+				if (!parse(it.next(), !it.hasNext(), entities::add))
 					errors.append(count).append(',');
 			}
 			if (errors.length() > 0)

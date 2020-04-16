@@ -1,30 +1,13 @@
 package pt.ist.meic.phylodb.phylogeny.taxon;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.error.ErrorOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
-import pt.ist.meic.phylodb.utils.MockHttp;
-
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
-@AutoConfigureMockMvc
+//@AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TaxonControllerTests extends TaxonTests {
-
+/*
 	@Autowired
 	private MockHttp http;
 
@@ -168,5 +151,5 @@ public class TaxonControllerTests extends TaxonTests {
 		ErrorOutputModel result = http.parseResult(ErrorOutputModel.class, response);
 		assertEquals(Problem.UNAUTHORIZED, result.getMessage());
 	}
-
+*/
 }

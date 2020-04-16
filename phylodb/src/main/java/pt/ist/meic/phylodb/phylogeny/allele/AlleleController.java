@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.phylogeny.allele;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,9 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 @RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
 public class AlleleController extends Controller<Allele> {
 
+	@Value("${fasta.length}")
+	private String lineLength;
+
 	private AlleleService service;
 
 	public AlleleController(AlleleService service) {
@@ -43,7 +47,7 @@ public class AlleleController extends Controller<Allele> {
 	) {
 		return getAll(type, l -> service.getAlleles(taxonId, locusId, project, page, l),
 				MultipleOutputModel::new,
-				(a) -> new FileOutputModel("alleles.fasta", new FastaFormatter().format(a)));
+				(a) -> new FileOutputModel("alleles.fasta", new FastaFormatter().format(a, Integer.parseInt(lineLength))));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ, required = false)

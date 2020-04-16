@@ -17,10 +17,6 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 		this(taxonId, locusId, id, -1, false, sequence, project);
 	}
 
-	public Allele(String id, String sequence) {
-		this(null, null, id, sequence, null);
-	}
-
 	public String getTaxonId() {
 		return id.getTaxonId();
 	}

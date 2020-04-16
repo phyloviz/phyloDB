@@ -5,10 +5,7 @@ import pt.ist.meic.phylodb.io.formatters.Formatter;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -18,9 +15,13 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	private List<String> headers;
 	private int id;
 	private int st;
+	private UUID projectId;
+	private UUID datasetId;
 
 	@Override
 	protected boolean init(Iterator<String> it, Object... params) {
+		this.projectId = (UUID) params[0];
+		this.datasetId = (UUID) params[1];
 		headers = Arrays.asList(it.next().split("\\t"));
 		if ((id = headers.indexOf("id")) == -1)
 			return false;
@@ -32,17 +33,17 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	}
 
 	@Override
-	protected boolean parse(String line, Consumer<Isolate> add) {
-		String[] columns = line.split("\\t");
+	protected boolean parse(String line, boolean last, Consumer<Isolate> add) {
+		String[] columns = line.split("\\t", -1);
 		String id = columns[this.id];
 		String profile = st != -1 ? columns[st] : null;
-		if (!id.matches("^\\d+$"))
+		if (!id.matches("^\\d+$") || columns.length != headers.size())
 			return false;
 		Ancillary[] ancillaries = IntStream.range(0, columns.length)
-				.filter(i -> !columns[i].equals(" ") && i != this.id && i != st)
+				.filter(i -> !columns[i].isEmpty() && i != this.id && i != st)
 				.mapToObj(i -> new Ancillary(headers.get(i), columns[i]))
 				.toArray(Ancillary[]::new);
-		add.accept(new Isolate(id, null, ancillaries, profile));
+		add.accept(new Isolate(projectId, datasetId, id, null, ancillaries, profile));
 		return true;
 	}
 
@@ -52,16 +53,27 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 				.flatMap(i -> Arrays.stream(i.getAncillaries()).map(Ancillary::getKey))
 				.distinct()
 				.collect(Collectors.toList());
-		StringBuilder raw = new StringBuilder("id\t").append(Strings.join(headers, '\t')).append("ST\n");
+		String headersString = Strings.join(headers, '\t');
+		StringBuilder formatted = new StringBuilder("id");
+		if(!headersString.equals(""))
+			formatted.append("\t").append(headersString);
+		boolean st = isolates.stream().anyMatch(i -> i.getProfile() != null);
+		if(st)
+			formatted.append("\t").append("ST");
+		formatted.append("\n");
 		for (Isolate isolate : isolates) {
-			raw.append(isolate.getPrimaryKey().getId()).append('\t');
+			formatted.append(isolate.getPrimaryKey().getId()).append('\t');
 			Map<String, String> ancillaries = Arrays.stream(isolate.getAncillaries())
 					.collect(Collectors.toMap(Ancillary::getKey, Ancillary::getValue));
 			for (String header : headers)
-				raw.append(ancillaries.getOrDefault(header, " ")).append('\t');
-			raw.append(isolate.getProfile()).append('\n');
+				formatted.append(ancillaries.getOrDefault(header, "")).append('\t');
+			if(isolate.getProfile() != null)
+				formatted.append(isolate.getProfile().getPrimaryKey());
+			else if(!st)
+				formatted.delete(formatted.length() - "\t".length(), formatted.length());
+			formatted.append('\n');
 		}
-		return raw.toString();
+		return formatted.substring(0, formatted.length() - "\n".length());
 	}
 
 }

@@ -129,7 +129,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 				"FOREACH (_ in CASE WHEN a is not null THEN [1] ELSE [] END |\n" +
 				"\t CREATE (p)-[:HAS {part: %s, version: r.version}]->(a))\n" +
 				"WITH pj, d, p, sd";
-		String[] allelesIds = profile.getAllelesids().toArray(new String[0]);
+		String[] allelesIds = profile.getAllelesIds().toArray(new String[0]);
 		for (int i = 0; i < allelesIds.length; i++)
 			query.appendQuery(statement, i, i, i)
 					.addParameter(allelesIds[i], allelesIds[i]);
