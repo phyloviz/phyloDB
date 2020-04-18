@@ -37,7 +37,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 		String[][] alleles = {{"1", "1", "1", "1", "1"}};
 		String[][] alleles1 = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}};
 		String[][] alleles2 = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}, {"3", "1", "1", "4", "4"}};
-		String[][] alleles3 = {{}, {"4", "1", "1", "3", "3"}, {}, {"4", "1", "1", "2", "3"}};
+		String[][] alleles3 = {{"1", "", "1", "1", "1"}, {"4", "1", "1", "3", "3"}, {"3", "1", "b", "4", "4"}, {"4", "1", "1", "2", "3"}};
 		return Stream.of(Arguments.of(project, dataset, fileSchema, "ml-h-d-1.txt", profiles(project, dataset, alleles)),
 				Arguments.of(project, dataset, fileSchema, "ml-d-1.txt", profiles(project, dataset, alleles)),
 				Arguments.of(project, dataset, fileSchema, "ml-h-d-2.txt", profiles(project, dataset, alleles1)),

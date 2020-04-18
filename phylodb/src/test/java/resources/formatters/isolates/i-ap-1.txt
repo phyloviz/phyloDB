@@ -1,9 +1,2 @@
 isolate	country	continent	ST (MLST)
-AU13161	USA	North America	102
-LMG 1231T	Unknown		102
-LMG 1860	France	Europe	103
-AU2523	USA	North America	97
-AU8059	USA	North America	92
-AU8560	USA	North America	91
-AU10038	USA	North America	96
-AU10726	USA	North America	93
+1	USA	North America	102

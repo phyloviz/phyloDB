@@ -35,7 +35,7 @@ public class SnpFormatterTests extends ProfilesFormatterTests {
 		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		String[][] alleles = {{"1", "0", "0", "1", "0"}};
 		String[][] alleles1 = {{"1", "0", "0", "1", "0"}, {"0", "1", "1", "0", "1"}};
-		String[][] alleles2 = {{}, {"0", "1", "1", "0", "1"}, {}};
+		String[][] alleles2 = {{"a", "0", "0", "1", "0"}, {"0", "1", "1", "0", "1"}, {"1", "3", "0", "1", "0"}};
 		return Stream.of(Arguments.of(project, dataset, fileSchema, "snp-d-1.txt", profiles(project, dataset, alleles)),
 				Arguments.of(project, dataset, fileSchema, "snp-d-2.txt", profiles(project, dataset, alleles1)),
 				Arguments.of(project, dataset, fileSchema, "snp-a-3.txt", profiles(project, dataset, alleles2)));

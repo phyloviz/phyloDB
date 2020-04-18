@@ -1,4 +1,4 @@
 id	isolate	country	continent	ST
 1	AU13161	USA	North America	102
 2	LMG 1231T	Unknown		102
-t	LMG 1860	France	Europe	103
+3	LMG 1860	France	Europe	103

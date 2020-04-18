@@ -47,7 +47,7 @@ public class AlleleController extends Controller<Allele> {
 	) {
 		return getAll(type, l -> service.getAlleles(taxonId, locusId, project, page, l),
 				MultipleOutputModel::new,
-				(a) -> new FileOutputModel("alleles.fasta", new FastaFormatter().format(a, Integer.parseInt(lineLength))));
+				(a) -> new FileOutputModel(new FastaFormatter().format(a, Integer.parseInt(lineLength))));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ, required = false)

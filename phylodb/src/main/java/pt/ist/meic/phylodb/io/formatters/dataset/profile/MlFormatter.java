@@ -13,7 +13,7 @@ public class MlFormatter extends ProfilesFormatter {
 	@Override
 	protected boolean parse(String line, boolean last, Consumer<Profile> add) {
 		String[] columns = line.split("\\t");
-		if (!Arrays.stream(columns).allMatch(c -> c.matches("^\\d+$")) || columns.length != loci + 1)
+		if (Arrays.asList(columns).contains("ST") || columns.length != loci + 1)
 			return false;
 		add.accept(new Profile(projectId, datasetId, columns[0], null, Arrays.copyOfRange(columns, 1, columns.length)));
 		return true;

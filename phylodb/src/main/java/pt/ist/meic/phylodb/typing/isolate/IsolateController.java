@@ -42,7 +42,7 @@ public class IsolateController extends Controller<Isolate> {
 	) {
 		return getAll(type, l -> service.getIsolates(projectId, datasetId, page, l),
 				MultipleOutputModel::new,
-				(i) -> new FileOutputModel("isolates.txt", new IsolatesFormatter().format(i)));
+				(i) -> new FileOutputModel(new IsolatesFormatter().format(i)));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)
@@ -72,9 +72,10 @@ public class IsolateController extends Controller<Isolate> {
 	public ResponseEntity<?> postIsolates(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
+			@RequestParam(value = "id", defaultValue = "0") int id,
 			@RequestBody MultipartFile file
 	) throws IOException {
-		return fileStatus(() -> service.saveIsolatesOnConflictSkip(projectId, datasetId, file));
+		return fileStatus(() -> service.saveIsolatesOnConflictSkip(projectId, datasetId, id, file));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
@@ -82,10 +83,11 @@ public class IsolateController extends Controller<Isolate> {
 	public ResponseEntity<?> putIsolates(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
+			@RequestParam(value = "id", defaultValue = "0") int id,
 			@RequestBody MultipartFile file
 
 	) throws IOException {
-		return fileStatus(() -> service.saveIsolatesOnConflictUpdate(projectId, datasetId, file));
+		return fileStatus(() -> service.saveIsolatesOnConflictUpdate(projectId, datasetId, id, file));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)

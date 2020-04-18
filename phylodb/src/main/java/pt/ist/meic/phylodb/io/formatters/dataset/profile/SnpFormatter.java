@@ -13,7 +13,7 @@ public class SnpFormatter extends ProfilesFormatter {
 	@Override
 	protected boolean parse(String line, boolean last, Consumer<Profile> add) {
 		String[] columns = line.split("\\t", 2);
-		if (columns.length != 2 || !columns[0].matches("^\\d+$") || !columns[1].matches("^[01]+$") || columns[1].length() != loci)
+		if (columns.length != 2 || columns[1].length() != loci)
 			return false;
 		add.accept(new Profile(projectId, datasetId, columns[0], null, columns[1].split("")));
 		return true;

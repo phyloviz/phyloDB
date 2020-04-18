@@ -54,19 +54,19 @@ public class IsolateService {
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictSkip(UUID projectId,UUID datasetId, MultipartFile file) throws IOException {
-		return saveAll(projectId, datasetId, BatchRepository.SKIP, file);
+	public boolean saveIsolatesOnConflictSkip(UUID projectId,UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, idColumn, BatchRepository.SKIP, file);
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictUpdate(UUID projectId,UUID datasetId, MultipartFile file) throws IOException {
-		return saveAll(projectId, datasetId, BatchRepository.UPDATE, file);
+	public boolean saveIsolatesOnConflictUpdate(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, idColumn, BatchRepository.UPDATE, file);
 	}
 
-	private boolean saveAll(UUID projectId,UUID datasetId, String conflict, MultipartFile file) throws IOException {
+	private boolean saveAll(UUID projectId,UUID datasetId, int idColumn, String conflict, MultipartFile file) throws IOException {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return false;
-		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId);
+		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId, idColumn);
 		return isolateRepository.saveAll(isolates, conflict, datasetId.toString());
 	}
 

@@ -42,8 +42,7 @@ public class ProfileController extends Controller<Profile> {
 	) {
 		return getAll(type, l -> service.getProfiles(projectId, datasetId, page, l),
 				p -> new MultipleOutputModel(p.getValue()),
-				p -> new FileOutputModel("profiles." + p.getKey().getPrimaryKey().getId().toLowerCase(),
-						ProfilesFormatter.get(p.getKey().getType().getName()).format(p.getValue(), p.getKey())));
+				p -> new FileOutputModel(ProfilesFormatter.get(p.getKey().getType().getName()).format(p.getValue(), p.getKey())));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)

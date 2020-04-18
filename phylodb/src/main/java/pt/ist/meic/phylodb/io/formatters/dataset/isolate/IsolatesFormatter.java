@@ -22,8 +22,9 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	protected boolean init(Iterator<String> it, Object... params) {
 		this.projectId = (UUID) params[0];
 		this.datasetId = (UUID) params[1];
+		this.id = (int) params[2];
 		headers = Arrays.asList(it.next().split("\\t"));
-		if ((id = headers.indexOf("id")) == -1)
+		if (id < 0 || id >= headers.size())
 			return false;
 		st = IntStream.range(0, headers.size())
 				.filter(i -> headers.get(i).startsWith("ST"))
@@ -37,7 +38,7 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 		String[] columns = line.split("\\t", -1);
 		String id = columns[this.id];
 		String profile = st != -1 ? columns[st] : null;
-		if (!id.matches("^\\d+$") || columns.length != headers.size())
+		if (columns.length != headers.size())
 			return false;
 		Ancillary[] ancillaries = IntStream.range(0, columns.length)
 				.filter(i -> !columns[i].isEmpty() && i != this.id && i != st)

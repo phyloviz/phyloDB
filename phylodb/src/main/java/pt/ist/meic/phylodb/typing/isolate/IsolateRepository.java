@@ -5,6 +5,8 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
+import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
+import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Reference;
@@ -16,8 +18,11 @@ import java.util.UUID;
 @Repository
 public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryKey> {
 
-	public IsolateRepository(Session session) {
+	private ProfileRepository profileRepository;
+
+	public IsolateRepository(Session session, ProfileRepository profileRepository) {
 		super(session);
+		this.profileRepository = profileRepository;
 	}
 
 	@Override
@@ -97,6 +102,11 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 
 	@Override
 	protected void batch(Query query, Isolate isolate) {
+		Isolate.PrimaryKey key = isolate.getPrimaryKey();
+		if(isolate.getProfile() != null && profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), key.getDatasetId(), isolate.getProfile().getPrimaryKey()))) {
+			LOG.info(String.format("The %s was not created due to absent profile", isolate.toString()));
+			return;
+		}
 		composeStore(query, isolate);
 		query.appendQuery("WITH d\n");
 	}
