@@ -4,16 +4,16 @@ import pt.ist.meic.phylodb.io.output.SingleOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
-public class DatasetOutputModel extends SingleOutputModel {
+public class DatasetOutputModel extends SingleOutputModel<Dataset.PrimaryKey> {
 
 	private final String description;
 	private final String taxon_id;
 	private final String schema_id;
-	private final int schema_version;
+	private final Long schema_version;
 	private final boolean schema_deprecated;
 
 	public DatasetOutputModel(Dataset dataset) {
-		super(dataset.getPrimaryKey().toString(), dataset.getVersion(), dataset.isDeprecated());
+		super(dataset);
 		this.description = dataset.getDescription();
 		Reference<Schema.PrimaryKey> schema = dataset.getSchema();
 		this.taxon_id = schema.getPrimaryKey().getTaxonId();
@@ -34,7 +34,7 @@ public class DatasetOutputModel extends SingleOutputModel {
 		return schema_id;
 	}
 
-	public int getSchema_version() {
+	public Long getSchema_version() {
 		return schema_version;
 	}
 

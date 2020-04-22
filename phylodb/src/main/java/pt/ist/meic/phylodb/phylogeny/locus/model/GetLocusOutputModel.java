@@ -2,12 +2,12 @@ package pt.ist.meic.phylodb.phylogeny.locus.model;
 
 import pt.ist.meic.phylodb.io.output.SingleOutputModel;
 
-public class LocusOutputModel extends SingleOutputModel {
+public class LocusOutputModel extends SingleOutputModel<Locus.PrimaryKey> {
 
 	private final String description;
 
 	public LocusOutputModel(Locus locus) {
-		super(locus.getPrimaryKey().getId(), locus.getVersion(), locus.isDeprecated());
+		super(locus);
 		this.description = locus.getDescription();
 	}
 

@@ -3,16 +3,16 @@ package pt.ist.meic.phylodb.typing.isolate.model;
 import pt.ist.meic.phylodb.io.output.SingleOutputModel;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
-public class IsolateOutputModel extends SingleOutputModel {
+public class IsolateOutputModel extends SingleOutputModel<Isolate.PrimaryKey> {
 
 	private final String description;
 	private final Ancillary[] ancillaries;
 	private final String profile_id;
-	private final int profile_version;
+	private final Long profile_version;
 	private final boolean profile_deprecated;
 
 	public IsolateOutputModel(Isolate isolate) {
-		super(isolate.getPrimaryKey().getId(), isolate.getVersion(), isolate.isDeprecated());
+		super(isolate);
 		this.description = isolate.getDescription();
 		this.ancillaries = isolate.getAncillaries();
 		Reference<String> profile = isolate.getProfile();
@@ -33,7 +33,7 @@ public class IsolateOutputModel extends SingleOutputModel {
 		return profile_id;
 	}
 
-	public int getProfile_version() {
+	public Long getProfile_version() {
 		return profile_version;
 	}
 
