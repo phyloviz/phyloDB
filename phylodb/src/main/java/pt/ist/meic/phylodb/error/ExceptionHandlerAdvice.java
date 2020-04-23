@@ -12,6 +12,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
@@ -43,7 +45,8 @@ public class ExceptionHandlerAdvice {
 		return handle(ex, Problem.NOT_ALLOWED);
 	}
 
-	@ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class})
+	@ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class,
+			MissingServletRequestPartException.class, MultipartException.class})
 	public final ResponseEntity<ErrorOutputModel> handle400(Exception ex) {
 		return handle(ex, Problem.BAD_REQUEST);
 	}

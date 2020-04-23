@@ -147,4 +147,7 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 .flattened-pom.xml
 
+### Logs ###
+phylodb/logs
+
 # End of https://www.gitignore.io/api/java,gradle,maven,intellij

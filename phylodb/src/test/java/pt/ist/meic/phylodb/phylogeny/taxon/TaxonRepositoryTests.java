@@ -29,13 +29,13 @@ public class TaxonRepositoryTests extends RepositoryTests {
 
 	private void store(Taxon[] taxons) {
 		for (Taxon taxon : taxons) {
-			String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = false WITH t\n" +
+			String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = $ WITH t\n" +
 					"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
 					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 					"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $}) WITH t\n" +
 					"CREATE (p)-[:CONTAINS]->(l:Locus {deprecated: false})-[:CONTAINS]->(:Allele {deprecated: false})";
-			execute(new Query(statement, taxon.getPrimaryKey(), taxon.getDescription()));
+			execute(new Query(statement, taxon.getPrimaryKey(), taxon.isDeprecated(), taxon.getDescription()));
 		}
 	}
 
@@ -114,7 +114,7 @@ public class TaxonRepositoryTests extends RepositoryTests {
 	private static Stream<Arguments> exists_params() {
 		String key = "test";
 		Taxon first = new Taxon(key, 1, false, null),
-				second = new Taxon(key + "2", 1, true, "description");
+				second = new Taxon(key, 1, true, "description");
 		return Stream.of(Arguments.of(key, new Taxon[0], false),
 				Arguments.of(key, new Taxon[]{first}, true),
 				Arguments.of(key, new Taxon[]{second}, false),

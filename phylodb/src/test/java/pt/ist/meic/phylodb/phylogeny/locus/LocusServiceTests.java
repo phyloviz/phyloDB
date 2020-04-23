@@ -72,7 +72,7 @@ public class LocusServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("getLoci_params")
-	public void getTaxons(int page, List<Locus> expected) {
+	public void getLoci(int page, List<Locus> expected) {
 		Mockito.when(locusRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Locus>> result = service.getLoci(taxon.getPrimaryKey(), page, LIMIT);
 		if(expected == null && !result.isPresent()) {
@@ -98,7 +98,7 @@ public class LocusServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("saveLocus_params")
-	public void saveTaxon(Locus locus, boolean exists, boolean expected) {
+	public void saveLocus(Locus locus, boolean exists, boolean expected) {
 		Mockito.when(taxonRepository.exists(any())).thenReturn(exists);
 		Mockito.when(locusRepository.save(any())).thenReturn(expected);
 		boolean result = service.saveLocus(locus);
@@ -107,7 +107,7 @@ public class LocusServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("deleteLocus_params")
-	public void deleteTaxon(Locus.PrimaryKey key, boolean expected) {
+	public void deleteLocus(Locus.PrimaryKey key, boolean expected) {
 		Mockito.when(locusRepository.remove(any())).thenReturn(expected);
 		boolean result = service.deleteLocus(key.getTaxonId(), key.getId());
 		assertEquals(expected, result);

@@ -2,6 +2,7 @@ package pt.ist.meic.phylodb.phylogeny.allele.model;
 
 import pt.ist.meic.phylodb.utils.service.Entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Allele extends Entity<Allele.PrimaryKey> {
@@ -32,6 +33,15 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 	@Override
 	public String toString() {
 		return String.format("Allele %s from locus %s of taxon %s with sequence %s", id.getId(), id.getLocusId(), id.getTaxonId(), sequence);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		Allele allele = (Allele) o;
+		return super.equals(allele) && Objects.equals(sequence, allele.sequence);
 	}
 
 	public static class PrimaryKey {
@@ -68,6 +78,16 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 			return project;
 		}
 
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			PrimaryKey that = (PrimaryKey) o;
+			return Objects.equals(taxonId, that.taxonId) &&
+					Objects.equals(locusId, that.locusId) &&
+					Objects.equals(id, that.id) &&
+					Objects.equals(project, that.project);
+		}
 	}
 
 }

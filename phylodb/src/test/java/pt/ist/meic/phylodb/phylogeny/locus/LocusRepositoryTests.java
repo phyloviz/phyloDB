@@ -37,13 +37,13 @@ public class LocusRepositoryTests extends RepositoryTests {
 		for (Locus locus : loci) {
 			String statement = "MATCH (t:Taxon {id: $})\n" +
 					"WHERE t.deprecated = false\n" +
-					"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = false WITH l\n" +
+					"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = $ WITH l\n" +
 					"OPTIONAL MATCH (l)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
 					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 					"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $}) WITH l\n" +
 					"CREATE (l)-[:CONTAINS]->(:Allele {deprecated: false})";
-			execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.getDescription()));
+			execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.isDeprecated(), locus.getDescription()));
 		}
 	}
 
@@ -122,7 +122,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	private static Stream<Arguments> exists_params() {
 		Locus.PrimaryKey key = new Locus.PrimaryKey(taxon.getPrimaryKey(), "test");
 		Locus first = new Locus(key.getTaxonId(), key.getId(), 1, false, null),
-				second = new Locus(key.getTaxonId(), key.getId() + "2", 1, true, "description");
+				second = new Locus(key.getTaxonId(), key.getId(), 1, true, "description");
 		return Stream.of(Arguments.of(key, new Locus[0], false),
 				Arguments.of(key, new Locus[]{first}, true),
 				Arguments.of(key, new Locus[]{second}, false),

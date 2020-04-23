@@ -157,7 +157,7 @@ public class ProjectControllerTests extends Test {
 	public void updateProject(MockHttpServletRequestBuilder req, ProjectInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if(input != null)
 			Mockito.when(service.saveProject(any(), any())).thenReturn(ret);
-		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON, input);
+		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if(expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -168,7 +168,7 @@ public class ProjectControllerTests extends Test {
 	public void postProject(MockHttpServletRequestBuilder req, ProjectInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if(input != null)
 			Mockito.when(service.saveProject(any(), any())).thenReturn(ret);
-		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON, input);
+		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if(expectedStatus.is2xxSuccessful()) {
 			CreatedOutputModel parsed = http.parseResult(CreatedOutputModel.class, result);

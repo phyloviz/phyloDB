@@ -133,9 +133,9 @@ public class ProjectRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7");
+		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
 		Project first = new Project(key1, 1, false, "name1", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				second = new Project(key2, 1, true, "name2", "private", null, new User.PrimaryKey[]{user2.getPrimaryKey()});
+				second = new Project(key1, 1, true, "name2", "private", null, new User.PrimaryKey[]{user2.getPrimaryKey()});
 		return Stream.of(Arguments.of(key1, new Project[0], false),
 				Arguments.of(key1, new Project[]{first}, true),
 				Arguments.of(key1, new Project[]{second}, false),

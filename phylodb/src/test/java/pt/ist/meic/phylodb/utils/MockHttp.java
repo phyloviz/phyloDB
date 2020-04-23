@@ -28,8 +28,12 @@ public class MockHttp {
 		return mvc.perform(action.accept(mediatype)).andReturn().getResponse();
 	}
 
-	public <T> MockHttpServletResponse executeRequest(MockHttpServletRequestBuilder action, MediaType mediatype, T data) throws Exception {
-		return mvc.perform(action.contentType(mediatype).content(objectMapper.writeValueAsString(data))).andReturn().getResponse();
+	public <T> MockHttpServletResponse executeRequest(MockHttpServletRequestBuilder action, T data) throws Exception {
+		return mvc.perform(action.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(data))).andReturn().getResponse();
+	}
+
+	public MockHttpServletResponse executeFileRequest(MockHttpServletRequestBuilder action) throws Exception {
+		return mvc.perform(action).andReturn().getResponse();
 	}
 
 }

@@ -31,12 +31,12 @@ public class UserRepositoryTests extends RepositoryTests {
 
 	private void store(User[] users) {
 		for (User user : users) {
-			String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = false WITH u\n" +
+			String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = $ WITH u\n" +
 					"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 					"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
-			execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));
+			execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.isDeprecated(), user.getRole().getName()));
 		}
 	}
 
@@ -105,7 +105,8 @@ public class UserRepositoryTests extends RepositoryTests {
 	private static Stream<Arguments> exists_params() {
 		String email = "test", provider = "test";
 		User.PrimaryKey key = new User.PrimaryKey(email, provider);
-		User first = new User(email, provider, 1, false, Role.USER), second = new User(email + "2", provider + "2", 1, true, Role.USER);
+		User first = new User(email, provider, 1, false, Role.USER),
+				second = new User(email, provider, 1, true, Role.USER);
 		return Stream.of(Arguments.of(key, new User[0], false),
 				Arguments.of(key, new User[]{first}, true),
 				Arguments.of(key, new User[]{second}, false),

@@ -59,7 +59,7 @@ public class AlleleController extends Controller<Allele> {
 			@RequestParam(value = "project", required = false) UUID project,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), GetAlleleOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), GetAlleleOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
@@ -68,10 +68,10 @@ public class AlleleController extends Controller<Allele> {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,
-			@RequestParam(value = "project", required = false) UUID project,
+			@RequestParam(value = "project", required = false) String project,
 			@RequestBody AlleleInputModel input
 	) {
-		return put(() -> input.toDomainEntity(taxonId, locusId, alleleId, project.toString()), service::saveAllele);
+		return put(() -> input.toDomainEntity(taxonId, locusId, alleleId, project), service::saveAllele);
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
@@ -80,7 +80,7 @@ public class AlleleController extends Controller<Allele> {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@RequestParam(value = "project", required = false) UUID project,
-			@RequestBody MultipartFile file
+			@RequestParam("file") MultipartFile file
 
 	) throws IOException {
 		return fileStatus(() -> service.saveAllelesOnConflictSkip(taxonId, locusId, project, file));
@@ -92,7 +92,7 @@ public class AlleleController extends Controller<Allele> {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@RequestParam(value = "project", required = false) UUID project,
-			@RequestBody MultipartFile file
+			@RequestParam("file") MultipartFile file
 
 	) throws IOException {
 		return fileStatus(() -> service.saveAllelesOnConflictUpdate(taxonId, locusId, project, file));

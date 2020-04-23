@@ -7,6 +7,8 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,14 +28,14 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		Object[] params = new Object[]{filters[0], filters[1], page, limit};
 		if(filters[2] != null) {
 			params = new Object[]{filters[0], filters[1], filters[2],page, limit};
-			statement += "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $}) WHERE p.deprecated = false\n" +
+			statement += "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $})\n" +
 					"WHERE p.deprecated = false\n" +
 					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence, p.id as project\n";
 		} else {
-			statement += "AND NOT (a)<-[:CONTAINS]-(p:Project)\n" +
+			statement += " AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
 					"\nRETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence\n";
 		}
-		statement += "SKIP $ LIMIT $";
+		statement += "ORDER BY t.id, l.id, a.id SKIP $ LIMIT $";
 		return query(new Query(statement, params));
 	}
 
@@ -46,8 +48,8 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 			statement += "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $}) WHERE p.deprecated = false\n" +
 			"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence, p.id as project\n";
 		} else {
-			statement += "AND NOT (a)<-[:CONTAINS]-(p:Project)\n" +
-					"\nRETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence\n";
+			statement += " AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
+					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence\n";
 		}
 		return query(new Query(statement, key.getTaxonId(), key.getLocusId(), key.getId(), version, key.getProject()));
 	}
@@ -69,7 +71,8 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		String statement = "OPTIONAL MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})\n";
 		statement += key.getProject() != null ?
 				"OPTIONAL MATCH (a)<-[:CONTAINS]-(p:Project {id: $}) WHERE p.deprecated = false\n" :
-				"WHERE NOT (a)<-[:CONTAINS]-(p:Project)\n";
+				"WHERE NOT (a)<-[:CONTAINS]-(:Project)\n";
+		statement += "RETURN COALESCE(a.deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getLocusId(), key.getId(), key.getProject()));
 	}
 
@@ -80,7 +83,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 				"WHERE t.deprecated = false AND l.deprecated = false\n";
 		if (allele.getPrimaryKey().getProject() != null) {
 			params = new Object[]{allele.getTaxonId(), allele.getLocusId(), allele.getPrimaryKey().getProject()};
-			statement += "MATCH(p:Project {id: $}) WHERE p.deprecated = false WITH t, l, p";
+			statement += "MATCH(p:Project {id: $}) WHERE p.deprecated = false WITH p, l\n";
 		}
 		Query query = new Query(statement, params);
 		composeStore(query, allele);
@@ -92,17 +95,22 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false ";
 		statement += key.getProject() != null ? "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $}) WHERE p.deprecated = false\n" :
-				"AND NOT (a)<-[:CONTAINS]-(p:Project)\n";
+				"AND NOT (a)<-[:CONTAINS]-(:Project)\n";
 		statement += "SET a.deprecated = true\n";
 		execute(new Query(statement, key.getTaxonId(), key.getLocusId(), key.getId(), key.getProject()));
 	}
 
 	@Override
 	protected Query init(String... params) {
-		String project = params[3] == null ? "WITH l" : "MATCH (p:Project {id: $}) WHERE p.deprecated = false WITH p, l";
+		String project = "WITH l";
+		List<String> parameters = new ArrayList<String>() {{ add(params[0]); add(params[1]); }};
+		if(params[2] != null) {
+			project = "MATCH (p:Project {id: $}) WHERE p.deprecated = false WITH p, l";
+			parameters.add(params[2]);
+		}
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false\n" + project + "\n";
-		return new Query(statement, (Object[]) params);
+		return new Query(statement, parameters.toArray());
 	}
 
 	@Override
@@ -113,17 +121,21 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 
 	@Override
 	protected void arrange(Query query, String... params) {
-		query.subQuery(query.length() - (params[3] == null ? "WITH l".length() : "WITH p, l\n".length()));
+		query.subQuery(query.length() - (params[2] == null ? "WITH l\n".length() : "WITH p, l\n".length()));
 	}
 
 	private void composeStore(Query query, Allele allele) {
-		String project= allele.getPrimaryKey().getProject() != null ? "<-[:CONTAINS]-(p)" : "";
-		String statement = "MERGE (l)-[:CONTAINS]->(a:Allele {id: $})" + project + " SET a.deprecated = false WITH l, a\n" +
+		String with = "l, a", project = "";
+		if(allele.getPrimaryKey().getProject() != null) {
+			with = "p, l, a";
+			project = "<-[:CONTAINS]-(p)";
+		}
+		String statement = "MERGE (l)-[:CONTAINS]->(a:Allele {id: $})" + project + " SET a.deprecated = false WITH " + with + "\n" +
 				"OPTIONAL MATCH (a)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-				"WITH l, a, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+				"WITH " + with + ", COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (a)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ad:AlleleDetails {sequence: $}) ";
-		query.appendQuery(statement).addParameter(allele.getPrimaryKey(), allele.getSequence());
+		query.appendQuery(statement).addParameter(allele.getPrimaryKey().getId(), allele.getSequence());
 	}
 
 }

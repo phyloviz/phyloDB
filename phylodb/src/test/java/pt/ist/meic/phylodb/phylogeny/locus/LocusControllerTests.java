@@ -50,7 +50,7 @@ public class LocusControllerTests extends Test {
 	private static final String taxonId = "t";
 
 
-	private static Stream<Arguments> getTaxons_params() {
+	private static Stream<Arguments> getLoci_params() {
 		String uri = "/taxons/%s/loci";
 		List<Locus> loci = new ArrayList<Locus>() {{add(new Locus(taxonId, "id", null));}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, taxonId)).param("page", "0"),
@@ -65,7 +65,7 @@ public class LocusControllerTests extends Test {
 				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, null, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
-	private static Stream<Arguments> getTaxon_params() {
+	private static Stream<Arguments> getLocus_params() {
 		String uri = "/taxons/%s/loci/%s";
 		Locus locus = new Locus(taxonId, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
@@ -77,7 +77,7 @@ public class LocusControllerTests extends Test {
 				Arguments.of(req2, null, HttpStatus.NOT_FOUND, new ErrorOutputModel(Problem.NOT_FOUND.getMessage())));
 	}
 
-	private static Stream<Arguments> saveTaxon_params() {
+	private static Stream<Arguments> saveLocus_params() {
 		String uri = "/taxons/%s/loci/%s";
 		Locus locus = new Locus(taxonId, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
@@ -90,7 +90,7 @@ public class LocusControllerTests extends Test {
 				Arguments.of(req1, null, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
-	private static Stream<Arguments> deleteTaxon_params() {
+	private static Stream<Arguments> deleteLocus_params() {
 		String uri = "/taxons/%s/loci/%s";
 		Locus locus = new Locus(taxonId, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
@@ -107,8 +107,8 @@ public class LocusControllerTests extends Test {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getTaxons_params")
-	public void getTaxons(MockHttpServletRequestBuilder req, List<Locus> loci, HttpStatus expectedStatus, List<LocusOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	@MethodSource("getLoci_params")
+	public void getLoci(MockHttpServletRequestBuilder req, List<Locus> loci, HttpStatus expectedStatus, List<LocusOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(service.getLoci(anyString(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(loci));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
@@ -130,8 +130,8 @@ public class LocusControllerTests extends Test {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getTaxon_params")
-	public void getTaxon(MockHttpServletRequestBuilder req, Locus locus, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+	@MethodSource("getLocus_params")
+	public void getLocus(MockHttpServletRequestBuilder req, Locus locus, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		Mockito.when(service.getLocus(anyString(), anyString(), anyLong())).thenReturn(Optional.ofNullable(locus));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
@@ -142,19 +142,19 @@ public class LocusControllerTests extends Test {
 	}
 
 	@ParameterizedTest
-	@MethodSource("saveTaxon_params")
-	public void saveTaxon(MockHttpServletRequestBuilder req, LocusInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+	@MethodSource("saveLocus_params")
+	public void saveLocus(MockHttpServletRequestBuilder req, LocusInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if(input != null)
 			Mockito.when(service.saveLocus(any())).thenReturn(ret);
-		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON, input);
+		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if(expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
 	@ParameterizedTest
-	@MethodSource("deleteTaxon_params")
-	public void deleteTaxon(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+	@MethodSource("deleteLocus_params")
+	public void deleteLocus(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		Mockito.when(service.deleteLocus(anyString(), anyString())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());

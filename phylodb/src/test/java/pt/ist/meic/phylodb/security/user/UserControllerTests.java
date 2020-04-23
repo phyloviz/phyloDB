@@ -153,7 +153,7 @@ public class UserControllerTests extends Test {
 	public void updateUser(MockHttpServletRequestBuilder req, UserInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if(input != null)
 			Mockito.when(service.updateUser(any())).thenReturn(ret);
-		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON, input);
+		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if(expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));

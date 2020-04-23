@@ -7,8 +7,11 @@ import java.util.UUID;
 
 public class AlleleInputModel implements InputModel<Allele> {
 
-	private final String id;
-	private final String sequence;
+	private String id;
+	private String sequence;
+
+	public AlleleInputModel() {
+	}
 
 	public AlleleInputModel(String id, String sequence) {
 		this.id = id;

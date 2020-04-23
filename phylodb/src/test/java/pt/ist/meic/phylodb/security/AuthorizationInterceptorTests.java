@@ -50,7 +50,7 @@ public class AuthorizationInterceptorTests extends Test {
 		Project otherPublicProject = new Project(UUID.fromString(ID), "t", "public", "t", new User.PrimaryKey[]{otherKey});
 		Project otherProject = new Project(UUID.fromString(ID), "t", "private", "t", new User.PrimaryKey[]{otherKey});
 		HandlerMethod handler1 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("saveTaxon", String.class, TaxonInputModel.class));
-		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, UUID.class, AlleleInputModel.class));
+		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, String.class, AlleleInputModel.class));
 		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, UUID.class, int.class, String.class));
 		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxons", int.class));
 		return Stream.of(Arguments.of(request(userKey, Role.ADMIN, null), response, handler1, null, true),

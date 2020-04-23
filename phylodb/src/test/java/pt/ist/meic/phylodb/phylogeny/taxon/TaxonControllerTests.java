@@ -143,7 +143,7 @@ public class TaxonControllerTests extends Test {
 	public void saveTaxon(MockHttpServletRequestBuilder req, TaxonInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if(input != null)
 			Mockito.when(service.saveTaxon(any())).thenReturn(ret);
-		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON, input);
+		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if(expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
