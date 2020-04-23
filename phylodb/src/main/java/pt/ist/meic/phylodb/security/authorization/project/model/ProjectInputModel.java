@@ -14,6 +14,9 @@ public class ProjectInputModel implements InputModel<Project> {
 	private String description;
 	private User.PrimaryKey[] users;
 
+	public ProjectInputModel() {
+	}
+
 	public ProjectInputModel(UUID id, String name, String type, String description, User.PrimaryKey[] users) {
 		this.id = id;
 		this.name = name;

@@ -15,7 +15,7 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 	private final Ancillary[] ancillaries;
 	private final Reference<String> profile;
 
-	public Isolate(UUID projectId, UUID datasetId, String id, int version, boolean deprecated, String description, Ancillary[] ancillaries, Reference<String> profile) {
+	public Isolate(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String description, Ancillary[] ancillaries, Reference<String> profile) {
 		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.description = description;
 		this.profile = profile;

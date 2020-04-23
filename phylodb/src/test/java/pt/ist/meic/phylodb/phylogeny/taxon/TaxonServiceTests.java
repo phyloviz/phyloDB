@@ -1,174 +1,108 @@
 package pt.ist.meic.phylodb.phylogeny.taxon;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 
-@Transactional
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TaxonServiceTests extends TaxonTests {
-/*
-	@Autowired
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+
+public class TaxonServiceTests extends Test {
+
+	@MockBean
+	private TaxonRepository repository;
+
+	@InjectMocks
 	private TaxonService service;
 
-	private static Stream<Arguments> validKeyParameters() {
-		return Stream.of(Arguments.of(IDS[0]), Arguments.of(IDS[1]));
+	private static final int LIMIT = 2;
+	private static final Taxon first = new Taxon("1one", 1, false, "description");
+	private static final Taxon second = new Taxon("2two", 1, false, null);
+	private static final Taxon[] state = new Taxon[]{first, second};
+
+	private static Stream<Arguments> getTaxons_params() {
+		List<Taxon> expected1 = new ArrayList<Taxon>() {{ add(state[0]); }};
+		List<Taxon> expected2 = new ArrayList<Taxon>() {{ add(state[0]); add(state[1]); }};
+		return Stream.of(Arguments.of(0, Collections.emptyList()),
+				Arguments.of(0, expected1),
+				Arguments.of(0, expected2),
+				Arguments.of(-1, null));
 	}
 
-	private static Stream<Arguments> validAndNullKeyParameters() {
-		return Stream.of(Arguments.of(IDS[0]), null);
+	private static Stream<Arguments> getTaxon_params() {
+		return Stream.of(Arguments.of(first.getPrimaryKey(), 1, first),
+				Arguments.of(first.getPrimaryKey(), 1, null));
 	}
 
-	private static Stream<Arguments> save_invalidParameters() {
-		return Stream.of(Arguments.of(IDS[0], new Taxon(IDS[1], null)),
-				Arguments.of(null, new Taxon(IDS[1], null)),
-				Arguments.of(IDS[1], null));
+	private static Stream<Arguments> saveTaxon_params() {
+		return Stream.of(Arguments.of(state[0], true),
+				Arguments.of(state[1], false),
+				Arguments.of(null, false));
 	}
 
-	private static Stream<Arguments> remove_invalidParameters() {
-		return Stream.of(Arguments.of(IDS[0]), null);
+	private static Stream<Arguments> deleteTaxon_params() {
+		return Stream.of(Arguments.of(state[0].getPrimaryKey(), true),
+				Arguments.of(state[0].getPrimaryKey(), false));
 	}
 
-	@ParameterizedTest
-	@ValueSource(ints = {0, 1, 2})
-	public void findAll_absentTaxonsAndPageZeroToN_emptyList(int page) {
-		Optional<List<Taxon>> actual = service.getTaxons(page);
-		assertTrue(actual.isPresent());
-		assertEquals(0, actual.get().size());
-	}
-
-	@ParameterizedTest
-	@ValueSource(ints = {1, 2})
-	public void findAll_singleTaxonAndPageOneToN_emptyList(int page) {
-		arrange(IDS[0]);
-		Optional<List<Taxon>> actual = service.getTaxons(page);
-		assertTrue(actual.isPresent());
-		assertEquals(0, actual.get().size());
-	}
-
-	@Test
-	public void findAll_singleTaxonAndPageZero_singletonList() {
-		arrange(IDS[0]);
-		Optional<List<Taxon>> actual = service.getTaxons(0);
-		assertTrue(actual.isPresent());
-		assertEquals(1, actual.get().size());
-		assertEquals(IDS[0], actual.get().get(0).getPrimaryKey());
+	@BeforeEach
+	public void init() {
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@ParameterizedTest
-	@ValueSource(ints = {0, 1, 2})
-	public void findAll_manyTaxonsAndPageZeroToN_nSizedList(int page) {
-		arrange(IDS);
-		int limit = 2;
-		Optional<List<Taxon>> actual = service.getTaxons(page);
-
-		assertTrue(actual.isPresent());
-		for (int i = 0; i < actual.get().size(); i++)
-			assertEquals(IDS[i + page * limit], actual.get().get(i).getPrimaryKey());
+	@MethodSource("getTaxons_params")
+	public void getTaxons(int page, List<Taxon> expected) {
+		Mockito.when(repository.findAll(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
+		Optional<List<Taxon>> result = service.getTaxons(page, LIMIT);
+		if(expected == null && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertNotNull(expected);
+		assertTrue(result.isPresent());
+		List<Taxon> users = result.get();
+		assertEquals(expected.size(), users.size());
+		assertEquals(expected, users);
 	}
 
 	@ParameterizedTest
-	@ValueSource(ints = {-1, -2, -10})
-	public void findAll_negativePage_null(int page) {
-		Optional<List<Taxon>> actual = service.getTaxons(page);
-		assertFalse(actual.isPresent());
+	@MethodSource("getTaxon_params")
+	public void getTaxon(String key, long version, Taxon expected) {
+		Mockito.when(repository.find(any(), anyLong())).thenReturn(Optional.ofNullable(expected));
+		Optional<Taxon> result = service.getTaxon(key, version);
+		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
+		if (expected != null)
+			assertEquals(expected, result.get());
 	}
 
 	@ParameterizedTest
-	@MethodSource("validKeyParameters")
-	public void find_validKeyAndExistingTaxon_taxon(String key) {
-		arrange(key);
-
-		Optional<Taxon> actual = service.getTaxon(key);
-
-		assertTrue(actual.isPresent());
-		assertEquals(key, actual.get().getPrimaryKey());
+	@MethodSource("saveTaxon_params")
+	public void saveTaxon(Taxon taxon, boolean expected) {
+		Mockito.when(repository.save(any())).thenReturn(expected);
+		boolean result = service.saveTaxon(taxon);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
-	@MethodSource("validAndNullKeyParameters")
-	public void find_nullOrValidKeyAndAbsentTaxon_null(String key) {
-		Optional<Taxon> actual = service.getTaxon(key);
-		assertFalse(actual.isPresent());
-	}
-
-	@Test
-	public void save_validKeyAndTaxonAbsentInDB_created() {
-		Taxon taxon = new Taxon(IDS[0], null);
-
-		boolean result = service.saveTaxon(IDS[0], taxon);
-
-		assertTrue(result);
-		Optional<Taxon> actual = service.getTaxon(IDS[0]);
-		assertTrue(actual.isPresent());
-	}
-
-	@Test
-	public void save_validKeyAndTaxonExistingInDB_updated() {
-		arrange(IDS[0]);
-		String description = "test description";
-
-		boolean result = service.saveTaxon(IDS[0], new Taxon(IDS[0], description));
-
-		assertTrue(result);
-		Optional<Taxon> actual = service.getTaxon(IDS[0]);
-		assertTrue(actual.isPresent());
-		assertEquals(description, actual.get().getDescription());
-	}
-
-	@ParameterizedTest
-	@MethodSource("save_invalidParameters")
-	public void save_invalidParameters_unmodified(String key, Taxon taxon) {
-		Optional<List<Taxon>> before = service.getTaxons(0);
-
-		boolean result = service.saveTaxon(key, taxon);
-
-		assertFalse(result);
-		Optional<List<Taxon>> after = service.getTaxons(0);
-		assertTrue(before.isPresent());
-		assertTrue(after.isPresent());
-		assertEquals(before.get().size(), after.get().size());
-	}
-
-	@ParameterizedTest
-	@MethodSource("validKeyParameters")
-	public void remove_validKeyAndTaxonExistingInDB_deleted(String id) {
-		arrange(id);
-		Optional<Taxon> before = service.getTaxon(id);
-
-		boolean result = service.deleteTaxon(id);
-
-		assertTrue(result);
-		Optional<Taxon> after = service.getTaxon(id);
-		assertTrue(before.isPresent());
-		assertFalse(after.isPresent());
-	}
-
-	@ParameterizedTest
-	@MethodSource("remove_invalidParameters")
-	public void remove_nullOrValidKeyAndTaxonAbsentInDB_unmodified(String key) {
-		Optional<List<Taxon>> before = service.getTaxons(0);
-
+	@MethodSource("deleteTaxon_params")
+	public void deleteTaxon(String key, boolean expected) {
+		Mockito.when(repository.remove(any())).thenReturn(expected);
 		boolean result = service.deleteTaxon(key);
-
-		assertFalse(result);
-		Optional<List<Taxon>> after = service.getTaxons(0);
-		assertTrue(before.isPresent());
-		assertTrue(after.isPresent());
-		assertEquals(before.get().size(), after.get().size());
+		assertEquals(expected, result);
 	}
 
-	@Test
-	public void remove_validKeyAndTaxonWithRelationshipsExistingInDB_unmodified() {
-		arrangeWithRelationships(IDS[0]);
-		Optional<List<Taxon>> before = service.getTaxons(0);
-
-		boolean result = service.deleteTaxon(IDS[0]);
-
-		assertFalse(result);
-		Optional<List<Taxon>> after = service.getTaxons(0);
-		assertTrue(before.isPresent());
-		assertTrue(after.isPresent());
-		assertEquals(before.get().size(), after.get().size());
-	}
-*/
 }

@@ -5,13 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.typing.schema.model.GetSchemaOutputModel;
+import pt.ist.meic.phylodb.typing.schema.model.GetSchemasOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
-import pt.ist.meic.phylodb.typing.schema.model.SchemaOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
@@ -31,16 +31,16 @@ public class SchemaController extends Controller<Schema> {
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getSchemas(taxonId, page, l), MultipleOutputModel::new, null);
+		return getAll(type, l -> service.getSchemas(taxonId, page, l), GetSchemasOutputModel::new, null);
 	}
 
 	@GetMapping(path = "/{schema}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getSchema(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("schema") String schemaId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getSchema(taxonId, schemaId, version), SchemaOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
+		return get(() -> service.getSchema(taxonId, schemaId, version), GetSchemaOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)

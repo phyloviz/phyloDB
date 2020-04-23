@@ -6,7 +6,10 @@ import org.springframework.http.ResponseEntity;
 
 public class FileOutputModel implements OutputModel {
 
-	private final String data;
+	private String data;
+
+	public FileOutputModel() {
+	}
 
 	public FileOutputModel(String data) {
 		this.data = data;

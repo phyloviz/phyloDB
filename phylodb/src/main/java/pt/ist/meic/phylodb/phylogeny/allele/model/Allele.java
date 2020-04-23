@@ -8,7 +8,7 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 
 	private final String sequence;
 
-	public Allele(String taxonId, String locusId, String id, int version, boolean deprecated, String sequence, UUID project) {
+	public Allele(String taxonId, String locusId, String id, long version, boolean deprecated, String sequence, UUID project) {
 		super(new PrimaryKey(taxonId, locusId, id, project), version, deprecated);
 		this.sequence = sequence;
 	}

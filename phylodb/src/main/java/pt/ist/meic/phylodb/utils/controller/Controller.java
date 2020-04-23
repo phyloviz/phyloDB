@@ -39,7 +39,7 @@ public abstract class Controller<T extends Entity<?>> {
 				.toResponseEntity();
 	}
 
-	protected ResponseEntity<?> get(Supplier<Optional<T>> input, Function<T, OutputModel> map, Supplier<OutputModel> error) {
+	protected <R> ResponseEntity<?> get(Supplier<Optional<R>> input, Function<R, OutputModel> map, Supplier<OutputModel> error) {
 		return execute(input, map, error);
 	}
 

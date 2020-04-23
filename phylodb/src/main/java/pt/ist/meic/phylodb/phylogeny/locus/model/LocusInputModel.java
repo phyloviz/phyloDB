@@ -6,8 +6,11 @@ import java.util.Optional;
 
 public class LocusInputModel implements InputModel<Locus> {
 
-	private final String id;
-	private final String description;
+	private String id;
+	private String description;
+
+	public LocusInputModel() {
+	}
 
 	public LocusInputModel(String id, String description) {
 		this.id = id;

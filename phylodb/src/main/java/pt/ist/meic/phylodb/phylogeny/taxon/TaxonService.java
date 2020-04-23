@@ -22,7 +22,7 @@ public class TaxonService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Taxon> getTaxon(String id, int version) {
+	public Optional<Taxon> getTaxon(String id, Long version) {
 		return taxonRepository.find(id, version);
 	}
 

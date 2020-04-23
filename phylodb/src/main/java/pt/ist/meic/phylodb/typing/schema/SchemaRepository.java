@@ -8,6 +8,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Entity;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.*;
@@ -35,7 +36,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	@Override
-	protected Result get(Schema.PrimaryKey key, int version) {
+	protected Result get(Schema.PrimaryKey key, Long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
 				"WHERE " + where + " WITH t, s, sd, l\n" +
@@ -48,11 +49,11 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	@Override
 	protected Schema parse(Map<String, Object> row) {
 		List<Reference<String>> lociIds = Arrays.stream((Object[][]) row.get("lociIds"))
-				.map(a -> new Reference<>((String) a[0], (int) a[1], (boolean) a[2]))
+				.map(a -> new Reference<>((String) a[0], (long) a[1], (boolean) a[2]))
 				.collect(Collectors.toList());
 		return new Schema((String) row.get("taxonId"),
 				(String) row.get("id"),
-				(int) row.get("version"),
+				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				Method.valueOf((String) row.get("type")),
 				(String) row.get("description"),
@@ -80,8 +81,12 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		execute(new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
-	public Optional<Schema> find(String taxonId, String[] lociIds, int version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+	public Optional<Schema> find(Schema schema) {
+		String taxonId = schema.getPrimaryKey().getTaxonId();
+		String[] lociIds = schema.getLociIds().stream()
+				.map(Entity::getPrimaryKey)
+				.toArray(String[]::new);
+		String where = schema.getVersion() == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
 				"WHERE s.deprecated = false AND  " + where + "\n" +
 				"WITH t, s, sd\n";

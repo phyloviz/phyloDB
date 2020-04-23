@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.GetLociOutputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.GetLocusOutputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
-import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
@@ -31,16 +31,16 @@ public class LocusController extends Controller<Locus> {
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getLoci(taxonId, page, l), MultipleOutputModel::new, null);
+		return getAll(type, l -> service.getLoci(taxonId, page, l), GetLociOutputModel::new, null);
 	}
 
 	@GetMapping(path = "/{locus}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getLocus(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getLocus(taxonId, locusId, version), LocusOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
+		return get(() -> service.getLocus(taxonId, locusId, version), GetLocusOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)

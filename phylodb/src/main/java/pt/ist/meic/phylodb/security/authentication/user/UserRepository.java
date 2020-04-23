@@ -8,7 +8,11 @@ import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
@@ -22,18 +26,18 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 		String statement = "MATCH (u:User)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE u.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
-				"u.role as role\n" +
-				"SKIP $ LIMIT $";
+				"ud.role as role\n" +
+				"ORDER BY u.id, u.provider SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
 	}
 
 	@Override
-	protected Result get(User.PrimaryKey key, int version) {
+	protected Result get(User.PrimaryKey key, Long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
-		String statement = "MATCH (u:User {id: $, provider: $})-[r:CONTAINS_DETAILS {version: $}]->(ud:UserDetails)\n" +
+		String statement = "MATCH (u:User {id: $, provider: $})-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE " + where + "\n" +
 				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
-				"u.role as role";
+				"ud.role as role";
 		return query(new Query(statement, key.getId(), key.getProvider(), version));
 	}
 
@@ -41,15 +45,15 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 	protected User parse(Map<String, Object> row) {
 		return new User((String) row.get("id"),
 				(String) row.get("provider"),
-				(int) row.get("version"),
+				(Long) row.get("version"),
 				(boolean) row.get("deprecated"),
-				Role.valueOf((String) row.get("role")));
+				Role.valueOf(((String) row.get("role")).toUpperCase()));
 	}
 
 	@Override
 	protected boolean isPresent(User.PrimaryKey key) {
 		String statement = "OPTIONAL MATCH (u:User {id: $, provider: $})\n" +
-				"RETURN COALESCE(t.deprecated = false, false)";
+				"RETURN COALESCE(u.deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key.getId(), key.getProvider()));
 	}
 
@@ -58,15 +62,28 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 		String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = false WITH u\n" +
 				"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-				"WITH u, COALESCE(MAX(r.version), 0) + 1 as v" +
+				"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
-		execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole()));
+		execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));
 	}
 
 	@Override
 	protected void delete(User.PrimaryKey key) {
-		String statement = "MATCH (u:User {id: $, provider: $}) SET u.deprecated = true WITH t\n";
+		String statement = "MATCH (u:User {id: $, provider: $}) SET u.deprecated = true\n";
 		execute(new Query(statement, key.getId(), key.getProvider()));
+	}
+
+	public boolean anyMissing(User.PrimaryKey[] keys) {
+		String parameterized = Arrays.stream(keys).map((i) -> "{id: $, provider: $}").collect(Collectors.joining(","));
+		String statement = String.format("MATCH (u:User)\n" +
+				"WHERE u.deprecated = false AND {id: u.id, provider: u.provider} IN [%s]\n" +
+				"RETURN COUNT(u.id)", parameterized);
+		List<String> params = new ArrayList<>();
+		for (User.PrimaryKey key : keys) {
+			params.add(key.getId());
+			params.add(key.getProvider());
+		}
+		return query(Integer.class, new Query(statement, params.toArray())) != keys.length;
 	}
 
 }

@@ -5,15 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.SecurityInterceptor;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectOutputModel;
+import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectsOutputModel;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.security.authorization.project.model.ProjectInputModel;
-import pt.ist.meic.phylodb.security.authorization.project.model.ProjectOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,19 +39,18 @@ public class ProjectController extends Controller<Project> {
 		String type = MediaType.APPLICATION_JSON_VALUE;
 		String userId = (String) req.getAttribute(SecurityInterceptor.ID);
 		String provider = (String) req.getAttribute(SecurityInterceptor.PROVIDER);
-		return getAll(type, l -> service.getProjects(new User.PrimaryKey(userId, provider), page, l), MultipleOutputModel::new, null);
+		return getAll(type, l -> service.getProjects(new User.PrimaryKey(userId, provider), page, l), GetProjectsOutputModel::new, null);
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)
 	@GetMapping(path = "/{project}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProject(
 			@PathVariable("project") UUID projectId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getProject(projectId, version), ProjectOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getProject(projectId, version), GetProjectOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postProject(
 			@RequestBody ProjectInputModel input,

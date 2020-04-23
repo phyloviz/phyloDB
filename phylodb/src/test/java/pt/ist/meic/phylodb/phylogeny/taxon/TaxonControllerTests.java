@@ -1,155 +1,162 @@
 package pt.ist.meic.phylodb.phylogeny.taxon;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.error.ErrorOutputModel;
+import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
+import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
+import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
+import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
+import pt.ist.meic.phylodb.utils.MockHttp;
 
-@Transactional
-//@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TaxonControllerTests extends TaxonTests {
-/*
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+public class TaxonControllerTests extends Test {
+
+	@InjectMocks
+	private TaxonController controller;
+	@MockBean
+	private TaxonService service;
+	@MockBean
+	private AuthenticationInterceptor authenticationInterceptor;
+	@MockBean
+	private AuthorizationInterceptor authorizationInterceptor;
 	@Autowired
 	private MockHttp http;
 
-	private static Stream<Arguments> getTaxons_validKeyParameters() {
-		return Stream.of(Arguments.of("0"), Arguments.of(""), null);
-	}
 
-	private static Stream<Arguments> saveTaxon_invalidParameters() {
-		return Stream.of(Arguments.of("teste", new TaxonInputModel("id", null)),
-				Arguments.of("teste", null));
-	}
-
-	@ParameterizedTest
-	@MethodSource("getTaxons_validKeyParameters")
-	public void getTaxons_validPageAndAbsentTaxonsInDB_ok(String page) throws Exception {
+	private static Stream<Arguments> getTaxons_params() {
 		String uri = "/taxons";
-		if (page != null)
-			uri = String.format(uri + "?page=%s", page);
+		List<Taxon> taxons = new ArrayList<Taxon>() {{add(new Taxon("id", null));}};
+		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
+				req2 = get(uri), req3 = get(uri).param("page", "-10");
+		List<TaxonOutputModel> result = taxons.stream()
+				.map(TaxonOutputModel::new)
+				.collect(Collectors.toList());
+		return Stream.of(Arguments.of(req1, taxons, HttpStatus.OK, result,  null),
+				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
+				Arguments.of(req2, taxons, HttpStatus.OK, result, null),
+				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, null, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+	}
 
-		MockHttpServletResponse response = http.get(uri);
+	private static Stream<Arguments> getTaxon_params() {
+		String uri = "/taxons/%s";
+		Taxon taxon = new Taxon("id", "description");
+		String key = taxon.getPrimaryKey();
+		MockHttpServletRequestBuilder req1 = get(String.format(uri, key)).param("version", "1"),
+				req2 = get(String.format(uri, key));
+		return Stream.of(Arguments.of(req1, taxon, HttpStatus.OK, new GetTaxonOutputModel(taxon)),
+				Arguments.of(req1, null, HttpStatus.NOT_FOUND, new ErrorOutputModel(Problem.NOT_FOUND.getMessage())),
+				Arguments.of(req2, taxon, HttpStatus.OK, new GetTaxonOutputModel(taxon)),
+				Arguments.of(req2, null, HttpStatus.NOT_FOUND, new ErrorOutputModel(Problem.NOT_FOUND.getMessage())));
+	}
 
-		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		GetTaxonsOutputModel result = http.parseResult(GetTaxonsOutputModel.class, response);
-		assertEquals(0, result.getTaxons().size());
+	private static Stream<Arguments> saveTaxon_params() {
+		String uri = "/taxons/%s";
+		Taxon taxon = new Taxon("id", "description");
+		String key = taxon.getPrimaryKey();
+		MockHttpServletRequestBuilder req1 = put(String.format(uri, key));
+		TaxonInputModel input1 = new TaxonInputModel(key, "description"),
+			input2 = new TaxonInputModel("different", "description");
+		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
+				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req1, null, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+	}
+
+	private static Stream<Arguments> deleteTaxon_params() {
+		String uri = "/taxons/%s";
+		Taxon taxon = new Taxon("id", "description");
+		String key = taxon.getPrimaryKey();
+		MockHttpServletRequestBuilder req1 = delete(String.format(uri, key));
+		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
+				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())));
+	}
+
+	@BeforeEach
+	public void init(){
+		MockitoAnnotations.initMocks(this);
+		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 	}
 
 	@ParameterizedTest
-	@MethodSource("getTaxons_validKeyParameters")
-	public void getTaxons_validPageAndExistingTaxonsInDB_ok(String page) throws Exception {
-		String uri = "/taxons";
-		if (page != null)
-			uri = String.format(uri + "?page=%s", page);
-		arrange(IDS[0], IDS[1]);
-
-		MockHttpServletResponse response = http.get(uri);
-
-		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		GetTaxonsOutputModel result = http.parseResult(GetTaxonsOutputModel.class, response);
-		assertEquals(2, result.getTaxons().size());
-		assertEquals(IDS[0], result.getTaxons().get(0).getId());
-		assertEquals(IDS[1], result.getTaxons().get(1).getId());
+	@MethodSource("getTaxons_params")
+	public void getTaxons(MockHttpServletRequestBuilder req, List<Taxon> taxons, HttpStatus expectedStatus, List<TaxonOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+		Mockito.when(service.getTaxons(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxons));
+		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
+		assertEquals(expectedStatus.value(), result.getStatus());
+		if(expectedStatus.is2xxSuccessful()) {
+			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
+			assertEquals(expectedResult.size(), parsed.size());
+			if(expectedResult.size() > 0) {
+				for (int i = 0; i < expectedResult.size(); i++) {
+					Map<String, Object> p = parsed.get(i);
+					assertEquals(expectedResult.get(i).getId(), p.get("id"));
+					assertEquals(expectedResult.get(i).getVersion(), Long.parseLong(p.get("version").toString()));
+					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
+				}
+			}
+		}
+		else
+			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"-1", "-500"})
-	public void getTaxons_invalidPage_badRequest(String page) throws Exception {
-		String uri = "/taxons";
-		if (page != null)
-			uri = String.format(uri + "?page=%s", page);
-
-		MockHttpServletResponse response = http.get(uri);
-
-		assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		ErrorOutputModel result = http.parseResult(ErrorOutputModel.class, response);
-		assertEquals(Problem.BAD_REQUEST, result.getMessage());
-	}
-
-	@Test
-	public void getTaxon_existingTaxonInDB_ok() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-		arrange(IDS[0]);
-
-		MockHttpServletResponse response = http.get(uri);
-
-		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		TaxonOutputModel result = http.parseResult(TaxonOutputModel.class, response);
-		assertEquals(IDS[0], result.getId());
-	}
-
-	@Test
-	public void getTaxon_absentTaxonInDB_notFound() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-
-		MockHttpServletResponse response = http.get(uri);
-
-		assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
-		ErrorOutputModel result = http.parseResult(ErrorOutputModel.class, response);
-		assertEquals(Problem.NOT_FOUND, result.getMessage());
-	}
-
-	@Test
-	public void saveTaxon_validKeyAndAbsentTaxonInDB_noContent() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-
-		MockHttpServletResponse response = http.put(uri, new TaxonInputModel(IDS[0], null));
-
-		assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
-	}
-
-	@Test
-	public void saveTaxon_validKeyAndExistingTaxonInDB_noContent() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-		arrange(IDS[0]);
-
-		MockHttpServletResponse response = http.put(uri, new TaxonInputModel(IDS[0], null));
-
-		assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+	@MethodSource("getTaxon_params")
+	public void getTaxon(MockHttpServletRequestBuilder req, Taxon taxon, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(service.getTaxon(anyString(), anyLong())).thenReturn(Optional.ofNullable(taxon));
+		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
+		assertEquals(expectedStatus.value(), result.getStatus());
+		if(expectedStatus.is2xxSuccessful())
+			assertEquals(expectedResult, http.parseResult(GetTaxonOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
 	@ParameterizedTest
-	@MethodSource("saveTaxon_invalidParameters")
-	public void saveTaxon_invalidParameters_badRequest(String id, TaxonInputModel inputModel) throws Exception {
-		String uri = "/taxons/" + id;
-
-		MockHttpServletResponse response = http.put(uri, inputModel);
-
-		assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		ErrorOutputModel result = http.parseResult(ErrorOutputModel.class, response);
-		assertEquals(Problem.BAD_REQUEST, result.getMessage());
+	@MethodSource("saveTaxon_params")
+	public void saveTaxon(MockHttpServletRequestBuilder req, TaxonInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		if(input != null)
+			Mockito.when(service.saveTaxon(any())).thenReturn(ret);
+		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON, input);
+		assertEquals(expectedStatus.value(), result.getStatus());
+		if(expectedStatus.is4xxClientError())
+			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
-	@Test
-	public void deleteTaxon_validKeyAndExistingTaxonInDB_noContent() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-		arrange(IDS[0]);
-
-		MockHttpServletResponse response = http.delete(uri);
-
-		assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+	@ParameterizedTest
+	@MethodSource("deleteTaxon_params")
+	public void deleteTaxon(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(service.deleteTaxon(any())).thenReturn(ret);
+		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
+		assertEquals(expectedStatus.value(), result.getStatus());
+		if(expectedStatus.is4xxClientError())
+			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
-	@Test
-	public void deleteTaxon_validKeyAndAbsentTaxonInDB_unauthorized() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-
-		MockHttpServletResponse response = http.delete(uri);
-
-		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
-		ErrorOutputModel result = http.parseResult(ErrorOutputModel.class, response);
-		assertEquals(Problem.UNAUTHORIZED, result.getMessage());
-	}
-
-	@Test
-	public void deleteTaxon_validKeyAndExistingTaxonWithRelationshipsInDB_unauthorized() throws Exception {
-		String uri = "/taxons/" + IDS[0];
-		arrangeWithRelationships(IDS[0]);
-
-		MockHttpServletResponse response = http.delete(uri);
-
-		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
-		ErrorOutputModel result = http.parseResult(ErrorOutputModel.class, response);
-		assertEquals(Problem.UNAUTHORIZED, result.getMessage());
-	}
-*/
 }

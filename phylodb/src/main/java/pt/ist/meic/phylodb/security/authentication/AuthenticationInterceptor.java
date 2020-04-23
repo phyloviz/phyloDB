@@ -10,6 +10,9 @@ import pt.ist.meic.phylodb.security.authorization.Role;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
+
+import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
 public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 
@@ -41,8 +44,10 @@ public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 				return handleProblem(res, Problem.INVALID_TOKEN);
 			String id = info.getId();
 			userService.createUser(new User(id, provider, Role.USER));
+			Optional<User> optionalUser = userService.getUser(id, provider, CURRENT_VERSION_VALUE);
 			req.setAttribute(ID, id);
 			req.setAttribute(PROVIDER, provider);
+			req.setAttribute(ROLE, optionalUser.get().getRole());
 			return true;
 		} catch (IOException ignored) {
 			return handleProblem(res, Problem.INVALID_TOKEN);

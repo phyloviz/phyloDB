@@ -43,7 +43,7 @@ public class SchemaInputModel implements InputModel<Schema> {
 
 	@Override
 	public Optional<Schema> toDomainEntity(String... params) {
-		return !params[0].equals(id) || taxon == null || loci == null || !Method.exists(type) ? Optional.empty() :
+		return !params[0].equals(id) || taxon == null || loci == null || loci.length == 0 || !Method.exists(type) ? Optional.empty() :
 				Optional.of(new Schema(taxon, id, Method.valueOf(type), description, loci));
 	}
 

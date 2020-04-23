@@ -7,18 +7,21 @@ import java.util.Optional;
 
 public class UserInputModel implements InputModel<User> {
 
-	private final String email;
-	private final String provider;
-	private final String role;
+	private String id;
+	private String provider;
+	private String role;
+
+	public UserInputModel() {
+	}
 
 	public UserInputModel(String email, String provider, String role) {
-		this.email = email;
+		this.id = email;
 		this.provider = provider;
 		this.role = role;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getId() {
+		return id;
 	}
 
 	public String getProvider() {
@@ -31,8 +34,8 @@ public class UserInputModel implements InputModel<User> {
 
 	@Override
 	public Optional<User> toDomainEntity(String... params) {
-		return !params[0].equals(email) || provider == null || !Role.exists(role) ? Optional.empty() :
-				Optional.of(new User(email, provider, Role.valueOf(role)));
+		return !params[0].equals(id) || !params[1].equals(provider) || !Role.exists(role) ? Optional.empty() :
+				Optional.of(new User(id, provider, Role.valueOf(role.toUpperCase())));
 	}
 
 }

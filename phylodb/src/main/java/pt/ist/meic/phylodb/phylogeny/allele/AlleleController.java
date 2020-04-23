@@ -9,10 +9,10 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
-import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleOutputModel;
+import pt.ist.meic.phylodb.phylogeny.allele.model.GetAlleleOutputModel;
+import pt.ist.meic.phylodb.phylogeny.allele.model.GetAllelesOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
@@ -46,7 +46,7 @@ public class AlleleController extends Controller<Allele> {
 			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
 		return getAll(type, l -> service.getAlleles(taxonId, locusId, project, page, l),
-				MultipleOutputModel::new,
+				GetAllelesOutputModel::new,
 				(a) -> new FileOutputModel(new FastaFormatter().format(a, Integer.parseInt(lineLength))));
 	}
 
@@ -57,14 +57,14 @@ public class AlleleController extends Controller<Allele> {
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,
 			@RequestParam(value = "project", required = false) UUID project,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), AlleleOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), GetAlleleOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
 	@PutMapping(path = "/{allele}")
-	public ResponseEntity<?> putAllele(
+	public ResponseEntity<?> saveAllele(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,

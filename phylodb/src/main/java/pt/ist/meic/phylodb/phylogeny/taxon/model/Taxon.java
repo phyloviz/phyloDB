@@ -6,7 +6,7 @@ public class Taxon extends Entity<String> {
 
 	private final String description;
 
-	public Taxon(String id, int version, boolean deprecated, String description) {
+	public Taxon(String id, long version, boolean deprecated, String description) {
 		super(id, version, deprecated);
 		this.description = description;
 	}

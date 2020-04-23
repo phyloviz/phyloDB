@@ -3,13 +3,15 @@ package pt.ist.meic.phylodb.security.authentication.user.model;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
+import java.util.Objects;
+
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
 public class User extends Entity<User.PrimaryKey> {
 
 	private final Role role;
 
-	public User(String email, String provider, int version, boolean deprecated, Role role) {
+	public User(String email, String provider, long version, boolean deprecated, Role role) {
 		super(new PrimaryKey(email, provider), version, deprecated);
 		this.role = role;
 	}
@@ -22,10 +24,22 @@ public class User extends Entity<User.PrimaryKey> {
 		return role;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		User user = (User) o;
+		return super.equals(user) &&
+				Objects.equals(role, user.role);
+	}
+
 	public static class PrimaryKey {
 
-		private final String id;
-		private final String provider;
+		private String id;
+		private String provider;
+
+		public PrimaryKey() {
+		}
 
 		public PrimaryKey(String email, String provider) {
 			this.id = email;
@@ -38,6 +52,15 @@ public class User extends Entity<User.PrimaryKey> {
 
 		public String getProvider() {
 			return provider;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			PrimaryKey that = (PrimaryKey) o;
+			return Objects.equals(id, that.id) &&
+					Objects.equals(provider, that.provider);
 		}
 
 	}

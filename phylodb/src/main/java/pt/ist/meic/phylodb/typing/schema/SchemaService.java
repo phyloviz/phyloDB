@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
+import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.service.Reference;
@@ -27,17 +28,17 @@ public class SchemaService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Schema> getSchema(String taxonId, String schemaId, int version) {
+	public Optional<Schema> getSchema(String taxonId, String schemaId, Long version) {
 		return schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId), version);
 	}
 
 	@Transactional
 	public boolean saveSchema(Schema schema) {
-		String[] lociIds = schema.getLociIds().stream()
-				.map(Reference::getPrimaryKey)
-				.toArray(String[]::new);
-		Optional<Schema> dbSchema = schemaRepository.find(schema.getPrimaryKey().getTaxonId(), lociIds, EntityRepository.CURRENT_VERSION_VALUE);
-		if (locusRepository.anyMissing(schema.getPrimaryKey().getTaxonId(), lociIds) ||
+		Locus.PrimaryKey[] lociKeys = schema.getLociIds().stream()
+				.map(r -> new Locus.PrimaryKey(schema.getPrimaryKey().getTaxonId(), r.getPrimaryKey()))
+				.toArray(Locus.PrimaryKey[]::new);
+		Optional<Schema> dbSchema = schemaRepository.find(schema);
+		if (locusRepository.anyMissing(lociKeys) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
 			return false;
 		return schemaRepository.save(schema);

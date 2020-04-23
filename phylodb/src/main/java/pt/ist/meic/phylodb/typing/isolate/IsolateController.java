@@ -8,13 +8,13 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.typing.isolate.model.GetIsolateOutputModel;
+import pt.ist.meic.phylodb.typing.isolate.model.GetIsolatesOutputModel;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.isolate.model.IsolateInputModel;
-import pt.ist.meic.phylodb.typing.isolate.model.IsolateOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class IsolateController extends Controller<Isolate> {
 			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
 		return getAll(type, l -> service.getIsolates(projectId, datasetId, page, l),
-				MultipleOutputModel::new,
+				GetIsolatesOutputModel::new,
 				(i) -> new FileOutputModel(new IsolatesFormatter().format(i)));
 	}
 
@@ -51,9 +51,9 @@ public class IsolateController extends Controller<Isolate> {
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), IsolateOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), GetIsolateOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)

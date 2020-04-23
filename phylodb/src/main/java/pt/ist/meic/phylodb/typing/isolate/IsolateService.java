@@ -35,7 +35,7 @@ public class IsolateService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Isolate> getIsolate(UUID projectId,UUID datasetId, String isolateId, int version) {
+	public Optional<Isolate> getIsolate(UUID projectId, UUID datasetId, String isolateId, Long version) {
 		return isolateRepository.find(new Isolate.PrimaryKey(projectId, datasetId, isolateId), version);
 	}
 

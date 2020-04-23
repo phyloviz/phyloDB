@@ -6,8 +6,11 @@ import java.util.Optional;
 
 public class TaxonInputModel implements InputModel<Taxon> {
 
-	private final String id;
-	private final String description;
+	private String id;
+	private String description;
+
+	public TaxonInputModel() {
+	}
 
 	public TaxonInputModel(String id, String description) {
 		this.id = id;

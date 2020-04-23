@@ -13,7 +13,6 @@ import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
-import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,21 +41,16 @@ public class ProfileService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Profile> getProfile(UUID projectId, UUID datasetId, String profileId, int version) {
-		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
+	public Optional<Pair<Schema, Profile>> getProfile(UUID projectId, UUID datasetId, String profileId, Long version) {
+		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version)
+				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
 	}
 
 	@Transactional
 	public boolean saveProfile(Profile profile) {
 		Dataset.PrimaryKey datasetKey = new Dataset.PrimaryKey(profile.getPrimaryKey().getProjectId(), profile.getPrimaryKey().getDatasetId());
 		Optional<Schema> optional = schemaRepository.find(datasetKey);
-		if (!datasetRepository.exists(datasetKey) || !optional.isPresent())
-			return false;
-		Schema schema = optional.get();
-		String[] lociIds = schema.getLociIds().stream()
-				.map(Reference::getPrimaryKey)
-				.toArray(String[]::new);
-		if (locusRepository.anyMissing(schema.getPrimaryKey().getTaxonId(), lociIds) || lociIds.length != profile.getAllelesReferences().size())
+		if (!datasetRepository.exists(datasetKey) || !optional.isPresent() || optional.get().getLociIds().size() != profile.getAllelesReferences().size())
 			return false;
 		return profileRepository.save(profile);
 	}

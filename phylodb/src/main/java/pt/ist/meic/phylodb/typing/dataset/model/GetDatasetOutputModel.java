@@ -1,45 +1,43 @@
 package pt.ist.meic.phylodb.typing.dataset.model;
 
-import pt.ist.meic.phylodb.io.output.SingleOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.typing.schema.model.SchemaOutputModel;
 import pt.ist.meic.phylodb.utils.service.Reference;
 
-public class DatasetOutputModel extends SingleOutputModel<Dataset.PrimaryKey> {
+import java.util.Objects;
 
-	private final String description;
-	private final String taxon_id;
-	private final String schema_id;
-	private final Long schema_version;
-	private final boolean schema_deprecated;
+public class GetDatasetOutputModel extends DatasetOutputModel {
 
-	public DatasetOutputModel(Dataset dataset) {
+	private String description;
+	private SchemaOutputModel schema;
+
+	public GetDatasetOutputModel() {
+	}
+
+	public GetDatasetOutputModel(Dataset dataset) {
 		super(dataset);
 		this.description = dataset.getDescription();
-		Reference<Schema.PrimaryKey> schema = dataset.getSchema();
-		this.taxon_id = schema.getPrimaryKey().getTaxonId();
-		this.schema_id = schema.getPrimaryKey().getId();
-		this.schema_version = schema.getVersion();
-		this.schema_deprecated = schema.isDeprecated();
+		Reference<Schema.PrimaryKey> reference = dataset.getSchema();
+		this.schema = new SchemaOutputModel(reference);
 	}
 
 	public String getDescription() {
 		return description;
 	}
 
-	public String getTaxon_id() {
-		return taxon_id;
+	public SchemaOutputModel getSchema() {
+		return schema;
 	}
 
-	public String getSchema_id() {
-		return schema_id;
-	}
-
-	public Long getSchema_version() {
-		return schema_version;
-	}
-
-	public boolean isSchema_deprecated() {
-		return schema_deprecated;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		GetDatasetOutputModel that = (GetDatasetOutputModel) o;
+		return super.equals(that) &&
+				Objects.equals(description, that.description) &&
+				Objects.equals(schema, that.schema);
 	}
 
 }

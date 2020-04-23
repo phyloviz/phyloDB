@@ -22,20 +22,20 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<User> getUser(String user, String provider, int version) {
+	public Optional<User> getUser(String user, String provider, long version) {
 		return userRepository.find(new User.PrimaryKey(user, provider), version);
 	}
 
 	@Transactional
 	public boolean updateUser(User user) {
-		if (!userRepository.exists(user.getPrimaryKey()))
+		if (user == null || !userRepository.exists(user.getPrimaryKey()))
 			return false;
 		return userRepository.save(user);
 	}
 
 	@Transactional
 	public void createUser(User user) {
-		if (userRepository.exists(user.getPrimaryKey()))
+		if (user == null || userRepository.exists(user.getPrimaryKey()))
 			return;
 		userRepository.save(user);
 	}

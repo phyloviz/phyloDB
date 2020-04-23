@@ -34,7 +34,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	}
 
 	@Override
-	protected Result get(Dataset.PrimaryKey id, int version) {
+	protected Result get(Dataset.PrimaryKey id, Long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE r2.version = h.version AND " + where + "\n" +
@@ -49,11 +49,11 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	protected Dataset parse(Map<String, Object> row) {
 		Reference<Schema.PrimaryKey> schema = new Reference<>(new Schema.PrimaryKey((String) row.get("taxonId"),
 				(String) row.get("schemaId")),
-				(int) row.get("schemaVersion"),
+				(long) row.get("schemaVersion"),
 				(boolean) row.get("schemaDeprecated"));
 		return new Dataset(UUID.fromString(row.get("projectId").toString()),
 				UUID.fromString(row.get("datasetId").toString()),
-				(int) row.get("version"),
+				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("description"),
 				schema);

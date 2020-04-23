@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.*;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
@@ -29,15 +26,15 @@ public class TaxonController extends Controller<Taxon> {
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getTaxons(page, l), MultipleOutputModel::new, null);
+		return getAll(type, l -> service.getTaxons(page, l), GetTaxonsOutputModel::new, null);
 	}
 
 	@GetMapping(path = "/{taxon}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getTaxon(
 			@PathVariable("taxon") String taxonId,
-			@RequestParam(value = "version", defaultValue = "-1") int version
+			@RequestParam(value = "version", defaultValue = "-1") Long version
 	) {
-		return get(() -> service.getTaxon(taxonId, version), TaxonOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
+		return get(() -> service.getTaxon(taxonId, version), GetTaxonOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)

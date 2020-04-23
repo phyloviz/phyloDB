@@ -31,7 +31,7 @@ public class AlleleService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, UUID project, int version) {
+	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, UUID project, long version) {
 		return alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId, project), version);
 	}
 

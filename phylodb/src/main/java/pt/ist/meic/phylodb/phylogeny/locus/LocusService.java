@@ -25,12 +25,14 @@ public class LocusService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Locus> getLocus(String taxonId, String locusId, int version) {
+	public Optional<Locus> getLocus(String taxonId, String locusId, Long version) {
 		return locusRepository.find(new Locus.PrimaryKey(taxonId, locusId), version);
 	}
 
 	@Transactional
 	public boolean saveLocus(Locus locus) {
+		if(locus == null)
+			return false;
 		return taxonRepository.exists(locus.getTaxonId()) && locusRepository.save(locus);
 	}
 

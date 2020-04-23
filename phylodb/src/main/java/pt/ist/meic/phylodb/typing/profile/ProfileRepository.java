@@ -36,7 +36,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
-	protected Result get(Profile.PrimaryKey key, int version) {
+	protected Result get(Profile.PrimaryKey key, Long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)\n" +
 				"WHERE " + where + "\n" +
@@ -51,12 +51,12 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	@Override
 	protected Profile parse(Map<String, Object> row) {
 		List<Reference<String>> alleleIds = Arrays.stream((Object[][]) row.get("alleleIds"))
-				.map(a -> new Reference<>((String) a[0], (int) a[1], (boolean) a[2]))
+				.map(a -> new Reference<>((String) a[0], (long) a[1], (boolean) a[2]))
 				.collect(Collectors.toList());
 		return new Profile(UUID.fromString(row.get("projectId").toString()),
 				UUID.fromString(row.get("datasetId").toString()),
 				(String) row.get("id"),
-				(int) row.get("version"),
+				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("aka"),
 				alleleIds

@@ -16,7 +16,7 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 	private final String description;
 	private final List<Reference<String>> lociIds;
 
-	public Schema(String taxonId, String id, int version, boolean deprecated, Method type, String description, List<Reference<String>> lociIds) {
+	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<Reference<String>> lociIds) {
 		super(new PrimaryKey(taxonId, id), version, deprecated);
 		this.type = type;
 		this.description = description;

@@ -1,18 +1,27 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
-import pt.ist.meic.phylodb.io.output.SingleOutputModel;
+import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
+import pt.ist.meic.phylodb.utils.service.Reference;
 
-public class SchemaOutputModel extends SingleOutputModel<Schema.PrimaryKey> {
+import java.util.Arrays;
+import java.util.Objects;
 
-	private final String type;
-	private final String description;
-	private final Object[] loci;
+public class GetSchemaOutputModel extends SchemaOutputModel {
 
-	public SchemaOutputModel(Schema schema) {
+	private String type;
+	private String description;
+	private LocusOutputModel[] loci;
+
+	public GetSchemaOutputModel() {
+	}
+
+	public GetSchemaOutputModel(Schema schema) {
 		super(schema);
 		this.type = schema.getType().getName();
 		this.description = schema.getDescription();
-		this.loci = schema.getLociIds().toArray();
+		this.loci = schema.getLociIds().stream()
+				.map(r -> new LocusOutputModel(taxon_id, r))
+				.toArray(LocusOutputModel[]::new);
 	}
 
 	public String getType() {
@@ -23,8 +32,20 @@ public class SchemaOutputModel extends SingleOutputModel<Schema.PrimaryKey> {
 		return description;
 	}
 
-	public Object[] getLoci() {
+	public LocusOutputModel[] getLoci() {
 		return loci;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		GetSchemaOutputModel that = (GetSchemaOutputModel) o;
+		return super.equals(that) &&
+				Objects.equals(type, that.type) &&
+				Objects.equals(description, that.description) &&
+				Arrays.equals(loci, that.loci);
 	}
 
 }

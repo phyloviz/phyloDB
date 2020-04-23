@@ -31,7 +31,7 @@ public class DatasetService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Dataset> getDataset(UUID projectId, UUID id, int version) {
+	public Optional<Dataset> getDataset(UUID projectId, UUID id, Long version) {
 		return datasetRepository.find(new Dataset.PrimaryKey(projectId, id), version);
 	}
 

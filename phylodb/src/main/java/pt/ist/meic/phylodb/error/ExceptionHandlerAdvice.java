@@ -8,6 +8,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -42,13 +43,13 @@ public class ExceptionHandlerAdvice {
 		return handle(ex, Problem.NOT_ALLOWED);
 	}
 
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public final ResponseEntity<ErrorOutputModel> handle(HttpMessageNotReadableException ex) {
+	@ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class})
+	public final ResponseEntity<ErrorOutputModel> handle400(Exception ex) {
 		return handle(ex, Problem.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(Exception.class)
-	public final ResponseEntity<ErrorOutputModel> handle(Exception ex) {
+	public final ResponseEntity<ErrorOutputModel> handle500(Exception ex) {
 		return handle(ex, Problem.SERVER);
 	}
 

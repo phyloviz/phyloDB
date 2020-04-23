@@ -8,7 +8,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.UnsupportedEncodingException;
 
@@ -25,29 +24,12 @@ public class MockHttp {
 		return objectMapper.readValue(response.getContentAsString(), _class);
 	}
 
-	public MockHttpServletResponse get(String uri) throws Exception {
-		return executeRequest(() -> MockMvcRequestBuilders.get(uri));
+	public MockHttpServletResponse executeRequest(MockHttpServletRequestBuilder action, MediaType mediatype) throws Exception {
+		return mvc.perform(action.accept(mediatype)).andReturn().getResponse();
 	}
 
-	public <T> MockHttpServletResponse post(String uri, T data) throws Exception {
-		return executeRequest(() -> MockMvcRequestBuilders.post(uri), data);
-	}
-
-	public <T> MockHttpServletResponse put(String uri, T data) throws Exception {
-		return executeRequest(() -> MockMvcRequestBuilders.put(uri), data);
-
-	}
-
-	public <T> MockHttpServletResponse delete(String uri) throws Exception {
-		return executeRequest(() -> MockMvcRequestBuilders.delete(uri));
-	}
-
-	private MockHttpServletResponse executeRequest(Supplier<MockHttpServletRequestBuilder> action) throws Exception {
-		return mvc.perform(action.get()).andReturn().getResponse();
-	}
-
-	private <T> MockHttpServletResponse executeRequest(Supplier<MockHttpServletRequestBuilder> action, T data) throws Exception {
-		return mvc.perform(action.get().contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(data))).andReturn().getResponse();
+	public <T> MockHttpServletResponse executeRequest(MockHttpServletRequestBuilder action, MediaType mediatype, T data) throws Exception {
+		return mvc.perform(action.contentType(mediatype).content(objectMapper.writeValueAsString(data))).andReturn().getResponse();
 	}
 
 }

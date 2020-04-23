@@ -40,7 +40,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected Result get(Isolate.PrimaryKey key, int version) {
+	protected Result get(Isolate.PrimaryKey key, Long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
 				"WHERE " + where + "\n" +
@@ -55,14 +55,14 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	protected Isolate parse(Map<String, Object> row) {
 		Reference<String> profile = null;
 		if(row.get("profileId") != null )
-			profile = new Reference<>((String) row.get("profileId"), (int) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
+			profile = new Reference<>((String) row.get("profileId"), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
 		Ancillary[] ancillaries = Arrays.stream((Object[][])row.get("ancillaries"))
 				.map(a -> new Ancillary((String)a[0], (String)a[1]))
 				.toArray(Ancillary[]::new);
 		return new Isolate(UUID.fromString(row.get("projectId").toString()),
 				UUID.fromString(row.get("datasetId").toString()),
 				(String) row.get("id"),
-				(int) row.get("version"),
+				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("description"),
 				ancillaries,

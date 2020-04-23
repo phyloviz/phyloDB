@@ -1,18 +1,30 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model;
 
-import pt.ist.meic.phylodb.io.output.SingleOutputModel;
+import java.util.Objects;
 
-public class AlleleOutputModel extends SingleOutputModel<Allele.PrimaryKey> {
+public class GetAlleleOutputModel extends AlleleOutputModel {
 
-	private final String sequence;
+	private String sequence;
 
-	public AlleleOutputModel(Allele allele) {
+	public GetAlleleOutputModel() {
+	}
+
+	public GetAlleleOutputModel(Allele allele) {
 		super(allele);
 		this.sequence = allele.getSequence();
 	}
 
 	public String getSequence() {
 		return sequence;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		GetAlleleOutputModel that = (GetAlleleOutputModel) o;
+		return super.equals(that) && Objects.equals(sequence, that.sequence);
 	}
 
 }

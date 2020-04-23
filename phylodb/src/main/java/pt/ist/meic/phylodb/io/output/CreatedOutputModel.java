@@ -7,7 +7,10 @@ import java.util.UUID;
 
 public class CreatedOutputModel implements OutputModel {
 
-	private final UUID id;
+	private UUID id;
+
+	public CreatedOutputModel() {
+	}
 
 	public CreatedOutputModel(UUID id) {
 		this.id = id;

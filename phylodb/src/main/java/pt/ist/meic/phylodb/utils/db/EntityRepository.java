@@ -12,7 +12,7 @@ import java.util.stream.StreamSupport;
 
 public abstract class EntityRepository<E, K> extends Repository {
 
-	public static final int CURRENT_VERSION_VALUE = -1;
+	public static final long CURRENT_VERSION_VALUE = -1;
 	public static final String CURRENT_VERSION = "" + CURRENT_VERSION_VALUE;
 
 	protected EntityRepository(Session session) {
@@ -21,7 +21,7 @@ public abstract class EntityRepository<E, K> extends Repository {
 
 	protected abstract Result getAll(int page, int limit, Object... filters);
 
-	protected abstract Result get(K key, int version);
+	protected abstract Result get(K key, Long version);
 
 	protected abstract boolean isPresent(K key);
 
@@ -40,7 +40,7 @@ public abstract class EntityRepository<E, K> extends Repository {
 				.collect(Collectors.toList()));
 	}
 
-	public Optional<E> find(K key, int version) {
+	public Optional<E> find(K key, Long version) {
 		if (key == null) return Optional.empty();
 		Result result = get(key, version);
 		if (result == null) return Optional.empty();
@@ -60,7 +60,7 @@ public abstract class EntityRepository<E, K> extends Repository {
 	}
 
 	public boolean remove(K key) {
-		if (!isPresent(key))
+		if (!exists(key))
 			return false;
 		delete(key);
 		return true;

@@ -24,35 +24,34 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 		if (filters == null || filters.length != 1)
 			return null;
 		User.PrimaryKey id = (User.PrimaryKey) filters[0];
-		String statement = "MATCH (p:Project)-[r:CONTAINS]->(pd:ProjectDetails)-[:HAS]->(u:Users)\n" +
+		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"WITH p, pd, collect([id: u.id, provider: u.provider]) as users\n" +
-				"WHERE {id: $, provider $} IN users\n" +
-				"RETURN p.id as id, p.deprecated as deprecated, p.version as version, " +
-				"p.name as name, p.type as type, p.description as description, users as users\n" +
-				"SKIP $ LIMIT $";
+				"WITH p, r, pd, collect(DISTINCT {id: u.id, provider: u.provider}) as users\n" +
+				"WHERE {id: $, provider: $} IN users OR pd.type = \"public\"\n" +
+				"RETURN p.id as id, p.deprecated as deprecated, r.version as version,\n" +
+				"pd.name as name, pd.type as type, pd.description as description, users as users\n" +
+				"ORDER BY p.id SKIP $ LIMIT $";
 		return query(new Query(statement, id.getId(), id.getProvider(), page, limit));
 	}
 
 	@Override
-	protected Result get(UUID key, int version) {
+	protected Result get(UUID key, Long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
-		String statement = "MATCH (p:Project {id: $})-[r:CONTAINS]->(pd:ProjectDetails)-[:HAS]->(u:Users)\n" +
+		String statement = "MATCH (p:Project {id: $})-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
 				"WHERE " + where + "\n" +
-				"WITH p, pd, collect([id: u.id, provider: u.provider]) as users\n" +
-				"RETURN p.id as id, p.deprecated as deprecated, p.version as version, " +
-				"p.name as name, p.type as type, p.description as description, users as users\n" +
-				"SKIP $ LIMIT $";
+				"WITH p, r, pd, collect(DISTINCT {id: u.id, provider: u.provider}) as users\n" +
+				"RETURN p.id as id, p.deprecated as deprecated, r.version as version,\n" +
+				"pd.name as name, pd.type as type, pd.description as description, users as users";
 		return query(new Query(statement, key, version));
 	}
 
 	@Override
 	protected Project parse(Map<String, Object> row) {
-		User.PrimaryKey[] userIds = Arrays.stream((Object[][]) row.get("users"))
-				.map(a -> new User.PrimaryKey((String) a[0], (String) a[1]))
+		User.PrimaryKey[] userIds = Arrays.stream((Map<String, String>[]) row.get("users"))
+				.map(a -> new User.PrimaryKey(a.get("id"), a.get("provider")))
 				.toArray(User.PrimaryKey[]::new);
 		return new Project(UUID.fromString((String) row.get("id")),
-				(int) row.get("version"),
+				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("name"),
 				(String) row.get("type"),
@@ -83,26 +82,19 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	@Override
 	protected void delete(UUID key) {
 		String statement = "MATCH (p:Project {id: $}) SET p.deprecated = true WITH p\n" +
-				"MATCH (p)-[:CONTAINS]->(pf:Profile) SET pf.deprecated = true WITH p\n" +
-				"MATCH (p)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true WITH p\n" +
-				"MATCH (p)-[:CONTAINS]->(a:Allele) SET a.deprecated = true";
+				"MATCH (p)-[:CONTAINS]->(a:Allele) SET a.deprecated = true WITH p\n" +
+				"MATCH (p)-[:CONTAINS]->(d:Dataset) SET d.deprecated = true WITH d\n" +
+				"MATCH (p)-[:CONTAINS]->(pf:Profile) SET pf.deprecated = true WITH d\n" +
+				"MATCH (p)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true";
 		execute(new Query(statement, key));
-	}
-
-	public boolean containsUser(String projectId, User.PrimaryKey userId) {
-		String statement = "MATCH (p:Project {id: $})-[r:CONTAINS]->(pd:ProjectDetails)-[:HAS]->(u:Users)\n" +
-				"WHERE NOT EXISTS(r.to)\n" +
-				"WITH p, pd, collect([id: u.id, provider: u.provider]) as users\n" +
-				"RETURN [id: $, provider: $] IN users";
-		return query(Boolean.class, new Query(statement, projectId, userId.getId(), userId.getProvider()));
 	}
 
 	private void composeUsers(Query query, User.PrimaryKey[] users) {
 		for (User.PrimaryKey user : users) {
-			query.appendQuery("MATCH (u:User {id: $, provider: $}) CREATE (pd)-[:HAS]->(u) WITH pd\n");
+			query.appendQuery("MATCH (u:User {id: $, provider: $}) WHERE u.deprecated = false CREATE (pd)-[:HAS]->(u) WITH pd\n");
 			query.addParameter(user.getId(), user.getProvider());
 		}
-		query.subQuery("WITH pd\n".length());
+		query.subQuery(query.length() - "WITH pd\n".length());
 	}
 
 }

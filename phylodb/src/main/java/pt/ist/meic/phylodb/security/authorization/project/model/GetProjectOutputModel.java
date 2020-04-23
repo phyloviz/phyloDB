@@ -1,26 +1,24 @@
 package pt.ist.meic.phylodb.security.authorization.project.model;
 
-import pt.ist.meic.phylodb.io.output.SingleOutputModel;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
-public class ProjectOutputModel extends SingleOutputModel<UUID> {
+public class GetProjectOutputModel extends ProjectOutputModel {
 
 	private String name;
 	private String description;
-	private User.PrimaryKey[] users;
+	private UserKeyOutputModel[] users;
 
-	public ProjectOutputModel() {
+	public GetProjectOutputModel() {
 	}
 
-	public ProjectOutputModel(Project project) {
+	public GetProjectOutputModel(Project project) {
 		super(project);
 		this.name = project.getName();
 		this.description = project.getDescription();
-		this.users = project.getUsers();
+		this.users = Arrays.stream(project.getUsers()).map(UserKeyOutputModel::new).toArray(UserKeyOutputModel[]::new);
 	}
 
 	public String getName() {
@@ -31,7 +29,7 @@ public class ProjectOutputModel extends SingleOutputModel<UUID> {
 		return description;
 	}
 
-	public User.PrimaryKey[] getUsers() {
+	public UserKeyOutputModel[] getUsers() {
 		return users;
 	}
 
@@ -40,11 +38,42 @@ public class ProjectOutputModel extends SingleOutputModel<UUID> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		if (!super.equals(o)) return false;
-		ProjectOutputModel that = (ProjectOutputModel) o;
+		GetProjectOutputModel that = (GetProjectOutputModel) o;
 		return super.equals(that) &&
 				Objects.equals(name, that.name) &&
 				Objects.equals(description, that.description) &&
 				Arrays.equals(users, that.users);
+	}
+
+	private static class UserKeyOutputModel {
+
+		private String email;
+		private String provider;
+
+		public UserKeyOutputModel() {
+		}
+
+		public UserKeyOutputModel(User.PrimaryKey key) {
+			this.email = key.getId();
+			this.provider = key.getProvider();
+		}
+
+		public String getEmail() {
+			return email;
+		}
+
+		public String getProvider() {
+			return provider;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			UserKeyOutputModel that = (UserKeyOutputModel) o;
+			return Objects.equals(email, that.email) &&
+					Objects.equals(provider, that.provider);
+		}
 	}
 
 }

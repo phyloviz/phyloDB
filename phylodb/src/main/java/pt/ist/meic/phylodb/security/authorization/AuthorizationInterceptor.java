@@ -22,7 +22,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALU
 @Order(2)
 public class AuthorizationInterceptor extends SecurityInterceptor {
 
-	private static final String PROJECT = "project";
+	public static final String PROJECT = "project";
 
 	private ProjectService projectService;
 
@@ -34,7 +34,7 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 	public boolean handle(HttpServletRequest req, HttpServletResponse res, Object handler) {
 		HandlerMethod hm = (HandlerMethod) handler;
 		Authorized methodAnnotation = hm.getMethodAnnotation(Authorized.class);
-		if (methodAnnotation == null || Role.valueOf(req.getAttribute(ROLE).toString()).equals(Role.ADMIN))
+		if (methodAnnotation == null || req.getAttribute(ROLE).equals(Role.ADMIN))
 			return true;
 		Role methodRole = methodAnnotation.role();
 		Permission methodPermission = methodAnnotation.permission();
@@ -48,7 +48,7 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 				boolean included = Arrays.stream(project.getUsers()).anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
 				if (methodRole.equals(Role.USER) &&
 						((methodPermission.equals(Permission.WRITE) && included) ||
-								(methodPermission.equals(Permission.READ) && included || project.getType().equals("public"))))
+								(methodPermission.equals(Permission.READ) && (included || project.getType().equals("public")))))
 					return true;
 			}
 		} else if (!methodAnnotation.required())

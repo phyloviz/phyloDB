@@ -13,7 +13,7 @@ public class Dataset extends Entity<Dataset.PrimaryKey> {
 	private final String description;
 	private final Reference<Schema.PrimaryKey> schema;
 
-	public Dataset(UUID projectId, UUID id, int version, boolean deprecated, String description, Reference<Schema.PrimaryKey> schema) {
+	public Dataset(UUID projectId, UUID id, long version, boolean deprecated, String description, Reference<Schema.PrimaryKey> schema) {
 		super(new PrimaryKey(projectId, id), version, deprecated);
 		this.description = description;
 		this.schema = schema;

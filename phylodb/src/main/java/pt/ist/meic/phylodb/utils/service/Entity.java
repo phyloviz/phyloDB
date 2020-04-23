@@ -1,12 +1,14 @@
 package pt.ist.meic.phylodb.utils.service;
 
+import java.util.Objects;
+
 public abstract class Entity<K> {
 
 	protected K id;
-	protected int version;
+	protected long version;
 	protected boolean deprecated;
 
-	public Entity(K id, int version, boolean deprecated) {
+	public Entity(K id, Long version, boolean deprecated) {
 		this.id = id;
 		this.version = version;
 		this.deprecated = deprecated;
@@ -16,12 +18,22 @@ public abstract class Entity<K> {
 		return id;
 	}
 
-	public int getVersion() {
+	public long getVersion() {
 		return version;
 	}
 
 	public boolean isDeprecated() {
 		return deprecated;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Entity<?> entity = (Entity<?>) o;
+		return version == entity.version &&
+				deprecated == entity.deprecated &&
+				Objects.equals(id, entity.id);
 	}
 
 }

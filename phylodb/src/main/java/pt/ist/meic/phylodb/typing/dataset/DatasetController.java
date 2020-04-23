@@ -5,13 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.io.output.MultipleOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Permission;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
-import pt.ist.meic.phylodb.typing.dataset.model.DatasetOutputModel;
+import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetOutputModel;
+import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetsOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class DatasetController extends Controller<Dataset> {
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getDatasets(projectId, page, l), MultipleOutputModel::new, null);
+		return getAll(type, l -> service.getDatasets(projectId, page, l), GetDatasetsOutputModel::new, null);
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)
@@ -43,9 +43,9 @@ public class DatasetController extends Controller<Dataset> {
 	public ResponseEntity<?> getDataset(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) int version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getDataset(projectId, datasetId, version), DatasetOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getDataset(projectId, datasetId, version), GetDatasetOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)

@@ -16,7 +16,7 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 	private final String aka;
 	private final List<Reference<String>> allelesIds;
 
-	public Profile(UUID projectId, UUID datasetId, String id, int version, boolean deprecated, String aka, List<Reference<String>> allelesIds) {
+	public Profile(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String aka, List<Reference<String>> allelesIds) {
 		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.aka = aka;
 		this.allelesIds = allelesIds;
