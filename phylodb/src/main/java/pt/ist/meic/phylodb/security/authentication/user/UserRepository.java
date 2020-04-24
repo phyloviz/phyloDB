@@ -32,7 +32,7 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 	}
 
 	@Override
-	protected Result get(User.PrimaryKey key, Long version) {
+	protected Result get(User.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (u:User {id: $, provider: $})-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE " + where + "\n" +
@@ -58,13 +58,13 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 	}
 
 	@Override
-	protected void store(User user) {
+	protected Result store(User user) {
 		String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = false WITH u\n" +
 				"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
-		execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));
+		return execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));
 	}
 
 	@Override

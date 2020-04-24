@@ -27,7 +27,7 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 	}
 
 	@Override
-	protected Result get(String key, Long version) {
+	protected Result get(String key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
 				"WHERE " + where + "\n" +
@@ -52,13 +52,13 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 	}
 
 	@Override
-	protected void store(Taxon taxon) {
+	protected Result store(Taxon taxon) {
 		String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = false WITH t\n" +
 				"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $})";
-		execute(new Query(statement, taxon.getPrimaryKey(), taxon.getDescription()));
+		return execute(new Query(statement, taxon.getPrimaryKey(), taxon.getDescription()));
 	}
 
 	@Override

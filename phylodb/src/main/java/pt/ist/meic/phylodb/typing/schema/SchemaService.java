@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
-import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +39,7 @@ public class SchemaService {
 		if (locusRepository.anyMissing(lociKeys) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
 			return false;
-		return schemaRepository.save(schema);
+		return schemaRepository.save(schema).isPresent();
 	}
 
 	@Transactional

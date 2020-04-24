@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import pt.ist.meic.phylodb.RepositoryTests;
@@ -133,9 +134,9 @@ public class LocusRepositoryTests extends RepositoryTests {
 		Locus.PrimaryKey key = new Locus.PrimaryKey(taxon.getPrimaryKey(), "3three");
 		Locus first = new Locus(key.getTaxonId(), key.getId(), 1, false, null),
 				second = new Locus(key.getTaxonId(), key.getId(), 2, false, "description");
-		return Stream.of(Arguments.of(first, new Locus[0], new Locus[]{state[0], state[1], first}, true),
-				Arguments.of(second, new Locus[]{first}, new Locus[]{state[0], state[1], first, second}, true),
-				Arguments.of(null, new Locus[0], state, false));
+		return Stream.of(Arguments.of(first, new Locus[0], new Locus[]{state[0], state[1], first}, true, 2, 2),
+				Arguments.of(second, new Locus[]{first}, new Locus[]{state[0], state[1], first, second}, true, 1, 1),
+				Arguments.of(null, new Locus[0], state, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
@@ -196,12 +197,17 @@ public class LocusRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("save_params")
-	public void save(Locus user, Locus[] state, Locus[] expectedState, boolean expectedResult) {
+	public void save(Locus user, Locus[] state, Locus[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(LocusRepositoryTests.state);
 		store(state);
-		boolean result = locusRepository.save(user);
+		Optional<QueryStatistics> result = locusRepository.save(user);
+		if(executed) {
+			assertTrue(result.isPresent());
+			assertEquals(nodesCreated, result.get().getNodesCreated());
+			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+		} else
+			assertFalse(result.isPresent());
 		Locus[] stateResult = findAll();
-		assertEquals(expectedResult, result);
 		assertArrayEquals(expectedState, stateResult);
 	}
 

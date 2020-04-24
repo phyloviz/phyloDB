@@ -44,7 +44,7 @@ public class ProjectService {
 		users.add(user);
 		if(userRepository.anyMissing(users.toArray(new User.PrimaryKey[0])))
 			return false;
-		return projectRepository.save(project);
+		return projectRepository.save(project).isPresent();
 	}
 
 	@Transactional

@@ -36,7 +36,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	@Override
-	protected Result get(Schema.PrimaryKey key, Long version) {
+	protected Result get(Schema.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
 				"WHERE " + where + " WITH t, s, sd, l\n" +
@@ -68,10 +68,10 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	@Override
-	protected void store(Schema schema) {
+	protected Result store(Schema schema) {
 		if (isPresent(schema.getPrimaryKey()))
-			put(schema);
-		post(schema);
+			return put(schema);
+		return post(schema);
 	}
 
 	@Override
@@ -122,15 +122,15 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		return Optional.of(parse(result.iterator().next()));
 	}
 
-	private void post(Schema schema) {
+	private Result post(Schema schema) {
 		String statement = "CREATE (s:Schema {id: $, type: $, deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version 1}]->(sd:SchemaDetails {description: $}) WITH sd\n " +
 				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false\n";
 		Query query = new Query(statement, schema.getPrimaryKey(), schema.getType(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
 		composeLoci(schema, query);
-		execute(query);
+		return execute(query);
 	}
 
-	private void put(Schema schema) {
+	private Result put(Schema schema) {
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
 				"WHERE NOT EXISTS(r.to)\n" +
 				"SET s.deprecated = false, r.to = datetime() WITH a, r.version + 1 as v\n" +
@@ -138,7 +138,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				"WITH t\n";
 		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey(), schema.getDescription());
 		composeLoci(schema, query);
-		execute(query);
+		return execute(query);
 	}
 
 	private void composeLoci(Schema schema, Query query) {

@@ -12,6 +12,17 @@ public abstract class RepositoryTests  extends Test{
 	@Autowired
 	private Session session;
 
+	protected Integer count(){
+		return query(Integer.class, new Query("OPTIONAL MATCH (n) return COUNT(n)"));
+	}
+	protected void xpto(){
+		Result r = query(new Query("OPTIONAL MATCH (n) return n"));
+		while(r.iterator().hasNext()) {
+			Object x = r.iterator().next();
+			int i = 1;
+		}
+	}
+
 	protected Result query(Query query) {
 		return session.query(query.getExpression(), query.getParameters());
 	}

@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import pt.ist.meic.phylodb.Test;
 import pt.ist.meic.phylodb.security.authentication.user.UserRepository;
@@ -15,6 +16,7 @@ import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.security.authorization.project.ProjectRepository;
 import pt.ist.meic.phylodb.security.authorization.project.ProjectService;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
+import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -53,9 +55,9 @@ public class ProjectServiceTests extends Test {
 	}
 
 	private static Stream<Arguments> saveProject_params() {
-		return Stream.of(Arguments.of(state[0], user1.getPrimaryKey(), false, true),
-				Arguments.of(state[1], user2.getPrimaryKey(), true, false),
-				Arguments.of(null, user2.getPrimaryKey(), false, false));
+		return Stream.of(Arguments.of(state[0], user1.getPrimaryKey(), false, new MockResult().queryStatistics()),
+				Arguments.of(state[1], user2.getPrimaryKey(), true, null),
+				Arguments.of(null, user2.getPrimaryKey(), false, null));
 	}
 
 	private static Stream<Arguments> deleteProject_params() {
@@ -96,11 +98,11 @@ public class ProjectServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("saveProject_params")
-	public void saveProject(Project project, User.PrimaryKey user, boolean missing, boolean expected) {
+	public void saveProject(Project project, User.PrimaryKey user, boolean missing, QueryStatistics expected) {
 		Mockito.when(userRepository.anyMissing(any())).thenReturn(missing);
-		Mockito.when(projectRepository.save(any())).thenReturn(expected);
+		Mockito.when(projectRepository.save(any())).thenReturn(Optional.ofNullable(expected));
 		boolean result = service.saveProject(project, user);
-		assertEquals(expected, result);
+		assertEquals(expected != null, result);
 	}
 
 	@ParameterizedTest

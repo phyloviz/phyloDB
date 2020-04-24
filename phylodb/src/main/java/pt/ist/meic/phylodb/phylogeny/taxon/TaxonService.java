@@ -28,7 +28,7 @@ public class TaxonService {
 
 	@Transactional
 	public boolean saveTaxon(Taxon taxon) {
-		return taxonRepository.save(taxon);
+		return taxonRepository.save(taxon).isPresent();
 	}
 
 	@Transactional

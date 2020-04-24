@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.phylogeny.taxon;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import pt.ist.meic.phylodb.RepositoryTests;
@@ -125,9 +126,9 @@ public class TaxonRepositoryTests extends RepositoryTests {
 		String id = "3three";
 		Taxon first = new Taxon(id, 1, false, null),
 				second = new Taxon(id, 2, false, "description");
-		return Stream.of(Arguments.of(first, new Taxon[0], new Taxon[]{state[0], state[1], first}, true),
-				Arguments.of(second, new Taxon[]{first}, new Taxon[]{state[0], state[1], first, second}, true),
-				Arguments.of(null, new Taxon[0], state, false));
+		return Stream.of(Arguments.of(first, new Taxon[0], new Taxon[]{state[0], state[1], first}, true, 2, 1),
+				Arguments.of(second, new Taxon[]{first}, new Taxon[]{state[0], state[1], first, second}, true, 1, 1),
+				Arguments.of(null, new Taxon[0], state, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
@@ -176,12 +177,17 @@ public class TaxonRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("save_params")
-	public void save(Taxon user, Taxon[] state, Taxon[] expectedState, boolean expectedResult) {
+	public void save(Taxon user, Taxon[] state, Taxon[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(TaxonRepositoryTests.state);
 		store(state);
-		boolean result = repository.save(user);
+		Optional<QueryStatistics> result = repository.save(user);
+		if(executed) {
+			assertTrue(result.isPresent());
+			assertEquals(nodesCreated, result.get().getNodesCreated());
+			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+		} else
+			assertFalse(result.isPresent());
 		Taxon[] stateResult = findAll();
-		assertEquals(expectedResult, result);
 		assertArrayEquals(expectedState, stateResult);
 	}
 

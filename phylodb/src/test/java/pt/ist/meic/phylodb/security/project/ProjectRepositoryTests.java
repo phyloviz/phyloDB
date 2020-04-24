@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import pt.ist.meic.phylodb.RepositoryTests;
@@ -146,9 +147,9 @@ public class ProjectRepositoryTests extends RepositoryTests {
 		UUID id = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
 		Project first = new Project(id, 1, false, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
 				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{user1.getPrimaryKey()});
-		return Stream.of(Arguments.of(first, new Project[0], new Project[]{projects[0], projects[1], projects[2], first}, true),
-				Arguments.of(second, new Project[]{first}, new Project[]{projects[0], projects[1], projects[2], first, second}, true),
-				Arguments.of(null, new Project[0], new Project[]{projects[0], projects[1], projects[2]}, false));
+		return Stream.of(Arguments.of(first, new Project[0], new Project[]{projects[0], projects[1], projects[2], first}, true, 2, 2),
+				Arguments.of(second, new Project[]{first}, new Project[]{projects[0], projects[1], projects[2], first, second}, true, 1, 2),
+				Arguments.of(null, new Project[0], new Project[]{projects[0], projects[1], projects[2]}, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
@@ -203,12 +204,17 @@ public class ProjectRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("save_params")
-	public void save(Project project, Project[] state, Project[] expectedState, boolean expectedResult) {
+	public void save(Project project, Project[] state, Project[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(ProjectRepositoryTests.projects);
 		store(state);
-		boolean result = projectRepository.save(project);
+		Optional<QueryStatistics> result = projectRepository.save(project);
+		if(executed) {
+			assertTrue(result.isPresent());
+			assertEquals(nodesCreated, result.get().getNodesCreated());
+			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+		} else
+			assertFalse(result.isPresent());
 		Project[] stateResult = findAll();
-		assertEquals(expectedResult, result);
 		assertArrayEquals(expectedState, stateResult);
 	}
 

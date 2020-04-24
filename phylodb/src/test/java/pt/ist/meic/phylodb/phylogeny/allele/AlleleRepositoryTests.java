@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import pt.ist.meic.phylodb.RepositoryTests;
@@ -211,12 +212,12 @@ public class AlleleRepositoryTests extends RepositoryTests {
 				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 2, false, null, key.getProject()),
 				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProject()),
 				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 2, false, null, keyP.getProject());
-		return Stream.of(Arguments.of(first, new Allele[0], null, new Allele[]{state[0], state[1], first}, true),
-				Arguments.of(second, new Allele[]{first}, null,  new Allele[]{state[0], state[1], first, second}, true),
-				Arguments.of(firstP, new Allele[0], projectId, new Allele[]{state[2], state[3], firstP}, true),
-				Arguments.of(secondP, new Allele[]{firstP}, projectId, new Allele[]{state[2], state[3], firstP, secondP}, true),
-				Arguments.of(null, new Allele[0], null,  new Allele[]{state[0], state[1]}, false),
-				Arguments.of(null, new Allele[0], projectId, new Allele[]{state[2], state[3]}, false));
+		return Stream.of(Arguments.of(first, new Allele[0], null, new Allele[]{state[0], state[1], first}, true, 2, 2),
+				Arguments.of(second, new Allele[]{first}, null,  new Allele[]{state[0], state[1], first, second}, true, 1, 1),
+				Arguments.of(firstP, new Allele[0], projectId, new Allele[]{state[2], state[3], firstP}, true, 2, 3),
+				Arguments.of(secondP, new Allele[]{firstP}, projectId, new Allele[]{state[2], state[3], firstP, secondP}, true, 1, 1),
+				Arguments.of(null, new Allele[0], null,  new Allele[]{state[0], state[1]}, false, 0, 0),
+				Arguments.of(null, new Allele[0], projectId, new Allele[]{state[2], state[3]}, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
@@ -238,23 +239,23 @@ public class AlleleRepositoryTests extends RepositoryTests {
 		Allele.PrimaryKey firstKey = first.getPrimaryKey(), firstPkey = firstProject.getPrimaryKey();
 		Allele firstConflict = new Allele(firstKey.getTaxonId(), firstKey.getLocusId(), firstKey.getId(), 2, false, "teste", firstKey.getProject()),
 				firstPConflict = new Allele(firstPkey.getTaxonId(), firstPkey.getLocusId(), firstPkey.getId(), 2, false, "sequencep", firstPkey.getProject());
-		return Stream.of(Arguments.of(Collections.emptyList(), new Allele[]{state[0], state[1]}, null, BatchRepository.SKIP, new Allele[]{state[0], state[1]}, true),
-				Arguments.of(Collections.singletonList(state[0]), new Allele[]{state[1]}, null, BatchRepository.SKIP, new Allele[]{state[0], state[1]}, true),
-				Arguments.of(Collections.singletonList(firstConflict), new Allele[]{state[0]}, null, BatchRepository.SKIP, new Allele[]{state[0]}, true),
-				Arguments.of(Collections.singletonList(state[2]), new Allele[]{state[3]}, projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, true),
-				Arguments.of(Collections.singletonList(firstPConflict), new Allele[]{state[2], state[3]}, projectId, BatchRepository.SKIP,  new Allele[]{state[2], state[3]}, true),
-				Arguments.of(Collections.singletonList(state[0]), new Allele[]{state[1]}, null, BatchRepository.UPDATE,  new Allele[]{state[0], state[1]}, true),
-				Arguments.of(Collections.singletonList(firstConflict), new Allele[]{state[0]}, null, BatchRepository.UPDATE, new Allele[]{state[0], firstConflict}, true),
-				Arguments.of(Collections.singletonList(state[2]), new Allele[]{state[3]}, projectId, BatchRepository.UPDATE, new Allele[]{state[2], state[3]}, true),
-				Arguments.of(Collections.singletonList(firstPConflict), new Allele[]{state[2], state[3]}, projectId, BatchRepository.UPDATE,  new Allele[]{state[2], firstPConflict, state[3]}, true),
-				Arguments.of(Arrays.asList(state[0], state[1]), new Allele[0], null, BatchRepository.SKIP,  new Allele[]{state[0], state[1]}, true),
-				Arguments.of(Arrays.asList(firstConflict, state[1]), new Allele[]{state[0]}, null, BatchRepository.SKIP,  new Allele[]{state[0], state[1]}, true),
-				Arguments.of(Arrays.asList(state[2], state[3]), new Allele[0], projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, true),
-				Arguments.of(Arrays.asList(firstPConflict, state[3]), new Allele[]{state[2]}, projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, true),
-				Arguments.of(Arrays.asList(state[0], state[1]), new Allele[0], null, BatchRepository.UPDATE,  new Allele[]{state[0], state[1]}, true),
-				Arguments.of(Arrays.asList(firstConflict, state[1]), new Allele[]{state[0]}, null, BatchRepository.UPDATE, new Allele[]{state[0], firstConflict, state[1]}, true),
-				Arguments.of(Arrays.asList(state[2], state[3]), new Allele[0], projectId, BatchRepository.UPDATE, new Allele[]{state[2], state[3]}, true),
-				Arguments.of(Arrays.asList(firstPConflict, state[3]), new Allele[]{state[2]}, projectId, BatchRepository.UPDATE,  new Allele[]{state[2], firstPConflict, state[3]}, true));
+		return Stream.of(Arguments.of(Collections.emptyList(), new Allele[]{state[0], state[1]}, null, BatchRepository.SKIP, new Allele[]{state[0], state[1]}, false, 0, 0),
+				Arguments.of(Collections.singletonList(state[0]), new Allele[]{state[1]}, null, BatchRepository.SKIP, new Allele[]{state[0], state[1]}, true, 2, 2),
+				Arguments.of(Collections.singletonList(firstConflict), new Allele[]{state[0]}, null, BatchRepository.SKIP, new Allele[]{state[0]}, false, 0, 0),
+				Arguments.of(Collections.singletonList(state[2]), new Allele[]{state[3]}, projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, true, 2, 3),
+				Arguments.of(Collections.singletonList(firstPConflict), new Allele[]{state[2], state[3]}, projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, false, 0, 0),
+				Arguments.of(Collections.singletonList(state[0]), new Allele[]{state[1]}, null, BatchRepository.UPDATE,  new Allele[]{state[0], state[1]}, true, 2, 2),
+				Arguments.of(Collections.singletonList(firstConflict), new Allele[]{state[0]}, null, BatchRepository.UPDATE, new Allele[]{state[0], firstConflict}, true, 1, 1),
+				Arguments.of(Collections.singletonList(state[2]), new Allele[]{state[3]}, projectId, BatchRepository.UPDATE, new Allele[]{state[2], state[3]}, true, 2, 3),
+				Arguments.of(Collections.singletonList(firstPConflict), new Allele[]{state[2], state[3]}, projectId, BatchRepository.UPDATE, new Allele[]{state[2], firstPConflict, state[3]}, true, 1, 1),
+				Arguments.of(Arrays.asList(state[0], state[1]), new Allele[0], null, BatchRepository.SKIP,  new Allele[]{state[0], state[1]}, true, 4, 4),
+				Arguments.of(Arrays.asList(firstConflict, state[1]), new Allele[]{state[0]}, null, BatchRepository.SKIP,  new Allele[]{state[0], state[1]}, true, 2, 2),
+				Arguments.of(Arrays.asList(state[2], state[3]), new Allele[0], projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, true, 4, 6),
+				Arguments.of(Arrays.asList(firstPConflict, state[3]), new Allele[]{state[2]}, projectId, BatchRepository.SKIP, new Allele[]{state[2], state[3]}, true, 2, 3),
+				Arguments.of(Arrays.asList(state[0], state[1]), new Allele[0], null, BatchRepository.UPDATE,  new Allele[]{state[0], state[1]}, true, 4, 4),
+				Arguments.of(Arrays.asList(firstConflict, state[1]), new Allele[]{state[0]}, null, BatchRepository.UPDATE, new Allele[]{state[0], firstConflict, state[1]}, true, 3, 3),
+				Arguments.of(Arrays.asList(state[2], state[3]), new Allele[0], projectId, BatchRepository.UPDATE, new Allele[]{state[2], state[3]}, true, 4, 6),
+				Arguments.of(Arrays.asList(firstPConflict, state[3]), new Allele[]{state[2]}, projectId, BatchRepository.UPDATE,  new Allele[]{state[2], firstPConflict, state[3]}, true, 3, 4));
 	}
 
 	@BeforeEach
@@ -316,12 +317,17 @@ public class AlleleRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("save_params")
-	public void save(Allele allele, Allele[] state, UUID projectId, Allele[] expectedState, boolean expectedResult) {
+	public void save(Allele allele, Allele[] state, UUID projectId, Allele[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(AlleleRepositoryTests.state);
 		store(state);
-		boolean result = alleleRepository.save(allele);
+		Optional<QueryStatistics> result = alleleRepository.save(allele);
 		Allele[] stateResult = findAll(projectId);
-		assertEquals(expectedResult, result);
+		if(executed) {
+			assertTrue(result.isPresent());
+			assertEquals(nodesCreated, result.get().getNodesCreated());
+			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+		} else
+			assertFalse(result.isPresent());
 		assertArrayEquals(expectedState, stateResult);
 	}
 
@@ -338,13 +344,18 @@ public class AlleleRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveAll(List<Allele> alleles, Allele[] state, UUID projectId, String flag, Allele[] expectedState, boolean expectedResult) {
+	public void saveAll(List<Allele> alleles, Allele[] state, UUID projectId, String flag, Allele[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(state);
-		boolean result = projectId == null ?
+		Optional<QueryStatistics> result = projectId == null ?
 				alleleRepository.saveAll(alleles, flag, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), null) :
 				alleleRepository.saveAll(alleles, flag, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), projectId.toString());
+		if(executed) {
+			assertTrue(result.isPresent());
+			assertEquals(nodesCreated, result.get().getNodesCreated());
+			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+		} else
+			assertFalse(result.isPresent());
 		Allele[] stateResult = findAll(projectId);
-		assertEquals(expectedResult, result);
 		assertArrayEquals(expectedState, stateResult);
 	}
 

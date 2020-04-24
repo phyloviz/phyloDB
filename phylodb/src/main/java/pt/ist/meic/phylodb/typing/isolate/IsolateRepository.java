@@ -40,7 +40,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected Result get(Isolate.PrimaryKey key, Long version) {
+	protected Result get(Isolate.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
 				"WHERE " + where + "\n" +
@@ -77,11 +77,11 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected void store(Isolate isolate) {
+	protected Result store(Isolate isolate) {
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
 		Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 		composeStore(query, isolate);
-		execute(query);
+		return execute(query);
 	}
 
 	@Override

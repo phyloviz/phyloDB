@@ -52,7 +52,7 @@ public class ProfileService {
 		Optional<Schema> optional = schemaRepository.find(datasetKey);
 		if (!datasetRepository.exists(datasetKey) || !optional.isPresent() || optional.get().getLociIds().size() != profile.getAllelesReferences().size())
 			return false;
-		return profileRepository.save(profile);
+		return profileRepository.save(profile).isPresent();
 	}
 
 	@Transactional
@@ -78,7 +78,7 @@ public class ProfileService {
 		Schema schema = optional.get();
 		List<Profile> profiles = ProfilesFormatter.get(schema.getType().getName())
 				.parse(file, projectId, datasetId, schema);
-		return profileRepository.saveAll(profiles, conflict, datasetId.toString());
+		return profileRepository.saveAll(profiles, conflict, datasetId.toString()).isPresent();
 	}
 
 }

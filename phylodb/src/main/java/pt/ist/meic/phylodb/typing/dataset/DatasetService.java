@@ -47,7 +47,7 @@ public class DatasetService {
 		} else if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) &&
 				profileRepository.findAll(0, 1, dataset.getPrimaryKey()).get().size() > 0)
 			return false;
-		return datasetRepository.save(dataset);
+		return datasetRepository.save(dataset).isPresent();
 	}
 
 	@Transactional

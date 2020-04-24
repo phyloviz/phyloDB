@@ -36,7 +36,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
-	protected Result get(Profile.PrimaryKey key, Long version) {
+	protected Result get(Profile.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)\n" +
 				"WHERE " + where + "\n" +
@@ -71,11 +71,11 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
-	protected void store(Profile profile) {
+	protected Result store(Profile profile) {
 		Profile.PrimaryKey key = profile.getPrimaryKey();
 		Query query = new Query("MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 		composeStore(query, profile);
-		execute(query);
+		return execute(query);
 	}
 
 	@Override

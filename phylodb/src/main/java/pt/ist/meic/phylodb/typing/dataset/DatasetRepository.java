@@ -34,7 +34,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	}
 
 	@Override
-	protected Result get(Dataset.PrimaryKey id, Long version) {
+	protected Result get(Dataset.PrimaryKey id, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE r2.version = h.version AND " + where + "\n" +
@@ -67,7 +67,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	}
 
 	@Override
-	protected void store(Dataset dataset) {
+	protected Result store(Dataset dataset) {
 		String statement = "MATCH (p:Project {id: $})\n" +
 				"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = false, WITH d\n" +
 				"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
@@ -80,7 +80,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 				"CREATE (dd)-[:HAS {version: r.version}]->(s)";
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
 		Query query = new Query(statement, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
-		execute(query);
+		return execute(query);
 	}
 
 	@Override

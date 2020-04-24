@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.security.user;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import pt.ist.meic.phylodb.RepositoryTests;
@@ -116,9 +117,9 @@ public class UserRepositoryTests extends RepositoryTests {
 	private static Stream<Arguments> save_params() {
 		String email = "3test", provider = "3test";
 		User first = new User(email, provider, 1, false, Role.USER), second = new User(email, provider, 2, false, Role.ADMIN);
-		return Stream.of(Arguments.of(first, new User[0], new User[]{state[0], state[1], first}, true),
-				Arguments.of(second, new User[]{first}, new User[]{state[0], state[1], first, second}, true),
-				Arguments.of(null, new User[0], state, false));
+		return Stream.of(Arguments.of(first, new User[0], new User[]{state[0], state[1], first}, true, 2, 1),
+				Arguments.of(second, new User[]{first}, new User[]{state[0], state[1], first, second}, true, 1, 1),
+				Arguments.of(null, new User[0], state, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
@@ -174,12 +175,17 @@ public class UserRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("save_params")
-	public void save(User user, User[] state, User[] expectedState, boolean expectedResult) {
+	public void save(User user, User[] state, User[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(UserRepositoryTests.state);
 		store(state);
-		boolean result = repository.save(user);
+		Optional<QueryStatistics> result = repository.save(user);
 		User[] stateResult = findAll();
-		assertEquals(expectedResult, result);
+		if(executed) {
+			assertTrue(result.isPresent());
+			assertEquals(nodesCreated, result.get().getNodesCreated());
+			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+		} else
+			assertFalse(result.isPresent());
 		assertArrayEquals(expectedState, stateResult);
 	}
 

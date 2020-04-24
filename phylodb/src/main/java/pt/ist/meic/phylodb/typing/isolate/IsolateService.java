@@ -45,7 +45,7 @@ public class IsolateService {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(key.getProjectId(), key.getDatasetId())) || isolate.getProfile() != null &&
 				!profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), isolate.getDatasetId(), isolate.getProfile().getPrimaryKey())))
 			return false;
-		return isolateRepository.save(isolate);
+		return isolateRepository.save(isolate).isPresent();
 	}
 
 	@Transactional
@@ -67,7 +67,7 @@ public class IsolateService {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return false;
 		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId, idColumn);
-		return isolateRepository.saveAll(isolates, conflict, datasetId.toString());
+		return isolateRepository.saveAll(isolates, conflict, datasetId.toString()).isPresent();
 	}
 
 }

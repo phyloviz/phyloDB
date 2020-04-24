@@ -40,7 +40,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 	}
 
 	@Override
-	protected Result get(Allele.PrimaryKey key, Long version) {
+	protected Result get(Allele.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"WHERE " + where;
@@ -77,7 +77,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 	}
 
 	@Override
-	protected void store(Allele allele) {
+	protected Result store(Allele allele) {
 		Object[] params = new Object[]{allele.getTaxonId(), allele.getLocusId()};
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false\n";
@@ -87,7 +87,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		}
 		Query query = new Query(statement, params);
 		composeStore(query, allele);
-		execute(query);
+		return execute(query);
 	}
 
 	@Override

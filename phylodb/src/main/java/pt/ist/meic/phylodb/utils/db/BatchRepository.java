@@ -1,9 +1,11 @@
 package pt.ist.meic.phylodb.utils.db;
 
+import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.session.Session;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepository<T, K> {
@@ -21,9 +23,9 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 
 	protected abstract void arrange(Query query, String... params);
 
-	public boolean saveAll(List<T> entities, String flag, String... params) {
+	public Optional<QueryStatistics> saveAll(List<T> entities, String flag, String... params) {
 		if (params.length == 0)
-			return false;
+			return Optional.empty();
 		Query query = init(params);
 		Function<T, Integer> handle = flag.equals(UPDATE) ?
 				(e) -> saveAllOnConflictUpdate(query, e) :
@@ -33,10 +35,9 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 			toExecute += handle.apply(e);
 		}
 		if (toExecute == 0)
-			return true;
+			return Optional.empty();
 		arrange(query, params);
-		execute(query);
-		return true;
+		return Optional.of(execute(query).queryStatistics());
 	}
 
 	private int saveAllOnConflictSkip(Query query, T entity) {

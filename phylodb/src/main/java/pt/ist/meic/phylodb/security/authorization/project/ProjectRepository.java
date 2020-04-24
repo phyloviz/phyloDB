@@ -35,7 +35,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	}
 
 	@Override
-	protected Result get(UUID key, Long version) {
+	protected Result get(UUID key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (p:Project {id: $})-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
 				"WHERE " + where + "\n" +
@@ -67,7 +67,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	}
 
 	@Override
-	protected void store(Project project) {
+	protected Result store(Project project) {
 		String statement = "MERGE (p:Project {id: $}) SET p.deprecated = false WITH p\n" +
 				"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
@@ -76,7 +76,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 				"WITH pd\n";
 		Query query = new Query(statement, project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription());
 		composeUsers(query, project.getUsers());
-		execute(query);
+		return execute(query);
 	}
 
 	@Override

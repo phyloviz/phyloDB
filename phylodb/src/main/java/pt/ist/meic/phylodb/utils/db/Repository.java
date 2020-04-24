@@ -24,10 +24,11 @@ public abstract class Repository {
 		return session.query(query.getExpression(), query.getParameters());
 	}
 
-	protected final void execute(Query query) {
+	protected final Result execute(Query query) {
 		LOG.info("\nQuery: " + query.getExpression() + "\nParameters: " + query.getParameters().toString());
-		session.query(query.getExpression(), query.getParameters());
+		Result result = session.query(query.getExpression(), query.getParameters());
 		session.clear();
+		return result;
 	}
 
 }

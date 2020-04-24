@@ -39,7 +39,7 @@ public class AlleleService {
 	public boolean saveAllele(Allele allele) {
 		if(allele == null) return false;
 		return locusRepository.exists(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) &&
-				alleleRepository.save(allele);
+				alleleRepository.save(allele).isPresent();
 	}
 
 	@Transactional
@@ -62,7 +62,7 @@ public class AlleleService {
 			return false;
 		List<Allele> alleles = new FastaFormatter().parse(file, taxonId, locusId, project);
 		String p = project != null ? project.toString() : null;
-		return alleleRepository.saveAll(alleles, conflict, taxonId, locusId, p);
+		return alleleRepository.saveAll(alleles, conflict, taxonId, locusId, p).isPresent();
 	}
 
 }

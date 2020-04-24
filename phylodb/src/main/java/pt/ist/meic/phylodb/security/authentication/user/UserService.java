@@ -30,7 +30,7 @@ public class UserService {
 	public boolean updateUser(User user) {
 		if (user == null || !userRepository.exists(user.getPrimaryKey()))
 			return false;
-		return userRepository.save(user);
+		return userRepository.save(user).isPresent();
 	}
 
 	@Transactional

@@ -7,12 +7,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.neo4j.ogm.model.QueryStatistics;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import pt.ist.meic.phylodb.Test;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,10 +54,10 @@ public class AlleleServiceTests extends Test {
 	}
 
 	private static Stream<Arguments> saveAllele_params() {
-		return Stream.of(Arguments.of(state[0], true, true),
-				Arguments.of(state[1], true, false),
-				Arguments.of(state[1], false, false),
-				Arguments.of(null, false, false));
+		return Stream.of(Arguments.of(state[0], true, new MockResult().queryStatistics()),
+				Arguments.of(state[1], true, null),
+				Arguments.of(state[1], false, null),
+				Arguments.of(null, false, null));
 	}
 
 	private static Stream<Arguments> deleteAllele_params() {
@@ -65,9 +67,9 @@ public class AlleleServiceTests extends Test {
 
 	private static Stream<Arguments> saveAll_params() {
 		Locus.PrimaryKey key = new Locus.PrimaryKey(taxonId, locusId);
-		return Stream.of(Arguments.of(key, true, true),
-				Arguments.of(key, true, false),
-				Arguments.of(key, false, false));
+		return Stream.of(Arguments.of(key, true, new MockResult().queryStatistics()),
+				Arguments.of(key, true, null),
+				Arguments.of(key, false, null));
 	}
 
 	@BeforeEach
@@ -103,11 +105,11 @@ public class AlleleServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("saveAllele_params")
-	public void saveAllele(Allele allele, boolean exists, boolean expected) {
+	public void saveAllele(Allele allele, boolean exists, QueryStatistics expected) {
 		Mockito.when(locusRepository.exists(any())).thenReturn(exists);
-		Mockito.when(alleleRepository.save(any())).thenReturn(expected);
+		Mockito.when(alleleRepository.save(any())).thenReturn(Optional.ofNullable(expected));
 		boolean result = service.saveAllele(allele);
-		assertEquals(expected, result);
+		assertEquals(expected != null, result);
 	}
 
 	@ParameterizedTest
@@ -120,22 +122,22 @@ public class AlleleServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveAllelesOnConflictSkip(Locus.PrimaryKey key, boolean exists, boolean expected) throws IOException {
+	public void saveAllelesOnConflictSkip(Locus.PrimaryKey key, boolean exists, QueryStatistics expected) throws IOException {
 		Mockito.when(locusRepository.exists(any())).thenReturn(exists);
-		Mockito.when(alleleRepository.saveAll(any(), any(), any(), any(), any())).thenReturn(expected);
+		Mockito.when(alleleRepository.saveAll(any(), any(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		MockMultipartFile file = new MockMultipartFile("t", "t", "text/plain", new byte[0]);
 		boolean result = service.saveAllelesOnConflictSkip(key.getTaxonId(), key.getId(), null, file);
-		assertEquals(expected, result);
+		assertEquals(expected != null, result);
 	}
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveAllelesOnConflictUpdate(Locus.PrimaryKey key, boolean exists, boolean expected) throws IOException {
+	public void saveAllelesOnConflictUpdate(Locus.PrimaryKey key, boolean exists, QueryStatistics expected) throws IOException {
 		Mockito.when(locusRepository.exists(any())).thenReturn(exists);
-		Mockito.when(alleleRepository.saveAll(any(), any(), any(), any(), any())).thenReturn(expected);
+		Mockito.when(alleleRepository.saveAll(any(), any(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		MockMultipartFile file = new MockMultipartFile("t", "t", "text/plain", new byte[0]);
 		boolean result = service.saveAllelesOnConflictUpdate(key.getTaxonId(), key.getId(), null, file);
-		assertEquals(expected, result);
+		assertEquals(expected != null, result);
 
 	}
 

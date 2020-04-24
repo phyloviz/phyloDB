@@ -33,7 +33,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 	}
 
 	@Override
-	protected Result get(Locus.PrimaryKey key, Long version) {
+	protected Result get(Locus.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
 				"WHERE " + where + "\n" +
@@ -59,7 +59,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 	}
 
 	@Override
-	protected void store(Locus locus) {
+	protected Result store(Locus locus) {
 		String statement = "MATCH (t:Taxon {id: $})\n" +
 				"WHERE t.deprecated = false\n" +
 				"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = false WITH l\n" +
@@ -67,7 +67,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $})";
-		execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.getDescription()));
+		return execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.getDescription()));
 	}
 
 	@Override
