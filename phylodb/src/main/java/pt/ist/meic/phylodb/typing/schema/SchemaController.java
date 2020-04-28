@@ -16,6 +16,7 @@ import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
+@RestController
 @RequestMapping("/taxons/{taxon}/schemas")
 public class SchemaController extends Controller<Schema> {
 
@@ -38,7 +39,7 @@ public class SchemaController extends Controller<Schema> {
 	public ResponseEntity<?> getSchema(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("schema") String schemaId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) long version
 	) {
 		return get(() -> service.getSchema(taxonId, schemaId, version), GetSchemaOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}

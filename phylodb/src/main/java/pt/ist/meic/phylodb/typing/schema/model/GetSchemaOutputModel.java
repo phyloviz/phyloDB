@@ -1,7 +1,6 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
-import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -20,7 +19,7 @@ public class GetSchemaOutputModel extends SchemaOutputModel {
 		this.type = schema.getType().getName();
 		this.description = schema.getDescription();
 		this.loci = schema.getLociIds().stream()
-				.map(r -> new LocusOutputModel(taxon_id, r))
+				.map(e -> new LocusOutputModel(taxon_id, e))
 				.toArray(LocusOutputModel[]::new);
 	}
 

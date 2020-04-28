@@ -2,10 +2,10 @@ package pt.ist.meic.phylodb.typing.schema.model;
 
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.utils.service.Entity;
-import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
@@ -14,9 +14,9 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 
 	private final Method type;
 	private final String description;
-	private final List<Reference<String>> lociIds;
+	private final List<Entity<String>> lociIds;
 
-	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<Reference<String>> lociIds) {
+	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<Entity<String>> lociIds) {
 		super(new PrimaryKey(taxonId, id), version, deprecated);
 		this.type = type;
 		this.description = description;
@@ -25,7 +25,7 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 
 	public Schema(String taxonId, String id, Method type, String description, String[] lociId) {
 		this(taxonId, id, -1, false, type, description, Arrays.stream(lociId)
-				.map(i -> new Reference<>(i, CURRENT_VERSION_VALUE, false))
+				.map(i -> new Entity<>(i, CURRENT_VERSION_VALUE, false))
 				.collect(Collectors.toList()));
 	}
 
@@ -37,8 +37,20 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 		return description;
 	}
 
-	public List<Reference<String>> getLociIds() {
+	public List<Entity<String>> getLociIds() {
 		return lociIds;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		if (!super.equals(o)) return false;
+		Schema schema = (Schema) o;
+		return super.equals(schema) &&
+				type == schema.type &&
+				Objects.equals(description, schema.description) &&
+				Objects.equals(lociIds, schema.lociIds);
 	}
 
 	public static class PrimaryKey {
@@ -57,6 +69,15 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 
 		public String getTaxonId() {
 			return taxonId;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			PrimaryKey that = (PrimaryKey) o;
+			return Objects.equals(taxonId, that.taxonId) &&
+					Objects.equals(id, that.id);
 		}
 
 	}

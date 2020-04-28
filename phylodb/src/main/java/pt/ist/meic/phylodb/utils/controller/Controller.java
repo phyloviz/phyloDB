@@ -3,7 +3,6 @@ package pt.ist.meic.phylodb.utils.controller;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
@@ -17,7 +16,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@RestController
 public abstract class Controller<T extends Entity<?>> {
 
 	@Value("${jsonLimit}")

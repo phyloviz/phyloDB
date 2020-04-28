@@ -7,11 +7,14 @@ import java.util.Optional;
 
 public class SchemaInputModel implements InputModel<Schema> {
 
-	private final String taxon;
-	private final String id;
-	private final String type;
-	private final String description;
-	private final String[] loci;
+	private String taxon;
+	private String id;
+	private String type;
+	private String description;
+	private String[] loci;
+
+	public SchemaInputModel() {
+	}
 
 	public SchemaInputModel(String taxon, String id, String type, String description, String[] loci) {
 		this.taxon = taxon;
@@ -43,8 +46,10 @@ public class SchemaInputModel implements InputModel<Schema> {
 
 	@Override
 	public Optional<Schema> toDomainEntity(String... params) {
-		return !params[0].equals(id) || taxon == null || loci == null || loci.length == 0 || !Method.exists(type) ? Optional.empty() :
-				Optional.of(new Schema(taxon, id, Method.valueOf(type), description, loci));
+		return !params[0].equals(taxon) || !params[1].equals(id) || loci == null || loci.length == 0 ||
+				type == null || !Method.exists(type) ?
+				Optional.empty() :
+				Optional.of(new Schema(taxon, id, Method.valueOf(type.toUpperCase()), description, loci));
 	}
 
 }

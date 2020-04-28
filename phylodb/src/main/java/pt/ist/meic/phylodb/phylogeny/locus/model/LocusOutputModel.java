@@ -3,7 +3,7 @@ package pt.ist.meic.phylodb.phylogeny.locus.model;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
@@ -24,11 +24,11 @@ public class LocusOutputModel implements OutputModel {
 		this.deprecated = locus.isDeprecated();
 	}
 
-	public LocusOutputModel(String taxonId, Reference<String> r) {
+	public LocusOutputModel(String taxonId, Entity<String> e) {
 		this.taxon_id =  taxonId;
-		this.id = r.getPrimaryKey();
-		this.version = r.getVersion();
-		this.deprecated = r.isDeprecated();
+		this.id = e.getPrimaryKey();
+		this.version = e.getVersion();
+		this.deprecated = e.isDeprecated();
 	}
 
 	public String getTaxon_id() {

@@ -2,13 +2,13 @@ package pt.ist.meic.phylodb.utils.service;
 
 import java.util.Objects;
 
-public abstract class Entity<K> {
+public class Entity<K> {
 
 	protected K id;
 	protected long version;
 	protected boolean deprecated;
 
-	public Entity(K id, Long version, boolean deprecated) {
+	public Entity(K id, long version, boolean deprecated) {
 		this.id = id;
 		this.version = version;
 		this.deprecated = deprecated;
