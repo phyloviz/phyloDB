@@ -15,6 +15,7 @@ import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectsOutpu
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.security.authorization.project.model.ProjectInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
@@ -58,7 +59,7 @@ public class ProjectController extends Controller<Project> {
 	) {
 		String userId = (String) req.getAttribute(SecurityInterceptor.ID);
 		String provider = (String) req.getAttribute(SecurityInterceptor.PROVIDER);
-		return post(input::toDomainEntity, (p) -> service.saveProject(p, new User.PrimaryKey(userId, provider)));
+		return post(input::toDomainEntity, p -> service.saveProject(p, new User.PrimaryKey(userId, provider)), Entity::getPrimaryKey);
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)

@@ -7,10 +7,13 @@ import java.util.UUID;
 
 public class DatasetInputModel implements InputModel<Dataset> {
 
-	private final UUID id;
-	private final String description;
-	private final String taxonId;
-	private final String schemaId;
+	private UUID id;
+	private String description;
+	private String taxonId;
+	private String schemaId;
+
+	public DatasetInputModel() {
+	}
 
 	public DatasetInputModel(UUID id, String description, String taxonId, String schemaId) {
 		this.id = id;

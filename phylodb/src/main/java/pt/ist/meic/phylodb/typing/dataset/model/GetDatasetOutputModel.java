@@ -2,7 +2,7 @@ package pt.ist.meic.phylodb.typing.dataset.model;
 
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaOutputModel;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public class GetDatasetOutputModel extends DatasetOutputModel {
 	public GetDatasetOutputModel(Dataset dataset) {
 		super(dataset);
 		this.description = dataset.getDescription();
-		Reference<Schema.PrimaryKey> reference = dataset.getSchema();
+		Entity<Schema.PrimaryKey> reference = dataset.getSchema();
 		this.schema = new SchemaOutputModel(reference);
 	}
 

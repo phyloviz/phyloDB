@@ -82,8 +82,8 @@ public class ProjectRepositoryTests extends RepositoryTests {
 		String statement = "MATCH (p:Project {id: $})\n" +
 				"OPTIONAL MATCH (p)-[:CONTAINS]->(a:Allele) WHERE a.deprecated = false WITH p, a\n" +
 				"OPTIONAL MATCH (p)-[:CONTAINS]->(d:Dataset) WHERE d.deprecated = false WITH d, a\n" +
-				"OPTIONAL MATCH (p)-[:CONTAINS]->(pf:Profile) WHERE pf.deprecated = false WITH d, a, pf\n" +
-				"OPTIONAL MATCH (p)-[:CONTAINS]->(i:Isolate) WHERE i.deprecated = false = false WITH d, a, pf, i\n" +
+				"OPTIONAL MATCH (d)-[:CONTAINS]->(pf:Profile) WHERE pf.deprecated = false WITH d, a, pf\n" +
+				"OPTIONAL MATCH (d)-[:CONTAINS]->(i:Isolate) WHERE i.deprecated = false = false WITH d, a, pf, i\n" +
 				"RETURN (COUNT(a) + COUNT(d) + COUNT(pf) + COUNT(i)) <> 0";
 		return query(Boolean.class, new Query(statement, key));
 	}

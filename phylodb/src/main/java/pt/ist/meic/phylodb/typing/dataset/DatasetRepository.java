@@ -7,7 +7,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Map;
 import java.util.UUID;
@@ -24,30 +24,30 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 		if (filters == null || filters.length != 1)
 			return null;
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-				"WHERE p.deprecated = false, d.deprecated = false AND NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+				"WHERE p.deprecated = false AND d.deprecated = false AND NOT EXISTS(r1.to) AND r2.version = h.version\n" +
 				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"WITH p, d, dd, s, t, collect(l) as loci\n" +
+				"WITH p, d, r1, dd, h, s, t, collect(l) as loci\n" +
 				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version, " +
 				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
-				"SKIP $ LIMIT $";
+				"ORDER BY p.id, d.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
 
 	@Override
 	protected Result get(Dataset.PrimaryKey id, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
-		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r1.version = $";
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE r2.version = h.version AND " + where + "\n" +
 				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"WITH p, d, dd, s, t, collect(l) as loci\n" +
+				"WITH p, d, r1, dd, h, s, t, collect(l) as loci\n" +
 				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version, " +
 				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated";
-		return query(new Query(statement, id.getProjectId(), id.getId()));
+		return query(new Query(statement, id.getProjectId(), id.getId(), version));
 	}
 
 	@Override
 	protected Dataset parse(Map<String, Object> row) {
-		Reference<Schema.PrimaryKey> schema = new Reference<>(new Schema.PrimaryKey((String) row.get("taxonId"),
+		Entity<Schema.PrimaryKey> schema = new Entity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
 				(String) row.get("schemaId")),
 				(long) row.get("schemaVersion"),
 				(boolean) row.get("schemaDeprecated"));
@@ -69,14 +69,14 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	@Override
 	protected Result store(Dataset dataset) {
 		String statement = "MATCH (p:Project {id: $})\n" +
-				"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = false, WITH d\n" +
+				"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = false WITH d\n" +
 				"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH d, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (d)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(dd:DatasetDetails {description: $}) WITH dd\n" +
 				"MATCH (s:Schema {id: $})-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
 				"WHERE NOT EXISTS(r.to)\n" +
-				"WITH dd, s, r\n" +
+				"WITH dd, s, r, collect(l) as loci\n" +
 				"CREATE (dd)-[:HAS {version: r.version}]->(s)";
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
 		Query query = new Query(statement, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());

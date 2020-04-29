@@ -45,7 +45,7 @@ public class DatasetController extends Controller<Dataset> {
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getDataset(projectId, datasetId, version), GetDatasetOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getDataset(projectId, datasetId, version), GetDatasetOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
@@ -54,7 +54,7 @@ public class DatasetController extends Controller<Dataset> {
 			@PathVariable("project") UUID projectId,
 			@RequestBody DatasetInputModel input
 	) {
-		return post(() -> input.toDomainEntity(projectId.toString()), service::saveDataset);
+		return post(() -> input.toDomainEntity(projectId.toString()), service::saveDataset, d -> d.getPrimaryKey().getId());
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)

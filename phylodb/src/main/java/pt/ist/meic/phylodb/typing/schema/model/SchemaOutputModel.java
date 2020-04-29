@@ -3,7 +3,7 @@ package pt.ist.meic.phylodb.typing.schema.model;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
@@ -24,7 +24,7 @@ public class SchemaOutputModel implements OutputModel {
 		this.deprecated = dataset.isDeprecated();
 	}
 
-	public SchemaOutputModel(Reference<Schema.PrimaryKey> reference) {
+	public SchemaOutputModel(Entity<Schema.PrimaryKey> reference) {
 		this.taxon_id = reference.getPrimaryKey().getTaxonId();
 		this.id = reference.getPrimaryKey().getId();
 		this.version = reference.getVersion();

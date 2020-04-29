@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
+import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
@@ -37,16 +38,17 @@ public class DatasetService {
 
 	@Transactional
 	public boolean saveDataset(Dataset dataset) {
+		if(dataset == null)
+			return false;
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
 		if (!schemaRepository.exists(schemaKey))
 			return false;
 		Optional<Dataset> dbDataset = datasetRepository.find(dataset.getPrimaryKey(), EntityRepository.CURRENT_VERSION_VALUE);
-		if (!dbDataset.isPresent()) {
-			datasetRepository.save(dataset);
-			return true;
-		} else if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) &&
-				profileRepository.findAll(0, 1, dataset.getPrimaryKey()).get().size() > 0)
-			return false;
+		if (dbDataset.isPresent()) {
+			Optional<List<Profile>> profiles = profileRepository.findAll(0, 1, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId());
+			if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) && profiles.isPresent() && profiles.get().size() > 0)
+				return false;
+		}
 		return datasetRepository.save(dataset).isPresent();
 	}
 

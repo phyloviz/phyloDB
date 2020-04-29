@@ -45,8 +45,8 @@ public abstract class Controller<T extends Entity<?>> {
 		return execute(input, o -> output(map.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
-	protected ResponseEntity<?> post(Supplier<Optional<T>> input, Function<T, Boolean> map) {
-		return execute(input, o -> output(map.apply(o), (UUID) o.getPrimaryKey()), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
+	protected ResponseEntity<?> post(Supplier<Optional<T>> input, Function<T, Boolean> map, Function<T, UUID> id) {
+		return execute(input, o -> output(map.apply(o), id.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
 	public ResponseEntity<?> fileStatus(Getter<Boolean> input) throws IOException {
