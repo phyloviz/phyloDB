@@ -18,8 +18,8 @@ public class GetSchemaOutputModel extends SchemaOutputModel {
 		super(schema);
 		this.type = schema.getType().getName();
 		this.description = schema.getDescription();
-		this.loci = schema.getLociIds().stream()
-				.map(e -> new LocusOutputModel(taxon_id, e))
+		this.loci = schema.getLociReferences().stream()
+				.map(LocusOutputModel::new)
 				.toArray(LocusOutputModel[]::new);
 	}
 

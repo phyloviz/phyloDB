@@ -4,7 +4,6 @@ import pt.ist.meic.phylodb.io.formatters.Formatter;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,9 +27,7 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 	protected boolean init(Iterator<String> it, Object... params) {
 		this.projectId = (UUID) params[0];
 		this.datasetId = (UUID) params[1];
-		this.loci = ((Schema) params[2]).getLociIds().stream()
-				.map(Entity::getPrimaryKey)
-				.count();
+		this.loci = ((Schema) params[2]).getLociIds().size();
 		return true;
 	}
 

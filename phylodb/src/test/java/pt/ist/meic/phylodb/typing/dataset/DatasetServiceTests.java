@@ -48,7 +48,7 @@ public class DatasetServiceTests extends Test {
 	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
 	private static final Locus locus2 = new Locus(taxon.getPrimaryKey(), "2", 1, false, null);
 	private static final Schema schema = new Schema(taxon.getPrimaryKey(), "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey().getId(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey().getId(), locus2.getVersion(), locus2.isDeprecated())));
+			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
 	private static final Entity<Schema.PrimaryKey> schemaReference = new Entity<>(schema.getPrimaryKey(), schema.getVersion(), schema.isDeprecated());
 	private static final Dataset dataset1 = new Dataset(project.getPrimaryKey(), UUID.randomUUID(), 1, false, "name1", schemaReference);
 	private static final Dataset dataset2 = new Dataset(project.getPrimaryKey(), UUID.randomUUID(), 1, false, "name2", schemaReference);

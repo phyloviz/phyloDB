@@ -1,8 +1,8 @@
 package pt.ist.meic.phylodb.typing.profile.model;
 
 import org.apache.logging.log4j.util.Strings;
+import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.utils.service.Entity;
-import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,9 +14,9 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALU
 public class Profile extends Entity<Profile.PrimaryKey> {
 
 	private final String aka;
-	private final List<Reference<String>> allelesIds;
+	private final List<Entity<Allele.PrimaryKey>> allelesIds;
 
-	public Profile(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String aka, List<Reference<String>> allelesIds) {
+	public Profile(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String aka, List<Entity<Allele.PrimaryKey>> allelesIds) {
 		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.aka = aka;
 		this.allelesIds = allelesIds;
@@ -24,7 +24,7 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 
 	public Profile(UUID projectId, UUID datasetId, String id, String aka, String[] allelesIds) {
 		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, aka, Arrays.stream(allelesIds)
-				.map(i -> new Reference<>(i, CURRENT_VERSION_VALUE, false))
+				.map(i -> new Entity<>(new Allele.PrimaryKey(null, null, i), CURRENT_VERSION_VALUE, false))
 				.collect(Collectors.toList()));
 	}
 
@@ -36,13 +36,13 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 		return aka;
 	}
 
-	public List<Reference<String>> getAllelesReferences() {
+	public List<Entity<Allele.PrimaryKey>> getAllelesReferences() {
 		return allelesIds;
 	}
 
 	public List<String> getAllelesIds() {
 		return allelesIds.stream()
-				.map(Entity::getPrimaryKey)
+				.map(e -> e.getPrimaryKey().getId())
 				.collect(Collectors.toList());
 	}
 

@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
+import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
@@ -10,7 +11,10 @@ import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -27,7 +31,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
 				"WHERE s.deprecated = false AND NOT EXISTS(r.to) WITH t, s, r, sd, l, h\n" +
 				"ORDER BY h.part\n" +
-				"WITH t, s, r, sd, collect(DISTINCT {id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
+				"WITH t, s, r, sd, collect(DISTINCT {taxon: t.id, id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
 				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version, " +
 				"sd.description as description, lociIds\n" +
 				"ORDER BY t.id, s.id SKIP $ LIMIT $";
@@ -48,10 +52,11 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 
 	@Override
 	protected Schema parse(Map<String, Object> row) {
-		List<Entity<String>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
-				.map(m -> new Entity<>((String) m.get("id"), (long) m.get("version"), (boolean) m.get("deprecated")))
+		String taxonId = (String) row.get("taxonId");
+		List<Entity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
+				.map(m -> new Entity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")), (long) m.get("version"), (boolean) m.get("deprecated")))
 				.collect(Collectors.toList());
-		return new Schema((String) row.get("taxonId"),
+		return new Schema(taxonId,
 				(String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
@@ -141,9 +146,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	private void composeLoci(Schema schema, Query query) {
-		String[] ids = schema.getLociIds().stream()
-				.map(Entity::getPrimaryKey)
-				.toArray(String[]::new);
+		String[] ids = schema.getLociIds().toArray(new String[0]);
 		for (int i = 0; i < ids.length; i++) {
 			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
 					"WHERE l%s.deprecated = false AND NOT EXISTS(r.to)\n" +

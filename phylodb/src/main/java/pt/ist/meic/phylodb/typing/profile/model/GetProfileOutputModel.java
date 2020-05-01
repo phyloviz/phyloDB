@@ -1,9 +1,8 @@
 package pt.ist.meic.phylodb.typing.profile.model;
 
-import javafx.util.Pair;
+import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleOutputModel;
-import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,14 +16,15 @@ public class GetProfileOutputModel extends ProfileOutputModel {
 	public GetProfileOutputModel() {
 	}
 
-	public GetProfileOutputModel(Pair<Schema, Profile> pair) {
-		super(pair.getValue());
-		this.aka = pair.getValue().getAka();
-		List<Reference<String>> references = pair.getValue().getAllelesReferences();
+	public GetProfileOutputModel(Profile profile) {
+		super(profile);
+		this.aka = profile.getAka();
+		List<Entity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
 		AlleleOutputModel[] alleles = new AlleleOutputModel[references.size()];
 		for (int i = 0; i < references.size(); i++) {
-			alleles[i] = new AlleleOutputModel(pair.getKey().getPrimaryKey().getTaxonId(),
-					pair.getKey().getLociIds().get(i).getPrimaryKey(), references.get(i));
+			Entity<Allele.PrimaryKey> reference = references.get(i);
+			if(reference != null)
+				alleles[i] = new AlleleOutputModel(reference);
 		}
 		this.alleles = alleles;
 	}

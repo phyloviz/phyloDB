@@ -1,11 +1,11 @@
 package pt.ist.meic.phylodb.typing.isolate.model;
 
+import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.profile.model.ProfileOutputModel;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
 public class GetIsolateOutputModel extends IsolateOutputModel {
 
@@ -20,8 +20,8 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 		super(isolate);
 		this.description = isolate.getDescription();
 		this.ancillaries = isolate.getAncillaries();
-		Reference<String> profile = isolate.getProfile();
-		this.profile = new ProfileOutputModel(project_id, dataset_id, isolate.getProfile());
+		Entity<Profile.PrimaryKey> profile = isolate.getProfile();
+		this.profile = new ProfileOutputModel(profile);
 	}
 
 	public String getDescription() {

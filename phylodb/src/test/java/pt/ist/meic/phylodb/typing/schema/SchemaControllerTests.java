@@ -54,9 +54,9 @@ public class SchemaControllerTests extends Test {
 	private static final Locus locus1 = new Locus(taxonId, "1", 1, false, "description");
 	private static final Locus locus2 = new Locus(taxonId, "2", 1, false, null);
 	private static final Schema schema1 = new Schema(taxonId, "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey().getId(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey().getId(), locus2.getVersion(), locus2.isDeprecated())));
+			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
 	private static final Schema schema2 = new Schema(taxonId, "2two", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus2.getPrimaryKey().getId(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey().getId(), locus1.getVersion(), locus1.isDeprecated())));
+			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
 
 	private static Stream<Arguments> getSchemas_params() {
 		String uri = "/taxons/%s/schemas";

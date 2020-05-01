@@ -27,7 +27,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 @RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
 public class AlleleController extends Controller<Allele> {
 
-	@Value("${fasta.length}")
+	@Value("${application.limits.files.fasta.line}")
 	private String lineLength;
 
 	private AlleleService service;

@@ -8,7 +8,6 @@ import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
-import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 
 import java.io.IOException;
@@ -43,7 +42,7 @@ public class IsolateService {
 	public boolean saveIsolate(Isolate isolate) {
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(key.getProjectId(), key.getDatasetId())) || isolate.getProfile() != null &&
-				!profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), isolate.getDatasetId(), isolate.getProfile().getPrimaryKey())))
+				!profileRepository.exists(isolate.getProfile().getPrimaryKey()))
 			return false;
 		return isolateRepository.save(isolate).isPresent();
 	}

@@ -9,7 +9,7 @@ import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -53,14 +53,15 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 
 	@Override
 	protected Isolate parse(Map<String, Object> row) {
-		Reference<String> profile = null;
+		UUID projectId = UUID.fromString(row.get("projectId").toString()), datasetId = UUID.fromString(row.get("datasetId").toString());
+		Entity<Profile.PrimaryKey> profile = null;
 		if(row.get("profileId") != null )
-			profile = new Reference<>((String) row.get("profileId"), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
+			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId,(String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
 		Ancillary[] ancillaries = Arrays.stream((Object[][])row.get("ancillaries"))
 				.map(a -> new Ancillary((String)a[0], (String)a[1]))
 				.toArray(Ancillary[]::new);
-		return new Isolate(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
+		return new Isolate(projectId,
+				datasetId,
 				(String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
@@ -103,7 +104,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	@Override
 	protected void batch(Query query, Isolate isolate) {
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
-		if(isolate.getProfile() != null && profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), key.getDatasetId(), isolate.getProfile().getPrimaryKey()))) {
+		if(isolate.getProfile() != null && profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), key.getDatasetId(), isolate.getProfile().getPrimaryKey().getId()))) {
 			LOG.info(String.format("The %s was not created due to absent profile", isolate.toString()));
 			return;
 		}
@@ -134,7 +135,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"WITH d, p, id, r\n" +
 				"CREATE (id)-[:HAS {version: r.version}]->(p)\n";
-		query.appendQuery(statement).addParameter(isolate.getProfile());
+		query.appendQuery(statement).addParameter(isolate.getProfile().getPrimaryKey().getId());
 	}
 
 	private void composeAncillary(Query query, Isolate isolate) {

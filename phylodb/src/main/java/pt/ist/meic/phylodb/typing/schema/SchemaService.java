@@ -35,12 +35,10 @@ public class SchemaService {
 	public boolean saveSchema(Schema schema) {
 		if(schema == null)
 			return false;
-		Locus.PrimaryKey[] lociKeys = schema.getLociIds().stream()
-				.map(r -> new Locus.PrimaryKey(schema.getPrimaryKey().getTaxonId(), r.getPrimaryKey()))
-				.toArray(Locus.PrimaryKey[]::new);
-		String[] lociIds = schema.getLociIds().stream()
+		Locus.PrimaryKey[] lociKeys = schema.getLociReferences().stream()
 				.map(Entity::getPrimaryKey)
-				.toArray(String[]::new);
+				.toArray(Locus.PrimaryKey[]::new);
+		String[] lociIds = schema.getLociIds().toArray(new String[0]);
 		Optional<Schema> dbSchema = schemaRepository.find(schema.getPrimaryKey().getTaxonId(), schema.getType(), lociIds);
 		if (locusRepository.anyMissing(lociKeys) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))

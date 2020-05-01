@@ -1,7 +1,7 @@
 package pt.ist.meic.phylodb.typing.isolate.model;
 
+import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.service.Entity;
-import pt.ist.meic.phylodb.utils.service.Reference;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -13,9 +13,9 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 
 	private final String description;
 	private final Ancillary[] ancillaries;
-	private final Reference<String> profile;
+	private final Entity<Profile.PrimaryKey> profile;
 
-	public Isolate(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String description, Ancillary[] ancillaries, Reference<String> profile) {
+	public Isolate(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String description, Ancillary[] ancillaries, Entity<Profile.PrimaryKey>  profile) {
 		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.description = description;
 		this.profile = profile;
@@ -24,7 +24,7 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 
 	public Isolate(UUID projectId,UUID datasetId, String id, String description, Ancillary[] ancillaries, String profileId) {
 		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, description, ancillaries,
-				profileId == null ? null : new Reference<>(profileId, CURRENT_VERSION_VALUE, false));
+				profileId == null ? null : new Entity<>(new Profile.PrimaryKey(projectId, datasetId, profileId), CURRENT_VERSION_VALUE, false));
 	}
 
 	public UUID getDatasetId() {
@@ -35,7 +35,7 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 		return description;
 	}
 
-	public Reference<String> getProfile() {
+	public Entity<Profile.PrimaryKey> getProfile() {
 		return profile;
 	}
 

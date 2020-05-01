@@ -24,11 +24,11 @@ public class LocusOutputModel implements OutputModel {
 		this.deprecated = locus.isDeprecated();
 	}
 
-	public LocusOutputModel(String taxonId, Entity<String> e) {
-		this.taxon_id =  taxonId;
-		this.id = e.getPrimaryKey();
-		this.version = e.getVersion();
-		this.deprecated = e.isDeprecated();
+	public LocusOutputModel(Entity<Locus.PrimaryKey> reference) {
+		this.taxon_id =  reference.getPrimaryKey().getTaxonId();
+		this.id = reference.getPrimaryKey().getId();
+		this.version = reference.getVersion();
+		this.deprecated = reference.isDeprecated();
 	}
 
 	public String getTaxon_id() {

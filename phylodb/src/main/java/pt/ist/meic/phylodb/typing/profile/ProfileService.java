@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.io.formatters.dataset.profile.ProfilesFormatter;
-import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
@@ -24,13 +23,11 @@ public class ProfileService {
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;
-	private LocusRepository locusRepository;
 	private SchemaRepository schemaRepository;
 
-	public ProfileService(DatasetRepository datasetRepository, ProfileRepository profileRepository, LocusRepository locusRepository, SchemaRepository schemaRepository) {
+	public ProfileService(DatasetRepository datasetRepository, ProfileRepository profileRepository, SchemaRepository schemaRepository) {
 		this.datasetRepository = datasetRepository;
 		this.profileRepository = profileRepository;
-		this.locusRepository = locusRepository;
 		this.schemaRepository = schemaRepository;
 	}
 
@@ -41,9 +38,8 @@ public class ProfileService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Pair<Schema, Profile>> getProfile(UUID projectId, UUID datasetId, String profileId, Long version) {
-		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version)
-				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
+	public Optional<Profile> getProfile(UUID projectId, UUID datasetId, String profileId, Long version) {
+		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
 	}
 
 	@Transactional

@@ -18,10 +18,10 @@ import java.util.function.Supplier;
 
 public abstract class Controller<T extends Entity<?>> {
 
-	@Value("${jsonLimit}")
+	@Value("${application.limits.pagination.json}")
 	protected String jsonLimit;
 
-	@Value("${fileLimit}")
+	@Value("${application.limits.pagination.file}")
 	protected String fileLimit;
 
 	protected <R> ResponseEntity<?> getAll(String type, Function<Integer, Optional<R>> getter, Function<R, OutputModel> json, Function<R, OutputModel> file) {

@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
+import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
@@ -14,9 +15,9 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 
 	private final Method type;
 	private final String description;
-	private final List<Entity<String>> lociIds;
+	private final List<Entity<Locus.PrimaryKey>> lociIds;
 
-	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<Entity<String>> lociIds) {
+	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<Entity<Locus.PrimaryKey>> lociIds) {
 		super(new PrimaryKey(taxonId, id), version, deprecated);
 		this.type = type;
 		this.description = description;
@@ -25,7 +26,7 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 
 	public Schema(String taxonId, String id, Method type, String description, String[] lociId) {
 		this(taxonId, id, -1, false, type, description, Arrays.stream(lociId)
-				.map(i -> new Entity<>(i, CURRENT_VERSION_VALUE, false))
+				.map(i -> new Entity<>(new Locus.PrimaryKey(taxonId, i), CURRENT_VERSION_VALUE, false))
 				.collect(Collectors.toList()));
 	}
 
@@ -37,8 +38,14 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 		return description;
 	}
 
-	public List<Entity<String>> getLociIds() {
+	public List<Entity<Locus.PrimaryKey>> getLociReferences() {
 		return lociIds;
+	}
+
+	public List<String> getLociIds() {
+		return lociIds.stream()
+				.map(l -> l.getPrimaryKey().getId())
+				.collect(Collectors.toList());
 	}
 
 	@Override

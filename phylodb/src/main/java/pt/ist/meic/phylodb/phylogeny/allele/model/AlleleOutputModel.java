@@ -3,7 +3,7 @@ package pt.ist.meic.phylodb.phylogeny.allele.model;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Reference;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
@@ -26,10 +26,10 @@ public class AlleleOutputModel implements OutputModel {
 		this.deprecated = allele.isDeprecated();
 	}
 
-	public AlleleOutputModel(String taxonId, String locusId, Reference<String> reference) {
-		this.taxon_id = taxonId;
-		this.locus_id = locusId;
-		this.id = reference.getPrimaryKey();
+	public AlleleOutputModel(Entity<Allele.PrimaryKey> reference) {
+		this.taxon_id = reference.getPrimaryKey().getTaxonId();
+		this.locus_id = reference.getPrimaryKey().getLocusId();
+		this.id = reference.getPrimaryKey().getId();
 		this.version = reference.getVersion();
 		this.deprecated = reference.isDeprecated();
 	}

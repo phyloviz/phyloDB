@@ -52,9 +52,9 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
 	private static final Locus locus2 = new Locus(taxon.getPrimaryKey(), "2", 1, false, null);
 	private static final Schema schema1 = new Schema(taxon.getPrimaryKey(), "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey().getId(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey().getId(), locus2.getVersion(), locus2.isDeprecated())));
+			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
 	private static final Schema schema2 = new Schema(taxon.getPrimaryKey(), "2two", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus2.getPrimaryKey().getId(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey().getId(), locus1.getVersion(), locus1.isDeprecated())));
+			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
 	private static final Entity<Schema.PrimaryKey> schema1Reference = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated());
 	private static final Entity<Schema.PrimaryKey> schema2Reference = new Entity<>(schema2.getPrimaryKey(), schema2.getVersion(), schema2.isDeprecated());
 	private static final Dataset dataset1 = new Dataset(project.getPrimaryKey(), UUID.fromString("1023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "name1", schema1Reference);

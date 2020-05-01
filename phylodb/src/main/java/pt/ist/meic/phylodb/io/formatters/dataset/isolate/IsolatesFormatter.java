@@ -69,7 +69,7 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 			for (String header : headers)
 				formatted.append(ancillaries.getOrDefault(header, "")).append('\t');
 			if(isolate.getProfile() != null)
-				formatted.append(isolate.getProfile().getPrimaryKey());
+				formatted.append(isolate.getProfile().getPrimaryKey().getId());
 			else if(!st)
 				formatted.delete(formatted.length() - "\t".length(), formatted.length());
 			formatted.append('\n');
