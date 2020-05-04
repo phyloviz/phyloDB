@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,15 +77,15 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 		execute(new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
-	public boolean anyMissing(Locus.PrimaryKey[] lociKeys) {
-		String parameterized = Arrays.stream(lociKeys).map((i) -> "$").collect(Collectors.joining(","));
+	public boolean anyMissing(List<Entity<Locus.PrimaryKey>> references) {
+		String parameterized = references.stream().map((i) -> "$").collect(Collectors.joining(","));
 		String statement = String.format("MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false AND l.id IN [%s]\n" +
 				"RETURN COUNT(l.id)", parameterized);
 		List<String> params = new ArrayList<>();
-		params.add(lociKeys[0].getTaxonId());
-		params.addAll(Arrays.stream(lociKeys).map(Locus.PrimaryKey::getId).collect(Collectors.toList()));
-		return query(Integer.class, new Query(statement, params.toArray())) != lociKeys.length;
+		params.add(references.get(0).getPrimaryKey().getTaxonId());
+		params.addAll(references.stream().map(r -> r.getPrimaryKey().getId()).collect(Collectors.toList()));
+		return query(Integer.class, new Query(statement, params.toArray())) != references.size();
 	}
 
 }

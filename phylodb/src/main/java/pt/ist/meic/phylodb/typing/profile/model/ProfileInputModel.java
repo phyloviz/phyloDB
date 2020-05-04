@@ -7,9 +7,12 @@ import java.util.UUID;
 
 public class ProfileInputModel implements InputModel<Profile> {
 
-	private final String id;
-	private final String aka;
-	private final String[] alleles;
+	private String id;
+	private String aka;
+	private String[] alleles;
+
+	public ProfileInputModel() {
+	}
 
 	public ProfileInputModel(String id, String aka, String[] alleles) {
 		this.id = id;

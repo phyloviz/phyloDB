@@ -6,12 +6,10 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepository<T, K> {
 
 	public static final String SKIP = "skip", UPDATE = "update";
-	private static final String LOG_MESSAGE = "%s could not be stored.";
 
 	protected BatchRepository(Session session) {
 		super(session);
@@ -23,35 +21,14 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 
 	protected abstract void arrange(Query query, String... params);
 
-	public Optional<QueryStatistics> saveAll(List<T> entities, String flag, String... params) {
-		if (params.length == 0)
+	public Optional<QueryStatistics> saveAll(List<T> entities, String... params) {
+		if (params.length == 0 || entities.size() == 0)
 			return Optional.empty();
 		Query query = init(params);
-		Function<T, Integer> handle = flag.equals(UPDATE) ?
-				(e) -> saveAllOnConflictUpdate(query, e) :
-				(e) -> saveAllOnConflictSkip(query, e);
-		int toExecute = 0;
-		for (T e : entities) {
-			toExecute += handle.apply(e);
-		}
-		if (toExecute == 0)
-			return Optional.empty();
+		for (T e : entities)
+			batch(query, e);
 		arrange(query, params);
 		return Optional.of(execute(query).queryStatistics());
-	}
-
-	private int saveAllOnConflictSkip(Query query, T entity) {
-		if (exists(entity.getPrimaryKey())) {
-			LOG.info(String.format(LOG_MESSAGE, entity.toString()));
-			return 0;
-		}
-		batch(query, entity);
-		return 1;
-	}
-
-	private int saveAllOnConflictUpdate(Query query, T entity) {
-		batch(query, entity);
-		return 1;
 	}
 
 }

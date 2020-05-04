@@ -3,9 +3,7 @@ package pt.ist.meic.phylodb.typing.isolate.model;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
-import java.util.Arrays;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
@@ -41,14 +39,6 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 
 	public Ancillary[] getAncillaries() {
 		return ancillaries;
-	}
-
-	@Override
-	public String toString() {
-		String ancillaries = Arrays.stream(this.ancillaries)
-				.map(Ancillary::toString)
-				.collect(Collectors.joining(","));
-		return String.format("Isolate %s from dataset %s with description %s and ancillary %s", id.getId(), id.getDatasetId(), getDescription(), ancillaries);
 	}
 
 	public static class PrimaryKey {

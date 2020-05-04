@@ -33,7 +33,7 @@ public class IsolateController extends Controller<Isolate> {
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getIsolates(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,

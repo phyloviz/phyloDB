@@ -37,7 +37,7 @@ public class AlleleController extends Controller<Allele> {
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ, required = false)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,

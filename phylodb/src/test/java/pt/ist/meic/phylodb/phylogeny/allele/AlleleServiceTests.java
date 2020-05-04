@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.phylogeny.allele;
 
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -9,8 +10,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.formatters.FastaFormatterTests;
+import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
@@ -18,6 +21,7 @@ import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,11 +69,19 @@ public class AlleleServiceTests extends Test {
 				Arguments.of(state[0].getPrimaryKey(), false));
 	}
 
-	private static Stream<Arguments> saveAll_params() {
+	private static Stream<Arguments> saveAll_params() throws IOException {
 		Locus.PrimaryKey key = new Locus.PrimaryKey(taxonId, locusId);
-		return Stream.of(Arguments.of(key, true, new MockResult().queryStatistics()),
-				Arguments.of(key, true, null),
-				Arguments.of(key, false, null));
+		MultipartFile file = FormatterTests.createFile("fasta", "f-2-a.txt");
+		List<Allele> alleles = Arrays.asList(FastaFormatterTests.alleles("t","l", null, new String[] {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"}));
+		List<Pair<Allele, Boolean>> existsNone = alleles.stream().map(a -> new Pair<>(a, false)).collect(Collectors.toList());
+		List<Pair<Allele, Boolean>> existsAll = alleles.stream().map(a -> new Pair<>(a, true)).collect(Collectors.toList());
+		List<Pair<Allele, Boolean>> existsSome = new ArrayList<>();
+		existsSome.add(new Pair<>(alleles.get(0), true));
+		existsSome.add(new Pair<>(alleles.get(1), false));
+		return Stream.of(Arguments.of(key, file, true, existsNone, new MockResult().queryStatistics()),
+				Arguments.of(key, file, true, existsAll, new MockResult().queryStatistics()),
+				Arguments.of(key, file, true, existsSome, new MockResult().queryStatistics()),
+				Arguments.of(key, file, false, existsSome, null));
 	}
 
 	@BeforeEach
@@ -122,23 +134,26 @@ public class AlleleServiceTests extends Test {
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveAllelesOnConflictSkip(Locus.PrimaryKey key, boolean exists, QueryStatistics expected) throws IOException {
-		Mockito.when(locusRepository.exists(any())).thenReturn(exists);
-		Mockito.when(alleleRepository.saveAll(any(), any(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
-		MockMultipartFile file = new MockMultipartFile("t", "t", "text/plain", new byte[0]);
+	public void saveAllelesOnConflictSkip(Locus.PrimaryKey key, MultipartFile file, boolean locusExists, List<Pair<Allele, Boolean>> canSaves, QueryStatistics expected) throws IOException {
+		Mockito.when(locusRepository.exists(any())).thenReturn(locusExists);
+		for (Pair<Allele, Boolean> canSave : canSaves)
+			Mockito.when(alleleRepository.exists(canSave.getKey().getPrimaryKey())).thenReturn(canSave.getValue());
+		List<Allele> alleles = canSaves.stream().filter(p -> !p.getValue()).map(Pair::getKey).collect(Collectors.toList());
+		Mockito.when(alleleRepository.saveAll(alleles, "t", "l", null)).thenReturn(Optional.ofNullable(expected));
 		boolean result = service.saveAllelesOnConflictSkip(key.getTaxonId(), key.getId(), null, file);
 		assertEquals(expected != null, result);
 	}
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveAllelesOnConflictUpdate(Locus.PrimaryKey key, boolean exists, QueryStatistics expected) throws IOException {
-		Mockito.when(locusRepository.exists(any())).thenReturn(exists);
-		Mockito.when(alleleRepository.saveAll(any(), any(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
-		MockMultipartFile file = new MockMultipartFile("t", "t", "text/plain", new byte[0]);
+	public void saveAllelesOnConflictUpdate(Locus.PrimaryKey key, MultipartFile file, boolean locusExists, List<Pair<Allele, Boolean>> canSaves, QueryStatistics expected) throws IOException {
+		Mockito.when(locusRepository.exists(any())).thenReturn(locusExists);
+		for (Pair<Allele, Boolean> canSave : canSaves)
+			Mockito.when(alleleRepository.exists(canSave.getKey().getPrimaryKey())).thenReturn(canSave.getValue());
+		List<Allele> alleles = canSaves.stream().map(Pair::getKey).collect(Collectors.toList());
+		Mockito.when(alleleRepository.saveAll(alleles, "t", "l", null)).thenReturn(Optional.ofNullable(expected));
 		boolean result = service.saveAllelesOnConflictUpdate(key.getTaxonId(), key.getId(), null, file);
 		assertEquals(expected != null, result);
-
 	}
 
 }

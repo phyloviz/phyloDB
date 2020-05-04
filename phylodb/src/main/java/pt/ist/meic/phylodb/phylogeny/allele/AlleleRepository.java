@@ -6,11 +6,9 @@ import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey> {
@@ -136,6 +134,30 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 				"WITH " + with + ", COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (a)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ad:AlleleDetails {sequence: $}) ";
 		query.appendQuery(statement).addParameter(allele.getPrimaryKey().getId(), allele.getSequence());
+	}
+
+	public boolean anyMissing(List<Entity<Allele.PrimaryKey>> references) {
+		Optional<Entity<Allele.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
+		if(!optional.isPresent())
+			return true;
+		String taxon = optional.get().getPrimaryKey().getTaxonId();
+		Query query = new Query("MATCH (t:Taxon {id: $}) WITH t, 0 as c\n", taxon);
+		for (Entity<Allele.PrimaryKey> reference : references) {
+			if (reference == null)
+				continue;
+			String where = "NOT (a)<-[:CONTAINS]-(:Project)";
+			List<Object> params = new ArrayList<Object>() {{ add(reference.getPrimaryKey().getLocusId()); add(reference.getPrimaryKey().getId()); }};
+			if (reference.getPrimaryKey().getProject() != null) {
+				where = "(a)<-[:CONTAINS]-(:Project {id: $})";
+				params.add(reference.getPrimaryKey().getProject());
+			}
+			query.appendQuery("OPTIONAL MATCH (t)-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})\n" +
+					"WHERE " + where + "\n" +
+					"WITH t, c + COALESCE(COUNT(a.id), 0) as c\n")
+					.addParameter(params.toArray());
+		}
+		query.appendQuery("RETURN c");
+		return query(Integer.class, query) != references.stream().filter(Objects::nonNull).count() ;
 	}
 
 }

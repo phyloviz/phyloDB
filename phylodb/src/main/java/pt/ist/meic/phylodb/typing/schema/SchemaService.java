@@ -3,9 +3,7 @@ package pt.ist.meic.phylodb.typing.schema;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,12 +33,9 @@ public class SchemaService {
 	public boolean saveSchema(Schema schema) {
 		if(schema == null)
 			return false;
-		Locus.PrimaryKey[] lociKeys = schema.getLociReferences().stream()
-				.map(Entity::getPrimaryKey)
-				.toArray(Locus.PrimaryKey[]::new);
 		String[] lociIds = schema.getLociIds().toArray(new String[0]);
 		Optional<Schema> dbSchema = schemaRepository.find(schema.getPrimaryKey().getTaxonId(), schema.getType(), lociIds);
-		if (locusRepository.anyMissing(lociKeys) ||
+		if (locusRepository.anyMissing(schema.getLociReferences()) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
 			return false;
 		return schemaRepository.save(schema).isPresent();

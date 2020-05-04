@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class AlleleService {
@@ -60,9 +62,11 @@ public class AlleleService {
 	private boolean saveAll(String taxonId, String locusId, UUID project, String conflict, MultipartFile file) throws IOException {
 		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
 			return false;
-		List<Allele> alleles = new FastaFormatter().parse(file, taxonId, locusId, project);
-		String p = project != null ? project.toString() : null;
-		return alleleRepository.saveAll(alleles, conflict, taxonId, locusId, p).isPresent();
+		Predicate<Allele> canSave = conflict.equals(BatchRepository.UPDATE) ? a -> true : a -> !alleleRepository.exists(a.getPrimaryKey());
+		List<Allele> alleles = new FastaFormatter().parse(file, taxonId, locusId, project).stream()
+				.filter(canSave)
+				.collect(Collectors.toList());
+		return alleleRepository.saveAll(alleles, taxonId, locusId, project != null ? project.toString() : null).isPresent();
 	}
 
 }

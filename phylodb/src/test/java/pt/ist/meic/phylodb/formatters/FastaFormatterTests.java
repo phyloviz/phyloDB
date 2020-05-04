@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FastaFormatterTests extends FormatterTests {
 
-	protected static Allele[] alleles(String taxon, String locus, UUID project, String[] sequences) {
+	public static Allele[] alleles(String taxon, String locus, UUID project, String[] sequences) {
 		return IntStream.range(0, sequences.length)
 				.filter(i -> sequences[i] != null)
 				.mapToObj(i -> new Allele(taxon, locus, "nusA_" + (i + 1), sequences[i], project))

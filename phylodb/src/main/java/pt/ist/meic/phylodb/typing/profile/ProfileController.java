@@ -33,7 +33,7 @@ public class ProfileController extends Controller<Profile> {
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getProfiles(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
@@ -53,7 +53,7 @@ public class ProfileController extends Controller<Profile> {
 			@PathVariable("profile") String profileId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getProfile(projectId, datasetId, profileId, version), GetProfileOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getProfile(projectId, datasetId, profileId, version), GetProfileOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
@@ -62,29 +62,32 @@ public class ProfileController extends Controller<Profile> {
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("profile") String profileId,
+			@RequestParam(value = "private_alleles", defaultValue = "false") boolean authorized,
 			@RequestBody ProfileInputModel input
 	) {
-		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), profileId), service::saveProfile);
+		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), profileId), p -> service.saveProfile(p, authorized));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
-	@PostMapping(path = "")
+	@PostMapping(path = "/files")
 	public ResponseEntity<?> postProfiles(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@RequestBody MultipartFile file
+			@RequestParam(value = "private_alleles", defaultValue = "false") boolean authorized,
+			@RequestParam("file") MultipartFile file
 	) throws IOException {
-		return fileStatus(() -> service.saveProfilesOnConflictSkip(projectId, datasetId, file));
+		return fileStatus(() -> service.saveProfilesOnConflictSkip(projectId, datasetId, authorized, file));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
-	@PutMapping(path = "")
+	@PutMapping(path = "/files")
 	public ResponseEntity<?> putProfiles(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@RequestBody MultipartFile file
+			@RequestParam(value = "private_alleles", defaultValue = "false") boolean authorized,
+			@RequestParam("file") MultipartFile file
 	) throws IOException {
-		return fileStatus(() -> service.saveProfilesOnConflictUpdate(projectId, datasetId, file));
+		return fileStatus(() -> service.saveProfilesOnConflictUpdate(projectId, datasetId, authorized, file));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)

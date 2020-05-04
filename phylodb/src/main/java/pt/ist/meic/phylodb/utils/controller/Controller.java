@@ -25,11 +25,11 @@ public abstract class Controller<T extends Entity<?>> {
 	protected String fileLimit;
 
 	protected <R> ResponseEntity<?> getAll(String type, Function<Integer, Optional<R>> getter, Function<R, OutputModel> json, Function<R, OutputModel> file) {
-		int limit = Integer.parseInt(fileLimit);
-		Function<R, OutputModel> result = file;
-		if (type.equals(MediaType.APPLICATION_JSON_VALUE)) {
-			limit = Integer.parseInt(jsonLimit);
-			result = json;
+		int limit = Integer.parseInt(jsonLimit);
+		Function<R, OutputModel> result = json;
+		if (type.equals(MediaType.TEXT_PLAIN_VALUE)) {
+			limit = Integer.parseInt(fileLimit);
+			result = file;
 		}
 		return getter.apply(limit)
 				.map(result)

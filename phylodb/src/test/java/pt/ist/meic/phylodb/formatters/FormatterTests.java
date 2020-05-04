@@ -14,14 +14,15 @@ import java.util.stream.Collectors;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FormatterTests {
 
-	protected String readFile(String path, String filename) throws IOException {
-		path = Paths.get("src", "test", "java", "resources", "formatters").toFile().getAbsolutePath() + "/" + path;
-		return Files.lines(Paths.get(path + "/" + filename)).collect(Collectors.joining("\n"));
-	}
-
-	protected MultipartFile createFile(String path, String filename) throws IOException {
+	public static MultipartFile createFile(String path, String filename) throws IOException {
 		path = Paths.get("src", "test", "java", "resources", "formatters").toFile().getAbsolutePath() + "/" + path;
 		byte[] bytes = Files.readAllBytes(Paths.get(path + "/" + filename));
 		return new MockMultipartFile(filename, filename, "text/plain", bytes);
 	}
+
+	protected static String readFile(String path, String filename) throws IOException {
+		path = Paths.get("src", "test", "java", "resources", "formatters").toFile().getAbsolutePath() + "/" + path;
+		return Files.lines(Paths.get(path + "/" + filename)).collect(Collectors.joining("\n"));
+	}
+
 }

@@ -33,64 +33,74 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 
 	private static Stream<Arguments> nonemptyListParams() {
 		UUID project = UUID.randomUUID(), dataset = UUID.randomUUID();
-		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
+		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		String[][] alleles = {{"1", "1", "1", "1", "1"}};
 		String[][] alleles1 = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}};
 		String[][] alleles2 = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}, {"3", "1", "1", "4", "4"}};
-		String[][] alleles3 = {{"1", "", "1", "1", "1"}, {"4", "1", "1", "3", "3"}, {"3", "1", "b", "4", "4"}, {"4", "1", "1", "2", "3"}};
-		return Stream.of(Arguments.of(project, dataset, fileSchema, "ml-h-d-1.txt", profiles(project, dataset, alleles)),
-				Arguments.of(project, dataset, fileSchema, "ml-d-1.txt", profiles(project, dataset, alleles)),
-				Arguments.of(project, dataset, fileSchema, "ml-h-d-2.txt", profiles(project, dataset, alleles1)),
-				Arguments.of(project, dataset, fileSchema, "ml-d-3.txt", profiles(project, dataset, alleles2)),
-				Arguments.of(project, dataset, fileSchema, "ml-h-a-4.txt", profiles(project, dataset, alleles3)));
+		String[][] alleles3 = {{"1", null, "1", "1", "1"}, {"4", "1", "1", "3", "3"}, {"3", "1", "b", "4", "4"}, {"4", "1", "1", "2", "3"}};
+		return Stream.of(Arguments.of(project, dataset, schema, "ml-h-d-1.txt", profiles(project, dataset, schema, alleles, true), true),
+				Arguments.of(project, dataset, schema, "ml-d-1.txt", profiles(project, dataset, schema, alleles, true), true),
+				Arguments.of(project, dataset, schema, "ml-h-d-2.txt", profiles(project, dataset, schema, alleles1, false), false),
+				Arguments.of(project, dataset, schema, "ml-d-3.txt", profiles(project, dataset, schema, alleles2, true), true),
+				Arguments.of(project, dataset, schema, "ml-h-a-4.txt", profiles(project, dataset, schema, alleles3, false), false));
 	}
 
 	@ParameterizedTest
 	@MethodSource("emptyListParams")
 	public void parse_emptyList(UUID project, UUID dataset, Schema schema, String filename) throws IOException {
 		MlFormatter formatter = new MlFormatter();
-		List<Profile> profiles = formatter.parse(createFile("ml", filename), project, dataset, schema);
+		List<Profile> profiles = formatter.parse(createFile("ml", filename), project, dataset, schema, " ", false);
 		assertEquals(0, profiles.size());
 	}
 
 	@ParameterizedTest
 	@MethodSource("nonemptyListParams")
-	public void parse_nonemptyList(UUID project, UUID dataset, Schema schema, String filename, Profile[] expected) throws IOException {
+	public void parse_nonemptyList(UUID project, UUID dataset, Schema schema, String filename, Profile[] expected, boolean authorized) throws IOException {
 		MlFormatter formatter = new MlFormatter();
-		List<Profile> profiles = formatter.parse(createFile("ml", filename), project, dataset, schema);
+		List<Profile> profiles = formatter.parse(createFile("ml", filename), project, dataset, schema, " ", authorized);
 		assertEquals(expected.length, profiles.size());
 		for (int i = 0; i < profiles.size(); i++) {
 			assertEquals(expected[i].getPrimaryKey().getId(), profiles.get(i).getPrimaryKey().getId());
-			assertEquals(expected[i].getAllelesIds(), profiles.get(i).getAllelesIds());
+			assertEquals(expected[i].getAllelesReferences(), profiles.get(i).getAllelesReferences());
 		}
 	}
 
 	@Test
 	public void format_fileWithHeaders() throws IOException {
-		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
+		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		MlFormatter formatter = new MlFormatter();
 		String expected = readFile("ml", "ml-h-d-0.txt");
-		String formatted = formatter.format(Lists.emptyList(), fileSchema);
+		String formatted = formatter.format(Lists.emptyList(), schema);
 		assertEquals(expected, formatted);
 	}
 
 	@Test
 	public void format_fileWithHeadersAndProfile() throws IOException {
-		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
+		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		MlFormatter formatter = new MlFormatter();
 		String[][] alleles = {{"1", "1", "1", "1", "1"}};
 		String expected = readFile("ml", "ml-h-d-1.txt");
-		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), alleles)), fileSchema);
+		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), schema, alleles, false)), schema);
 		assertEquals(expected, formatted);
 	}
 
 	@Test
 	public void format_fileWithHeadersAndProfiles() throws IOException {
-		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
+		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		MlFormatter formatter = new MlFormatter();
 		String[][] alleles = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}};
 		String expected = readFile("ml", "ml-h-d-2.txt");
-		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), alleles)), fileSchema);
+		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), schema, alleles, false)), schema);
+		assertEquals(expected, formatted);
+	}
+
+	@Test
+	public void format_fileWithHeadersAndProfilesWithMissingAlleles() throws IOException {
+		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
+		MlFormatter formatter = new MlFormatter();
+		String[][] alleles = {{"1", "1", "1", "1", null}, {null, "1", null, "3", "3"}};
+		String expected = readFile("ml", "ml-h-d-2-m.txt");
+		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), schema, alleles, false)), schema);
 		assertEquals(expected, formatted);
 	}
 

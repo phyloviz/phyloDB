@@ -11,8 +11,11 @@ import pt.ist.meic.phylodb.RepositoryTests;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -149,10 +152,20 @@ public class LocusRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
-		return Stream.of(Arguments.of(new Locus.PrimaryKey[] {state[0].getPrimaryKey()}, false),
-				Arguments.of(new Locus.PrimaryKey[] {state[0].getPrimaryKey(), state[1].getPrimaryKey()}, false),
-				Arguments.of(new Locus.PrimaryKey[] {state[0].getPrimaryKey(), new Locus.PrimaryKey("not", "not")}, true),
-				Arguments.of(new Locus.PrimaryKey[] {new Locus.PrimaryKey("not", "not")}, true));
+		List<Entity<Locus.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(), references3 = new ArrayList<>(), references4 = new ArrayList<>();
+		Entity<Locus.PrimaryKey> reference1 = new Entity<>(new Locus.PrimaryKey(taxon.getPrimaryKey(), state[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
+				reference2 = new Entity<>(new Locus.PrimaryKey(taxon.getPrimaryKey(), state[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
+				notReference = new Entity<>(new Locus.PrimaryKey("not", "not"), EntityRepository.CURRENT_VERSION_VALUE, false);
+		references1.add(reference1);
+		references2.add(reference1);
+		references2.add(reference2);
+		references3.add(reference1);
+		references3.add(notReference);
+		references4.add(notReference);
+		return Stream.of(Arguments.of(references1, false),
+				Arguments.of(references2, false),
+				Arguments.of(references3, true),
+				Arguments.of(references4, true));
 	}
 
 	@BeforeEach
@@ -226,9 +239,9 @@ public class LocusRepositoryTests extends RepositoryTests {
 
 	@ParameterizedTest
 	@MethodSource("anyMissing_params")
-	public void anyMissing(Locus.PrimaryKey[] keys, boolean expected) {
+	public void anyMissing(List<Entity<Locus.PrimaryKey>> references, boolean expected) {
 		store(LocusRepositoryTests.state);
-		boolean result = locusRepository.anyMissing(keys);
+		boolean result = locusRepository.anyMissing(references);
 		assertEquals(expected, result);
 	}
 

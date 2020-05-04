@@ -30,11 +30,6 @@ public class ExceptionHandlerAdvice {
 		return handle(ex, Problem.NOT_ACCEPTABLE);
 	}
 
-	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-	public final ResponseEntity<ErrorOutputModel> handle(MethodArgumentTypeMismatchException ex) {
-		return handle(ex, Problem.PARAMETER_TYPE);
-	}
-
 	@ExceptionHandler(BindException.class)
 	public final ResponseEntity<ErrorOutputModel> handle(BindException ex) {
 		return handle(ex, Problem.BODY_TYPE);
@@ -45,8 +40,13 @@ public class ExceptionHandlerAdvice {
 		return handle(ex, Problem.NOT_ALLOWED);
 	}
 
-	@ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class,
-			MissingServletRequestPartException.class, MultipartException.class})
+	@ExceptionHandler({
+			HttpMessageNotReadableException.class,
+			MissingServletRequestParameterException.class,
+			MissingServletRequestPartException.class,
+			MultipartException.class,
+			MethodArgumentTypeMismatchException.class
+	})
 	public final ResponseEntity<ErrorOutputModel> handle400(Exception ex) {
 		return handle(ex, Problem.BAD_REQUEST);
 	}

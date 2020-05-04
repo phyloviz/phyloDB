@@ -31,11 +31,6 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 	}
 
 	@Override
-	public String toString() {
-		return String.format("Allele %s from locus %s of taxon %s with sequence %s", id.getId(), id.getLocusId(), id.getTaxonId(), sequence);
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
