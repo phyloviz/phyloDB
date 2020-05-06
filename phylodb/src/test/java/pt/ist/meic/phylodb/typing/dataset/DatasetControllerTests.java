@@ -50,19 +50,20 @@ public class DatasetControllerTests extends Test {
 	@Autowired
 	private MockHttp http;
 
-
 	private static Stream<Arguments> getDatasets_params() {
 		String uri = "/projects/%s/datasets";
 		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
 		Entity<Schema.PrimaryKey> schemaReference = new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false);
 		Dataset dataset = new Dataset(projectId, datasetId, 1, false, "name1", schemaReference);
-		List<Dataset> datasets = new ArrayList<Dataset>() {{add(dataset);}};
+		List<Dataset> datasets = new ArrayList<Dataset>() {{
+			add(dataset);
+		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId)).param("page", "0"),
 				req2 = get(String.format(uri, projectId)), req3 = get(String.format(uri, projectId)).param("page", "-10");
 		List<DatasetOutputModel> result = datasets.stream()
 				.map(DatasetOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, datasets, HttpStatus.OK, result,  null),
+		return Stream.of(Arguments.of(req1, datasets, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req2, datasets, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
@@ -87,7 +88,7 @@ public class DatasetControllerTests extends Test {
 		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, projectId, datasetId));
 		DatasetInputModel input1 = new DatasetInputModel(datasetId, "description", "t", "x"),
-			input2 = new DatasetInputModel(UUID.randomUUID(), null, null, "x");
+				input2 = new DatasetInputModel(UUID.randomUUID(), null, null, "x");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -115,7 +116,7 @@ public class DatasetControllerTests extends Test {
 	}
 
 	@BeforeEach
-	public void init(){
+	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
@@ -127,10 +128,10 @@ public class DatasetControllerTests extends Test {
 		Mockito.when(service.getDatasets(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(datasets));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
 			assertEquals(expectedResult.size(), parsed.size());
-			if(expectedResult.size() > 0) {
+			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getId().toString(), p.get("id"));
@@ -149,7 +150,7 @@ public class DatasetControllerTests extends Test {
 		Mockito.when(service.getDataset(any(), any(), anyLong())).thenReturn(Optional.ofNullable(dataset));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful())
 			assertEquals(expectedResult, http.parseResult(GetDatasetOutputModel.class, result));
 		else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -161,7 +162,7 @@ public class DatasetControllerTests extends Test {
 		Mockito.when(service.saveDataset(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -171,11 +172,10 @@ public class DatasetControllerTests extends Test {
 		Mockito.when(service.saveDataset(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			CreatedOutputModel parsed = http.parseResult(CreatedOutputModel.class, result);
 			assertNotNull(parsed.getId());
-		}
-		else if(expectedStatus.is4xxClientError())
+		} else if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -185,7 +185,7 @@ public class DatasetControllerTests extends Test {
 		Mockito.when(service.deleteDataset(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

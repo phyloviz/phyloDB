@@ -26,6 +26,12 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class ProjectServiceTests extends Test {
 
+	private static final int LIMIT = 2;
+	private static final User user1 = new User("1one", "one", 1, false, Role.USER);
+	private static final User user2 = new User("2two", "two", 1, false, Role.USER);
+	private static final Project[] state = new Project[]{new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
+			new Project(UUID.fromString("26d20a45-470a-4336-81ab-ed057d3f5d66"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user2.getPrimaryKey()}),
+			new Project(UUID.fromString("3f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "private1", "public", null, new User.PrimaryKey[]{user2.getPrimaryKey()})};
 	@MockBean
 	private UserRepository userRepository;
 	@MockBean
@@ -33,16 +39,14 @@ public class ProjectServiceTests extends Test {
 	@InjectMocks
 	private ProjectService service;
 
-	private static final int LIMIT = 2;
-	private static final User user1 = new User("1one", "one", 1, false, Role.USER);
-	private static final User user2 = new User("2two", "two", 1, false, Role.USER);
-	private static final Project[] state = new Project[] {new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-			new Project(UUID.fromString("26d20a45-470a-4336-81ab-ed057d3f5d66"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user2.getPrimaryKey()}),
-			new Project(UUID.fromString("3f809af7-2c99-43f7-b674-4843c77384c7"), 1, false,"private1", "public", null, new User.PrimaryKey[]{user2.getPrimaryKey()})};
-
 	private static Stream<Arguments> getProjects_params() {
-		List<Project> expected1 = new ArrayList<Project>() {{ add(state[0]); }};
-		List<Project> expected2 = new ArrayList<Project>() {{ add(state[0]); add(state[1]); }};
+		List<Project> expected1 = new ArrayList<Project>() {{
+			add(state[0]);
+		}};
+		List<Project> expected2 = new ArrayList<Project>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -75,7 +79,7 @@ public class ProjectServiceTests extends Test {
 	public void getProjects(int page, List<Project> expected) {
 		Mockito.when(projectRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Project>> result = service.getProjects(user1.getPrimaryKey(), page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

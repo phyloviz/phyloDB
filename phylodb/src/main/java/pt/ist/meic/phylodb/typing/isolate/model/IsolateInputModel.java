@@ -8,16 +8,19 @@ import java.util.UUID;
 
 public class IsolateInputModel implements InputModel<Isolate> {
 
-	private final String id;
-	private final String description;
-	private final String profileId;
-	private final Ancillary[] ancillaries;
+	private String id;
+	private String description;
+	private String profileId;
+	private Ancillary[] ancillaries;
 
-	public IsolateInputModel(String id, String description, String profileId, Ancillary[] ancillaries) {
+	public IsolateInputModel() {
+	}
+
+	public IsolateInputModel(String id, String description, Ancillary[] ancillaries, String profileId) {
 		this.id = id;
 		this.description = description;
-		this.profileId = profileId;
 		this.ancillaries = ancillaries;
+		this.profileId = profileId;
 	}
 
 	public String getId() {
@@ -28,19 +31,22 @@ public class IsolateInputModel implements InputModel<Isolate> {
 		return description;
 	}
 
-	public String getProfileId() {
-		return profileId;
-	}
-
 	public Ancillary[] getAncillaries() {
 		return ancillaries;
+	}
+
+	public String getProfileId() {
+		return profileId;
 	}
 
 	@Override
 	public Optional<Isolate> toDomainEntity(String... params) {
 		if (!params[2].equals(id)) return Optional.empty();
-		Ancillary[] ancillaries = this.ancillaries == null ? new Ancillary[0] : this.ancillaries;
-		return Optional.of(new Isolate(UUID.fromString(params[0]), UUID.fromString(params[1]), id, description, (Ancillary[]) Arrays.stream(ancillaries).distinct().toArray(), profileId));
+		Ancillary[] ancillaries = this.ancillaries == null ? new Ancillary[0] : Arrays.stream(this.ancillaries)
+				.filter(a -> a.getKey() != null && a.getValue() != null)
+				.distinct()
+				.toArray(Ancillary[]::new);
+		return Optional.of(new Isolate(UUID.fromString(params[0]), UUID.fromString(params[1]), id, description, ancillaries, profileId));
 	}
 
 }

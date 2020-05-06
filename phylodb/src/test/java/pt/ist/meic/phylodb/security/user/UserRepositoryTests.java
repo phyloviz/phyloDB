@@ -22,44 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserRepositoryTests extends RepositoryTests {
 
-	@Autowired
-	private UserRepository repository;
-
 	private static final int LIMIT = 2;
 	private static final User first = new User("1one", "one", 1, false, Role.USER);
 	private static final User second = new User("2two", "two", 1, false, Role.USER);
 	private static final User[] state = new User[]{first, second};
-
-	private void store(User[] users) {
-		for (User user : users) {
-			String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = $ WITH u\n" +
-					"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-					"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
-					"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
-			execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.isDeprecated(), user.getRole().getName()));
-		}
-	}
-
-	private User parse(Map<String, Object> row) {
-		return new User((String) row.get("id"),
-				(String) row.get("provider"),
-				(Long) row.get("version"),
-				(boolean) row.get("deprecated"),
-				Role.valueOf(((String) row.get("role")).toUpperCase()));
-	}
-
-	private User[] findAll() {
-		String statement = "MATCH (u:User)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
-				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
-				"ud.role as role\n" +
-				"ORDER BY id, version";
-		Result result = query(new Query(statement));
-		if (result == null) return new User[0];
-		return StreamSupport.stream(result.spliterator(), false)
-				.map(this::parse)
-				.toArray(User[]::new);
-	}
+	@Autowired
+	private UserRepository repository;
 
 	private static Stream<Arguments> findAll_params() {
 		String email1 = "3test", provider1 = "3test", email3 = "5test", provider3 = "5provider";
@@ -132,10 +100,41 @@ public class UserRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
-		return Stream.of(Arguments.of(new User.PrimaryKey[] {state[0].getPrimaryKey()}, false),
-				Arguments.of(new User.PrimaryKey[] {state[0].getPrimaryKey(), state[1].getPrimaryKey()}, false),
-				Arguments.of(new User.PrimaryKey[] {state[0].getPrimaryKey(), new User.PrimaryKey("not", "not")}, true),
-				Arguments.of(new User.PrimaryKey[] {new User.PrimaryKey("not", "not")}, true));
+		return Stream.of(Arguments.of(new User.PrimaryKey[]{state[0].getPrimaryKey()}, false),
+				Arguments.of(new User.PrimaryKey[]{state[0].getPrimaryKey(), state[1].getPrimaryKey()}, false),
+				Arguments.of(new User.PrimaryKey[]{state[0].getPrimaryKey(), new User.PrimaryKey("not", "not")}, true),
+				Arguments.of(new User.PrimaryKey[]{new User.PrimaryKey("not", "not")}, true));
+	}
+
+	private void store(User[] users) {
+		for (User user : users) {
+			String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = $ WITH u\n" +
+					"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
+					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+					"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
+			execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.isDeprecated(), user.getRole().getName()));
+		}
+	}
+
+	private User parse(Map<String, Object> row) {
+		return new User((String) row.get("id"),
+				(String) row.get("provider"),
+				(Long) row.get("version"),
+				(boolean) row.get("deprecated"),
+				Role.valueOf(((String) row.get("role")).toUpperCase()));
+	}
+
+	private User[] findAll() {
+		String statement = "MATCH (u:User)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
+				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
+				"ud.role as role\n" +
+				"ORDER BY id, version";
+		Result result = query(new Query(statement));
+		if (result == null) return new User[0];
+		return StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.toArray(User[]::new);
 	}
 
 	@ParameterizedTest
@@ -149,7 +148,7 @@ public class UserRepositoryTests extends RepositoryTests {
 		}
 		assertTrue(result.isPresent());
 		List<User> users = result.get();
-		assertEquals(expected.length,  users.size());
+		assertEquals(expected.length, users.size());
 		assertArrayEquals(expected, users.toArray());
 	}
 
@@ -180,7 +179,7 @@ public class UserRepositoryTests extends RepositoryTests {
 		store(state);
 		Optional<QueryStatistics> result = repository.save(user);
 		User[] stateResult = findAll();
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());

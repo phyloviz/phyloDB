@@ -26,24 +26,26 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class LocusServiceTests extends Test {
 
-	@MockBean
-	private TaxonRepository taxonRepository;
-
-	@MockBean
-	private LocusRepository locusRepository;
-
-	@InjectMocks
-	private LocusService service;
-
 	private static final int LIMIT = 2;
 	private static final Taxon taxon = new Taxon("t", 1, false, null);
 	private static final Locus first = new Locus(taxon.getPrimaryKey(), "1one", 1, false, "description");
 	private static final Locus second = new Locus(taxon.getPrimaryKey(), "2two", 1, false, null);
 	private static final Locus[] state = new Locus[]{first, second};
+	@MockBean
+	private TaxonRepository taxonRepository;
+	@MockBean
+	private LocusRepository locusRepository;
+	@InjectMocks
+	private LocusService service;
 
 	private static Stream<Arguments> getLoci_params() {
-		List<Locus> expected1 = new ArrayList<Locus>() {{ add(state[0]); }};
-		List<Locus> expected2 = new ArrayList<Locus>() {{ add(state[0]); add(state[1]); }};
+		List<Locus> expected1 = new ArrayList<Locus>() {{
+			add(state[0]);
+		}};
+		List<Locus> expected2 = new ArrayList<Locus>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -77,7 +79,7 @@ public class LocusServiceTests extends Test {
 	public void getLoci(int page, List<Locus> expected) {
 		Mockito.when(locusRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Locus>> result = service.getLoci(taxon.getPrimaryKey(), page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

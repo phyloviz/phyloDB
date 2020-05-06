@@ -28,7 +28,7 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 	protected static List<String> formatAlleles(List<Entity<Allele.PrimaryKey>> alleles) {
 		List<String> output = new ArrayList<>();
 		for (Entity<Allele.PrimaryKey> allele : alleles) {
-			if(allele == null)
+			if (allele == null)
 				output.add(" ");
 			else
 				output.add(allele.getPrimaryKey().getId());

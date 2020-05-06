@@ -38,7 +38,7 @@ public class DatasetService {
 
 	@Transactional
 	public boolean saveDataset(Dataset dataset) {
-		if(dataset == null)
+		if (dataset == null)
 			return false;
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
 		if (!schemaRepository.exists(schemaKey))

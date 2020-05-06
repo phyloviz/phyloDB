@@ -23,7 +23,7 @@ public class GetProfileOutputModel extends ProfileOutputModel {
 		AlleleOutputModel[] alleles = new AlleleOutputModel[references.size()];
 		for (int i = 0; i < references.size(); i++) {
 			Entity<Allele.PrimaryKey> reference = references.get(i);
-			if(reference != null)
+			if (reference != null)
 				alleles[i] = new AlleleOutputModel(reference);
 		}
 		this.alleles = alleles;

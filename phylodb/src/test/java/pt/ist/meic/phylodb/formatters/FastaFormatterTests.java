@@ -90,4 +90,5 @@ public class FastaFormatterTests extends FormatterTests {
 		String formatted = formatter.format(Arrays.asList(alleles("taxon", "locus", UUID.randomUUID(), alleles)), 17);
 		assertEquals(expected, formatted);
 	}
+
 }

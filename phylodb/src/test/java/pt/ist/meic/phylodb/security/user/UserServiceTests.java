@@ -25,20 +25,23 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class UserServiceTests extends Test {
 
-	@MockBean
-	private UserRepository repository;
-
-	@InjectMocks
-	private UserService service;
-
 	private static final int LIMIT = 2;
 	private static final User first = new User("1one", "one", 1, false, Role.USER);
 	private static final User second = new User("2two", "two", 1, false, Role.USER);
 	private static final User[] state = new User[]{first, second};
+	@MockBean
+	private UserRepository repository;
+	@InjectMocks
+	private UserService service;
 
 	private static Stream<Arguments> getUsers_params() {
-		List<User> expected1 = new ArrayList<User>() {{ add(state[0]); }};
-		List<User> expected2 = new ArrayList<User>() {{ add(state[0]); add(state[1]); }};
+		List<User> expected1 = new ArrayList<User>() {{
+			add(state[0]);
+		}};
+		List<User> expected2 = new ArrayList<User>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -77,7 +80,7 @@ public class UserServiceTests extends Test {
 	public void getUsers(int page, List<User> expected) {
 		Mockito.when(repository.findAll(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<User>> result = service.getUsers(page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

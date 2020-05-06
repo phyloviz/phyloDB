@@ -25,7 +25,7 @@ public class LocusOutputModel implements OutputModel {
 	}
 
 	public LocusOutputModel(Entity<Locus.PrimaryKey> reference) {
-		this.taxon_id =  reference.getPrimaryKey().getTaxonId();
+		this.taxon_id = reference.getPrimaryKey().getTaxonId();
 		this.id = reference.getPrimaryKey().getId();
 		this.version = reference.getVersion();
 		this.deprecated = reference.isDeprecated();

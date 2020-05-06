@@ -21,7 +21,8 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 		this.description = isolate.getDescription();
 		this.ancillaries = isolate.getAncillaries();
 		Entity<Profile.PrimaryKey> profile = isolate.getProfile();
-		this.profile = new ProfileOutputModel(profile);
+		if(isolate.getProfile() != null)
+			this.profile = new ProfileOutputModel(profile);
 	}
 
 	public String getDescription() {
@@ -32,7 +33,7 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 		return ancillaries;
 	}
 
-	public ProfileOutputModel getProfile_id() {
+	public ProfileOutputModel getProfile() {
 		return profile;
 	}
 

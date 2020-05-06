@@ -17,12 +17,14 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	private int st;
 	private UUID projectId;
 	private UUID datasetId;
+	private String missing;
 
 	@Override
 	protected boolean init(Iterator<String> it, Object... params) {
 		this.projectId = (UUID) params[0];
 		this.datasetId = (UUID) params[1];
 		this.id = (int) params[2];
+		this.missing = (String) params[3];
 		headers = Arrays.asList(it.next().split("\\t"));
 		if (id < 0 || id >= headers.size())
 			return false;
@@ -37,11 +39,11 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	protected boolean parse(String line, boolean last, Consumer<Isolate> add) {
 		String[] columns = line.split("\\t", -1);
 		String id = columns[this.id];
-		String profile = st != -1 ? columns[st] : null;
+		String profile = st == -1 || columns[st].matches(String.format("[\\s%s]*", missing)) ? null : columns[st];
 		if (columns.length != headers.size())
 			return false;
 		Ancillary[] ancillaries = IntStream.range(0, columns.length)
-				.filter(i -> !columns[i].isEmpty() && i != this.id && i != st)
+				.filter(i -> !columns[i].matches(String.format("[\\s%s]*", missing)) && i != this.id && i != st)
 				.mapToObj(i -> new Ancillary(headers.get(i), columns[i]))
 				.toArray(Ancillary[]::new);
 		add.accept(new Isolate(projectId, datasetId, id, null, ancillaries, profile));
@@ -56,10 +58,10 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 				.collect(Collectors.toList());
 		String headersString = Strings.join(headers, '\t');
 		StringBuilder formatted = new StringBuilder("id");
-		if(!headersString.equals(""))
+		if (!headersString.equals(""))
 			formatted.append("\t").append(headersString);
 		boolean st = isolates.stream().anyMatch(i -> i.getProfile() != null);
-		if(st)
+		if (st)
 			formatted.append("\t").append("ST");
 		formatted.append("\n");
 		for (Isolate isolate : isolates) {
@@ -68,9 +70,9 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 					.collect(Collectors.toMap(Ancillary::getKey, Ancillary::getValue));
 			for (String header : headers)
 				formatted.append(ancillaries.getOrDefault(header, "")).append('\t');
-			if(isolate.getProfile() != null)
+			if (isolate.getProfile() != null)
 				formatted.append(isolate.getProfile().getPrimaryKey().getId());
-			else if(!st)
+			else if (!st)
 				formatted.delete(formatted.length() - "\t".length(), formatted.length());
 			formatted.append('\n');
 		}

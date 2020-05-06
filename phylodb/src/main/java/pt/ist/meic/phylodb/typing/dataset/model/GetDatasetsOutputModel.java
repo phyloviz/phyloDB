@@ -22,6 +22,4 @@ public class GetDatasetsOutputModel implements OutputModel {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 
-
-
 }

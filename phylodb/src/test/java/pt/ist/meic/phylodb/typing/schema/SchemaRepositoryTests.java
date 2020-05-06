@@ -27,13 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SchemaRepositoryTests extends RepositoryTests {
 
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
-	@Autowired
-	private SchemaRepository schemaRepository;
-
 	private static final int LIMIT = 2;
 	private static final Taxon taxon = new Taxon("t", null);
 	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
@@ -43,98 +36,12 @@ public class SchemaRepositoryTests extends RepositoryTests {
 	private static final Schema schema2 = new Schema(taxon.getPrimaryKey(), "2two", 1, false, Method.MLST, null,
 			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
 	private static final Schema[] state = new Schema[]{schema1, schema2};
-
-	private void store(Schema[] schemas) {
-		for (Schema schema : schemas) {
-			if (isPresent(schema.getPrimaryKey())) {
-				put(schema);
-				continue;
-			}
-			post(schema);
-		}
-	}
-
-	private void storeWithDataset(Dataset.PrimaryKey key, Schema[] schemas) {
-		for (Schema schema : schemas) {
-			if (isPresent(schema.getPrimaryKey())) {
-				put(schema);
-				continue;
-			}
-			String statement = "CREATE (:Project {id: $})-[:CONTAINS]->(:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)-[:HAS {version: 1}]->(s:Schema {id: $, type: $, deprecated: $})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(sd:SchemaDetails {description: $}) WITH sd\n" +
-					"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false WITH t, sd\n";
-			Query query = new Query(statement, key.getProjectId(), key.getId(), schema.getPrimaryKey().getId(), schema.getType().getName(), schema.isDeprecated(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
-			composeLoci(schema, query);
-			execute(query);
-		}
-
-	}
-
-	private boolean isPresent(Schema.PrimaryKey key) {
-		String statement = "OPTIONAL MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
-				"WITH s, collect(l) as loci\n" +
-				"RETURN COALESCE(s.deprecated = false, false)";
-		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
-	}
-
-	private void post(Schema schema) {
-		String statement = "CREATE (s:Schema {id: $, type: $, deprecated: $})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(sd:SchemaDetails {description: $}) WITH sd\n " +
-				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false WITH t, sd\n";
-		Query query = new Query(statement, schema.getPrimaryKey().getId(), schema.getType().getName(), schema.isDeprecated(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
-		composeLoci(schema, query);
-		execute(query);
-	}
-
-	private void put(Schema schema) {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
-				"WHERE NOT EXISTS(r.to)\n" +
-				"WITH t, s, r, sd, collect(l.id) as loci\n" +
-				"SET s.deprecated = $, r.to = datetime() WITH t, s, r.version + 1 as v\n" +
-				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(sd:SchemaDetails {description: $})\n" +
-				"WITH t, sd\n";
-		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId(), schema.isDeprecated(), schema.getDescription());
-		composeLoci(schema, query);
-		execute(query);
-	}
-
-	private void composeLoci(Schema schema, Query query) {
-		List<String> ids = schema.getLociIds();
-		for (int i = 0; i < ids.size(); i++) {
-			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
-					"WHERE l%s.deprecated = false AND NOT EXISTS(r.to)\n" +
-					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l%s) WITH sd, t\n", i, i, i + 1, i)
-					.addParameter(ids.get(i));
-		}
-		query.subQuery(query.length() - "WITH sd, t\n".length());
-	}
-
-	private Schema parse(Map<String, Object> row) {
-		String taxonId = (String) row.get("taxonId");
-		List<Entity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
-				.map(m -> new Entity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")) , (long) m.get("version"), (boolean) m.get("deprecated")))
-				.collect(Collectors.toList());
-		return new Schema(taxonId,
-				(String) row.get("id"),
-				(long) row.get("version"),
-				(boolean) row.get("deprecated"),
-				Method.valueOf(((String) row.get("type")).toUpperCase()),
-				(String) row.get("description"),
-				lociIds);
-	}
-
-	private Schema[] findAll() {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
-				"WITH t, s, r, sd, h, l\n" +
-				"ORDER BY h.part\n" +
-				"WITH t, s, r, sd, collect({id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
-				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version, " +
-				"sd.description as description, lociIds\n" +
-				"ORDER BY t.id, s.id, version";
-		Result result = query(new Query(statement, taxon.getPrimaryKey()));
-		if (result == null) return new Schema[0];
-		return StreamSupport.stream(result.spliterator(), false)
-				.map(this::parse)
-				.toArray(Schema[]::new);
-	}
+	@Autowired
+	private TaxonRepository taxonRepository;
+	@Autowired
+	private LocusRepository locusRepository;
+	@Autowired
+	private SchemaRepository schemaRepository;
 
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
@@ -146,7 +53,7 @@ public class SchemaRepositoryTests extends RepositoryTests {
 		Schema first = new Schema(taxonKey, id1, 1, false, Method.MLST, "description", loci1),
 				firstChanged = new Schema(taxonKey, id1, 2, false, Method.MLST, "description2", loci1),
 				second = new Schema(taxonKey, "4test", 1, false, Method.MLST, null, loci2),
-				third = new Schema(taxonKey, id3 , 1, false, Method.MLST, "description3", loci2),
+				third = new Schema(taxonKey, id3, 1, false, Method.MLST, "description3", loci2),
 				thirdChanged = new Schema(taxonKey, id3, 2, false, Method.MLST, null, loci1),
 				fourth = new Schema(taxonKey, "6test", 1, false, Method.MLST, null, loci2);
 		return Stream.of(Arguments.of(0, new Schema[0], new Schema[0]),
@@ -245,11 +152,11 @@ public class SchemaRepositoryTests extends RepositoryTests {
 
 	private static Stream<Arguments> findByLoci_params() {
 		String[] existentLoci = state[0].getLociIds().toArray(new String[0]),
-				loci1NotExists = new String[] {"not", "exists"};
+				loci1NotExists = new String[]{"not", "exists"};
 		Schema schema = new Schema(taxon.getPrimaryKey(), "3three", 1, false, Method.SNP, null,
 				Collections.singletonList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
 		return Stream.of(Arguments.of(taxon.getPrimaryKey(), state[0].getType(), existentLoci, state, state[0]),
-				Arguments.of(taxon.getPrimaryKey(), schema.getType(), new String[] {locus2.getPrimaryKey().getId()}, new Schema[] {state[0], state[1], schema}, schema),
+				Arguments.of(taxon.getPrimaryKey(), schema.getType(), new String[]{locus2.getPrimaryKey().getId()}, new Schema[]{state[0], state[1], schema}, schema),
 				Arguments.of(taxon.getPrimaryKey(), state[0].getType(), loci1NotExists, state, null),
 				Arguments.of(taxon.getPrimaryKey(), state[0].getType(), null, state, null),
 				Arguments.of(taxon.getPrimaryKey(), state[0].getType(), new String[0], state, null),
@@ -265,12 +172,104 @@ public class SchemaRepositoryTests extends RepositoryTests {
 				schema1Changed = new Schema(taxon.getPrimaryKey(), "3three", 2, false, Method.SNP, "changed", loci2),
 				schema2 = new Schema(taxon.getPrimaryKey(), "4fourth", 1, false, Method.MLVA, null, loci2),
 				schema2Changed = new Schema(taxon.getPrimaryKey(), "4fourth", 2, false, Method.MLVA, "description", loci1);
-		return Stream.of(Arguments.of(key, key, new Schema[] {schema1}, schema1),
-				Arguments.of(key, key, new Schema[] {schema1, schema1Changed}, schema1),
-				Arguments.of(key, key, new Schema[] {schema2}, schema2),
-				Arguments.of(key, key, new Schema[] {schema2, schema2Changed}, schema2),
-				Arguments.of(new Dataset.PrimaryKey(UUID.randomUUID(), UUID.randomUUID()), key, new Schema[] {schema1}, null),
-				Arguments.of(null, key, new Schema[] {schema1}, null));
+		return Stream.of(Arguments.of(key, key, new Schema[]{schema1}, schema1),
+				Arguments.of(key, key, new Schema[]{schema1, schema1Changed}, schema1),
+				Arguments.of(key, key, new Schema[]{schema2}, schema2),
+				Arguments.of(key, key, new Schema[]{schema2, schema2Changed}, schema2),
+				Arguments.of(new Dataset.PrimaryKey(UUID.randomUUID(), UUID.randomUUID()), key, new Schema[]{schema1}, null),
+				Arguments.of(null, key, new Schema[]{schema1}, null));
+	}
+
+	private void store(Schema[] schemas) {
+		for (Schema schema : schemas) {
+			if (isPresent(schema.getPrimaryKey())) {
+				put(schema);
+				continue;
+			}
+			post(schema);
+		}
+	}
+
+	private void storeWithDataset(Dataset.PrimaryKey key, Schema[] schemas) {
+		for (Schema schema : schemas) {
+			if (isPresent(schema.getPrimaryKey())) {
+				put(schema);
+				continue;
+			}
+			String statement = "CREATE (:Project {id: $})-[:CONTAINS]->(:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)-[:HAS {version: 1}]->(s:Schema {id: $, type: $, deprecated: $})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(sd:SchemaDetails {description: $}) WITH sd\n" +
+					"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false WITH t, sd\n";
+			Query query = new Query(statement, key.getProjectId(), key.getId(), schema.getPrimaryKey().getId(), schema.getType().getName(), schema.isDeprecated(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
+			composeLoci(schema, query);
+			execute(query);
+		}
+
+	}
+
+	private boolean isPresent(Schema.PrimaryKey key) {
+		String statement = "OPTIONAL MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"WITH s, collect(l) as loci\n" +
+				"RETURN COALESCE(s.deprecated = false, false)";
+		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
+	}
+
+	private void post(Schema schema) {
+		String statement = "CREATE (s:Schema {id: $, type: $, deprecated: $})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(sd:SchemaDetails {description: $}) WITH sd\n " +
+				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false WITH t, sd\n";
+		Query query = new Query(statement, schema.getPrimaryKey().getId(), schema.getType().getName(), schema.isDeprecated(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
+		composeLoci(schema, query);
+		execute(query);
+	}
+
+	private void put(Schema schema) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
+				"WHERE NOT EXISTS(r.to)\n" +
+				"WITH t, s, r, sd, collect(l.id) as loci\n" +
+				"SET s.deprecated = $, r.to = datetime() WITH t, s, r.version + 1 as v\n" +
+				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(sd:SchemaDetails {description: $})\n" +
+				"WITH t, sd\n";
+		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId(), schema.isDeprecated(), schema.getDescription());
+		composeLoci(schema, query);
+		execute(query);
+	}
+
+	private void composeLoci(Schema schema, Query query) {
+		List<String> ids = schema.getLociIds();
+		for (int i = 0; i < ids.size(); i++) {
+			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
+					"WHERE l%s.deprecated = false AND NOT EXISTS(r.to)\n" +
+					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l%s) WITH sd, t\n", i, i, i + 1, i)
+					.addParameter(ids.get(i));
+		}
+		query.subQuery(query.length() - "WITH sd, t\n".length());
+	}
+
+	private Schema parse(Map<String, Object> row) {
+		String taxonId = (String) row.get("taxonId");
+		List<Entity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
+				.map(m -> new Entity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")), (long) m.get("version"), (boolean) m.get("deprecated")))
+				.collect(Collectors.toList());
+		return new Schema(taxonId,
+				(String) row.get("id"),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"),
+				Method.valueOf(((String) row.get("type")).toUpperCase()),
+				(String) row.get("description"),
+				lociIds);
+	}
+
+	private Schema[] findAll() {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
+				"WITH t, s, r, sd, h, l\n" +
+				"ORDER BY h.part\n" +
+				"WITH t, s, r, sd, collect({id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
+				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version, " +
+				"sd.description as description, lociIds\n" +
+				"ORDER BY t.id, s.id, version";
+		Result result = query(new Query(statement, taxon.getPrimaryKey()));
+		if (result == null) return new Schema[0];
+		return StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.toArray(Schema[]::new);
 	}
 
 	@BeforeEach
@@ -291,7 +290,7 @@ public class SchemaRepositoryTests extends RepositoryTests {
 		}
 		assertTrue(result.isPresent());
 		List<Schema> schemas = result.get();
-		assertEquals(expected.length,  schemas.size());
+		assertEquals(expected.length, schemas.size());
 		assertArrayEquals(expected, schemas.toArray());
 	}
 
@@ -321,7 +320,7 @@ public class SchemaRepositoryTests extends RepositoryTests {
 		store(SchemaRepositoryTests.state);
 		store(state);
 		Optional<QueryStatistics> result = schemaRepository.save(schema);
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());

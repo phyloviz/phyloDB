@@ -54,7 +54,7 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 		return new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), this.getVersion(), this.isDeprecated(), this.getAka(), IntStream.range(0, alleles.size())
 				.mapToObj(i -> {
 					Entity<Allele.PrimaryKey> ref = alleles.get(i);
-					if(ref != null)
+					if (ref != null)
 						return !ref.getPrimaryKey().getId().matches(String.format("[\\s%s]*", missing)) ? new Entity<>(cons.apply(loci.get(i).getPrimaryKey().getId(), ref.getPrimaryKey().getId()), ref.getVersion(), ref.isDeprecated()) : null;
 					return null;
 				})

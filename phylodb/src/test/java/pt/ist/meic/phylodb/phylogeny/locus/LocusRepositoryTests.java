@@ -26,57 +26,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LocusRepositoryTests extends RepositoryTests {
 
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
-
 	private static final int LIMIT = 2;
 	private static final Taxon taxon = new Taxon("t", null);
 	private static final Locus first = new Locus(taxon.getPrimaryKey(), "1one", 1, false, "description");
 	private static final Locus second = new Locus(taxon.getPrimaryKey(), "2two", 1, false, null);
 	private static final Locus[] state = new Locus[]{first, second};
-
-	private void store(Locus[] loci) {
-		for (Locus locus : loci) {
-			String statement = "MATCH (t:Taxon {id: $})\n" +
-					"WHERE t.deprecated = false\n" +
-					"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = $ WITH l\n" +
-					"OPTIONAL MATCH (l)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-					"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
-					"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $}) WITH l\n" +
-					"CREATE (l)-[:CONTAINS]->(:Allele {deprecated: false})";
-			execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.isDeprecated(), locus.getDescription()));
-		}
-	}
-
-	private Locus parse(Map<String, Object> row) {
-		return new Locus((String) row.get("taxonId"),
-				(String) row.get("id"),
-				(long) row.get("version"),
-				(boolean) row.get("deprecated"),
-				(String) row.get("description"));
-	}
-
-	private Locus[] findAll() {
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
-				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
-				"l.name as name, ld.description as description\n" +
-				"ORDER BY t.id, l.id, version";
-		Result result = query(new Query(statement, taxon.getPrimaryKey()));
-		if (result == null) return new Locus[0];
-		return StreamSupport.stream(result.spliterator(), false)
-				.map(this::parse)
-				.toArray(Locus[]::new);
-	}
-
-	private boolean hasDescendents(Locus.PrimaryKey key){
-		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $}) WITH l\n" +
-				"OPTIONAL MATCH (l)-[:CONTAINS]->(a:Allele) WHERE a.deprecated = false WITH a\n" +
-				"RETURN COUNT(a) <> 0";
-		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
-	}
+	@Autowired
+	private TaxonRepository taxonRepository;
+	@Autowired
+	private LocusRepository locusRepository;
 
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
@@ -84,7 +42,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 		Locus first = new Locus(taxonKey, id1, 1, false, "description"),
 				firstChanged = new Locus(taxonKey, id1, 2, false, "description2"),
 				second = new Locus(taxonKey, "4test", 1, false, null),
-				third = new Locus(taxonKey, id3 , 1, false, "description3"),
+				third = new Locus(taxonKey, id3, 1, false, "description3"),
 				thirdChanged = new Locus(taxonKey, id3, 2, false, null),
 				fourth = new Locus(taxonKey, "6test", 1, false, null);
 		return Stream.of(Arguments.of(0, new Locus[0], new Locus[0]),
@@ -168,6 +126,47 @@ public class LocusRepositoryTests extends RepositoryTests {
 				Arguments.of(references4, true));
 	}
 
+	private void store(Locus[] loci) {
+		for (Locus locus : loci) {
+			String statement = "MATCH (t:Taxon {id: $})\n" +
+					"WHERE t.deprecated = false\n" +
+					"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = $ WITH l\n" +
+					"OPTIONAL MATCH (l)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
+					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+					"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $}) WITH l\n" +
+					"CREATE (l)-[:CONTAINS]->(:Allele {deprecated: false})";
+			execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.isDeprecated(), locus.getDescription()));
+		}
+	}
+
+	private Locus parse(Map<String, Object> row) {
+		return new Locus((String) row.get("taxonId"),
+				(String) row.get("id"),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"),
+				(String) row.get("description"));
+	}
+
+	private Locus[] findAll() {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
+				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
+				"l.name as name, ld.description as description\n" +
+				"ORDER BY t.id, l.id, version";
+		Result result = query(new Query(statement, taxon.getPrimaryKey()));
+		if (result == null) return new Locus[0];
+		return StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.toArray(Locus[]::new);
+	}
+
+	private boolean hasDescendents(Locus.PrimaryKey key) {
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $}) WITH l\n" +
+				"OPTIONAL MATCH (l)-[:CONTAINS]->(a:Allele) WHERE a.deprecated = false WITH a\n" +
+				"RETURN COUNT(a) <> 0";
+		return query(Boolean.class, new Query(statement, key.getTaxonId(), key.getId()));
+	}
+
 	@BeforeEach
 	public void init() {
 		taxonRepository.save(taxon);
@@ -184,7 +183,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 		}
 		assertTrue(result.isPresent());
 		List<Locus> users = result.get();
-		assertEquals(expected.length,  users.size());
+		assertEquals(expected.length, users.size());
 		assertArrayEquals(expected, users.toArray());
 	}
 
@@ -214,7 +213,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 		store(LocusRepositoryTests.state);
 		store(state);
 		Optional<QueryStatistics> result = locusRepository.save(user);
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());

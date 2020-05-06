@@ -24,8 +24,8 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false AND NOT EXISTS(r.to)";
 		Object[] params = new Object[]{filters[0], filters[1], page, limit};
-		if(filters[2] != null) {
-			params = new Object[]{filters[0], filters[1], filters[2],page, limit};
+		if (filters[2] != null) {
+			params = new Object[]{filters[0], filters[1], filters[2], page, limit};
 			statement += "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $})\n" +
 					"WHERE p.deprecated = false\n" +
 					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence, p.id as project\n";
@@ -42,9 +42,9 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"WHERE " + where;
-		if(key.getProject() != null) {
+		if (key.getProject() != null) {
 			statement += "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $}) WHERE p.deprecated = false\n" +
-			"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence, p.id as project\n";
+					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence, p.id as project\n";
 		} else {
 			statement += " AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
 					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence\n";
@@ -101,8 +101,11 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 	@Override
 	protected Query init(String... params) {
 		String project = "WITH l";
-		List<String> parameters = new ArrayList<String>() {{ add(params[0]); add(params[1]); }};
-		if(params[2] != null) {
+		List<String> parameters = new ArrayList<String>() {{
+			add(params[0]);
+			add(params[1]);
+		}};
+		if (params[2] != null) {
 			project = "MATCH (p:Project {id: $}) WHERE p.deprecated = false WITH p, l";
 			parameters.add(params[2]);
 		}
@@ -124,7 +127,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 
 	private void composeStore(Query query, Allele allele) {
 		String with = "l, a", project = "";
-		if(allele.getPrimaryKey().getProject() != null) {
+		if (allele.getPrimaryKey().getProject() != null) {
 			with = "p, l, a";
 			project = "<-[:CONTAINS]-(p)";
 		}
@@ -138,7 +141,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 
 	public boolean anyMissing(List<Entity<Allele.PrimaryKey>> references) {
 		Optional<Entity<Allele.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
-		if(!optional.isPresent())
+		if (!optional.isPresent())
 			return true;
 		String taxon = optional.get().getPrimaryKey().getTaxonId();
 		Query query = new Query("MATCH (t:Taxon {id: $}) WITH t, 0 as c\n", taxon);
@@ -146,7 +149,10 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 			if (reference == null)
 				continue;
 			String where = "NOT (a)<-[:CONTAINS]-(:Project)";
-			List<Object> params = new ArrayList<Object>() {{ add(reference.getPrimaryKey().getLocusId()); add(reference.getPrimaryKey().getId()); }};
+			List<Object> params = new ArrayList<Object>() {{
+				add(reference.getPrimaryKey().getLocusId());
+				add(reference.getPrimaryKey().getId());
+			}};
 			if (reference.getPrimaryKey().getProject() != null) {
 				where = "(a)<-[:CONTAINS]-(:Project {id: $})";
 				params.add(reference.getPrimaryKey().getProject());
@@ -157,7 +163,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 					.addParameter(params.toArray());
 		}
 		query.appendQuery("RETURN c");
-		return query(Integer.class, query) != references.stream().filter(Objects::nonNull).count() ;
+		return query(Integer.class, query) != references.stream().filter(Objects::nonNull).count();
 	}
 
 }

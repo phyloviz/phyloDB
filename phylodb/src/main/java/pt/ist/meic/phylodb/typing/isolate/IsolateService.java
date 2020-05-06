@@ -1,22 +1,30 @@
 package pt.ist.meic.phylodb.typing.isolate;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
+import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class IsolateService {
+
+	@Value("${application.profiles.missing}")
+	private String missing;
 
 	private DatasetRepository datasetRepository;
 	private IsolateRepository isolateRepository;
@@ -40,20 +48,26 @@ public class IsolateService {
 
 	@Transactional
 	public boolean saveIsolate(Isolate isolate) {
-		Isolate.PrimaryKey key = isolate.getPrimaryKey();
-		if (!datasetRepository.exists(new Dataset.PrimaryKey(key.getProjectId(), key.getDatasetId())) || isolate.getProfile() != null &&
-				!profileRepository.exists(isolate.getProfile().getPrimaryKey()))
+		if(isolate == null)
 			return false;
-		return isolateRepository.save(isolate).isPresent();
+		Isolate.PrimaryKey key = isolate.getPrimaryKey();
+		if (!datasetRepository.exists(new Dataset.PrimaryKey(key.getProjectId(), key.getDatasetId())) || (isolate.getProfile() != null &&
+				!profileRepository.exists(isolate.getProfile().getPrimaryKey())))
+			return false;
+		Ancillary[] ancillaries = Arrays.stream(isolate.getAncillaries())
+				.filter(a -> !a.getValue().matches(String.format("[\\s%s]*", missing)))
+				.toArray(Ancillary[]::new);
+		Isolate save = new Isolate(key.getProjectId(), key.getDatasetId(), key.getId(), isolate.getVersion(), isolate.isDeprecated(), isolate.getDescription(), ancillaries, isolate.getProfile());
+		return isolateRepository.save(save).isPresent();
 	}
 
 	@Transactional
-	public boolean deleteIsolate(UUID projectId,UUID datasetId, String isolateId) {
+	public boolean deleteIsolate(UUID projectId, UUID datasetId, String isolateId) {
 		return isolateRepository.remove(new Isolate.PrimaryKey(projectId, datasetId, isolateId));
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictSkip(UUID projectId,UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+	public boolean saveIsolatesOnConflictSkip(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, idColumn, BatchRepository.SKIP, file);
 	}
 
@@ -62,11 +76,14 @@ public class IsolateService {
 		return saveAll(projectId, datasetId, idColumn, BatchRepository.UPDATE, file);
 	}
 
-	private boolean saveAll(UUID projectId,UUID datasetId, int idColumn, String conflict, MultipartFile file) throws IOException {
+	private boolean saveAll(UUID projectId, UUID datasetId, int idColumn, String conflict, MultipartFile file) throws IOException {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return false;
-		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId, idColumn);
-		return isolateRepository.saveAll(isolates, conflict, datasetId.toString()).isPresent();
+		Predicate<Isolate> canSave = conflict.equals(BatchRepository.UPDATE) ? i -> true : i -> !isolateRepository.exists(i.getPrimaryKey());
+		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId, idColumn, missing).stream()
+				.filter(i -> canSave.test(i) && (i.getProfile() == null || profileRepository.exists(i.getProfile().getPrimaryKey())))
+				.collect(Collectors.toList());
+		return isolateRepository.saveAll(isolates, projectId.toString(), datasetId.toString()).isPresent();
 	}
 
 }

@@ -32,19 +32,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DatasetRepositoryTests extends RepositoryTests {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private ProjectRepository projectRepository;
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
-	@Autowired
-	private SchemaRepository schemaRepository;
-	@Autowired
-	private DatasetRepository datasetRepository;
-
 	private static final int LIMIT = 2;
 	private static final User user = new User("1one", "one", 1, false, Role.USER);
 	private static final Project project = new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user.getPrimaryKey()});
@@ -60,61 +47,18 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	private static final Dataset dataset1 = new Dataset(project.getPrimaryKey(), UUID.fromString("1023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "name1", schema1Reference);
 	private static final Dataset dataset2 = new Dataset(project.getPrimaryKey(), UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "name2", schema2Reference);
 	private static final Dataset[] state = new Dataset[]{dataset1, dataset2};
-
-
-	private void store(Dataset[] datasets) {
-		for (Dataset dataset : datasets) {
-			String statement = "MATCH (p:Project {id: $})\n" +
-					"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = $ WITH d\n" +
-					"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-					"WITH d, COALESCE(MAX(r.version), 0) + 1 as v\n" +
-					"CREATE (d)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(dd:DatasetDetails {description: $}) WITH dd\n" +
-					"MATCH (s:Schema {id: $})-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
-					"WHERE NOT EXISTS(r.to)\n" +
-					"WITH dd, s, r, collect(l) as loci\n" +
-					"CREATE (dd)-[:HAS {version: r.version}]->(s)";
-			Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
-			Query query = new Query(statement, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId(), dataset.isDeprecated(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
-			execute(query);
-		}
-	}
-
-	private Dataset parse(Map<String, Object> row) {
-		Entity<Schema.PrimaryKey> schema = new Entity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
-				(String) row.get("schemaId")),
-				(long) row.get("schemaVersion"),
-				(boolean) row.get("schemaDeprecated"));
-		return new Dataset(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
-				(long) row.get("version"),
-				(boolean) row.get("deprecated"),
-				(String) row.get("description"),
-				schema);
-	}
-
-	private Dataset[] findAll() {
-		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-				"WHERE r2.version = h.version\n" +
-				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"WITH p, d, r1, dd, h, s, t, collect(l) as loci\n" +
-				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version,\n" +
-				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
-				"ORDER BY p.id, d.id, r1.version";
-		Result result = query(new Query(statement, project.getPrimaryKey()));
-		if (result == null) return new Dataset[0];
-		return StreamSupport.stream(result.spliterator(), false)
-				.map(this::parse)
-				.toArray(Dataset[]::new);
-	}
-
-	private boolean hasDescendents(Dataset.PrimaryKey key){
-		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
-				"OPTIONAL MATCH (d)-[:CONTAINS]->(pf:Profile) WHERE pf.deprecated = false WITH d, pf\n" +
-				"OPTIONAL MATCH (d)-[:CONTAINS]->(i:Isolate) WHERE i.deprecated = false = false WITH d, pf, i\n" +
-				"RETURN (COUNT(pf) + COUNT(i)) <> 0";
-		return query(Boolean.class, new Query(statement, key.getProjectId(), key.getId()));
-	}
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private ProjectRepository projectRepository;
+	@Autowired
+	private TaxonRepository taxonRepository;
+	@Autowired
+	private LocusRepository locusRepository;
+	@Autowired
+	private SchemaRepository schemaRepository;
+	@Autowired
+	private DatasetRepository datasetRepository;
 
 	private static Stream<Arguments> findAll_params() {
 		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
@@ -124,7 +68,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 				firstChanged = new Dataset(project.getPrimaryKey(), key1, 2, false, "name2", s2),
 				second = new Dataset(project.getPrimaryKey(), UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name3", s2),
 				third = new Dataset(project.getPrimaryKey(), key2, 1, false, "name5", s2),
-				thirdChanged = new Dataset(project.getPrimaryKey(), key2, 2, false, "name4",s1),
+				thirdChanged = new Dataset(project.getPrimaryKey(), key2, 2, false, "name4", s1),
 				fourth = new Dataset(project.getPrimaryKey(), UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", s1);
 		return Stream.of(Arguments.of(0, new Dataset[0], new Dataset[0]),
 				Arguments.of(0, new Dataset[]{state[0]}, new Dataset[]{state[0]}),
@@ -190,9 +134,63 @@ public class DatasetRepositoryTests extends RepositoryTests {
 		Entity<Schema.PrimaryKey> s1 = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated());
 		Dataset before = new Dataset(project.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				after = new Dataset(project.getPrimaryKey(), key.getId(), 1, true, "name", s1);
-		return Stream.of(Arguments.of(key, new Dataset[0], new Dataset[]{state[0],  state[1]}, false),
-				Arguments.of(key, new Dataset[]{before}, new Dataset[]{state[0],  state[1], after}, true),
-				Arguments.of(null, new Dataset[0], new Dataset[]{state[0],  state[1]}, false));
+		return Stream.of(Arguments.of(key, new Dataset[0], new Dataset[]{state[0], state[1]}, false),
+				Arguments.of(key, new Dataset[]{before}, new Dataset[]{state[0], state[1], after}, true),
+				Arguments.of(null, new Dataset[0], new Dataset[]{state[0], state[1]}, false));
+	}
+
+	private void store(Dataset[] datasets) {
+		for (Dataset dataset : datasets) {
+			String statement = "MATCH (p:Project {id: $})\n" +
+					"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = $ WITH d\n" +
+					"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
+					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WITH d, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+					"CREATE (d)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(dd:DatasetDetails {description: $}) WITH dd\n" +
+					"MATCH (s:Schema {id: $})-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
+					"WHERE NOT EXISTS(r.to)\n" +
+					"WITH dd, s, r, collect(l) as loci\n" +
+					"CREATE (dd)-[:HAS {version: r.version}]->(s)";
+			Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
+			Query query = new Query(statement, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId(), dataset.isDeprecated(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
+			execute(query);
+		}
+	}
+
+	private Dataset parse(Map<String, Object> row) {
+		Entity<Schema.PrimaryKey> schema = new Entity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
+				(String) row.get("schemaId")),
+				(long) row.get("schemaVersion"),
+				(boolean) row.get("schemaDeprecated"));
+		return new Dataset(UUID.fromString(row.get("projectId").toString()),
+				UUID.fromString(row.get("datasetId").toString()),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"),
+				(String) row.get("description"),
+				schema);
+	}
+
+	private Dataset[] findAll() {
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+				"WHERE r2.version = h.version\n" +
+				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
+				"WITH p, d, r1, dd, h, s, t, collect(l) as loci\n" +
+				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version,\n" +
+				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
+				"ORDER BY p.id, d.id, r1.version";
+		Result result = query(new Query(statement, project.getPrimaryKey()));
+		if (result == null) return new Dataset[0];
+		return StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.toArray(Dataset[]::new);
+	}
+
+	private boolean hasDescendents(Dataset.PrimaryKey key) {
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
+				"OPTIONAL MATCH (d)-[:CONTAINS]->(pf:Profile) WHERE pf.deprecated = false WITH d, pf\n" +
+				"OPTIONAL MATCH (d)-[:CONTAINS]->(i:Isolate) WHERE i.deprecated = false = false WITH d, pf, i\n" +
+				"RETURN (COUNT(pf) + COUNT(i)) <> 0";
+		return query(Boolean.class, new Query(statement, key.getProjectId(), key.getId()));
 	}
 
 	@BeforeEach
@@ -217,7 +215,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 		}
 		assertTrue(result.isPresent());
 		List<Dataset> projects = result.get();
-		assertEquals(expected.length,  projects.size());
+		assertEquals(expected.length, projects.size());
 		assertArrayEquals(expected, projects.toArray());
 	}
 
@@ -247,7 +245,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 		store(DatasetRepositoryTests.state);
 		store(state);
 		Optional<QueryStatistics> result = datasetRepository.save(dataset);
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
@@ -265,7 +263,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 		boolean result = datasetRepository.remove(key);
 		Dataset[] stateResult = findAll();
 		assertEquals(expectedResult, result);
-		if(key != null)
+		if (key != null)
 			assertFalse(hasDescendents(key));
 		assertArrayEquals(expectedState, stateResult);
 	}

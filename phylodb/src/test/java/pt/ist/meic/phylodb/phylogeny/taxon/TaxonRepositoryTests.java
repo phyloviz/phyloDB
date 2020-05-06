@@ -20,60 +20,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TaxonRepositoryTests extends RepositoryTests {
 
-	@Autowired
-	private TaxonRepository repository;
-
 	private static final int LIMIT = 2;
 	private static final Taxon first = new Taxon("1one", 1, false, "description");
 	private static final Taxon second = new Taxon("2two", 1, false, null);
 	private static final Taxon[] state = new Taxon[]{first, second};
-
-	private void store(Taxon[] taxons) {
-		for (Taxon taxon : taxons) {
-			String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = $ WITH t\n" +
-					"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-					"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
-					"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $}) WITH t\n" +
-					"CREATE (p)-[:CONTAINS]->(l:Locus {deprecated: false})-[:CONTAINS]->(:Allele {deprecated: false})";
-			execute(new Query(statement, taxon.getPrimaryKey(), taxon.isDeprecated(), taxon.getDescription()));
-		}
-	}
-
-	private Taxon parse(Map<String, Object> row) {
-		return new Taxon((String) row.get("id"),
-				(long) row.get("version"),
-				(boolean) row.get("deprecated"),
-				(String) row.get("description"));
-	}
-
-	private Taxon[] findAll() {
-		String statement = "MATCH (t:Taxon)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
-				"RETURN t.id as id, t.deprecated as deprecated, r.version as version,\n" +
-				"t.name as name, td.description as description\n" +
-				"ORDER BY id, version";
-		Result result = query(new Query(statement));
-		if (result == null) return new Taxon[0];
-		return StreamSupport.stream(result.spliterator(), false)
-				.map(this::parse)
-				.toArray(Taxon[]::new);
-	}
-
-
-	private boolean hasDescendents(String key){
-		String statement = "MATCH (t:Taxon {id: $})\n" +
-				"OPTIONAL MATCH (t)-[:CONTAINS]->(l:Locus) WHERE l.deprecated = false WITH l\n" +
-				"OPTIONAL MATCH (l)-[:CONTAINS]->(a:Allele) WHERE a.deprecated = false WITH l, a\n" +
-				"RETURN (COUNT(l) + COUNT(a)) <> 0";
-		return query(Boolean.class, new Query(statement, key));
-	}
+	@Autowired
+	private TaxonRepository repository;
 
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
 		Taxon first = new Taxon(id1, 1, false, "description"),
 				firstChanged = new Taxon(id1, 2, false, "description2"),
 				second = new Taxon("4test", 1, false, null),
-				third = new Taxon(id3 , 1, false, "description3"),
+				third = new Taxon(id3, 1, false, "description3"),
 				thirdChanged = new Taxon(id3, 2, false, null),
 				fourth = new Taxon("6test", 1, false, null);
 		return Stream.of(Arguments.of(0, new Taxon[0], new Taxon[0]),
@@ -140,6 +99,45 @@ public class TaxonRepositoryTests extends RepositoryTests {
 				Arguments.of(null, new Taxon[0], state, false));
 	}
 
+	private void store(Taxon[] taxons) {
+		for (Taxon taxon : taxons) {
+			String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = $ WITH t\n" +
+					"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
+					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+					"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $}) WITH t\n" +
+					"CREATE (p)-[:CONTAINS]->(l:Locus {deprecated: false})-[:CONTAINS]->(:Allele {deprecated: false})";
+			execute(new Query(statement, taxon.getPrimaryKey(), taxon.isDeprecated(), taxon.getDescription()));
+		}
+	}
+
+	private Taxon parse(Map<String, Object> row) {
+		return new Taxon((String) row.get("id"),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"),
+				(String) row.get("description"));
+	}
+
+	private Taxon[] findAll() {
+		String statement = "MATCH (t:Taxon)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
+				"RETURN t.id as id, t.deprecated as deprecated, r.version as version,\n" +
+				"t.name as name, td.description as description\n" +
+				"ORDER BY id, version";
+		Result result = query(new Query(statement));
+		if (result == null) return new Taxon[0];
+		return StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.toArray(Taxon[]::new);
+	}
+
+	private boolean hasDescendents(String key) {
+		String statement = "MATCH (t:Taxon {id: $})\n" +
+				"OPTIONAL MATCH (t)-[:CONTAINS]->(l:Locus) WHERE l.deprecated = false WITH l\n" +
+				"OPTIONAL MATCH (l)-[:CONTAINS]->(a:Allele) WHERE a.deprecated = false WITH l, a\n" +
+				"RETURN (COUNT(l) + COUNT(a)) <> 0";
+		return query(Boolean.class, new Query(statement, key));
+	}
+
 	@ParameterizedTest
 	@MethodSource("findAll_params")
 	public void findAll(int page, Taxon[] state, Taxon[] expected) {
@@ -151,7 +149,7 @@ public class TaxonRepositoryTests extends RepositoryTests {
 		}
 		assertTrue(result.isPresent());
 		List<Taxon> users = result.get();
-		assertEquals(expected.length,  users.size());
+		assertEquals(expected.length, users.size());
 		assertArrayEquals(expected, users.toArray());
 	}
 
@@ -181,7 +179,7 @@ public class TaxonRepositoryTests extends RepositoryTests {
 		store(TaxonRepositoryTests.state);
 		store(state);
 		Optional<QueryStatistics> result = repository.save(user);
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());

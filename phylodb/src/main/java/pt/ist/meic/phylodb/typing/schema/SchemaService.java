@@ -31,7 +31,7 @@ public class SchemaService {
 
 	@Transactional
 	public boolean saveSchema(Schema schema) {
-		if(schema == null)
+		if (schema == null)
 			return false;
 		String[] lociIds = schema.getLociIds().toArray(new String[0]);
 		Optional<Schema> dbSchema = schemaRepository.find(schema.getPrimaryKey().getTaxonId(), schema.getType(), lociIds);

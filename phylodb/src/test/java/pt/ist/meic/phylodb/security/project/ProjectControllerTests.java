@@ -51,17 +51,18 @@ public class ProjectControllerTests extends Test {
 	@Autowired
 	private MockHttp http;
 
-
 	private static Stream<Arguments> getProjects_params() {
 		String uri = "/projects";
 		Project project = new Project(UUID.randomUUID(), "x", "x", "x", new User.PrimaryKey[0]);
-		List<Project> projects = new ArrayList<Project>() {{add(project);}};
+		List<Project> projects = new ArrayList<Project>() {{
+			add(project);
+		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
 		List<ProjectOutputModel> result = projects.stream()
 				.map(ProjectOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, projects, HttpStatus.OK, result,  null),
+		return Stream.of(Arguments.of(req1, projects, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req2, projects, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
@@ -71,7 +72,7 @@ public class ProjectControllerTests extends Test {
 	private static Stream<Arguments> getProject_params() {
 		String uri = "/projects/%s";
 		UUID id = UUID.randomUUID();
-		Project project = new Project(id, "x", "x", "x", new User.PrimaryKey[] {new User.PrimaryKey("teste", "teste")});
+		Project project = new Project(id, "x", "x", "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, id)).param("version", "1"),
 				req2 = get(String.format(uri, id));
 		return Stream.of(Arguments.of(req1, project, HttpStatus.OK, new GetProjectOutputModel(project)),
@@ -83,10 +84,10 @@ public class ProjectControllerTests extends Test {
 	private static Stream<Arguments> putProject_params() {
 		String uri = "/projects/%s";
 		UUID id = UUID.randomUUID();
-		Project project = new Project(id, "x", "private", "x", new User.PrimaryKey[] {new User.PrimaryKey("teste", "teste")});
+		Project project = new Project(id, "x", "private", "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, id));
 		ProjectInputModel input1 = new ProjectInputModel(project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription(), project.getUsers()),
-			input2 = new ProjectInputModel(project.getPrimaryKey(), null, "error", project.getDescription(), null);
+				input2 = new ProjectInputModel(project.getPrimaryKey(), null, "error", project.getDescription(), null);
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -113,7 +114,7 @@ public class ProjectControllerTests extends Test {
 	}
 
 	@BeforeEach
-	public void init(){
+	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
@@ -125,10 +126,10 @@ public class ProjectControllerTests extends Test {
 		Mockito.when(service.getProjects(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
 			assertEquals(expectedResult.size(), parsed.size());
-			if(expectedResult.size() > 0) {
+			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getId().toString(), p.get("id"));
@@ -146,7 +147,7 @@ public class ProjectControllerTests extends Test {
 		Mockito.when(service.getProject(any(), anyLong())).thenReturn(Optional.ofNullable(project));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful())
 			assertEquals(expectedResult, http.parseResult(GetProjectOutputModel.class, result));
 		else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -155,26 +156,25 @@ public class ProjectControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("putProject_params")
 	public void updateProject(MockHttpServletRequestBuilder req, ProjectInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		if(input != null)
+		if (input != null)
 			Mockito.when(service.saveProject(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
 	@ParameterizedTest
 	@MethodSource("postProject_params")
 	public void postProject(MockHttpServletRequestBuilder req, ProjectInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		if(input != null)
+		if (input != null)
 			Mockito.when(service.saveProject(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			CreatedOutputModel parsed = http.parseResult(CreatedOutputModel.class, result);
 			assertNotNull(parsed.getId());
-		}
-		else if(expectedStatus.is4xxClientError())
+		} else if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -184,7 +184,7 @@ public class ProjectControllerTests extends Test {
 		Mockito.when(service.deleteProject(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

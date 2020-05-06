@@ -74,6 +74,7 @@ public class GetProjectOutputModel extends ProjectOutputModel {
 			return Objects.equals(email, that.email) &&
 					Objects.equals(provider, that.provider);
 		}
+
 	}
 
 }

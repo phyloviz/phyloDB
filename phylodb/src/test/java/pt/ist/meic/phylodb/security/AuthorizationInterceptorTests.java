@@ -35,12 +35,11 @@ import static pt.ist.meic.phylodb.security.SecurityInterceptor.ROLE;
 
 public class AuthorizationInterceptorTests extends Test {
 
+	private static final String ID = "4f809af7-2c99-43f7-b674-4843c77384c7";
 	@Autowired
 	private AuthorizationInterceptor interceptor;
 	@MockBean
 	private ProjectService service;
-
-	private static final String ID = "4f809af7-2c99-43f7-b674-4843c77384c7";
 
 	private static Stream<Arguments> preHandle_params() throws NoSuchMethodException {
 		MockHttpServletResponse response = new MockHttpServletResponse();
@@ -76,7 +75,7 @@ public class AuthorizationInterceptorTests extends Test {
 		request.setAttribute(PROVIDER, key.getProvider());
 		request.setAttribute(ROLE, userRole);
 		request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, Collections.emptyMap());
-		if(projectId != null)
+		if (projectId != null)
 			request.setParameter(AuthorizationInterceptor.PROJECT, projectId);
 		return request;
 	}
@@ -89,4 +88,5 @@ public class AuthorizationInterceptorTests extends Test {
 		boolean result = interceptor.handle(req, res, hm);
 		assertEquals(expected, result);
 	}
+
 }

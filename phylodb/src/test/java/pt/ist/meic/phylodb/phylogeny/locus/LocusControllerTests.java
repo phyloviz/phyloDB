@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class LocusControllerTests extends Test {
 
+	private static final String taxonId = "t";
 	@InjectMocks
 	private LocusController controller;
 	@MockBean
@@ -47,18 +48,17 @@ public class LocusControllerTests extends Test {
 	@Autowired
 	private MockHttp http;
 
-	private static final String taxonId = "t";
-
-
 	private static Stream<Arguments> getLoci_params() {
 		String uri = "/taxons/%s/loci";
-		List<Locus> loci = new ArrayList<Locus>() {{add(new Locus(taxonId, "id", null));}};
+		List<Locus> loci = new ArrayList<Locus>() {{
+			add(new Locus(taxonId, "id", null));
+		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, taxonId)).param("page", "0"),
 				req2 = get(uri), req3 = get(String.format(uri, taxonId)).param("page", "-10");
 		List<LocusOutputModel> result = loci.stream()
 				.map(LocusOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, loci, HttpStatus.OK, result,  null),
+		return Stream.of(Arguments.of(req1, loci, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req2, loci, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
@@ -83,7 +83,7 @@ public class LocusControllerTests extends Test {
 		Locus.PrimaryKey key = locus.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, taxonId, key.getId()));
 		LocusInputModel input1 = new LocusInputModel(key.getId(), "description"),
-			input2 = new LocusInputModel("different", "description");
+				input2 = new LocusInputModel("different", "description");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -100,7 +100,7 @@ public class LocusControllerTests extends Test {
 	}
 
 	@BeforeEach
-	public void init(){
+	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
@@ -112,10 +112,10 @@ public class LocusControllerTests extends Test {
 		Mockito.when(service.getLoci(anyString(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(loci));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
 			assertEquals(expectedResult.size(), parsed.size());
-			if(expectedResult.size() > 0) {
+			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getTaxon_id(), p.get("taxon_id"));
@@ -124,8 +124,7 @@ public class LocusControllerTests extends Test {
 					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
 				}
 			}
-		}
-		else
+		} else
 			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -135,7 +134,7 @@ public class LocusControllerTests extends Test {
 		Mockito.when(service.getLocus(anyString(), anyString(), anyLong())).thenReturn(Optional.ofNullable(locus));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful())
 			assertEquals(expectedResult, http.parseResult(GetLocusOutputModel.class, result));
 		else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -144,11 +143,11 @@ public class LocusControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("saveLocus_params")
 	public void saveLocus(MockHttpServletRequestBuilder req, LocusInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		if(input != null)
+		if (input != null)
 			Mockito.when(service.saveLocus(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -158,7 +157,7 @@ public class LocusControllerTests extends Test {
 		Mockito.when(service.deleteLocus(anyString(), anyString())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

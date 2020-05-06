@@ -39,6 +39,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class SchemaControllerTests extends Test {
 
+	private static final String taxonId = "t";
+	private static final Locus locus1 = new Locus(taxonId, "1", 1, false, "description");
+	private static final Locus locus2 = new Locus(taxonId, "2", 1, false, null);
+	private static final Schema schema1 = new Schema(taxonId, "1one", 1, false, Method.MLST, null,
+			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
+	private static final Schema schema2 = new Schema(taxonId, "2two", 1, false, Method.MLST, null,
+			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
 	@InjectMocks
 	private SchemaController controller;
 	@MockBean
@@ -50,23 +57,18 @@ public class SchemaControllerTests extends Test {
 	@Autowired
 	private MockHttp http;
 
-	private static final String taxonId = "t";
-	private static final Locus locus1 = new Locus(taxonId, "1", 1, false, "description");
-	private static final Locus locus2 = new Locus(taxonId, "2", 1, false, null);
-	private static final Schema schema1 = new Schema(taxonId, "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
-	private static final Schema schema2 = new Schema(taxonId, "2two", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
-
 	private static Stream<Arguments> getSchemas_params() {
 		String uri = "/taxons/%s/schemas";
-		List<Schema> loci = new ArrayList<Schema>() {{add(schema1); add(schema2);}};
+		List<Schema> loci = new ArrayList<Schema>() {{
+			add(schema1);
+			add(schema2);
+		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, taxonId)).param("page", "0"),
 				req2 = get(uri), req3 = get(String.format(uri, taxonId)).param("page", "-10");
 		List<SchemaOutputModel> result = loci.stream()
 				.map(SchemaOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, loci, HttpStatus.OK, result,  null),
+		return Stream.of(Arguments.of(req1, loci, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req2, loci, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
@@ -88,8 +90,8 @@ public class SchemaControllerTests extends Test {
 		String uri = "/taxons/%s/schemas/%s";
 		Schema.PrimaryKey key = schema1.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, taxonId, key.getId()));
-		SchemaInputModel input1 = new SchemaInputModel(taxonId, key.getId(), Method.MLST.getName(), null, new String[] {locus1.getPrimaryKey().getId(), locus2.getPrimaryKey().getId()}),
-			input2 = new SchemaInputModel("different", "description", Method.MLST.getName(), null, new String[] {locus1.getPrimaryKey().getId(), locus2.getPrimaryKey().getId()});
+		SchemaInputModel input1 = new SchemaInputModel(taxonId, key.getId(), Method.MLST.getName(), null, new String[]{locus1.getPrimaryKey().getId(), locus2.getPrimaryKey().getId()}),
+				input2 = new SchemaInputModel("different", "description", Method.MLST.getName(), null, new String[]{locus1.getPrimaryKey().getId(), locus2.getPrimaryKey().getId()});
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -106,7 +108,7 @@ public class SchemaControllerTests extends Test {
 	}
 
 	@BeforeEach
-	public void init(){
+	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
@@ -118,10 +120,10 @@ public class SchemaControllerTests extends Test {
 		Mockito.when(service.getSchemas(anyString(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(schemas));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
 			assertEquals(expectedResult.size(), parsed.size());
-			if(expectedResult.size() > 0) {
+			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getTaxon_id(), p.get("taxon_id"));
@@ -130,8 +132,7 @@ public class SchemaControllerTests extends Test {
 					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
 				}
 			}
-		}
-		else
+		} else
 			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -141,7 +142,7 @@ public class SchemaControllerTests extends Test {
 		Mockito.when(service.getSchema(anyString(), anyString(), anyLong())).thenReturn(Optional.ofNullable(schema));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful())
 			assertEquals(expectedResult, http.parseResult(GetSchemaOutputModel.class, result));
 		else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -153,7 +154,7 @@ public class SchemaControllerTests extends Test {
 		Mockito.when(service.saveSchema(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -163,7 +164,7 @@ public class SchemaControllerTests extends Test {
 		Mockito.when(service.deleteSchema(anyString(), anyString())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

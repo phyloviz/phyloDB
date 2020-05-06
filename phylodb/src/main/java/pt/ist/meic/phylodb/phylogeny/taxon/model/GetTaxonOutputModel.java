@@ -6,7 +6,8 @@ public class GetTaxonOutputModel extends TaxonOutputModel {
 
 	private String description;
 
-	public GetTaxonOutputModel() { }
+	public GetTaxonOutputModel() {
+	}
 
 	public GetTaxonOutputModel(Taxon taxon) {
 		super(taxon);
@@ -22,7 +23,7 @@ public class GetTaxonOutputModel extends TaxonOutputModel {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		GetTaxonOutputModel that = (GetTaxonOutputModel) o;
-		return  super.equals(that) &&
+		return super.equals(that) &&
 				Objects.equals(description, that.description);
 	}
 

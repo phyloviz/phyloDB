@@ -58,14 +58,14 @@ public class FastaFormatter extends Formatter<Allele> {
 	}
 
 	private String formatSequence(String sequence, int lineLength) {
-		if(sequence == null)
+		if (sequence == null)
 			return "";
 		StringBuilder formatted = new StringBuilder(sequence);
 		int n = sequence.length() / lineLength;
-		if(n == 0 || sequence.length() == lineLength)
+		if (n == 0 || sequence.length() == lineLength)
 			return sequence;
 		int i = 0;
-		while(i != n)
+		while (i != n)
 			formatted.insert((i + 1) * lineLength + i++, "\n");
 		return formatted.toString();
 	}

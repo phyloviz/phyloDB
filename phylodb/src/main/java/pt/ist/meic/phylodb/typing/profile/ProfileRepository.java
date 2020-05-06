@@ -63,10 +63,10 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		ArrayList<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 			allelesReferences.add(null);
-		for (Map<String, Object> a: (Map<String, Object>[]) row.get("alleles")) {
+		for (Map<String, Object> a : (Map<String, Object>[]) row.get("alleles")) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
-			UUID project =  projectId == null ? null : UUID.fromString((String) projectId);
+			UUID project = projectId == null ? null : UUID.fromString((String) projectId);
 			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), project);
 			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
 			allelesReferences.set(position - 1, reference);
@@ -146,7 +146,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		List<Entity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
 		for (int i = 0; i < allelesIds.size(); i++) {
 			Entity<Allele.PrimaryKey> reference = allelesIds.get(i);
-			if(reference == null)
+			if (reference == null)
 				continue;
 			String referenceId = reference.getPrimaryKey().getId();
 			String where = reference.getPrimaryKey().getProject() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";

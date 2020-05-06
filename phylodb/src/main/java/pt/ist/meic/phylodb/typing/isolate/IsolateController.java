@@ -46,14 +46,14 @@ public class IsolateController extends Controller<Isolate> {
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.READ)
-	@GetMapping(path = "/{isolate}/", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/{isolate}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolate(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("isolate") String isolateId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
-		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), GetIsolateOutputModel::new, () -> new ErrorOutputModel(Problem.UNAUTHORIZED));
+		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), GetIsolateOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
@@ -73,7 +73,7 @@ public class IsolateController extends Controller<Isolate> {
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "id", defaultValue = "0") int id,
-			@RequestBody MultipartFile file
+			@RequestParam("file") MultipartFile file
 	) throws IOException {
 		return fileStatus(() -> service.saveIsolatesOnConflictSkip(projectId, datasetId, id, file));
 	}
@@ -84,7 +84,7 @@ public class IsolateController extends Controller<Isolate> {
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "id", defaultValue = "0") int id,
-			@RequestBody MultipartFile file
+			@RequestParam("file") MultipartFile file
 
 	) throws IOException {
 		return fileStatus(() -> service.saveIsolatesOnConflictUpdate(projectId, datasetId, id, file));

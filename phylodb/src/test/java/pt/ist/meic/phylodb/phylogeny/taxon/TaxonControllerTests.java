@@ -47,16 +47,17 @@ public class TaxonControllerTests extends Test {
 	@Autowired
 	private MockHttp http;
 
-
 	private static Stream<Arguments> getTaxons_params() {
 		String uri = "/taxons";
-		List<Taxon> taxons = new ArrayList<Taxon>() {{add(new Taxon("id", null));}};
+		List<Taxon> taxons = new ArrayList<Taxon>() {{
+			add(new Taxon("id", null));
+		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
 		List<TaxonOutputModel> result = taxons.stream()
 				.map(TaxonOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, taxons, HttpStatus.OK, result,  null),
+		return Stream.of(Arguments.of(req1, taxons, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req2, taxons, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
@@ -81,7 +82,7 @@ public class TaxonControllerTests extends Test {
 		String key = taxon.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, key));
 		TaxonInputModel input1 = new TaxonInputModel(key, "description"),
-			input2 = new TaxonInputModel("different", "description");
+				input2 = new TaxonInputModel("different", "description");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -98,7 +99,7 @@ public class TaxonControllerTests extends Test {
 	}
 
 	@BeforeEach
-	public void init(){
+	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
@@ -110,10 +111,10 @@ public class TaxonControllerTests extends Test {
 		Mockito.when(service.getTaxons(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxons));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
 			assertEquals(expectedResult.size(), parsed.size());
-			if(expectedResult.size() > 0) {
+			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getId(), p.get("id"));
@@ -121,8 +122,7 @@ public class TaxonControllerTests extends Test {
 					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
 				}
 			}
-		}
-		else
+		} else
 			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -132,7 +132,7 @@ public class TaxonControllerTests extends Test {
 		Mockito.when(service.getTaxon(anyString(), anyLong())).thenReturn(Optional.ofNullable(taxon));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful())
 			assertEquals(expectedResult, http.parseResult(GetTaxonOutputModel.class, result));
 		else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -141,11 +141,11 @@ public class TaxonControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("saveTaxon_params")
 	public void saveTaxon(MockHttpServletRequestBuilder req, TaxonInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		if(input != null)
+		if (input != null)
 			Mockito.when(service.saveTaxon(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -155,7 +155,7 @@ public class TaxonControllerTests extends Test {
 		Mockito.when(service.deleteTaxon(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

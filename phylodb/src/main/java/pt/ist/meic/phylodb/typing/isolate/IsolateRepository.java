@@ -5,7 +5,6 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
-import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
@@ -18,11 +17,8 @@ import java.util.UUID;
 @Repository
 public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryKey> {
 
-	private ProfileRepository profileRepository;
-
-	public IsolateRepository(Session session, ProfileRepository profileRepository) {
+	public IsolateRepository(Session session) {
 		super(session);
-		this.profileRepository = profileRepository;
 	}
 
 	@Override
@@ -30,11 +26,15 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 		if (filters == null || filters.length != 2)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
-				"WHERE pj.deprecated = false, d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"OPTIONAL MATCH (p:Profile)<-[h:HAS]-(id)-[:HAS]->(a:Ancillary) WITH pj, d, r, i, id, h, p, collect([a.key, a.value]) as ancillary\n" +
-				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated, r.version as version, " +
+				"WHERE pj.deprecated = false AND d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"OPTIONAL MATCH (id)-[h:HAS]->(p:Profile)\n" +
+				"OPTIONAL MATCH (id)-[:HAS]->(a:Ancillary)\n" +
+				"WITH pj, d, r, i, id, h, p, a\n" +
+				"ORDER BY pj.id, d.id, i.id, a.key\n" +
+				"WITH pj, d, r, i, id, h, p, collect(DISTINCT {key: a.key, value: a.value}) as ancillary\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated as deprecated, r.version as version, " +
 				"p.id as profileId, p.deprecated as profileDeprecated, h.version as profileVersion, " +
-				"id.description as description.id as id, ancillary as ancillaries\n" +
+				"id.description as description, ancillary as ancillaries\n" +
 				"SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], page, limit));
 	}
@@ -44,10 +44,14 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
 				"WHERE " + where + "\n" +
-				"OPTIONAL MATCH (p:Profile)<-[:HAS]-(id)-[:HAS]->(a:Ancillary) WITH pj, d, r, i, id, p, collect([a.key, a.value]) as ancillary\n" +
-				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated, r.version as version, " +
+				"OPTIONAL MATCH (id)-[h:HAS]->(p:Profile)\n" +
+				"OPTIONAL MATCH (id)-[:HAS]->(a:Ancillary)\n" +
+				"WITH pj, d, r, i, id, h, p, a\n" +
+				"ORDER BY pj.id, d.id, i.id, a.key\n" +
+				"WITH pj, d, r, i, id, h, p, collect(DISTINCT {key: a.key, value: a.value}) as ancillary\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated as deprecated, r.version as version, " +
 				"p.id as profileId, p.deprecated as profileDeprecated, h.version as profileVersion, " +
-				"d.description as description.id as id, ancillary as ancillaries";
+				"id.description as description, ancillary as ancillaries";
 		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), version));
 	}
 
@@ -55,10 +59,11 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	protected Isolate parse(Map<String, Object> row) {
 		UUID projectId = UUID.fromString(row.get("projectId").toString()), datasetId = UUID.fromString(row.get("datasetId").toString());
 		Entity<Profile.PrimaryKey> profile = null;
-		if(row.get("profileId") != null )
-			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId,(String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
-		Ancillary[] ancillaries = Arrays.stream((Object[][])row.get("ancillaries"))
-				.map(a -> new Ancillary((String)a[0], (String)a[1]))
+		if (row.get("profileId") != null)
+			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
+		Ancillary[] ancillaries = Arrays.stream((Map<String, Object>[]) row.get("ancillaries"))
+				.filter(a -> a.get("key") != null)
+				.map(a -> new Ancillary((String) a.get("key"), (String) a.get("value")))
 				.toArray(Ancillary[]::new);
 		return new Isolate(projectId,
 				datasetId,
@@ -80,7 +85,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	@Override
 	protected Result store(Isolate isolate) {
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
-		Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
+		Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE p.deprecated = false AND d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 		composeStore(query, isolate);
 		return execute(query);
 	}
@@ -88,7 +93,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	@Override
 	protected void delete(Isolate.PrimaryKey key) {
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})\n" +
-				"WHERE p.deprecated = false AND d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE p.deprecated = false AND d.deprecated = false AND i.deprecated = false\n" +
 				"SET i.deprecated = true";
 		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
@@ -96,18 +101,13 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	@Override
 	protected Query init(String... params) {
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
-				"WHERE d.deprecated = false\n" +
+				"WHERE p.deprecated = false AND d.deprecated = false\n" +
 				"WITH d\n";
 		return new Query(statement, params[0], params[1]);
 	}
 
 	@Override
 	protected void batch(Query query, Isolate isolate) {
-		Isolate.PrimaryKey key = isolate.getPrimaryKey();
-		if(isolate.getProfile() != null && profileRepository.exists(new Profile.PrimaryKey(key.getProjectId(), key.getDatasetId(), isolate.getProfile().getPrimaryKey().getId()))) {
-			LOG.info(String.format("The %s was not created due to absent profile", isolate.toString()));
-			return;
-		}
 		composeStore(query, isolate);
 		query.appendQuery("WITH d\n");
 	}
@@ -123,7 +123,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH d, i, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (i)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(id:IsolateDetails {description: $})\n";
-		query.appendQuery(statement).addParameter(isolate.getPrimaryKey(), isolate.getDescription());
+		query.appendQuery(statement).addParameter(isolate.getPrimaryKey().getId(), isolate.getDescription());
 		composeProfile(query, isolate);
 		composeAncillary(query, isolate);
 	}
@@ -131,9 +131,8 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	private void composeProfile(Query query, Isolate isolate) {
 		if (isolate.getProfile() == null) return;
 		String statement = "WITH d, id\n" +
-				"MATCH (p:Profile {id: $}-[r:CONTAINS_DETAILS]->(pd:ProfileDetails))\n" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"WITH d, p, id, r\n" +
 				"CREATE (id)-[:HAS {version: r.version}]->(p)\n";
 		query.appendQuery(statement).addParameter(isolate.getProfile().getPrimaryKey().getId());
 	}

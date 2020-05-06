@@ -4,8 +4,11 @@ import java.util.Objects;
 
 public class Ancillary {
 
-	private final String key;
-	private final String value;
+	private String key;
+	private String value;
+
+	public Ancillary() {
+	}
 
 	public Ancillary(String key, String value) {
 		this.key = key;

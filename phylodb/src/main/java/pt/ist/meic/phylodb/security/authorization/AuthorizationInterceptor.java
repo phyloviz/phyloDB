@@ -43,7 +43,7 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 		Optional<String> optional = getProjectId(req);
 		if (optional.isPresent()) {
 			Optional<Project> optionalProject = optional.flatMap(i -> projectService.getProject(UUID.fromString(i), CURRENT_VERSION_VALUE));
-			if(optionalProject.isPresent()) {
+			if (optionalProject.isPresent()) {
 				Project project = optionalProject.get();
 				boolean included = Arrays.stream(project.getUsers()).anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
 				if (methodRole.equals(Role.USER) &&

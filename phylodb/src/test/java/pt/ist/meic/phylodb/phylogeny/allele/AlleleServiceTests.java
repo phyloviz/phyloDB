@@ -29,23 +29,26 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class AlleleServiceTests extends Test {
 
-	@MockBean
-	private LocusRepository locusRepository;
-	@MockBean
-	private AlleleRepository alleleRepository;
-
-	@InjectMocks
-	private AlleleService service;
-
 	private static final int LIMIT = 2;
 	private static final String taxonId = "t", locusId = "l";
 	private static final Allele first = new Allele(taxonId, locusId, "1one", 1, false, "description", null);
 	private static final Allele second = new Allele(taxonId, locusId, "2two", 1, false, null, UUID.randomUUID());
 	private static final Allele[] state = new Allele[]{first, second};
+	@MockBean
+	private LocusRepository locusRepository;
+	@MockBean
+	private AlleleRepository alleleRepository;
+	@InjectMocks
+	private AlleleService service;
 
 	private static Stream<Arguments> getAlleles_params() {
-		List<Allele> expected1 = new ArrayList<Allele>() {{ add(state[0]); }};
-		List<Allele> expected2 = new ArrayList<Allele>() {{ add(state[0]); add(state[1]); }};
+		List<Allele> expected1 = new ArrayList<Allele>() {{
+			add(state[0]);
+		}};
+		List<Allele> expected2 = new ArrayList<Allele>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -72,7 +75,7 @@ public class AlleleServiceTests extends Test {
 	private static Stream<Arguments> saveAll_params() throws IOException {
 		Locus.PrimaryKey key = new Locus.PrimaryKey(taxonId, locusId);
 		MultipartFile file = FormatterTests.createFile("fasta", "f-2-a.txt");
-		List<Allele> alleles = Arrays.asList(FastaFormatterTests.alleles("t","l", null, new String[] {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"}));
+		List<Allele> alleles = Arrays.asList(FastaFormatterTests.alleles("t", "l", null, new String[]{"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"}));
 		List<Pair<Allele, Boolean>> existsNone = alleles.stream().map(a -> new Pair<>(a, false)).collect(Collectors.toList());
 		List<Pair<Allele, Boolean>> existsAll = alleles.stream().map(a -> new Pair<>(a, true)).collect(Collectors.toList());
 		List<Pair<Allele, Boolean>> existsSome = new ArrayList<>();
@@ -94,7 +97,7 @@ public class AlleleServiceTests extends Test {
 	public void getAlleles(int page, List<Allele> expected) {
 		Mockito.when(alleleRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Allele>> result = service.getAlleles("", "", null, page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

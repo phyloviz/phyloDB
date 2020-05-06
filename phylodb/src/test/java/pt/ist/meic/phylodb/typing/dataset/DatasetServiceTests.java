@@ -32,15 +32,6 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class DatasetServiceTests extends Test {
 
-	@MockBean
-	private DatasetRepository datasetRepository;
-	@MockBean
-	private SchemaRepository schemaRepository;
-	@MockBean
-	private ProfileRepository profileRepository;
-	@InjectMocks
-	private DatasetService service;
-
 	private static final int LIMIT = 2;
 	private static final User user = new User("1one", "one", 1, false, Role.USER);
 	private static final Project project = new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user.getPrimaryKey()});
@@ -53,10 +44,23 @@ public class DatasetServiceTests extends Test {
 	private static final Dataset dataset1 = new Dataset(project.getPrimaryKey(), UUID.randomUUID(), 1, false, "name1", schemaReference);
 	private static final Dataset dataset2 = new Dataset(project.getPrimaryKey(), UUID.randomUUID(), 1, false, "name2", schemaReference);
 	private static final Dataset[] state = new Dataset[]{dataset1, dataset2};
+	@MockBean
+	private DatasetRepository datasetRepository;
+	@MockBean
+	private SchemaRepository schemaRepository;
+	@MockBean
+	private ProfileRepository profileRepository;
+	@InjectMocks
+	private DatasetService service;
 
 	private static Stream<Arguments> getDatasets_params() {
-		List<Dataset> expected1 = new ArrayList<Dataset>() {{ add(state[0]); }};
-		List<Dataset> expected2 = new ArrayList<Dataset>() {{ add(state[0]); add(state[1]); }};
+		List<Dataset> expected1 = new ArrayList<Dataset>() {{
+			add(state[0]);
+		}};
+		List<Dataset> expected2 = new ArrayList<Dataset>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -95,7 +99,7 @@ public class DatasetServiceTests extends Test {
 	public void getDatasets(int page, List<Dataset> expected) {
 		Mockito.when(datasetRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Dataset>> result = service.getDatasets(project.getPrimaryKey(), page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

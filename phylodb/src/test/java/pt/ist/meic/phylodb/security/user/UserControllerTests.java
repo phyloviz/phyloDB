@@ -50,16 +50,17 @@ public class UserControllerTests extends Test {
 	@Autowired
 	private MockHttp http;
 
-
 	private static Stream<Arguments> getUsers_params() {
 		String uri = "/users";
-		List<User> users = new ArrayList<User>() {{add(new User("id", "provider", Role.USER));}};
+		List<User> users = new ArrayList<User>() {{
+			add(new User("id", "provider", Role.USER));
+		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
 		List<UserOutputModel> result = users.stream()
 				.map(UserOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, users, HttpStatus.OK, result,  null),
+		return Stream.of(Arguments.of(req1, users, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req2, users, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
@@ -87,7 +88,7 @@ public class UserControllerTests extends Test {
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, key.getId())).param("provider", key.getProvider()),
 				req2 = put(String.format(uri, key.getId()));
 		UserInputModel input1 = new UserInputModel(key.getId(), key.getProvider(), user.getRole().getName()),
-			input2 = new UserInputModel("different", key.getProvider(), "random");
+				input2 = new UserInputModel("different", key.getProvider(), "random");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -107,7 +108,7 @@ public class UserControllerTests extends Test {
 	}
 
 	@BeforeEach
-	public void init(){
+	public void init() {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(authenticationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 		Mockito.when(authorizationInterceptor.preHandle(any(), any(), any())).thenReturn(true);
@@ -119,10 +120,10 @@ public class UserControllerTests extends Test {
 		Mockito.when(service.getUsers(anyInt(), anyInt())).thenReturn(Optional.ofNullable(users));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful()) {
+		if (expectedStatus.is2xxSuccessful()) {
 			List<Map<String, Object>> parsed = http.parseResult(List.class, result);
 			assertEquals(expectedResult.size(), parsed.size());
-			if(expectedResult.size() > 0) {
+			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getEmail(), p.get("email"));
@@ -131,8 +132,7 @@ public class UserControllerTests extends Test {
 					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
 				}
 			}
-		}
-		else
+		} else
 			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -142,7 +142,7 @@ public class UserControllerTests extends Test {
 		Mockito.when(service.getUser(anyString(), anyString(), anyLong())).thenReturn(Optional.ofNullable(user));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful())
 			assertEquals(expectedResult, http.parseResult(GetUserOutputModel.class, result));
 		else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
@@ -151,11 +151,11 @@ public class UserControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("updateUser_params")
 	public void updateUser(MockHttpServletRequestBuilder req, UserInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		if(input != null)
+		if (input != null)
 			Mockito.when(service.updateUser(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 
@@ -165,7 +165,7 @@ public class UserControllerTests extends Test {
 		Mockito.when(service.deleteUser(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if(expectedStatus.is4xxClientError())
+		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

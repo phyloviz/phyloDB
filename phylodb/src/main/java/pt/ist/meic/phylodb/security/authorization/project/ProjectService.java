@@ -35,14 +35,14 @@ public class ProjectService {
 
 	@Transactional
 	public boolean saveProject(Project project, User.PrimaryKey user) {
-		if(project == null || user == null)
+		if (project == null || user == null)
 			return false;
 		List<User.PrimaryKey> users = Arrays.stream(project.getUsers())
 				.filter(u -> !u.equals(user))
 				.distinct()
 				.collect(Collectors.toList());
 		users.add(user);
-		if(userRepository.anyMissing(users.toArray(new User.PrimaryKey[0])))
+		if (userRepository.anyMissing(users.toArray(new User.PrimaryKey[0])))
 			return false;
 		return projectRepository.save(project).isPresent();
 	}

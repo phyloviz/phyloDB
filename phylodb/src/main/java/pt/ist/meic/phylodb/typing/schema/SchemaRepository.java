@@ -88,7 +88,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	public Optional<Schema> find(String taxonId, Method type, String[] lociIds) {
-		if(taxonId == null || lociIds == null || lociIds.length == 0)
+		if (taxonId == null || lociIds == null || lociIds.length == 0)
 			return Optional.empty();
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {type: $})\n" +
 				"WHERE s.deprecated = false AND NOT EXISTS(r.to)\n" +
@@ -110,7 +110,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	public Optional<Schema> find(Dataset.PrimaryKey key) {
-		if(key == null)
+		if (key == null)
 			return Optional.empty();
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h1:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE NOT EXISTS(r1.to) AND r2.version = h1.version\n" +
@@ -148,9 +148,9 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	private void composeLoci(Schema schema, Query query) {
 		String[] ids = schema.getLociIds().toArray(new String[0]);
 		for (int i = 0; i < ids.length; i++) {
-			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
-					"WHERE l%s.deprecated = false AND NOT EXISTS(r.to)\n" +
-					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l%s) WITH sd, t\n", i, i, i + 1, i)
+			query.appendQuery("MATCH (t)-[:CONTAINS]->(l:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
+					"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
+					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l) WITH sd, t\n", i + 1)
 					.addParameter(ids[i]);
 		}
 		query.subQuery(query.length() - "WITH sd, t\n".length());

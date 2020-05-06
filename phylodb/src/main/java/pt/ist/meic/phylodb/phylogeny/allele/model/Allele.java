@@ -83,6 +83,7 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 					Objects.equals(id, that.id) &&
 					Objects.equals(project, that.project);
 		}
+
 	}
 
 }

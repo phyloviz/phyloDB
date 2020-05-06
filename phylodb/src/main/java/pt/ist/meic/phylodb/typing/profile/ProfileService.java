@@ -57,7 +57,7 @@ public class ProfileService {
 
 	@Transactional
 	public boolean saveProfile(Profile profile, boolean authorized) {
-		if(profile == null)
+		if (profile == null)
 			return false;
 		Dataset.PrimaryKey datasetKey = new Dataset.PrimaryKey(profile.getPrimaryKey().getProjectId(), profile.getPrimaryKey().getDatasetId());
 		Optional<Schema> optional = schemaRepository.find(datasetKey);
@@ -66,7 +66,7 @@ public class ProfileService {
 		Schema schema = optional.get();
 		List<Entity<Locus.PrimaryKey>> loci = schema.getLociReferences();
 		List<Entity<Allele.PrimaryKey>> alleles = profile.getAllelesReferences();
-		if(loci.size() != alleles.size())
+		if (loci.size() != alleles.size())
 			return false;
 		profile = profile.updateReferences(schema, missing, authorized);
 		return verifyAlleles(profile.getAllelesReferences()) && profileRepository.save(profile).isPresent();

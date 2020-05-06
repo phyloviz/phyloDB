@@ -8,17 +8,18 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.utils.db.Query;
 
 @Transactional
-public abstract class RepositoryTests  extends Test {
+public abstract class RepositoryTests extends Test {
 
 	@Autowired
 	private Session session;
 
-	protected Integer count(){
+	protected Integer count() {
 		return query(Integer.class, new Query("MATCH (n) return COUNT(n)"));
 	}
-	protected void xpto(){
+
+	protected void xpto() {
 		Result r = query(new Query("MATCH (n) return n.id"));
-		while(r.iterator().hasNext()) {
+		while (r.iterator().hasNext()) {
 			Object x = r.iterator().next();
 			int i = 1;
 		}
@@ -39,4 +40,5 @@ public abstract class RepositoryTests  extends Test {
 		session.clear();
 		return statistics;
 	}
+
 }

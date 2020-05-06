@@ -24,20 +24,23 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class TaxonServiceTests extends Test {
 
-	@MockBean
-	private TaxonRepository repository;
-
-	@InjectMocks
-	private TaxonService service;
-
 	private static final int LIMIT = 2;
 	private static final Taxon first = new Taxon("1one", 1, false, "description");
 	private static final Taxon second = new Taxon("2two", 1, false, null);
 	private static final Taxon[] state = new Taxon[]{first, second};
+	@MockBean
+	private TaxonRepository repository;
+	@InjectMocks
+	private TaxonService service;
 
 	private static Stream<Arguments> getTaxons_params() {
-		List<Taxon> expected1 = new ArrayList<Taxon>() {{ add(state[0]); }};
-		List<Taxon> expected2 = new ArrayList<Taxon>() {{ add(state[0]); add(state[1]); }};
+		List<Taxon> expected1 = new ArrayList<Taxon>() {{
+			add(state[0]);
+		}};
+		List<Taxon> expected2 = new ArrayList<Taxon>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -70,7 +73,7 @@ public class TaxonServiceTests extends Test {
 	public void getTaxons(int page, List<Taxon> expected) {
 		Mockito.when(repository.findAll(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Taxon>> result = service.getTaxons(page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

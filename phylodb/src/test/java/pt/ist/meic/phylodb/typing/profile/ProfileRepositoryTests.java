@@ -36,23 +36,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProfileRepositoryTests extends RepositoryTests {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
-	@Autowired
-	private AlleleRepository alleleRepository;
-	@Autowired
-	private SchemaRepository schemaRepository;
-	@Autowired
-	private ProjectRepository projectRepository;
-	@Autowired
-	private DatasetRepository datasetRepository;
-	@Autowired
-	private ProfileRepository profileRepository;
-
 	private static final int LIMIT = 2;
 	private static final User user = new User("1one", "one", 1, false, Role.USER);
 	private static final Project project1 = new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user.getPrimaryKey()});
@@ -73,81 +56,22 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	private static final Profile profile2 = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "2", 1, false, null,
 			Arrays.asList(new Entity<>(allele12.getPrimaryKey(), allele12.getVersion(), allele12.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())));
 	private static final Profile[] state = new Profile[]{profile1, profile2};
-
-	private void store(Profile[] profiles) {
-		for (Profile profile : profiles) {
-			Profile.PrimaryKey key = profile.getPrimaryKey();
-			String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE pj.deprecated = false AND d.deprecated = false\n" +
-					"MERGE (d)-[:CONTAINS]->(p:Profile {id: $}) SET p.deprecated = $ WITH pj, d, p\n" +
-					"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-					"WITH pj, d, p, COALESCE(r.version, 0) + 1 as v\n" +
-					"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProfileDetails {aka: $})\n" +
-					"WITH pj, d, pd\n" +
-					"MATCH (d)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-					"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
-					"WITH pj, d, pd, sd\n";
-			Query query = new Query(statement);
-			query.addParameter(key.getProjectId(), key.getDatasetId(), key.getId(), profile.isDeprecated(), profile.getAka());
-			statement = "MATCH (sd)-[:HAS {part: %s}]->(l:Locus)\n" +
-					"MATCH (l)-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-					"WHERE NOT EXISTS(r.to) AND %s\n" +
-					"CREATE (pd)-[:HAS {version: r.version}]->(a)\n" +
-					"WITH pj, d, pd, sd\n";
-			List<Entity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
-			for (int i = 0; i < allelesIds.size(); i++) {
-				Entity<Allele.PrimaryKey> reference = allelesIds.get(i);
-				if(reference == null || reference.getPrimaryKey().getId().matches(missing))
-					continue;
-				String referenceId = reference.getPrimaryKey().getId();
-				String where = reference.getPrimaryKey().getProject() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";
-				query.appendQuery(statement, i + 1, where).addParameter(referenceId);
-			}
-			query.subQuery(query.length() - "WITH pj, d, pd, sd\n".length());
-			execute(query);
-		}
-	}
-
-	private Profile parse(Map<String, Object> row) {
-		int size = Math.toIntExact((long) row.get("size"));
-		ArrayList<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
-		for (int i = 0; i < size; i++)
-			allelesReferences.add(null);
-		for (Map<String, Object> a: (Map<String, Object>[]) row.get("alleles")) {
-			int position = Math.toIntExact((long) a.get("part"));
-			Object projectId = a.get("project");
-			UUID project =  projectId == null ? null : UUID.fromString((String) projectId);
-			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), project);
-			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
-			allelesReferences.set(position - 1, reference);
-		}
-		return new Profile(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
-				(String) row.get("id"),
-				(long) row.get("version"),
-				(boolean) row.get("deprecated"),
-				(String) row.get("aka"),
-				allelesReferences
-		);
-	}
-
-	private Profile[] findAll() {
-		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
-				"MATCH (dd)-[h:HAS]->(s:Schema)-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[sp:HAS]->(:Locus)\n" +
-				"WHERE r.version = h.version\n" +
-				"WITH pj, d, s, sd, COUNT(sp) as schemaSize\n" +
-				"MATCH (sd)-[sp:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l)\n" +
-				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
-				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, schemaSize as size, r.version as version, p.deprecated as deprecated,\n" +
-				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:sp.part}) as alleles\n" +
-				"ORDER BY pj.id, d.id, p.id, version";
-		Result result = query(new Query(statement, project1.getPrimaryKey(), dataset.getPrimaryKey().getId()));
-		if (result == null) return new Profile[0];
-		return StreamSupport.stream(result.spliterator(), false)
-				.map(this::parse)
-				.toArray(Profile[]::new);
-	}
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private TaxonRepository taxonRepository;
+	@Autowired
+	private LocusRepository locusRepository;
+	@Autowired
+	private AlleleRepository alleleRepository;
+	@Autowired
+	private SchemaRepository schemaRepository;
+	@Autowired
+	private ProjectRepository projectRepository;
+	@Autowired
+	private DatasetRepository datasetRepository;
+	@Autowired
+	private ProfileRepository profileRepository;
 
 	private static Stream<Arguments> findAll_params() {
 		List<Entity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), null);
@@ -284,14 +208,89 @@ public class ProfileRepositoryTests extends RepositoryTests {
 				Arguments.of(Collections.singletonList(firstPrivateMissingConflict), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateMissingConflict}, true, 1, 2),
 				Arguments.of(Collections.singletonList(firstPublicMissing), new Profile[]{state[1]}, new Profile[]{firstPublicMissing, state[1]}, true, 2, 3),
 				Arguments.of(Collections.singletonList(firstPublicMissingConflict), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicMissingConflict}, true, 1, 2),
-				Arguments.of(Arrays.asList(firstPrivateExists, secondPrivateExists), new Profile[0],  new Profile[]{firstPrivateExists, secondPrivateExists}, true, 4, 8),
-				Arguments.of(Arrays.asList(firstPrivateExistsConflict, secondPrivateExists), new Profile[]{state[0]},  new Profile[]{state[0], firstPrivateExistsConflict, secondPrivateExists}, true, 3, 7),
+				Arguments.of(Arrays.asList(firstPrivateExists, secondPrivateExists), new Profile[0], new Profile[]{firstPrivateExists, secondPrivateExists}, true, 4, 8),
+				Arguments.of(Arrays.asList(firstPrivateExistsConflict, secondPrivateExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateExistsConflict, secondPrivateExists}, true, 3, 7),
 				Arguments.of(Arrays.asList(firstPublicExists, secondPublicExists), new Profile[0], new Profile[]{firstPublicExists, secondPublicExists}, true, 4, 8),
 				Arguments.of(Arrays.asList(firstPublicExistsConflict, secondPublicExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicExistsConflict, secondPublicExists}, true, 3, 7),
-				Arguments.of(Arrays.asList(firstPrivateMissing, secondPrivateExists), new Profile[0],  new Profile[]{firstPrivateMissing, secondPrivateExists}, true, 4, 7),
+				Arguments.of(Arrays.asList(firstPrivateMissing, secondPrivateExists), new Profile[0], new Profile[]{firstPrivateMissing, secondPrivateExists}, true, 4, 7),
 				Arguments.of(Arrays.asList(firstPrivateMissingConflict, secondPrivateExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateMissingConflict, secondPrivateExists}, true, 3, 6),
 				Arguments.of(Arrays.asList(firstPublicMissing, secondPublicExists), new Profile[0], new Profile[]{firstPublicMissing, secondPublicExists}, true, 4, 7),
-				Arguments.of(Arrays.asList(firstPublicMissingConflict, secondPublicExists), new Profile[]{state[0]},  new Profile[]{state[0], firstPublicMissingConflict, secondPublicExists}, true, 3, 6));
+				Arguments.of(Arrays.asList(firstPublicMissingConflict, secondPublicExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicMissingConflict, secondPublicExists}, true, 3, 6));
+	}
+
+	private void store(Profile[] profiles) {
+		for (Profile profile : profiles) {
+			Profile.PrimaryKey key = profile.getPrimaryKey();
+			String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE pj.deprecated = false AND d.deprecated = false\n" +
+					"MERGE (d)-[:CONTAINS]->(p:Profile {id: $}) SET p.deprecated = $ WITH pj, d, p\n" +
+					"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
+					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WITH pj, d, p, COALESCE(r.version, 0) + 1 as v\n" +
+					"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProfileDetails {aka: $})\n" +
+					"WITH pj, d, pd\n" +
+					"MATCH (d)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
+					"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+					"WITH pj, d, pd, sd\n";
+			Query query = new Query(statement);
+			query.addParameter(key.getProjectId(), key.getDatasetId(), key.getId(), profile.isDeprecated(), profile.getAka());
+			statement = "MATCH (sd)-[:HAS {part: %s}]->(l:Locus)\n" +
+					"MATCH (l)-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
+					"WHERE NOT EXISTS(r.to) AND %s\n" +
+					"CREATE (pd)-[:HAS {version: r.version}]->(a)\n" +
+					"WITH pj, d, pd, sd\n";
+			List<Entity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
+			for (int i = 0; i < allelesIds.size(); i++) {
+				Entity<Allele.PrimaryKey> reference = allelesIds.get(i);
+				if (reference == null || reference.getPrimaryKey().getId().matches(missing))
+					continue;
+				String referenceId = reference.getPrimaryKey().getId();
+				String where = reference.getPrimaryKey().getProject() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";
+				query.appendQuery(statement, i + 1, where).addParameter(referenceId);
+			}
+			query.subQuery(query.length() - "WITH pj, d, pd, sd\n".length());
+			execute(query);
+		}
+	}
+
+	private Profile parse(Map<String, Object> row) {
+		int size = Math.toIntExact((long) row.get("size"));
+		ArrayList<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
+		for (int i = 0; i < size; i++)
+			allelesReferences.add(null);
+		for (Map<String, Object> a : (Map<String, Object>[]) row.get("alleles")) {
+			int position = Math.toIntExact((long) a.get("part"));
+			Object projectId = a.get("project");
+			UUID project = projectId == null ? null : UUID.fromString((String) projectId);
+			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), project);
+			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
+			allelesReferences.set(position - 1, reference);
+		}
+		return new Profile(UUID.fromString(row.get("projectId").toString()),
+				UUID.fromString(row.get("datasetId").toString()),
+				(String) row.get("id"),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"),
+				(String) row.get("aka"),
+				allelesReferences
+		);
+	}
+
+	private Profile[] findAll() {
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
+				"MATCH (dd)-[h:HAS]->(s:Schema)-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[sp:HAS]->(:Locus)\n" +
+				"WHERE r.version = h.version\n" +
+				"WITH pj, d, s, sd, COUNT(sp) as schemaSize\n" +
+				"MATCH (sd)-[sp:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l)\n" +
+				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, schemaSize as size, r.version as version, p.deprecated as deprecated,\n" +
+				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:sp.part}) as alleles\n" +
+				"ORDER BY pj.id, d.id, p.id, version";
+		Result result = query(new Query(statement, project1.getPrimaryKey(), dataset.getPrimaryKey().getId()));
+		if (result == null) return new Profile[0];
+		return StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.toArray(Profile[]::new);
 	}
 
 	@BeforeEach
@@ -321,7 +320,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 		}
 		assertTrue(result.isPresent());
 		List<Profile> schemas = result.get();
-		assertEquals(expected.length,  schemas.size());
+		assertEquals(expected.length, schemas.size());
 		assertArrayEquals(expected, schemas.toArray());
 	}
 
@@ -351,7 +350,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 		store(ProfileRepositoryTests.state);
 		store(state);
 		Optional<QueryStatistics> result = profileRepository.save(profile);
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
@@ -377,7 +376,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	public void saveAll(List<Profile> profiles, Profile[] state, Profile[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(state);
 		Optional<QueryStatistics> result = profileRepository.saveAll(profiles, project1.getPrimaryKey().toString(), dataset.getPrimaryKey().getId().toString());
-		if(executed) {
+		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
 			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());

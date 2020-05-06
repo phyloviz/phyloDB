@@ -39,7 +39,7 @@ public class AlleleService {
 
 	@Transactional
 	public boolean saveAllele(Allele allele) {
-		if(allele == null) return false;
+		if (allele == null) return false;
 		return locusRepository.exists(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) &&
 				alleleRepository.save(allele).isPresent();
 	}

@@ -12,9 +12,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import pt.ist.meic.phylodb.Test;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.MockResult;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
@@ -26,14 +26,6 @@ import static org.mockito.ArgumentMatchers.*;
 
 public class SchemaServiceTests extends Test {
 
-	@MockBean
-	private LocusRepository locusRepository;
-	@MockBean
-	private SchemaRepository schemaRepository;
-
-	@InjectMocks
-	private SchemaService service;
-
 	private static final int LIMIT = 2;
 	private static final Taxon taxon = new Taxon("t", null);
 	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
@@ -43,10 +35,21 @@ public class SchemaServiceTests extends Test {
 	private static final Schema schema2 = new Schema(taxon.getPrimaryKey(), "2two", 1, false, Method.MLST, null,
 			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
 	private static final Schema[] state = new Schema[]{schema1, schema2};
+	@MockBean
+	private LocusRepository locusRepository;
+	@MockBean
+	private SchemaRepository schemaRepository;
+	@InjectMocks
+	private SchemaService service;
 
 	private static Stream<Arguments> getSchemas_params() {
-		List<Schema> expected1 = new ArrayList<Schema>() {{ add(state[0]); }};
-		List<Schema> expected2 = new ArrayList<Schema>() {{ add(state[0]); add(state[1]); }};
+		List<Schema> expected1 = new ArrayList<Schema>() {{
+			add(state[0]);
+		}};
+		List<Schema> expected2 = new ArrayList<Schema>() {{
+			add(state[0]);
+			add(state[1]);
+		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
 				Arguments.of(0, expected2),
@@ -59,7 +62,7 @@ public class SchemaServiceTests extends Test {
 	}
 
 	private static Stream<Arguments> saveSchema_params() {
-		Schema different =  new Schema(taxon.getPrimaryKey(), "different", 1, false, Method.MLST, null, null);
+		Schema different = new Schema(taxon.getPrimaryKey(), "different", 1, false, Method.MLST, null, null);
 		return Stream.of(Arguments.of(state[0], false, state[0], new MockResult().queryStatistics()),
 				Arguments.of(state[1], false, different, null),
 				Arguments.of(state[0], true, state[0], null),
@@ -81,7 +84,7 @@ public class SchemaServiceTests extends Test {
 	public void getSchema(int page, List<Schema> expected) {
 		Mockito.when(schemaRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Schema>> result = service.getSchemas(taxon.getPrimaryKey(), page, LIMIT);
-		if(expected == null && !result.isPresent()) {
+		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}

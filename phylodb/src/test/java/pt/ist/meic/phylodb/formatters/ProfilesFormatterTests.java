@@ -3,9 +3,9 @@ package pt.ist.meic.phylodb.formatters;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.service.Entity;
-import pt.ist.meic.phylodb.typing.schema.model.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class ProfilesFormatterTests extends FormatterTests {
 			List<Entity<Allele.PrimaryKey>> references = new ArrayList<>();
 			String[] alleles = profileAlleles[j];
 			for (int i = 0; i < alleles.length; ++i) {
-				if(alleles[i] != null) {
+				if (alleles[i] != null) {
 					Allele.PrimaryKey key = authorized ?
 							new Allele.PrimaryKey(schema.getPrimaryKey().getTaxonId(), lociReferences.get(i).getPrimaryKey().getId(), alleles[i], project) :
 							new Allele.PrimaryKey(schema.getPrimaryKey().getTaxonId(), lociReferences.get(i).getPrimaryKey().getId(), alleles[i]);
@@ -33,4 +33,5 @@ public class ProfilesFormatterTests extends FormatterTests {
 		}
 		return profiles.toArray(new Profile[0]);
 	}
+
 }

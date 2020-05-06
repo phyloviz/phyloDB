@@ -31,7 +31,7 @@ public class LocusService {
 
 	@Transactional
 	public boolean saveLocus(Locus locus) {
-		if(locus == null)
+		if (locus == null)
 			return false;
 		return taxonRepository.exists(locus.getTaxonId()) && locusRepository.save(locus).isPresent();
 	}

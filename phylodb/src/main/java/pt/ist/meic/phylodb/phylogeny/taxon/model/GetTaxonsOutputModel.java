@@ -22,6 +22,4 @@ public class GetTaxonsOutputModel implements OutputModel {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 
-
-
 }
