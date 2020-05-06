@@ -6,28 +6,21 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
-import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectController;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectService;
 import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectOutputModel;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.security.authorization.project.model.ProjectInputModel;
 import pt.ist.meic.phylodb.security.authorization.project.model.ProjectOutputModel;
-import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,18 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-public class ProjectControllerTests extends Test {
-
-	@Autowired
-	private ProjectController controller;
-	@MockBean
-	private ProjectService service;
-	@MockBean
-	private AuthenticationInterceptor authenticationInterceptor;
-	@MockBean
-	private AuthorizationInterceptor authorizationInterceptor;
-	@Autowired
-	private MockHttp http;
+public class ProjectControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProjects_params() {
 		String uri = "/projects";
@@ -123,7 +105,7 @@ public class ProjectControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getProjects_params")
 	public void getProjects(MockHttpServletRequestBuilder req, List<Project> projects, HttpStatus expectedStatus, List<ProjectOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(service.getProjects(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
+		Mockito.when(projectService.getProjects(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -144,7 +126,7 @@ public class ProjectControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getProject_params")
 	public void getProject(MockHttpServletRequestBuilder req, Project project, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.getProject(any(), anyLong())).thenReturn(Optional.ofNullable(project));
+		Mockito.when(projectService.getProject(any(), anyLong())).thenReturn(Optional.ofNullable(project));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())
@@ -157,7 +139,7 @@ public class ProjectControllerTests extends Test {
 	@MethodSource("putProject_params")
 	public void updateProject(MockHttpServletRequestBuilder req, ProjectInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if (input != null)
-			Mockito.when(service.saveProject(any(), any())).thenReturn(ret);
+			Mockito.when(projectService.saveProject(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -168,7 +150,7 @@ public class ProjectControllerTests extends Test {
 	@MethodSource("postProject_params")
 	public void postProject(MockHttpServletRequestBuilder req, ProjectInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if (input != null)
-			Mockito.when(service.saveProject(any(), any())).thenReturn(ret);
+			Mockito.when(projectService.saveProject(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -181,7 +163,7 @@ public class ProjectControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("deleteProject_params")
 	public void deleteProject(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.deleteProject(any())).thenReturn(ret);
+		Mockito.when(projectService.deleteProject(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())

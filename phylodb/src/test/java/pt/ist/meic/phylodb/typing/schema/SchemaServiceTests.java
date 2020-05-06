@@ -4,51 +4,35 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.neo4j.ogm.model.QueryStatistics;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import pt.ist.meic.phylodb.Test;
-import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.MockResult;
-import pt.ist.meic.phylodb.utils.service.Entity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
-public class SchemaServiceTests extends Test {
+public class SchemaServiceTests extends ServiceTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final Taxon taxon = new Taxon("t", null);
-	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
-	private static final Locus locus2 = new Locus(taxon.getPrimaryKey(), "2", 1, false, null);
-	private static final Schema schema1 = new Schema(taxon.getPrimaryKey(), "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
-	private static final Schema schema2 = new Schema(taxon.getPrimaryKey(), "2two", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
-	private static final Schema[] state = new Schema[]{schema1, schema2};
-	@MockBean
-	private LocusRepository locusRepository;
-	@MockBean
-	private SchemaRepository schemaRepository;
-	@InjectMocks
-	private SchemaService service;
+	private static final Schema[] STATE = new Schema[]{SCHEMA1, SCHEMA2};
 
 	private static Stream<Arguments> getSchemas_params() {
 		List<Schema> expected1 = new ArrayList<Schema>() {{
-			add(state[0]);
+			add(STATE[0]);
 		}};
 		List<Schema> expected2 = new ArrayList<Schema>() {{
-			add(state[0]);
-			add(state[1]);
+			add(STATE[0]);
+			add(STATE[1]);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -57,21 +41,21 @@ public class SchemaServiceTests extends Test {
 	}
 
 	private static Stream<Arguments> getSchema_params() {
-		return Stream.of(Arguments.of(schema1.getPrimaryKey(), 1, schema1),
-				Arguments.of(schema1.getPrimaryKey(), 1, null));
+		return Stream.of(Arguments.of(SCHEMA1.getPrimaryKey(), 1, SCHEMA1),
+				Arguments.of(SCHEMA1.getPrimaryKey(), 1, null));
 	}
 
 	private static Stream<Arguments> saveSchema_params() {
-		Schema different = new Schema(taxon.getPrimaryKey(), "different", 1, false, Method.MLST, null, null);
-		return Stream.of(Arguments.of(state[0], false, state[0], new MockResult().queryStatistics()),
-				Arguments.of(state[1], false, different, null),
-				Arguments.of(state[0], true, state[0], null),
-				Arguments.of(null, false, state[0], null));
+		Schema different = new Schema(TAXON1.getPrimaryKey(), "different", 1, false, Method.MLST, null, null);
+		return Stream.of(Arguments.of(STATE[0], false, STATE[0], new MockResult().queryStatistics()),
+				Arguments.of(STATE[1], false, different, null),
+				Arguments.of(STATE[0], true, STATE[0], null),
+				Arguments.of(null, false, STATE[0], null));
 	}
 
 	private static Stream<Arguments> deleteSchema_params() {
-		return Stream.of(Arguments.of(state[0].getPrimaryKey(), true),
-				Arguments.of(state[0].getPrimaryKey(), false));
+		return Stream.of(Arguments.of(STATE[0].getPrimaryKey(), true),
+				Arguments.of(STATE[0].getPrimaryKey(), false));
 	}
 
 	@BeforeEach
@@ -83,7 +67,7 @@ public class SchemaServiceTests extends Test {
 	@MethodSource("getSchemas_params")
 	public void getSchema(int page, List<Schema> expected) {
 		Mockito.when(schemaRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Schema>> result = service.getSchemas(taxon.getPrimaryKey(), page, LIMIT);
+		Optional<List<Schema>> result = schemaService.getSchemas(TAXON1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -99,7 +83,7 @@ public class SchemaServiceTests extends Test {
 	@MethodSource("getSchema_params")
 	public void getSchema(Schema.PrimaryKey key, long version, Schema expected) {
 		Mockito.when(schemaRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(expected));
-		Optional<Schema> result = service.getSchema(key.getTaxonId(), key.getId(), version);
+		Optional<Schema> result = schemaService.getSchema(key.getTaxonId(), key.getId(), version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
 		if (expected != null)
 			assertEquals(expected, result.get());
@@ -111,7 +95,7 @@ public class SchemaServiceTests extends Test {
 		Mockito.when(locusRepository.anyMissing(any())).thenReturn(missing);
 		Mockito.when(schemaRepository.find(any(), any(), any())).thenReturn(Optional.ofNullable(dbSchema));
 		Mockito.when(schemaRepository.save(any())).thenReturn(Optional.ofNullable(expected));
-		boolean result = service.saveSchema(schema);
+		boolean result = schemaService.saveSchema(schema);
 		assertEquals(expected != null, result);
 	}
 
@@ -119,7 +103,7 @@ public class SchemaServiceTests extends Test {
 	@MethodSource("deleteSchema_params")
 	public void deleteSchema(Schema.PrimaryKey key, boolean expected) {
 		Mockito.when(schemaRepository.remove(any())).thenReturn(expected);
-		boolean result = service.deleteSchema(key.getTaxonId(), key.getId());
+		boolean result = schemaService.deleteSchema(key.getTaxonId(), key.getId());
 		assertEquals(expected, result);
 	}
 

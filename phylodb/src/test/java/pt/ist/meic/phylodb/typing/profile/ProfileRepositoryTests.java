@@ -6,25 +6,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.phylodb.RepositoryTests;
-import pt.ist.meic.phylodb.phylogeny.allele.AlleleRepository;
+import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
-import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
-import pt.ist.meic.phylodb.security.authentication.user.UserRepository;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
-import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectRepository;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
-import pt.ist.meic.phylodb.typing.Method;
-import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
-import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
-import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
@@ -34,87 +18,54 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ProfileRepositoryTests extends RepositoryTests {
+public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final User user = new User("1one", "one", 1, false, Role.USER);
-	private static final Project project1 = new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user.getPrimaryKey()});
-	private static final Project project2 = new Project(UUID.fromString("3023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user.getPrimaryKey()});
-	private static final String missing = "-";
-	private static final Taxon taxon = new Taxon("t", null);
-	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
-	private static final Locus locus2 = new Locus(taxon.getPrimaryKey(), "2", 1, false, null);
-	private static final Allele allele11 = new Allele(taxon.getPrimaryKey(), locus1.getPrimaryKey().getId(), "1", 1, false, "sequence11", project1.getPrimaryKey());
-	private static final Allele allele12 = new Allele(taxon.getPrimaryKey(), locus1.getPrimaryKey().getId(), "2", 1, false, "sequence12", null);
-	private static final Allele allele21 = new Allele(taxon.getPrimaryKey(), locus2.getPrimaryKey().getId(), "1", 1, false, "sequence21", project1.getPrimaryKey());
-	private static final Allele allele22 = new Allele(taxon.getPrimaryKey(), locus2.getPrimaryKey().getId(), "2", 1, false, "sequence22", null);
-	private static final Schema schema = new Schema(taxon.getPrimaryKey(), "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
-	private static final Dataset dataset = new Dataset(project1.getPrimaryKey(), UUID.fromString("1023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "name1", schema);
-	private static final Profile profile1 = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "1", 1, false, null,
-			Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated())));
-	private static final Profile profile2 = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "2", 1, false, null,
-			Arrays.asList(new Entity<>(allele12.getPrimaryKey(), allele12.getVersion(), allele12.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())));
-	private static final Profile[] state = new Profile[]{profile1, profile2};
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
-	@Autowired
-	private AlleleRepository alleleRepository;
-	@Autowired
-	private SchemaRepository schemaRepository;
-	@Autowired
-	private ProjectRepository projectRepository;
-	@Autowired
-	private DatasetRepository datasetRepository;
-	@Autowired
-	private ProfileRepository profileRepository;
+	private static final String MISSING = "-";
+	private static final Profile[] STATE = new Profile[]{PROFILE1, PROFILE2};
 
 	private static Stream<Arguments> findAll_params() {
-		List<Entity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), null);
-		List<Entity<Allele.PrimaryKey>> alleles1Changed = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()),
-				new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated()));
-		List<Entity<Allele.PrimaryKey>> alleles2 = Arrays.asList(null, new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated()));
-		List<Entity<Allele.PrimaryKey>> alleles3 = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()),
-				new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated()));
-		Profile first = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "3", 1, false, null, alleles1),
-				firstChanged = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "3", 2, false, null, alleles1Changed),
-				second = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "4", 1, false, "aka4", alleles2),
-				third = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "5", 1, false, "aka5", alleles3),
-				thirdChanged = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "5", 2, false, "aka4changed", alleles3),
-				fourth = new Profile(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "6", 1, false, "aka6", alleles1);
+		List<Entity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
+		List<Entity<Allele.PrimaryKey>> alleles1Changed = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
+				new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<Entity<Allele.PrimaryKey>> alleles2 = Arrays.asList(null, new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<Entity<Allele.PrimaryKey>> alleles3 = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
+				new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
+		Profile first = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 1, false, null, alleles1),
+				firstChanged = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 2, false, null, alleles1Changed),
+				second = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "4", 1, false, "aka4", alleles2),
+				third = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "5", 1, false, "aka5", alleles3),
+				thirdChanged = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "5", 2, false, "aka4changed", alleles3),
+				fourth = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "6", 1, false, "aka6", alleles1);
 		return Stream.of(Arguments.of(0, new Profile[0], new Profile[0]),
-				Arguments.of(0, new Profile[]{state[0]}, new Profile[]{state[0]}),
+				Arguments.of(0, new Profile[]{STATE[0]}, new Profile[]{STATE[0]}),
 				Arguments.of(0, new Profile[]{first, firstChanged}, new Profile[]{firstChanged}),
-				Arguments.of(0, new Profile[]{state[0], state[1], first}, state),
-				Arguments.of(0, new Profile[]{state[0], state[1], first, firstChanged}, state),
+				Arguments.of(0, new Profile[]{STATE[0], STATE[1], first}, STATE),
+				Arguments.of(0, new Profile[]{STATE[0], STATE[1], first, firstChanged}, STATE),
 				Arguments.of(1, new Profile[0], new Profile[0]),
-				Arguments.of(1, new Profile[]{state[0]}, new Profile[0]),
+				Arguments.of(1, new Profile[]{STATE[0]}, new Profile[0]),
 				Arguments.of(1, new Profile[]{first, firstChanged}, new Profile[0]),
-				Arguments.of(1, new Profile[]{state[0], state[1], first}, new Profile[]{first}),
-				Arguments.of(1, new Profile[]{state[0], state[1], first, firstChanged}, new Profile[]{firstChanged}),
-				Arguments.of(1, new Profile[]{state[0], state[1], first, second}, new Profile[]{first, second}),
-				Arguments.of(1, new Profile[]{state[0], state[1], first, firstChanged, second}, new Profile[]{firstChanged, second}),
-				Arguments.of(1, new Profile[]{state[0], state[1], first, firstChanged}, new Profile[]{firstChanged}),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], first}, new Profile[]{first}),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], first, firstChanged}, new Profile[]{firstChanged}),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], first, second}, new Profile[]{first, second}),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], first, firstChanged, second}, new Profile[]{firstChanged, second}),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], first, firstChanged}, new Profile[]{firstChanged}),
 				Arguments.of(2, new Profile[0], new Profile[0]),
-				Arguments.of(2, new Profile[]{state[0]}, new Profile[0]),
+				Arguments.of(2, new Profile[]{STATE[0]}, new Profile[0]),
 				Arguments.of(2, new Profile[]{first, firstChanged}, new Profile[0]),
-				Arguments.of(2, new Profile[]{state[0], state[1], first, second, third}, new Profile[]{third}),
-				Arguments.of(2, new Profile[]{state[0], state[1], first, second, third, thirdChanged}, new Profile[]{thirdChanged}),
-				Arguments.of(2, new Profile[]{state[0], state[1], first, second, third, fourth}, new Profile[]{third, fourth}),
-				Arguments.of(2, new Profile[]{state[0], state[1], first, second, third, thirdChanged, fourth}, new Profile[]{thirdChanged, fourth}),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], first, second, third}, new Profile[]{third}),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Profile[]{thirdChanged}),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], first, second, third, fourth}, new Profile[]{third, fourth}),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Profile[]{thirdChanged, fourth}),
 				Arguments.of(-1, new Profile[0], new Profile[0]));
 	}
 
 	private static Stream<Arguments> find_params() {
-		Profile.PrimaryKey key = new Profile.PrimaryKey(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())),
-				allelesChangedAll = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated())),
-				allelesMissing = Arrays.asList(null, new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated())),
-				allelesChangedMissing = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), null);
+		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
+		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesChangedAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesMissing = Arrays.asList(null, new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesChangedMissing = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		Profile first = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAll),
 				firstChanged = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, null, allelesChangedAll),
 				second = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "aka5", allelesMissing),
@@ -133,9 +84,9 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		Profile.PrimaryKey key = new Profile.PrimaryKey(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())),
-				allelesMissing = Arrays.asList(null, new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated()));
+		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
+		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesMissing = Arrays.asList(null, new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
 		Profile first = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAll),
 				firstDeleted = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, true, null, allelesAll),
 				second = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesMissing),
@@ -149,11 +100,11 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> save_params() {
-		Profile.PrimaryKey key = new Profile.PrimaryKey(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new Entity<>(allele12.getPrimaryKey(), allele12.getVersion(), allele12.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())),
-				allelesAllPrivate = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated())),
-				allelesMissingPublic = Arrays.asList(null, new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())),
-				allelesMissingPrivate = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), null);
+		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
+		List<Entity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new Entity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesAllPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesMissingPublic = Arrays.asList(null, new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesMissingPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		Profile firstPublic = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAllPublic),
 				firstPublicChanged = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, null, allelesAllPrivate),
 				firstPrivate = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAllPrivate),
@@ -162,33 +113,33 @@ public class ProfileRepositoryTests extends RepositoryTests {
 				secondPublicChanged = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, "aka5publicChanged", allelesMissingPrivate),
 				secondPrivate = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "aka5private", allelesMissingPrivate),
 				secondPrivateChanged = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, "aka5privateChanged", allelesMissingPublic);
-		return Stream.of(Arguments.of(firstPublic, new Profile[0], new Profile[]{state[0], state[1], firstPublic}, true, 2, 4),
-				Arguments.of(firstPrivate, new Profile[0], new Profile[]{state[0], state[1], firstPrivate}, true, 2, 4),
-				Arguments.of(secondPublic, new Profile[0], new Profile[]{state[0], state[1], secondPublic}, true, 2, 3),
-				Arguments.of(secondPrivate, new Profile[0], new Profile[]{state[0], state[1], secondPrivate}, true, 2, 3),
-				Arguments.of(firstPublicChanged, new Profile[]{firstPublic}, new Profile[]{state[0], state[1], firstPublic, firstPublicChanged}, true, 1, 3),
-				Arguments.of(firstPrivateChanged, new Profile[]{firstPrivate}, new Profile[]{state[0], state[1], firstPrivate, firstPrivateChanged}, true, 1, 3),
-				Arguments.of(secondPublicChanged, new Profile[]{secondPublic}, new Profile[]{state[0], state[1], secondPublic, secondPublicChanged}, true, 1, 2),
-				Arguments.of(secondPrivateChanged, new Profile[]{secondPrivate}, new Profile[]{state[0], state[1], secondPrivate, secondPrivateChanged}, true, 1, 2),
-				Arguments.of(null, new Profile[0], state, false, 0, 0));
+		return Stream.of(Arguments.of(firstPublic, new Profile[0], new Profile[]{STATE[0], STATE[1], firstPublic}, true, 2, 4),
+				Arguments.of(firstPrivate, new Profile[0], new Profile[]{STATE[0], STATE[1], firstPrivate}, true, 2, 4),
+				Arguments.of(secondPublic, new Profile[0], new Profile[]{STATE[0], STATE[1], secondPublic}, true, 2, 3),
+				Arguments.of(secondPrivate, new Profile[0], new Profile[]{STATE[0], STATE[1], secondPrivate}, true, 2, 3),
+				Arguments.of(firstPublicChanged, new Profile[]{firstPublic}, new Profile[]{STATE[0], STATE[1], firstPublic, firstPublicChanged}, true, 1, 3),
+				Arguments.of(firstPrivateChanged, new Profile[]{firstPrivate}, new Profile[]{STATE[0], STATE[1], firstPrivate, firstPrivateChanged}, true, 1, 3),
+				Arguments.of(secondPublicChanged, new Profile[]{secondPublic}, new Profile[]{STATE[0], STATE[1], secondPublic, secondPublicChanged}, true, 1, 2),
+				Arguments.of(secondPrivateChanged, new Profile[]{secondPrivate}, new Profile[]{STATE[0], STATE[1], secondPrivate, secondPrivateChanged}, true, 1, 2),
+				Arguments.of(null, new Profile[0], STATE, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
-		Profile.PrimaryKey key = new Profile.PrimaryKey(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated()));
+		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
+		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
 		Profile first = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAll),
 				firstDeleted = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, true, null, allelesAll);
-		return Stream.of(Arguments.of(key, new Profile[0], state, false),
-				Arguments.of(key, new Profile[]{first}, new Profile[]{state[0], state[1], firstDeleted}, true),
-				Arguments.of(null, new Profile[0], state, false));
+		return Stream.of(Arguments.of(key, new Profile[0], STATE, false),
+				Arguments.of(key, new Profile[]{first}, new Profile[]{STATE[0], STATE[1], firstDeleted}, true),
+				Arguments.of(null, new Profile[0], STATE, false));
 	}
 
 	private static Stream<Arguments> saveAll_params() {
-		Profile.PrimaryKey key = new Profile.PrimaryKey(project1.getPrimaryKey(), dataset.getPrimaryKey().getId(), profile1.getPrimaryKey().getId());
-		List<Entity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new Entity<>(allele12.getPrimaryKey(), allele12.getVersion(), allele12.isDeprecated()), new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())),
-				allelesAllPrivate = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), new Entity<>(allele21.getPrimaryKey(), allele21.getVersion(), allele21.isDeprecated())),
-				allelesMissingPublic = Arrays.asList(null, new Entity<>(allele22.getPrimaryKey(), allele22.getVersion(), allele22.isDeprecated())),
-				allelesMissingPrivate = Arrays.asList(new Entity<>(allele11.getPrimaryKey(), allele11.getVersion(), allele11.isDeprecated()), null);
+		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), PROFILE1.getPrimaryKey().getId());
+		List<Entity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new Entity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesAllPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesMissingPublic = Arrays.asList(null, new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesMissingPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		Profile firstPrivateExists = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "test", allelesAllPrivate),
 				firstPublicExists = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "test", allelesAllPublic),
 				firstPrivateExistsConflict = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, "aka", allelesAllPrivate),
@@ -199,23 +150,23 @@ public class ProfileRepositoryTests extends RepositoryTests {
 				firstPublicMissingConflict = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, null, allelesMissingPublic),
 				secondPrivateExists = new Profile(key.getProjectId(), key.getDatasetId(), key.getId() + "1", 1, false, null, allelesAllPrivate),
 				secondPublicExists = new Profile(key.getProjectId(), key.getDatasetId(), key.getId() + "1", 1, false, null, allelesAllPublic);
-		return Stream.of(Arguments.of(Collections.emptyList(), new Profile[]{state[0], state[1]}, new Profile[]{state[0], state[1]}, false, 0, 0),
-				Arguments.of(Collections.singletonList(firstPrivateExists), new Profile[]{state[1]}, new Profile[]{firstPrivateExists, state[1]}, true, 2, 4),
-				Arguments.of(Collections.singletonList(firstPrivateExistsConflict), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateExistsConflict}, true, 1, 3),
-				Arguments.of(Collections.singletonList(firstPublicExists), new Profile[]{state[1]}, new Profile[]{firstPublicExists, state[1]}, true, 2, 4),
-				Arguments.of(Collections.singletonList(firstPublicExistsConflict), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicExistsConflict}, true, 1, 3),
-				Arguments.of(Collections.singletonList(firstPrivateMissing), new Profile[]{state[1]}, new Profile[]{firstPrivateMissing, state[1]}, true, 2, 3),
-				Arguments.of(Collections.singletonList(firstPrivateMissingConflict), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateMissingConflict}, true, 1, 2),
-				Arguments.of(Collections.singletonList(firstPublicMissing), new Profile[]{state[1]}, new Profile[]{firstPublicMissing, state[1]}, true, 2, 3),
-				Arguments.of(Collections.singletonList(firstPublicMissingConflict), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicMissingConflict}, true, 1, 2),
+		return Stream.of(Arguments.of(Collections.emptyList(), new Profile[]{STATE[0], STATE[1]}, new Profile[]{STATE[0], STATE[1]}, false, 0, 0),
+				Arguments.of(Collections.singletonList(firstPrivateExists), new Profile[]{STATE[1]}, new Profile[]{firstPrivateExists, STATE[1]}, true, 2, 4),
+				Arguments.of(Collections.singletonList(firstPrivateExistsConflict), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPrivateExistsConflict}, true, 1, 3),
+				Arguments.of(Collections.singletonList(firstPublicExists), new Profile[]{STATE[1]}, new Profile[]{firstPublicExists, STATE[1]}, true, 2, 4),
+				Arguments.of(Collections.singletonList(firstPublicExistsConflict), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPublicExistsConflict}, true, 1, 3),
+				Arguments.of(Collections.singletonList(firstPrivateMissing), new Profile[]{STATE[1]}, new Profile[]{firstPrivateMissing, STATE[1]}, true, 2, 3),
+				Arguments.of(Collections.singletonList(firstPrivateMissingConflict), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPrivateMissingConflict}, true, 1, 2),
+				Arguments.of(Collections.singletonList(firstPublicMissing), new Profile[]{STATE[1]}, new Profile[]{firstPublicMissing, STATE[1]}, true, 2, 3),
+				Arguments.of(Collections.singletonList(firstPublicMissingConflict), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPublicMissingConflict}, true, 1, 2),
 				Arguments.of(Arrays.asList(firstPrivateExists, secondPrivateExists), new Profile[0], new Profile[]{firstPrivateExists, secondPrivateExists}, true, 4, 8),
-				Arguments.of(Arrays.asList(firstPrivateExistsConflict, secondPrivateExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateExistsConflict, secondPrivateExists}, true, 3, 7),
+				Arguments.of(Arrays.asList(firstPrivateExistsConflict, secondPrivateExists), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPrivateExistsConflict, secondPrivateExists}, true, 3, 7),
 				Arguments.of(Arrays.asList(firstPublicExists, secondPublicExists), new Profile[0], new Profile[]{firstPublicExists, secondPublicExists}, true, 4, 8),
-				Arguments.of(Arrays.asList(firstPublicExistsConflict, secondPublicExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicExistsConflict, secondPublicExists}, true, 3, 7),
+				Arguments.of(Arrays.asList(firstPublicExistsConflict, secondPublicExists), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPublicExistsConflict, secondPublicExists}, true, 3, 7),
 				Arguments.of(Arrays.asList(firstPrivateMissing, secondPrivateExists), new Profile[0], new Profile[]{firstPrivateMissing, secondPrivateExists}, true, 4, 7),
-				Arguments.of(Arrays.asList(firstPrivateMissingConflict, secondPrivateExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPrivateMissingConflict, secondPrivateExists}, true, 3, 6),
+				Arguments.of(Arrays.asList(firstPrivateMissingConflict, secondPrivateExists), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPrivateMissingConflict, secondPrivateExists}, true, 3, 6),
 				Arguments.of(Arrays.asList(firstPublicMissing, secondPublicExists), new Profile[0], new Profile[]{firstPublicMissing, secondPublicExists}, true, 4, 7),
-				Arguments.of(Arrays.asList(firstPublicMissingConflict, secondPublicExists), new Profile[]{state[0]}, new Profile[]{state[0], firstPublicMissingConflict, secondPublicExists}, true, 3, 6));
+				Arguments.of(Arrays.asList(firstPublicMissingConflict, secondPublicExists), new Profile[]{STATE[0]}, new Profile[]{STATE[0], firstPublicMissingConflict, secondPublicExists}, true, 3, 6));
 	}
 
 	private void store(Profile[] profiles) {
@@ -241,7 +192,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 			List<Entity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
 			for (int i = 0; i < allelesIds.size(); i++) {
 				Entity<Allele.PrimaryKey> reference = allelesIds.get(i);
-				if (reference == null || reference.getPrimaryKey().getId().matches(missing))
+				if (reference == null || reference.getPrimaryKey().getId().matches(MISSING))
 					continue;
 				String referenceId = reference.getPrimaryKey().getId();
 				String where = reference.getPrimaryKey().getProject() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";
@@ -286,7 +237,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, schemaSize as size, r.version as version, p.deprecated as deprecated,\n" +
 				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:sp.part}) as alleles\n" +
 				"ORDER BY pj.id, d.id, p.id, version";
-		Result result = query(new Query(statement, project1.getPrimaryKey(), dataset.getPrimaryKey().getId()));
+		Result result = query(new Query(statement, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId()));
 		if (result == null) return new Profile[0];
 		return StreamSupport.stream(result.spliterator(), false)
 				.map(this::parse)
@@ -295,25 +246,25 @@ public class ProfileRepositoryTests extends RepositoryTests {
 
 	@BeforeEach
 	public void init() {
-		taxonRepository.save(taxon);
-		locusRepository.save(locus1);
-		locusRepository.save(locus2);
-		userRepository.save(user);
-		projectRepository.save(project1);
-		projectRepository.save(project2);
-		schemaRepository.save(schema);
-		datasetRepository.save(dataset);
-		alleleRepository.save(allele11);
-		alleleRepository.save(allele12);
-		alleleRepository.save(allele21);
-		alleleRepository.save(allele22);
+		taxonRepository.save(TAXON1);
+		locusRepository.save(LOCUS1);
+		locusRepository.save(LOCUS2);
+		userRepository.save(USER1);
+		projectRepository.save(PROJECT1);
+		projectRepository.save(PROJECT2);
+		schemaRepository.save(SCHEMA1);
+		datasetRepository.save(DATASET1);
+		alleleRepository.save(ALLELE11P);
+		alleleRepository.save(ALLELE12);
+		alleleRepository.save(ALLELE21);
+		alleleRepository.save(ALLELE22);
 	}
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
 	public void findAll(int page, Profile[] state, Profile[] expected) {
 		store(state);
-		Optional<List<Profile>> result = profileRepository.findAll(page, LIMIT, project1.getPrimaryKey(), dataset.getPrimaryKey().getId());
+		Optional<List<Profile>> result = profileRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -327,7 +278,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("find_params")
 	public void find(Profile.PrimaryKey key, long version, Profile[] state, Profile expected) {
-		store(ProfileRepositoryTests.state);
+		store(ProfileRepositoryTests.STATE);
 		store(state);
 		Optional<Profile> result = profileRepository.find(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
@@ -338,7 +289,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("exists_params")
 	public void exists(Profile.PrimaryKey key, Profile[] state, boolean expected) {
-		store(ProfileRepositoryTests.state);
+		store(ProfileRepositoryTests.STATE);
 		store(state);
 		boolean result = profileRepository.exists(key);
 		assertEquals(expected, result);
@@ -347,7 +298,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("save_params")
 	public void save(Profile profile, Profile[] state, Profile[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
-		store(ProfileRepositoryTests.state);
+		store(ProfileRepositoryTests.STATE);
 		store(state);
 		Optional<QueryStatistics> result = profileRepository.save(profile);
 		if (executed) {
@@ -363,7 +314,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("remove_params")
 	public void remove(Profile.PrimaryKey key, Profile[] state, Profile[] expectedState, boolean expectedResult) {
-		store(ProfileRepositoryTests.state);
+		store(ProfileRepositoryTests.STATE);
 		store(state);
 		boolean result = profileRepository.remove(key);
 		Profile[] stateResult = findAll();
@@ -375,7 +326,7 @@ public class ProfileRepositoryTests extends RepositoryTests {
 	@MethodSource("saveAll_params")
 	public void saveAll(List<Profile> profiles, Profile[] state, Profile[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(state);
-		Optional<QueryStatistics> result = profileRepository.saveAll(profiles, project1.getPrimaryKey().toString(), dataset.getPrimaryKey().getId().toString());
+		Optional<QueryStatistics> result = profileRepository.saveAll(profiles, PROJECT1.getPrimaryKey().toString(), DATASET1.getPrimaryKey().getId().toString());
 		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());

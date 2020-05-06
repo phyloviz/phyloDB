@@ -4,11 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,18 +13,15 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
-import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.typing.isolate.model.*;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,35 +31,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-public class IsolateControllerTests extends Test {
+public class IsolateControllerTests extends ControllerTestsContext {
 
-	private static final String taxonId = "t", locusId = "t";
-	private static final UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
-	private static final Ancillary ancillary1 = new Ancillary("key1", "value1");
-	private static final Ancillary ancillary2 = new Ancillary("key2", "value2");
-
-	@InjectMocks
-	private IsolateController controller;
-	@MockBean
-	private IsolateService service;
-	@MockBean
-	private AuthenticationInterceptor authenticationInterceptor;
-	@MockBean
-	private AuthorizationInterceptor authorizationInterceptor;
-	@Autowired
-	private MockHttp http;
+	private static final String TAXONID = TAXON1.getPrimaryKey(), LOCUSID = LOCUS1.getPrimaryKey().getId();
+	private static final UUID PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
 
 	private static Stream<Arguments> getIsolatesList_params() {
 		String uri = "/projects/%s/datasets/%s/isolates";
-		Profile profile = new Profile(projectId, datasetId, "1", 1, false, null, null);
-		Isolate isolate1 = new Isolate(projectId, datasetId, "1", "description", new Ancillary[]{ancillary1, ancillary2}, null);
-		Isolate isolate2 = new Isolate(projectId, datasetId, "2", "test", new Ancillary[]{ancillary1}, profile.getPrimaryKey().getId());
+		Profile profile = new Profile(PROJECTID, DATASETID, "1", 1, false, null, null);
+		Isolate isolate1 = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
+		Isolate isolate2 = new Isolate(PROJECTID, DATASETID, "2", "test", new Ancillary[]{ANCILLARY1}, profile.getPrimaryKey().getId());
 		List<Isolate> isolates = new ArrayList<Isolate>() {{
 			add(isolate1);
 			add(isolate2);
 		}};
-		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId, datasetId)).param("page", "0"),
-				req2 = get(String.format(uri, projectId, datasetId)), req3 = get(String.format(uri, projectId, datasetId)).param("page", "-10");
+		MockHttpServletRequestBuilder req1 = get(String.format(uri, PROJECTID, DATASETID)).param("page", "0"),
+				req2 = get(String.format(uri, PROJECTID, DATASETID)), req3 = get(String.format(uri, PROJECTID, DATASETID)).param("page", "-10");
 		List<IsolateOutputModel> result1 = isolates.stream()
 				.map(IsolateOutputModel::new)
 				.collect(Collectors.toList());
@@ -78,14 +59,14 @@ public class IsolateControllerTests extends Test {
 
 	private static Stream<Arguments> getIsolatesString_params() {
 		String uri = "/projects/%s/datasets/%s/isolates";
-		Profile profile = new Profile(projectId, datasetId, "1", "aka", new String[]{"1", "2", "3"});
-		Isolate isolate1 = new Isolate(projectId, datasetId, "1", "description", new Ancillary[]{ancillary1, ancillary2}, null);
-		Isolate isolate2 = new Isolate(projectId, datasetId, "2", "test", new Ancillary[]{ancillary1}, profile.getPrimaryKey().getId());
+		Profile profile = new Profile(PROJECTID, DATASETID, "1", "aka", new String[]{"1", "2", "3"});
+		Isolate isolate1 = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
+		Isolate isolate2 = new Isolate(PROJECTID, DATASETID, "2", "test", new Ancillary[]{ANCILLARY1}, profile.getPrimaryKey().getId());
 		List<Isolate> isolates = new ArrayList<Isolate>() {{
 			add(isolate1);
 			add(isolate2);
 		}};
-		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId, datasetId)).param("page", "0");
+		MockHttpServletRequestBuilder req1 = get(String.format(uri, PROJECTID, DATASETID)).param("page", "0");
 		FileOutputModel result3 = new FileOutputModel(new IsolatesFormatter().format(Collections.emptyList()));
 		FileOutputModel result4 = new FileOutputModel(new IsolatesFormatter().format(isolates));
 		return Stream.of(Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, result3, null),
@@ -94,13 +75,13 @@ public class IsolateControllerTests extends Test {
 
 	private static Stream<Arguments> getIsolate_params() {
 		String uri = "/projects/%s/datasets/%s/isolates/%s";
-		Profile profile = new Profile(projectId, datasetId, "1", "aka", new String[]{"1", "2", "3"});
-		Isolate isolate1 = new Isolate(projectId, datasetId, "1", "description", new Ancillary[]{ancillary1, ancillary2}, null);
-		Isolate isolate2 = new Isolate(projectId, datasetId, "2", "test", new Ancillary[]{ancillary1}, profile.getPrimaryKey().getId());
+		Profile profile = new Profile(PROJECTID, DATASETID, "1", "aka", new String[]{"1", "2", "3"});
+		Isolate isolate1 = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
+		Isolate isolate2 = new Isolate(PROJECTID, DATASETID, "2", "test", new Ancillary[]{ANCILLARY1}, profile.getPrimaryKey().getId());
 		Isolate.PrimaryKey key1 = isolate1.getPrimaryKey();
 		Isolate.PrimaryKey key2 = isolate2.getPrimaryKey();
-		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId, datasetId, key1.getId())).param("version", "1"),
-				req2 = get(String.format(uri, projectId, datasetId, key2.getId()));
+		MockHttpServletRequestBuilder req1 = get(String.format(uri, PROJECTID, DATASETID, key1.getId())).param("version", "1"),
+				req2 = get(String.format(uri, PROJECTID, DATASETID, key2.getId()));
 		return Stream.of(Arguments.of(req1, isolate1, HttpStatus.OK, new GetIsolateOutputModel(isolate1)),
 				Arguments.of(req1, null, HttpStatus.NOT_FOUND, new ErrorOutputModel(Problem.NOT_FOUND.getMessage())),
 				Arguments.of(req2, isolate2, HttpStatus.OK, new GetIsolateOutputModel(isolate2)),
@@ -110,11 +91,11 @@ public class IsolateControllerTests extends Test {
 
 	private static Stream<Arguments> saveIsolate_params() {
 		String uri = "/projects/%s/datasets/%s/isolates/%s";
-		Profile profile = new Profile(projectId, datasetId, "1", "aka", new String[]{"1", "2", "3"});
-		Isolate isolate1 = new Isolate(projectId, datasetId, "1", "description", new Ancillary[]{ancillary1, ancillary2}, null);
+		Profile profile = new Profile(PROJECTID, DATASETID, "1", "aka", new String[]{"1", "2", "3"});
+		Isolate isolate1 = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
 		Isolate.PrimaryKey key = isolate1.getPrimaryKey();
-		MockHttpServletRequestBuilder req1 = put(String.format(uri, projectId, datasetId, key.getId()));
-		IsolateInputModel input1 = new IsolateInputModel(key.getId(), "aka", new Ancillary[]{ancillary1}, profile.getPrimaryKey().getId()),
+		MockHttpServletRequestBuilder req1 = put(String.format(uri, PROJECTID, DATASETID, key.getId()));
+		IsolateInputModel input1 = new IsolateInputModel(key.getId(), "aka", new Ancillary[]{ANCILLARY1}, profile.getPrimaryKey().getId()),
 				input2 = new IsolateInputModel("different", "aka", null, null);
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
@@ -125,8 +106,8 @@ public class IsolateControllerTests extends Test {
 	private static Stream<Arguments> putIsolates_params() {
 		String uri = "/projects/%s/datasets/%s/isolates/files";
 		MockMultipartFile file = new MockMultipartFile("file", "", "text/plain", "b".getBytes());
-		MockMultipartHttpServletRequestBuilder req1 = multipart(String.format(uri, projectId, datasetId)).file(file),
-				req2 = multipart(String.format(uri, projectId, datasetId));
+		MockMultipartHttpServletRequestBuilder req1 = multipart(String.format(uri, PROJECTID, DATASETID)).file(file),
+				req2 = multipart(String.format(uri, PROJECTID, DATASETID));
 		req1.with(r -> {
 			r.setMethod(HttpMethod.PUT.name());
 			return r;
@@ -135,7 +116,7 @@ public class IsolateControllerTests extends Test {
 			r.setMethod(HttpMethod.PUT.name());
 			return r;
 		});
-		MockHttpServletRequestBuilder req3 = put(String.format(uri, taxonId, locusId));
+		MockHttpServletRequestBuilder req3 = put(String.format(uri, TAXONID, LOCUSID));
 		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -145,9 +126,9 @@ public class IsolateControllerTests extends Test {
 	private static Stream<Arguments> postIsolates_params() {
 		String uri = "/projects/%s/datasets/%s/isolates/files";
 		MockMultipartFile file = new MockMultipartFile("file", "", "text/plain", "bytes".getBytes());
-		MockHttpServletRequestBuilder req1 = multipart(String.format(uri, projectId, datasetId)).file(file),
-				req3 = multipart(String.format(uri, projectId, datasetId)),
-				req4 = post(String.format(uri, taxonId, locusId));
+		MockHttpServletRequestBuilder req1 = multipart(String.format(uri, PROJECTID, DATASETID)).file(file),
+				req3 = multipart(String.format(uri, PROJECTID, DATASETID)),
+				req4 = post(String.format(uri, TAXONID, LOCUSID));
 		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -156,9 +137,9 @@ public class IsolateControllerTests extends Test {
 
 	private static Stream<Arguments> deleteIsolate_params() {
 		String uri = "/projects/%s/datasets/%s/isolates/%s";
-		Isolate isolate = new Isolate(projectId, datasetId, "1", "description", new Ancillary[]{ancillary1, ancillary2}, null);
+		Isolate isolate = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
-		MockHttpServletRequestBuilder req1 = delete(String.format(uri, projectId, datasetId, key.getId()));
+		MockHttpServletRequestBuilder req1 = delete(String.format(uri, PROJECTID, DATASETID, key.getId()));
 		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())));
 	}
@@ -173,7 +154,7 @@ public class IsolateControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getIsolatesList_params")
 	public void getIsolatesList(MockHttpServletRequestBuilder req, List<Isolate> isolates, HttpStatus expectedStatus, List<IsolateOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(service.getIsolates(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
+		Mockito.when(isolateService.getIsolates(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -196,7 +177,7 @@ public class IsolateControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getIsolatesString_params")
 	public void getProfilesString(MockHttpServletRequestBuilder req, List<Isolate> isolates, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(service.getIsolates(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
+		Mockito.when(isolateService.getIsolates(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.TEXT_PLAIN);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())
@@ -208,7 +189,7 @@ public class IsolateControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getIsolate_params")
 	public void getIsolate(MockHttpServletRequestBuilder req, Isolate isolate, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.getIsolate(any(), any(), anyString(), anyLong())).thenReturn(Optional.ofNullable(isolate));
+		Mockito.when(isolateService.getIsolate(any(), any(), anyString(), anyLong())).thenReturn(Optional.ofNullable(isolate));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())
@@ -221,7 +202,7 @@ public class IsolateControllerTests extends Test {
 	@MethodSource("saveIsolate_params")
 	public void putIsolate(MockHttpServletRequestBuilder req, IsolateInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if (input != null)
-			Mockito.when(service.saveIsolate(any())).thenReturn(ret);
+			Mockito.when(isolateService.saveIsolate(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -231,7 +212,7 @@ public class IsolateControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("putIsolates_params")
 	public void putIsolates(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.saveIsolatesOnConflictUpdate(any(), any(), anyInt(), any())).thenReturn(ret);
+		Mockito.when(isolateService.saveIsolatesOnConflictUpdate(any(), any(), anyInt(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -241,7 +222,7 @@ public class IsolateControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("postIsolates_params")
 	public void postIsolates(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.saveIsolatesOnConflictSkip(any(), any(), anyInt(), any())).thenReturn(ret);
+		Mockito.when(isolateService.saveIsolatesOnConflictSkip(any(), any(), anyInt(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -251,7 +232,7 @@ public class IsolateControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("deleteIsolate_params")
 	public void deleteIsolates(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.deleteIsolate(any(), any(), anyString())).thenReturn(ret);
+		Mockito.when(isolateService.deleteIsolate(any(), any(), anyString())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())

@@ -11,7 +11,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.TestContext;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleController;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonController;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static pt.ist.meic.phylodb.security.SecurityInterceptor.PROVIDER;
 import static pt.ist.meic.phylodb.security.SecurityInterceptor.ROLE;
 
-public class AuthorizationInterceptorTests extends Test {
+public class AuthorizationInterceptorTests extends TestContext {
 
 	private static final String ID = "4f809af7-2c99-43f7-b674-4843c77384c7";
 	@Autowired

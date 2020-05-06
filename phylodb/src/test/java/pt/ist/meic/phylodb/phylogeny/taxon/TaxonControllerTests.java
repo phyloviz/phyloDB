@@ -4,16 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
@@ -22,9 +19,6 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
-import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
-import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
-import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,18 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-public class TaxonControllerTests extends Test {
-
-	@InjectMocks
-	private TaxonController controller;
-	@MockBean
-	private TaxonService service;
-	@MockBean
-	private AuthenticationInterceptor authenticationInterceptor;
-	@MockBean
-	private AuthorizationInterceptor authorizationInterceptor;
-	@Autowired
-	private MockHttp http;
+public class TaxonControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getTaxons_params() {
 		String uri = "/taxons";
@@ -108,7 +91,7 @@ public class TaxonControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getTaxons_params")
 	public void getTaxons(MockHttpServletRequestBuilder req, List<Taxon> taxons, HttpStatus expectedStatus, List<TaxonOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(service.getTaxons(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxons));
+		Mockito.when(taxonService.getTaxons(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxons));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -129,7 +112,7 @@ public class TaxonControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getTaxon_params")
 	public void getTaxon(MockHttpServletRequestBuilder req, Taxon taxon, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.getTaxon(anyString(), anyLong())).thenReturn(Optional.ofNullable(taxon));
+		Mockito.when(taxonService.getTaxon(anyString(), anyLong())).thenReturn(Optional.ofNullable(taxon));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())
@@ -142,7 +125,7 @@ public class TaxonControllerTests extends Test {
 	@MethodSource("saveTaxon_params")
 	public void saveTaxon(MockHttpServletRequestBuilder req, TaxonInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if (input != null)
-			Mockito.when(service.saveTaxon(any())).thenReturn(ret);
+			Mockito.when(taxonService.saveTaxon(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -152,7 +135,7 @@ public class TaxonControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("deleteTaxon_params")
 	public void deleteTaxon(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.deleteTaxon(any())).thenReturn(ret);
+		Mockito.when(taxonService.deleteTaxon(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())

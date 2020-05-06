@@ -5,8 +5,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.phylodb.RepositoryTests;
+import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.db.Query;
 
@@ -18,14 +17,10 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TaxonRepositoryTests extends RepositoryTests {
+public class TaxonRepositoryTests extends RepositoryTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final Taxon first = new Taxon("1one", 1, false, "description");
-	private static final Taxon second = new Taxon("2two", 1, false, null);
-	private static final Taxon[] state = new Taxon[]{first, second};
-	@Autowired
-	private TaxonRepository repository;
+	private static final Taxon[] STATE = new Taxon[]{TAXON1, TAXON2};
 
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
@@ -36,25 +31,25 @@ public class TaxonRepositoryTests extends RepositoryTests {
 				thirdChanged = new Taxon(id3, 2, false, null),
 				fourth = new Taxon("6test", 1, false, null);
 		return Stream.of(Arguments.of(0, new Taxon[0], new Taxon[0]),
-				Arguments.of(0, new Taxon[]{state[0]}, new Taxon[]{state[0]}),
+				Arguments.of(0, new Taxon[]{STATE[0]}, new Taxon[]{STATE[0]}),
 				Arguments.of(0, new Taxon[]{first, firstChanged}, new Taxon[]{firstChanged}),
-				Arguments.of(0, new Taxon[]{state[0], state[1], first}, state),
-				Arguments.of(0, new Taxon[]{state[0], state[1], first, firstChanged}, state),
+				Arguments.of(0, new Taxon[]{STATE[0], STATE[1], first}, STATE),
+				Arguments.of(0, new Taxon[]{STATE[0], STATE[1], first, firstChanged}, STATE),
 				Arguments.of(1, new Taxon[0], new Taxon[0]),
-				Arguments.of(1, new Taxon[]{state[0]}, new Taxon[0]),
+				Arguments.of(1, new Taxon[]{STATE[0]}, new Taxon[0]),
 				Arguments.of(1, new Taxon[]{first, firstChanged}, new Taxon[0]),
-				Arguments.of(1, new Taxon[]{state[0], state[1], first}, new Taxon[]{first}),
-				Arguments.of(1, new Taxon[]{state[0], state[1], first, firstChanged}, new Taxon[]{firstChanged}),
-				Arguments.of(1, new Taxon[]{state[0], state[1], first, second}, new Taxon[]{first, second}),
-				Arguments.of(1, new Taxon[]{state[0], state[1], first, firstChanged, second}, new Taxon[]{firstChanged, second}),
-				Arguments.of(1, new Taxon[]{state[0], state[1], first, firstChanged}, new Taxon[]{firstChanged}),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first}, new Taxon[]{first}),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, firstChanged}, new Taxon[]{firstChanged}),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, second}, new Taxon[]{first, second}),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, firstChanged, second}, new Taxon[]{firstChanged, second}),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, firstChanged}, new Taxon[]{firstChanged}),
 				Arguments.of(2, new Taxon[0], new Taxon[0]),
-				Arguments.of(2, new Taxon[]{state[0]}, new Taxon[0]),
+				Arguments.of(2, new Taxon[]{STATE[0]}, new Taxon[0]),
 				Arguments.of(2, new Taxon[]{first, firstChanged}, new Taxon[0]),
-				Arguments.of(2, new Taxon[]{state[0], state[1], first, second, third}, new Taxon[]{third}),
-				Arguments.of(2, new Taxon[]{state[0], state[1], first, second, third, thirdChanged}, new Taxon[]{thirdChanged}),
-				Arguments.of(2, new Taxon[]{state[0], state[1], first, second, third, fourth}, new Taxon[]{third, fourth}),
-				Arguments.of(2, new Taxon[]{state[0], state[1], first, second, third, thirdChanged, fourth}, new Taxon[]{thirdChanged, fourth}),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third}, new Taxon[]{third}),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Taxon[]{thirdChanged}),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third, fourth}, new Taxon[]{third, fourth}),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Taxon[]{thirdChanged, fourth}),
 				Arguments.of(-1, new Taxon[0], new Taxon[0]));
 	}
 
@@ -85,18 +80,18 @@ public class TaxonRepositoryTests extends RepositoryTests {
 		String id = "3three";
 		Taxon first = new Taxon(id, 1, false, null),
 				second = new Taxon(id, 2, false, "description");
-		return Stream.of(Arguments.of(first, new Taxon[0], new Taxon[]{state[0], state[1], first}, true, 2, 1),
-				Arguments.of(second, new Taxon[]{first}, new Taxon[]{state[0], state[1], first, second}, true, 1, 1),
-				Arguments.of(null, new Taxon[0], state, false, 0, 0));
+		return Stream.of(Arguments.of(first, new Taxon[0], new Taxon[]{STATE[0], STATE[1], first}, true, 2, 1),
+				Arguments.of(second, new Taxon[]{first}, new Taxon[]{STATE[0], STATE[1], first, second}, true, 1, 1),
+				Arguments.of(null, new Taxon[0], STATE, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
 		String id = "3three";
 		Taxon first = new Taxon(id, 1, false, null),
 				second = new Taxon(id, 1, true, null);
-		return Stream.of(Arguments.of(id, new Taxon[0], state, false),
-				Arguments.of(id, new Taxon[]{first}, new Taxon[]{state[0], state[1], second}, true),
-				Arguments.of(null, new Taxon[0], state, false));
+		return Stream.of(Arguments.of(id, new Taxon[0], STATE, false),
+				Arguments.of(id, new Taxon[]{first}, new Taxon[]{STATE[0], STATE[1], second}, true),
+				Arguments.of(null, new Taxon[0], STATE, false));
 	}
 
 	private void store(Taxon[] taxons) {
@@ -142,7 +137,7 @@ public class TaxonRepositoryTests extends RepositoryTests {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Taxon[] state, Taxon[] expected) {
 		store(state);
-		Optional<List<Taxon>> result = repository.findAll(page, LIMIT);
+		Optional<List<Taxon>> result = taxonRepository.findAll(page, LIMIT);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -156,9 +151,9 @@ public class TaxonRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("find_params")
 	public void find(String key, long version, Taxon[] state, Taxon expected) {
-		store(TaxonRepositoryTests.state);
+		store(TaxonRepositoryTests.STATE);
 		store(state);
-		Optional<Taxon> result = repository.find(key, version);
+		Optional<Taxon> result = taxonRepository.find(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
 		if (expected != null)
 			assertEquals(expected, result.get());
@@ -167,18 +162,18 @@ public class TaxonRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("exists_params")
 	public void exists(String key, Taxon[] state, boolean expected) {
-		store(TaxonRepositoryTests.state);
+		store(TaxonRepositoryTests.STATE);
 		store(state);
-		boolean result = repository.exists(key);
+		boolean result = taxonRepository.exists(key);
 		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
 	@MethodSource("save_params")
 	public void save(Taxon user, Taxon[] state, Taxon[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
-		store(TaxonRepositoryTests.state);
+		store(TaxonRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = repository.save(user);
+		Optional<QueryStatistics> result = taxonRepository.save(user);
 		if (executed) {
 			assertTrue(result.isPresent());
 			assertEquals(nodesCreated, result.get().getNodesCreated());
@@ -192,9 +187,9 @@ public class TaxonRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("remove_params")
 	public void remove(String key, Taxon[] state, Taxon[] expectedState, boolean expectedResult) {
-		store(TaxonRepositoryTests.state);
+		store(TaxonRepositoryTests.STATE);
 		store(state);
-		boolean result = repository.remove(key);
+		boolean result = taxonRepository.remove(key);
 		Taxon[] stateResult = findAll();
 		assertEquals(expectedResult, result);
 		assertFalse(hasDescendents(key));

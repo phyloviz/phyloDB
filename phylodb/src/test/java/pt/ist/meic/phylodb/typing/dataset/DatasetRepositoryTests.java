@@ -6,98 +6,64 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.phylodb.RepositoryTests;
-import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
-import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
-import pt.ist.meic.phylodb.security.authentication.user.UserRepository;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
-import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectRepository;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
-import pt.ist.meic.phylodb.typing.Method;
+import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
-import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DatasetRepositoryTests extends RepositoryTests {
+public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final User user = new User("1one", "one", 1, false, Role.USER);
-	private static final Project project = new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user.getPrimaryKey()});
-	private static final Taxon taxon = new Taxon("t", null);
-	private static final Locus locus1 = new Locus(taxon.getPrimaryKey(), "1", 1, false, "description");
-	private static final Locus locus2 = new Locus(taxon.getPrimaryKey(), "2", 1, false, null);
-	private static final Schema schema1 = new Schema(taxon.getPrimaryKey(), "1one", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated()), new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated())));
-	private static final Schema schema2 = new Schema(taxon.getPrimaryKey(), "2two", 1, false, Method.MLST, null,
-			Arrays.asList(new Entity<>(locus2.getPrimaryKey(), locus2.getVersion(), locus2.isDeprecated()), new Entity<>(locus1.getPrimaryKey(), locus1.getVersion(), locus1.isDeprecated())));
-	private static final Entity<Schema.PrimaryKey> schema1Reference = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated());
-	private static final Entity<Schema.PrimaryKey> schema2Reference = new Entity<>(schema2.getPrimaryKey(), schema2.getVersion(), schema2.isDeprecated());
-	private static final Dataset dataset1 = new Dataset(project.getPrimaryKey(), UUID.fromString("1023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "name1", schema1Reference);
-	private static final Dataset dataset2 = new Dataset(project.getPrimaryKey(), UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "name2", schema2Reference);
-	private static final Dataset[] state = new Dataset[]{dataset1, dataset2};
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private ProjectRepository projectRepository;
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
-	@Autowired
-	private SchemaRepository schemaRepository;
-	@Autowired
-	private DatasetRepository datasetRepository;
+	private static final Dataset[] STATE = new Dataset[]{DATASET1, DATASET2};
 
 	private static Stream<Arguments> findAll_params() {
 		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated()),
-				s2 = new Entity<>(schema2.getPrimaryKey(), schema2.getVersion(), schema2.isDeprecated());
-		Dataset first = new Dataset(project.getPrimaryKey(), key1, 1, false, "name", s1),
-				firstChanged = new Dataset(project.getPrimaryKey(), key1, 2, false, "name2", s2),
-				second = new Dataset(project.getPrimaryKey(), UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name3", s2),
-				third = new Dataset(project.getPrimaryKey(), key2, 1, false, "name5", s2),
-				thirdChanged = new Dataset(project.getPrimaryKey(), key2, 2, false, "name4", s1),
-				fourth = new Dataset(project.getPrimaryKey(), UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", s1);
+		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
+				s2 = new Entity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
+		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key1, 1, false, "name", s1),
+				firstChanged = new Dataset(PROJECT1.getPrimaryKey(), key1, 2, false, "name2", s2),
+				second = new Dataset(PROJECT1.getPrimaryKey(), UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name3", s2),
+				third = new Dataset(PROJECT1.getPrimaryKey(), key2, 1, false, "name5", s2),
+				thirdChanged = new Dataset(PROJECT1.getPrimaryKey(), key2, 2, false, "name4", s1),
+				fourth = new Dataset(PROJECT1.getPrimaryKey(), UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", s1);
 		return Stream.of(Arguments.of(0, new Dataset[0], new Dataset[0]),
-				Arguments.of(0, new Dataset[]{state[0]}, new Dataset[]{state[0]}),
+				Arguments.of(0, new Dataset[]{STATE[0]}, new Dataset[]{STATE[0]}),
 				Arguments.of(0, new Dataset[]{first, firstChanged}, new Dataset[]{firstChanged}),
-				Arguments.of(0, new Dataset[]{state[0], state[1], first}, state),
-				Arguments.of(0, new Dataset[]{state[0], state[1], first, firstChanged}, state),
+				Arguments.of(0, new Dataset[]{STATE[0], STATE[1], first}, STATE),
+				Arguments.of(0, new Dataset[]{STATE[0], STATE[1], first, firstChanged}, STATE),
 				Arguments.of(1, new Dataset[0], new Dataset[0]),
-				Arguments.of(1, new Dataset[]{state[0]}, new Dataset[0]),
+				Arguments.of(1, new Dataset[]{STATE[0]}, new Dataset[0]),
 				Arguments.of(1, new Dataset[]{first, firstChanged}, new Dataset[0]),
-				Arguments.of(1, new Dataset[]{state[0], state[1], first}, new Dataset[]{first}),
-				Arguments.of(1, new Dataset[]{state[0], state[1], first, firstChanged}, new Dataset[]{firstChanged}),
-				Arguments.of(1, new Dataset[]{state[0], state[1], first, second}, new Dataset[]{first, second}),
-				Arguments.of(1, new Dataset[]{state[0], state[1], first, firstChanged, second}, new Dataset[]{firstChanged, second}),
-				Arguments.of(1, new Dataset[]{state[0], state[1], first, firstChanged}, new Dataset[]{firstChanged}),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first}, new Dataset[]{first}),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, firstChanged}, new Dataset[]{firstChanged}),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, second}, new Dataset[]{first, second}),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, firstChanged, second}, new Dataset[]{firstChanged, second}),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, firstChanged}, new Dataset[]{firstChanged}),
 				Arguments.of(2, new Dataset[0], new Dataset[0]),
-				Arguments.of(2, new Dataset[]{state[0]}, new Dataset[0]),
+				Arguments.of(2, new Dataset[]{STATE[0]}, new Dataset[0]),
 				Arguments.of(2, new Dataset[]{first, firstChanged}, new Dataset[0]),
-				Arguments.of(2, new Dataset[]{state[0], state[1], first, second, third}, new Dataset[]{third}),
-				Arguments.of(2, new Dataset[]{state[0], state[1], first, second, third, thirdChanged}, new Dataset[]{thirdChanged}),
-				Arguments.of(2, new Dataset[]{state[0], state[1], first, second, third, fourth}, new Dataset[]{third, fourth}),
-				Arguments.of(2, new Dataset[]{state[0], state[1], first, second, third, thirdChanged, fourth}, new Dataset[]{thirdChanged, fourth}),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third}, new Dataset[]{third}),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Dataset[]{thirdChanged}),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third, fourth}, new Dataset[]{third, fourth}),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Dataset[]{thirdChanged, fourth}),
 				Arguments.of(-1, new Dataset[0], new Dataset[0]));
 	}
 
 	private static Stream<Arguments> find_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(project.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated());
-		Dataset first = new Dataset(project.getPrimaryKey(), key.getId(), 1, false, "name", s1),
-				second = new Dataset(project.getPrimaryKey(), key.getId(), 2, true, "name", s1);
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
+		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
+		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
+				second = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 2, true, "name", s1);
 		return Stream.of(Arguments.of(key, 1, new Dataset[0], null),
 				Arguments.of(key, 1, new Dataset[]{first}, first),
 				Arguments.of(key, 2, new Dataset[]{first, second}, second),
@@ -108,10 +74,10 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(project.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated());
-		Dataset first = new Dataset(project.getPrimaryKey(), key.getId(), 1, false, "name", s1),
-				second = new Dataset(project.getPrimaryKey(), key.getId(), 2, true, "name", s1);
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
+		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
+		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
+				second = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 2, true, "name", s1);
 		return Stream.of(Arguments.of(key, new Dataset[0], false),
 				Arguments.of(key, new Dataset[]{first}, true),
 				Arguments.of(key, new Dataset[]{second}, false),
@@ -120,23 +86,23 @@ public class DatasetRepositoryTests extends RepositoryTests {
 
 	private static Stream<Arguments> save_params() {
 		UUID key = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated()),
-				s2 = new Entity<>(schema2.getPrimaryKey(), schema2.getVersion(), schema2.isDeprecated());
-		Dataset first = new Dataset(project.getPrimaryKey(), key, 1, false, "name", s1),
-				second = new Dataset(project.getPrimaryKey(), key, 2, false, "name", s2);
-		return Stream.of(Arguments.of(first, new Dataset[0], new Dataset[]{state[0], state[1], first}, true, 2, 3),
-				Arguments.of(second, new Dataset[]{first}, new Dataset[]{state[0], state[1], first, second}, true, 1, 2),
-				Arguments.of(null, new Dataset[0], new Dataset[]{state[0], state[1]}, false, 0, 0));
+		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
+				s2 = new Entity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
+		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key, 1, false, "name", s1),
+				second = new Dataset(PROJECT1.getPrimaryKey(), key, 2, false, "name", s2);
+		return Stream.of(Arguments.of(first, new Dataset[0], new Dataset[]{STATE[0], STATE[1], first}, true, 2, 3),
+				Arguments.of(second, new Dataset[]{first}, new Dataset[]{STATE[0], STATE[1], first, second}, true, 1, 2),
+				Arguments.of(null, new Dataset[0], new Dataset[]{STATE[0], STATE[1]}, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(project.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(schema1.getPrimaryKey(), schema1.getVersion(), schema1.isDeprecated());
-		Dataset before = new Dataset(project.getPrimaryKey(), key.getId(), 1, false, "name", s1),
-				after = new Dataset(project.getPrimaryKey(), key.getId(), 1, true, "name", s1);
-		return Stream.of(Arguments.of(key, new Dataset[0], new Dataset[]{state[0], state[1]}, false),
-				Arguments.of(key, new Dataset[]{before}, new Dataset[]{state[0], state[1], after}, true),
-				Arguments.of(null, new Dataset[0], new Dataset[]{state[0], state[1]}, false));
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
+		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
+		Dataset before = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
+				after = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, true, "name", s1);
+		return Stream.of(Arguments.of(key, new Dataset[0], new Dataset[]{STATE[0], STATE[1]}, false),
+				Arguments.of(key, new Dataset[]{before}, new Dataset[]{STATE[0], STATE[1], after}, true),
+				Arguments.of(null, new Dataset[0], new Dataset[]{STATE[0], STATE[1]}, false));
 	}
 
 	private void store(Dataset[] datasets) {
@@ -178,7 +144,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version,\n" +
 				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
 				"ORDER BY p.id, d.id, r1.version";
-		Result result = query(new Query(statement, project.getPrimaryKey()));
+		Result result = query(new Query(statement, PROJECT1.getPrimaryKey()));
 		if (result == null) return new Dataset[0];
 		return StreamSupport.stream(result.spliterator(), false)
 				.map(this::parse)
@@ -195,20 +161,20 @@ public class DatasetRepositoryTests extends RepositoryTests {
 
 	@BeforeEach
 	public void init() {
-		userRepository.save(user);
-		projectRepository.save(project);
-		taxonRepository.save(taxon);
-		locusRepository.save(locus1);
-		locusRepository.save(locus2);
-		schemaRepository.save(schema1);
-		schemaRepository.save(schema2);
+		userRepository.save(USER1);
+		projectRepository.save(PROJECT1);
+		taxonRepository.save(TAXON1);
+		locusRepository.save(LOCUS1);
+		locusRepository.save(LOCUS2);
+		schemaRepository.save(SCHEMA1);
+		schemaRepository.save(SCHEMA2);
 	}
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
 	public void findAll(int page, Dataset[] state, Dataset[] expected) {
 		store(state);
-		Optional<List<Dataset>> result = datasetRepository.findAll(page, LIMIT, project.getPrimaryKey());
+		Optional<List<Dataset>> result = datasetRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -222,7 +188,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("find_params")
 	public void find(Dataset.PrimaryKey key, long version, Dataset[] state, Dataset expected) {
-		store(DatasetRepositoryTests.state);
+		store(DatasetRepositoryTests.STATE);
 		store(state);
 		Optional<Dataset> result = datasetRepository.find(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
@@ -233,7 +199,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("exists_params")
 	public void exists(Dataset.PrimaryKey key, Dataset[] state, boolean expected) {
-		store(DatasetRepositoryTests.state);
+		store(DatasetRepositoryTests.STATE);
 		store(state);
 		boolean result = datasetRepository.exists(key);
 		assertEquals(expected, result);
@@ -242,7 +208,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("save_params")
 	public void save(Dataset dataset, Dataset[] state, Dataset[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
-		store(DatasetRepositoryTests.state);
+		store(DatasetRepositoryTests.STATE);
 		store(state);
 		Optional<QueryStatistics> result = datasetRepository.save(dataset);
 		if (executed) {
@@ -258,7 +224,7 @@ public class DatasetRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("remove_params")
 	public void remove(Dataset.PrimaryKey key, Dataset[] state, Dataset[] expectedState, boolean expectedResult) {
-		store(DatasetRepositoryTests.state);
+		store(DatasetRepositoryTests.STATE);
 		store(state);
 		boolean result = datasetRepository.remove(key);
 		Dataset[] stateResult = findAll();

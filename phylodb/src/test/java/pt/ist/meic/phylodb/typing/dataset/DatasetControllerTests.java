@@ -6,26 +6,21 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
-import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetOutputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.MockHttp;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.*;
@@ -37,18 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-public class DatasetControllerTests extends Test {
-
-	@Autowired
-	private DatasetController controller;
-	@MockBean
-	private DatasetService service;
-	@MockBean
-	private AuthenticationInterceptor authenticationInterceptor;
-	@MockBean
-	private AuthorizationInterceptor authorizationInterceptor;
-	@Autowired
-	private MockHttp http;
+public class DatasetControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getDatasets_params() {
 		String uri = "/projects/%s/datasets";
@@ -125,7 +109,7 @@ public class DatasetControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getDatasets_params")
 	public void getDatasets(MockHttpServletRequestBuilder req, List<Dataset> datasets, HttpStatus expectedStatus, List<DatasetOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(service.getDatasets(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(datasets));
+		Mockito.when(datasetService.getDatasets(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(datasets));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -147,7 +131,7 @@ public class DatasetControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getProject_params")
 	public void getProject(MockHttpServletRequestBuilder req, Dataset dataset, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.getDataset(any(), any(), anyLong())).thenReturn(Optional.ofNullable(dataset));
+		Mockito.when(datasetService.getDataset(any(), any(), anyLong())).thenReturn(Optional.ofNullable(dataset));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())
@@ -159,7 +143,7 @@ public class DatasetControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("putProject_params")
 	public void updateProject(MockHttpServletRequestBuilder req, DatasetInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.saveDataset(any())).thenReturn(ret);
+		Mockito.when(datasetService.saveDataset(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -169,7 +153,7 @@ public class DatasetControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("postProject_params")
 	public void postProject(MockHttpServletRequestBuilder req, DatasetInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.saveDataset(any())).thenReturn(ret);
+		Mockito.when(datasetService.saveDataset(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -182,7 +166,7 @@ public class DatasetControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("deleteProject_params")
 	public void deleteProject(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.deleteDataset(any(), any())).thenReturn(ret);
+		Mockito.when(datasetService.deleteDataset(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())

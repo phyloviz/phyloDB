@@ -5,22 +5,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.neo4j.ogm.model.QueryStatistics;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.multipart.MultipartFile;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.formatters.ProfilesFormatterTests;
-import pt.ist.meic.phylodb.phylogeny.allele.AlleleRepository;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.typing.Method;
-import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.MockResult;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
@@ -35,38 +30,25 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
-public class ProfileServiceTests extends Test {
+public class ProfileServiceTests extends ServiceTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final String taxonId = "t", locusId1 = "l", locusId2 = "2";
-	private static final UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
-	private static final Allele first = new Allele(taxonId, locusId1, "1", 1, false, "description", null);
-	private static final Allele second = new Allele(taxonId, locusId2, "2", 1, false, null, null);
-	private static final Allele third = new Allele(taxonId, locusId1, "3", 1, false, "description", projectId);
-	private static final Allele fourth = new Allele(taxonId, locusId2, "4", 1, false, null, projectId);
-	private static final Profile profile1 = new Profile(projectId, datasetId, "1", 1, false, null,
-			Arrays.asList(new Entity<>(first.getPrimaryKey(), first.getVersion(), first.isDeprecated()), new Entity<>(second.getPrimaryKey(), second.getVersion(), second.isDeprecated())));
-	private static final Profile profile2 = new Profile(projectId, datasetId, "2", 1, false, null,
-			Arrays.asList(new Entity<>(third.getPrimaryKey(), third.getVersion(), third.isDeprecated()), new Entity<>(fourth.getPrimaryKey(), fourth.getVersion(), fourth.isDeprecated())));
-	private static final Profile[] state = new Profile[]{profile1, profile2};
-	@MockBean
-	private DatasetRepository datasetRepository;
-	@MockBean
-	private ProfileRepository profileRepository;
-	@MockBean
-	private AlleleRepository alleleRepository;
-	@MockBean
-	private SchemaRepository schemaRepository;
-	@InjectMocks
-	private ProfileService service;
+	private static final String TAXONID = TAXON1.getPrimaryKey(), locusId1 = LOCUS1.getPrimaryKey().getId(), locusId2 = LOCUS2.getPrimaryKey().getId();
+	private static final UUID PROJECTID = PROJECT1.getPrimaryKey(), datasetId = DATASET1.getPrimaryKey().getId();
+	private static final Allele ALLELE21P = new Allele(TAXONID, locusId2, "1", 1, false, null, PROJECTID);
+	private static final Profile PROFILE3 = new Profile(PROJECTID, datasetId, "1", 1, false, null,
+			Arrays.asList(new Entity<>(ALLELE11.getPrimaryKey(), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
+	private static final Profile PROFILE4 = new Profile(PROJECTID, datasetId, "2", 1, false, null,
+			Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21P.getPrimaryKey(), ALLELE21P.getVersion(), ALLELE21P.isDeprecated())));
+	private static final Profile[] STATE = new Profile[]{PROFILE3, PROFILE4};
 
 	private static Stream<Arguments> getProfiles_params() {
 		List<Profile> expected1 = new ArrayList<Profile>() {{
-			add(state[0]);
+			add(STATE[0]);
 		}};
 		List<Profile> expected2 = new ArrayList<Profile>() {{
-			add(state[0]);
-			add(state[1]);
+			add(STATE[0]);
+			add(STATE[1]);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -75,16 +57,16 @@ public class ProfileServiceTests extends Test {
 	}
 
 	private static Stream<Arguments> getProfile_params() {
-		return Stream.of(Arguments.of(state[0].getPrimaryKey(), 1, profile1),
-				Arguments.of(state[0].getPrimaryKey(), 1, null));
+		return Stream.of(Arguments.of(STATE[0].getPrimaryKey(), 1, PROFILE3),
+				Arguments.of(STATE[0].getPrimaryKey(), 1, null));
 	}
 
 	private static Stream<Arguments> saveProfile_params() {
-		Profile profile1 = new Profile(projectId, datasetId, state[0].getPrimaryKey().getId(), 1, false, null,
-				Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, first.getPrimaryKey().getId()), first.getVersion(), first.isDeprecated()), new Entity<>(new Allele.PrimaryKey(null, null, second.getPrimaryKey().getId()), second.getVersion(), second.isDeprecated())));
-		Profile profile2 = new Profile(projectId, datasetId, "new", 1, false, null, Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, third.getPrimaryKey().getId()), third.getVersion(), third.isDeprecated()), null));
-		Profile profile3 = new Profile(projectId, datasetId, "new", 1, false, null, Collections.singletonList(new Entity<>(third.getPrimaryKey(), third.getVersion(), third.isDeprecated())));
-		Profile profile4 = new Profile(projectId, datasetId, "new", 1, false, null, Arrays.asList(null, null));
+		Profile profile1 = new Profile(PROJECTID, datasetId, STATE[0].getPrimaryKey().getId(), 1, false, null,
+				Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, ALLELE11.getPrimaryKey().getId()), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new Entity<>(new Allele.PrimaryKey(null, null, ALLELE21.getPrimaryKey().getId()), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
+		Profile profile2 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, ALLELE11P.getPrimaryKey().getId()), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null));
+		Profile profile3 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Collections.singletonList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated())));
+		Profile profile4 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(null, null));
 		return Stream.of(Arguments.of(profile1, true, true, false, new MockResult().queryStatistics()),
 				Arguments.of(profile2, false, true, false, new MockResult().queryStatistics()),
 				Arguments.of(profile2, false, true, true, null),
@@ -95,20 +77,20 @@ public class ProfileServiceTests extends Test {
 	}
 
 	private static Stream<Arguments> deleteProfile_params() {
-		return Stream.of(Arguments.of(state[0].getPrimaryKey(), true),
-				Arguments.of(state[0].getPrimaryKey(), false));
+		return Stream.of(Arguments.of(STATE[0].getPrimaryKey(), true),
+				Arguments.of(STATE[0].getPrimaryKey(), false));
 	}
 
 	private static Stream<Arguments> saveAll_params() throws IOException {
 		String[] headers = new String[]{"uvrA", "gyrB", "ftsY", "tuf", "gap"};
 		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
-		Dataset dataset = new Dataset(projectId, datasetId, null, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId());
+		Dataset dataset = new Dataset(PROJECTID, datasetId, null, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId());
 		String[][] alleles1 = {{"1", "1", "1", "1", "1"}};
 		String[][] alleles2 = {{"1", "1", "1", "1", " "}, {" ", "1", " ", "3", "3"}};
 		MultipartFile fileNone = FormatterTests.createFile("ml", "ml-d-0.txt"), file1 = FormatterTests.createFile("ml", "ml-h-d-1.txt"),
 				fileN = FormatterTests.createFile("ml", "ml-h-d-2-m.txt");
-		List<Profile> profiles1 = Arrays.asList(ProfilesFormatterTests.profiles(projectId, datasetId, schema, alleles1, false));
-		List<Profile> profilesN = Arrays.asList(ProfilesFormatterTests.profiles(projectId, datasetId, schema, alleles2, false));
+		List<Profile> profiles1 = Arrays.asList(ProfilesFormatterTests.profiles(PROJECTID, datasetId, schema, alleles1, false));
+		List<Profile> profilesN = Arrays.asList(ProfilesFormatterTests.profiles(PROJECTID, datasetId, schema, alleles2, false));
 		boolean[] existsAll1 = new boolean[]{true}, notExists1 = new boolean[]{false},
 				notExistsN = new boolean[]{false, false}, existsAllN = new boolean[]{true, true},
 				existsSomeN = new boolean[]{true, false};
@@ -146,10 +128,10 @@ public class ProfileServiceTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getProfiles_params")
 	public void getProfiles(int page, List<Profile> expected) {
-		Schema schema = new Schema(taxonId, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
+		Schema schema = new Schema(TAXONID, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
 		Mockito.when(profileRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Mockito.when(schemaRepository.find(any())).thenReturn(Optional.of(schema));
-		Optional<Pair<Schema, List<Profile>>> result = service.getProfiles(projectId, datasetId, page, LIMIT);
+		Optional<Pair<Schema, List<Profile>>> result = profileService.getProfiles(PROJECTID, datasetId, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -166,7 +148,7 @@ public class ProfileServiceTests extends Test {
 	@MethodSource("getProfile_params")
 	public void getProfile(Profile.PrimaryKey key, long version, Profile expected) {
 		Mockito.when(profileRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(expected));
-		Optional<Profile> result = service.getProfile(key.getProjectId(), key.getDatasetId(), key.getId(), version);
+		Optional<Profile> result = profileService.getProfile(key.getProjectId(), key.getDatasetId(), key.getId(), version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
 		if (expected != null)
 			assertEquals(expected, result.get());
@@ -175,13 +157,13 @@ public class ProfileServiceTests extends Test {
 	@ParameterizedTest
 	@MethodSource("saveProfile_params")
 	public void saveProfile(Profile profile, boolean authorized, boolean dataset, boolean anyMissing, QueryStatistics expected) {
-		Schema schema = new Schema(taxonId, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
+		Schema schema = new Schema(TAXONID, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
 		Mockito.when(datasetRepository.exists(any())).thenReturn(dataset);
 		Mockito.when(schemaRepository.find(any())).thenReturn(Optional.of(schema));
 		Mockito.when(alleleRepository.anyMissing(any())).thenReturn(anyMissing);
 		if (profile != null)
 			Mockito.when(profileRepository.save(profile.updateReferences(schema, "", authorized))).thenReturn(Optional.ofNullable(expected));
-		boolean result = service.saveProfile(profile, authorized);
+		boolean result = profileService.saveProfile(profile, authorized);
 		assertEquals(expected != null, result);
 	}
 
@@ -189,7 +171,7 @@ public class ProfileServiceTests extends Test {
 	@MethodSource("deleteProfile_params")
 	public void deleteProfile(Profile.PrimaryKey key, boolean expected) {
 		Mockito.when(profileRepository.remove(any())).thenReturn(expected);
-		boolean result = service.deleteProfile(key.getProjectId(), key.getDatasetId(), key.getId());
+		boolean result = profileService.deleteProfile(key.getProjectId(), key.getDatasetId(), key.getId());
 		assertEquals(expected, result);
 	}
 
@@ -213,12 +195,12 @@ public class ProfileServiceTests extends Test {
 			else if (flag.equals(BatchRepository.UPDATE) && !missing[i])
 				toSave.add(updated.get(i));
 		});
-		Mockito.when(profileRepository.saveAll(toSave, projectId.toString(), datasetId.toString())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(profileRepository.saveAll(toSave, PROJECTID.toString(), datasetId.toString())).thenReturn(Optional.ofNullable(expected));
 		boolean result;
 		if (flag.equals(BatchRepository.SKIP))
-			result = service.saveProfilesOnConflictSkip(projectId, datasetId, false, file);
+			result = profileService.saveProfilesOnConflictSkip(PROJECTID, datasetId, false, file);
 		else
-			result = service.saveProfilesOnConflictUpdate(projectId, datasetId, false, file);
+			result = profileService.saveProfilesOnConflictUpdate(PROJECTID, datasetId, false, file);
 		assertEquals(expected != null, result);
 	}
 

@@ -4,30 +4,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.Test;
+import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
-import pt.ist.meic.phylodb.security.authentication.user.UserController;
-import pt.ist.meic.phylodb.security.authentication.user.UserService;
 import pt.ist.meic.phylodb.security.authentication.user.model.GetUserOutputModel;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authentication.user.model.UserInputModel;
 import pt.ist.meic.phylodb.security.authentication.user.model.UserOutputModel;
-import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.utils.MockHttp;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,18 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-public class UserControllerTests extends Test {
-
-	@InjectMocks
-	private UserController controller;
-	@MockBean
-	private UserService service;
-	@MockBean
-	private AuthenticationInterceptor authenticationInterceptor;
-	@MockBean
-	private AuthorizationInterceptor authorizationInterceptor;
-	@Autowired
-	private MockHttp http;
+public class UserControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getUsers_params() {
 		String uri = "/users";
@@ -117,7 +98,7 @@ public class UserControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getUsers_params")
 	public void getUsers(MockHttpServletRequestBuilder req, List<User> users, HttpStatus expectedStatus, List<UserOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(service.getUsers(anyInt(), anyInt())).thenReturn(Optional.ofNullable(users));
+		Mockito.when(userService.getUsers(anyInt(), anyInt())).thenReturn(Optional.ofNullable(users));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -139,7 +120,7 @@ public class UserControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("getUser_params")
 	public void getUser(MockHttpServletRequestBuilder req, User user, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.getUser(anyString(), anyString(), anyLong())).thenReturn(Optional.ofNullable(user));
+		Mockito.when(userService.getUser(anyString(), anyString(), anyLong())).thenReturn(Optional.ofNullable(user));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())
@@ -152,7 +133,7 @@ public class UserControllerTests extends Test {
 	@MethodSource("updateUser_params")
 	public void updateUser(MockHttpServletRequestBuilder req, UserInputModel input, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		if (input != null)
-			Mockito.when(service.updateUser(any())).thenReturn(ret);
+			Mockito.when(userService.updateUser(any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, input);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
@@ -162,7 +143,7 @@ public class UserControllerTests extends Test {
 	@ParameterizedTest
 	@MethodSource("deleteUser_params")
 	public void deleteUser(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(service.deleteUser(any(), any())).thenReturn(ret);
+		Mockito.when(userService.deleteUser(any(), any())).thenReturn(ret);
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())

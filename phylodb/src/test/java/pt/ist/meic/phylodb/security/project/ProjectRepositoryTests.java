@@ -6,12 +6,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.phylodb.RepositoryTests;
-import pt.ist.meic.phylodb.security.authentication.user.UserRepository;
+import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
-import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectRepository;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.utils.db.Query;
 
@@ -21,54 +17,47 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ProjectRepositoryTests extends RepositoryTests {
+public class ProjectRepositoryTests extends RepositoryTestsContext {
 
-	private static final User user1 = new User("1one", "one", 1, false, Role.USER);
-	private static final User user2 = new User("2two", "two", 1, false, Role.USER);
-	private static final Project[] projects = new Project[]{new Project(UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-			new Project(UUID.fromString("26d20a45-470a-4336-81ab-ed057d3f5d66"), 1, false, "private1", "private", null, new User.PrimaryKey[]{user2.getPrimaryKey()}),
-			new Project(UUID.fromString("3f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "private1", "public", null, new User.PrimaryKey[]{user2.getPrimaryKey()})};
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private ProjectRepository projectRepository;
+	private static final Project[] STATE = new Project[]{PROJECT1, new Project(UUID.fromString("26d20a45-470a-4336-81ab-ed057d3f5d66"), 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+			new Project(UUID.fromString("3f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
 
 	private static Stream<Arguments> findAll_params() {
 		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7"), key3 = UUID.fromString("8f809af7-2c99-43f7-b674-4843c77384c7");
-		Project first = new Project(key1, 1, false, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				firstChanged = new Project(key1, 2, false, "name2", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				second = new Project(key2, 1, false, "name3", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				secondChanged = new Project(key2, 2, false, "name4", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				third = new Project(UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name5", "public", null, new User.PrimaryKey[]{user2.getPrimaryKey()}),
-				fourth = new Project(UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", "public", null, new User.PrimaryKey[]{user2.getPrimaryKey()}),
-				fifth = new Project(key3, 1, false, "name7", "public", null, new User.PrimaryKey[]{user2.getPrimaryKey()}),
-				fifthChanged = new Project(key3, 2, false, "name77", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				sixth = new Project(UUID.fromString("9f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name8", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()});
+		Project first = new Project(key1, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				firstChanged = new Project(key1, 2, false, "name2", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(key2, 1, false, "name3", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				secondChanged = new Project(key2, 2, false, "name4", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				third = new Project(UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name5", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fourth = new Project(UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fifth = new Project(key3, 1, false, "name7", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fifthChanged = new Project(key3, 2, false, "name77", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				sixth = new Project(UUID.fromString("9f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name8", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(0, new Project[0], new Project[0]),
-				Arguments.of(0, new Project[]{projects[0]}, new Project[]{projects[0]}),
+				Arguments.of(0, new Project[]{STATE[0]}, new Project[]{STATE[0]}),
 				Arguments.of(0, new Project[]{first, firstChanged}, new Project[]{firstChanged}),
-				Arguments.of(0, new Project[]{projects[0], projects[1], projects[2], first}, new Project[]{projects[0], projects[2], first}),
-				Arguments.of(0, new Project[]{projects[0], projects[1], projects[2], first, firstChanged}, new Project[]{projects[0], projects[2], firstChanged}),
+				Arguments.of(0, new Project[]{STATE[0], STATE[1], STATE[2], first}, new Project[]{STATE[0], STATE[2], first}),
+				Arguments.of(0, new Project[]{STATE[0], STATE[1], STATE[2], first, firstChanged}, new Project[]{STATE[0], STATE[2], firstChanged}),
 				Arguments.of(1, new Project[0], new Project[0]),
-				Arguments.of(1, new Project[]{projects[0]}, new Project[0]),
+				Arguments.of(1, new Project[]{STATE[0]}, new Project[0]),
 				Arguments.of(1, new Project[]{first, firstChanged}, new Project[0]),
-				Arguments.of(1, new Project[]{projects[0], projects[1], projects[2], first, second}, new Project[]{second}),
-				Arguments.of(1, new Project[]{projects[0], projects[1], projects[2], first, firstChanged, second, third}, new Project[]{second, third}),
-				Arguments.of(1, new Project[]{projects[0], projects[1], projects[2], first, firstChanged, second, secondChanged, third}, new Project[]{secondChanged, third}),
+				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], first, second}, new Project[]{second}),
+				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], first, firstChanged, second, third}, new Project[]{second, third}),
+				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], first, firstChanged, second, secondChanged, third}, new Project[]{secondChanged, third}),
 				Arguments.of(2, new Project[0], new Project[0]),
-				Arguments.of(2, new Project[]{projects[0]}, new Project[0]),
+				Arguments.of(2, new Project[]{STATE[0]}, new Project[0]),
 				Arguments.of(2, new Project[]{first, firstChanged}, new Project[0]),
-				Arguments.of(2, new Project[]{projects[0], projects[1], projects[2], first, second, third, fourth, fifth}, new Project[]{fifth}),
-				Arguments.of(2, new Project[]{projects[0], projects[1], projects[2], first, second, third, fourth, fifth, fifthChanged}, new Project[]{fifthChanged}),
-				Arguments.of(2, new Project[]{projects[0], projects[1], projects[2], first, second, third, fourth, fifth, sixth}, new Project[]{fifth, sixth}),
-				Arguments.of(2, new Project[]{projects[0], projects[1], projects[2], first, second, third, fourth, fifth, fifthChanged, sixth}, new Project[]{fifthChanged, sixth}),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth}, new Project[]{fifth}),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth, fifthChanged}, new Project[]{fifthChanged}),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth, sixth}, new Project[]{fifth, sixth}),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth, fifthChanged, sixth}, new Project[]{fifthChanged, sixth}),
 				Arguments.of(-1, new Project[0], new Project[0]));
 	}
 
 	private static Stream<Arguments> find_params() {
 		UUID key = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
-		Project first = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				second = new Project(key, 2, true, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()});
+		Project first = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(key, 2, true, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(key, 1, new Project[0], null),
 				Arguments.of(key, 1, new Project[]{first}, first),
 				Arguments.of(key, 2, new Project[]{first, second}, second),
@@ -80,8 +69,8 @@ public class ProjectRepositoryTests extends RepositoryTests {
 
 	private static Stream<Arguments> exists_params() {
 		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
-		Project first = new Project(key1, 1, false, "name1", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				second = new Project(key1, 1, true, "name2", "private", null, new User.PrimaryKey[]{user2.getPrimaryKey()});
+		Project first = new Project(key1, 1, false, "name1", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(key1, 1, true, "name2", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()});
 		return Stream.of(Arguments.of(key1, new Project[0], false),
 				Arguments.of(key1, new Project[]{first}, true),
 				Arguments.of(key1, new Project[]{second}, false),
@@ -90,20 +79,20 @@ public class ProjectRepositoryTests extends RepositoryTests {
 
 	private static Stream<Arguments> save_params() {
 		UUID id = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
-		Project first = new Project(id, 1, false, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{user1.getPrimaryKey()});
-		return Stream.of(Arguments.of(first, new Project[0], new Project[]{projects[0], projects[1], projects[2], first}, true, 2, 2),
-				Arguments.of(second, new Project[]{first}, new Project[]{projects[0], projects[1], projects[2], first, second}, true, 1, 2),
-				Arguments.of(null, new Project[0], new Project[]{projects[0], projects[1], projects[2]}, false, 0, 0));
+		Project first = new Project(id, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{USER1.getPrimaryKey()});
+		return Stream.of(Arguments.of(first, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2], first}, true, 2, 2),
+				Arguments.of(second, new Project[]{first}, new Project[]{STATE[0], STATE[1], STATE[2], first, second}, true, 1, 2),
+				Arguments.of(null, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
 		UUID key = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
-		Project before = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()}),
-				after = new Project(key, 1, true, "name", "private", null, new User.PrimaryKey[]{user1.getPrimaryKey()});
-		return Stream.of(Arguments.of(key, new Project[0], new Project[]{projects[0], projects[1], projects[2]}, false),
-				Arguments.of(key, new Project[]{before}, new Project[]{projects[0], projects[1], projects[2], after}, true),
-				Arguments.of(null, new Project[0], new Project[]{projects[0], projects[1], projects[2]}, false));
+		Project before = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				after = new Project(key, 1, true, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+		return Stream.of(Arguments.of(key, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false),
+				Arguments.of(key, new Project[]{before}, new Project[]{STATE[0], STATE[1], STATE[2], after}, true),
+				Arguments.of(null, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false));
 	}
 
 	private void store(Project[] projects) {
@@ -162,7 +151,7 @@ public class ProjectRepositoryTests extends RepositoryTests {
 
 	@BeforeEach
 	public void init() {
-		for (User user : new User[]{user1, user2})
+		for (User user : new User[]{USER1, USER2})
 			userRepository.save(user);
 	}
 
@@ -170,7 +159,7 @@ public class ProjectRepositoryTests extends RepositoryTests {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Project[] state, Project[] expected) {
 		store(state);
-		Optional<List<Project>> result = projectRepository.findAll(page, 3, user1.getPrimaryKey());
+		Optional<List<Project>> result = projectRepository.findAll(page, 3, USER1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -184,7 +173,7 @@ public class ProjectRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("find_params")
 	public void find(UUID key, long version, Project[] state, Project expected) {
-		store(ProjectRepositoryTests.projects);
+		store(ProjectRepositoryTests.STATE);
 		store(state);
 		Optional<Project> result = projectRepository.find(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
@@ -195,7 +184,7 @@ public class ProjectRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("exists_params")
 	public void exists(UUID key, Project[] state, boolean expected) {
-		store(ProjectRepositoryTests.projects);
+		store(ProjectRepositoryTests.STATE);
 		store(state);
 		boolean result = projectRepository.exists(key);
 		assertEquals(expected, result);
@@ -204,7 +193,7 @@ public class ProjectRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("save_params")
 	public void save(Project project, Project[] state, Project[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
-		store(ProjectRepositoryTests.projects);
+		store(ProjectRepositoryTests.STATE);
 		store(state);
 		Optional<QueryStatistics> result = projectRepository.save(project);
 		if (executed) {
@@ -220,7 +209,7 @@ public class ProjectRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("remove_params")
 	public void remove(UUID key, Project[] state, Project[] expectedState, boolean expectedResult) {
-		store(ProjectRepositoryTests.projects);
+		store(ProjectRepositoryTests.STATE);
 		store(state);
 		boolean result = projectRepository.remove(key);
 		Project[] stateResult = findAll();

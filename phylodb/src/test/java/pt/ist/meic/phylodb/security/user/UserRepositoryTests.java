@@ -5,9 +5,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.phylodb.RepositoryTests;
-import pt.ist.meic.phylodb.security.authentication.user.UserRepository;
+import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.db.Query;
@@ -20,14 +18,10 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserRepositoryTests extends RepositoryTests {
+public class UserRepositoryTests extends RepositoryTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final User first = new User("1one", "one", 1, false, Role.USER);
-	private static final User second = new User("2two", "two", 1, false, Role.USER);
-	private static final User[] state = new User[]{first, second};
-	@Autowired
-	private UserRepository repository;
+	private static final User[] STATE = new User[]{USER1, USER2};
 
 	private static Stream<Arguments> findAll_params() {
 		String email1 = "3test", provider1 = "3test", email3 = "5test", provider3 = "5provider";
@@ -36,25 +30,25 @@ public class UserRepositoryTests extends RepositoryTests {
 				third = new User(email3, provider3, 1, false, Role.USER), thirdChanged = new User(email3, provider3, 2, false, Role.ADMIN),
 				fourth = new User("6test", "6provider", 1, false, Role.USER);
 		return Stream.of(Arguments.of(0, new User[0], new User[0]),
-				Arguments.of(0, new User[]{state[0]}, new User[]{state[0]}),
+				Arguments.of(0, new User[]{STATE[0]}, new User[]{STATE[0]}),
 				Arguments.of(0, new User[]{first, firstChanged}, new User[]{firstChanged}),
-				Arguments.of(0, new User[]{state[0], state[1], first}, state),
-				Arguments.of(0, new User[]{state[0], state[1], first, firstChanged}, state),
+				Arguments.of(0, new User[]{STATE[0], STATE[1], first}, STATE),
+				Arguments.of(0, new User[]{STATE[0], STATE[1], first, firstChanged}, STATE),
 				Arguments.of(1, new User[0], new User[0]),
-				Arguments.of(1, new User[]{state[0]}, new User[0]),
+				Arguments.of(1, new User[]{STATE[0]}, new User[0]),
 				Arguments.of(1, new User[]{first, firstChanged}, new User[0]),
-				Arguments.of(1, new User[]{state[0], state[1], first}, new User[]{first}),
-				Arguments.of(1, new User[]{state[0], state[1], first, firstChanged}, new User[]{firstChanged}),
-				Arguments.of(1, new User[]{state[0], state[1], first, second}, new User[]{first, second}),
-				Arguments.of(1, new User[]{state[0], state[1], first, firstChanged, second}, new User[]{firstChanged, second}),
-				Arguments.of(1, new User[]{state[0], state[1], first, firstChanged}, new User[]{firstChanged}),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], first}, new User[]{first}),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], first, firstChanged}, new User[]{firstChanged}),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], first, second}, new User[]{first, second}),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], first, firstChanged, second}, new User[]{firstChanged, second}),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], first, firstChanged}, new User[]{firstChanged}),
 				Arguments.of(2, new User[0], new User[0]),
-				Arguments.of(2, new User[]{state[0]}, new User[0]),
+				Arguments.of(2, new User[]{STATE[0]}, new User[0]),
 				Arguments.of(2, new User[]{first, firstChanged}, new User[0]),
-				Arguments.of(2, new User[]{state[0], state[1], first, second, third}, new User[]{third}),
-				Arguments.of(2, new User[]{state[0], state[1], first, second, third, thirdChanged}, new User[]{thirdChanged}),
-				Arguments.of(2, new User[]{state[0], state[1], first, second, third, fourth}, new User[]{third, fourth}),
-				Arguments.of(2, new User[]{state[0], state[1], first, second, third, thirdChanged, fourth}, new User[]{thirdChanged, fourth}),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third}, new User[]{third}),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new User[]{thirdChanged}),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third, fourth}, new User[]{third, fourth}),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new User[]{thirdChanged, fourth}),
 				Arguments.of(-1, new User[0], new User[0]));
 	}
 
@@ -85,24 +79,24 @@ public class UserRepositoryTests extends RepositoryTests {
 	private static Stream<Arguments> save_params() {
 		String email = "3test", provider = "3test";
 		User first = new User(email, provider, 1, false, Role.USER), second = new User(email, provider, 2, false, Role.ADMIN);
-		return Stream.of(Arguments.of(first, new User[0], new User[]{state[0], state[1], first}, true, 2, 1),
-				Arguments.of(second, new User[]{first}, new User[]{state[0], state[1], first, second}, true, 1, 1),
-				Arguments.of(null, new User[0], state, false, 0, 0));
+		return Stream.of(Arguments.of(first, new User[0], new User[]{STATE[0], STATE[1], first}, true, 2, 1),
+				Arguments.of(second, new User[]{first}, new User[]{STATE[0], STATE[1], first, second}, true, 1, 1),
+				Arguments.of(null, new User[0], STATE, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
 		String email = "3test", provider = "3test";
 		User.PrimaryKey key = new User.PrimaryKey(email, provider);
 		User first = new User(email, provider, 1, false, Role.USER), after = new User(email, provider, 1, true, Role.USER);
-		return Stream.of(Arguments.of(key, new User[0], state, false),
-				Arguments.of(key, new User[]{first}, new User[]{state[0], state[1], after}, true),
-				Arguments.of(null, new User[0], state, false));
+		return Stream.of(Arguments.of(key, new User[0], STATE, false),
+				Arguments.of(key, new User[]{first}, new User[]{STATE[0], STATE[1], after}, true),
+				Arguments.of(null, new User[0], STATE, false));
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
-		return Stream.of(Arguments.of(new User.PrimaryKey[]{state[0].getPrimaryKey()}, false),
-				Arguments.of(new User.PrimaryKey[]{state[0].getPrimaryKey(), state[1].getPrimaryKey()}, false),
-				Arguments.of(new User.PrimaryKey[]{state[0].getPrimaryKey(), new User.PrimaryKey("not", "not")}, true),
+		return Stream.of(Arguments.of(new User.PrimaryKey[]{STATE[0].getPrimaryKey()}, false),
+				Arguments.of(new User.PrimaryKey[]{STATE[0].getPrimaryKey(), STATE[1].getPrimaryKey()}, false),
+				Arguments.of(new User.PrimaryKey[]{STATE[0].getPrimaryKey(), new User.PrimaryKey("not", "not")}, true),
 				Arguments.of(new User.PrimaryKey[]{new User.PrimaryKey("not", "not")}, true));
 	}
 
@@ -141,7 +135,7 @@ public class UserRepositoryTests extends RepositoryTests {
 	@MethodSource("findAll_params")
 	public void findAll(int page, User[] state, User[] expected) {
 		store(state);
-		Optional<List<User>> result = repository.findAll(page, LIMIT);
+		Optional<List<User>> result = userRepository.findAll(page, LIMIT);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -155,9 +149,9 @@ public class UserRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("find_params")
 	public void find(User.PrimaryKey key, long version, User[] state, User expected) {
-		store(UserRepositoryTests.state);
+		store(UserRepositoryTests.STATE);
 		store(state);
-		Optional<User> result = repository.find(key, version);
+		Optional<User> result = userRepository.find(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
 		if (expected != null)
 			assertEquals(expected, result.get());
@@ -166,18 +160,18 @@ public class UserRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("exists_params")
 	public void exists(User.PrimaryKey key, User[] state, boolean expected) {
-		store(UserRepositoryTests.state);
+		store(UserRepositoryTests.STATE);
 		store(state);
-		boolean result = repository.exists(key);
+		boolean result = userRepository.exists(key);
 		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
 	@MethodSource("save_params")
 	public void save(User user, User[] state, User[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
-		store(UserRepositoryTests.state);
+		store(UserRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = repository.save(user);
+		Optional<QueryStatistics> result = userRepository.save(user);
 		User[] stateResult = findAll();
 		if (executed) {
 			assertTrue(result.isPresent());
@@ -191,9 +185,9 @@ public class UserRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("remove_params")
 	public void remove(User.PrimaryKey key, User[] state, User[] expectedState, boolean expectedResult) {
-		store(UserRepositoryTests.state);
+		store(UserRepositoryTests.STATE);
 		store(state);
-		boolean result = repository.remove(key);
+		boolean result = userRepository.remove(key);
 		User[] stateResult = findAll();
 		assertEquals(expectedResult, result);
 		assertArrayEquals(expectedState, stateResult);
@@ -202,8 +196,8 @@ public class UserRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("anyMissing_params")
 	public void anyMissing(User.PrimaryKey[] keys, boolean expected) {
-		store(UserRepositoryTests.state);
-		boolean result = repository.anyMissing(keys);
+		store(UserRepositoryTests.STATE);
+		boolean result = userRepository.anyMissing(keys);
 		assertEquals(expected, result);
 	}
 

@@ -6,11 +6,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
-import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.phylodb.RepositoryTests;
+import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
@@ -24,21 +21,14 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LocusRepositoryTests extends RepositoryTests {
+public class LocusRepositoryTests extends RepositoryTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final Taxon taxon = new Taxon("t", null);
-	private static final Locus first = new Locus(taxon.getPrimaryKey(), "1one", 1, false, "description");
-	private static final Locus second = new Locus(taxon.getPrimaryKey(), "2two", 1, false, null);
-	private static final Locus[] state = new Locus[]{first, second};
-	@Autowired
-	private TaxonRepository taxonRepository;
-	@Autowired
-	private LocusRepository locusRepository;
+	private static final Locus[] STATE = new Locus[]{LOCUS1, LOCUS2};
 
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
-		String taxonKey = taxon.getPrimaryKey();
+		String taxonKey = TAXON1.getPrimaryKey();
 		Locus first = new Locus(taxonKey, id1, 1, false, "description"),
 				firstChanged = new Locus(taxonKey, id1, 2, false, "description2"),
 				second = new Locus(taxonKey, "4test", 1, false, null),
@@ -46,30 +36,30 @@ public class LocusRepositoryTests extends RepositoryTests {
 				thirdChanged = new Locus(taxonKey, id3, 2, false, null),
 				fourth = new Locus(taxonKey, "6test", 1, false, null);
 		return Stream.of(Arguments.of(0, new Locus[0], new Locus[0]),
-				Arguments.of(0, new Locus[]{state[0]}, new Locus[]{state[0]}),
+				Arguments.of(0, new Locus[]{STATE[0]}, new Locus[]{STATE[0]}),
 				Arguments.of(0, new Locus[]{first, firstChanged}, new Locus[]{firstChanged}),
-				Arguments.of(0, new Locus[]{state[0], state[1], first}, state),
-				Arguments.of(0, new Locus[]{state[0], state[1], first, firstChanged}, state),
+				Arguments.of(0, new Locus[]{STATE[0], STATE[1], first}, STATE),
+				Arguments.of(0, new Locus[]{STATE[0], STATE[1], first, firstChanged}, STATE),
 				Arguments.of(1, new Locus[0], new Locus[0]),
-				Arguments.of(1, new Locus[]{state[0]}, new Locus[0]),
+				Arguments.of(1, new Locus[]{STATE[0]}, new Locus[0]),
 				Arguments.of(1, new Locus[]{first, firstChanged}, new Locus[0]),
-				Arguments.of(1, new Locus[]{state[0], state[1], first}, new Locus[]{first}),
-				Arguments.of(1, new Locus[]{state[0], state[1], first, firstChanged}, new Locus[]{firstChanged}),
-				Arguments.of(1, new Locus[]{state[0], state[1], first, second}, new Locus[]{first, second}),
-				Arguments.of(1, new Locus[]{state[0], state[1], first, firstChanged, second}, new Locus[]{firstChanged, second}),
-				Arguments.of(1, new Locus[]{state[0], state[1], first, firstChanged}, new Locus[]{firstChanged}),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first}, new Locus[]{first}),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, firstChanged}, new Locus[]{firstChanged}),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, second}, new Locus[]{first, second}),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, firstChanged, second}, new Locus[]{firstChanged, second}),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, firstChanged}, new Locus[]{firstChanged}),
 				Arguments.of(2, new Locus[0], new Locus[0]),
-				Arguments.of(2, new Locus[]{state[0]}, new Locus[0]),
+				Arguments.of(2, new Locus[]{STATE[0]}, new Locus[0]),
 				Arguments.of(2, new Locus[]{first, firstChanged}, new Locus[0]),
-				Arguments.of(2, new Locus[]{state[0], state[1], first, second, third}, new Locus[]{third}),
-				Arguments.of(2, new Locus[]{state[0], state[1], first, second, third, thirdChanged}, new Locus[]{thirdChanged}),
-				Arguments.of(2, new Locus[]{state[0], state[1], first, second, third, fourth}, new Locus[]{third, fourth}),
-				Arguments.of(2, new Locus[]{state[0], state[1], first, second, third, thirdChanged, fourth}, new Locus[]{thirdChanged, fourth}),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third}, new Locus[]{third}),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Locus[]{thirdChanged}),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third, fourth}, new Locus[]{third, fourth}),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Locus[]{thirdChanged, fourth}),
 				Arguments.of(-1, new Locus[0], new Locus[0]));
 	}
 
 	private static Stream<Arguments> find_params() {
-		Locus.PrimaryKey key = new Locus.PrimaryKey(taxon.getPrimaryKey(), "test");
+		Locus.PrimaryKey key = new Locus.PrimaryKey(TAXON1.getPrimaryKey(), "test");
 		Locus first = new Locus(key.getTaxonId(), key.getId(), 1, false, null),
 				second = new Locus(key.getTaxonId(), key.getId(), 2, false, "description");
 		return Stream.of(Arguments.of(key, 1, new Locus[0], null),
@@ -82,7 +72,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		Locus.PrimaryKey key = new Locus.PrimaryKey(taxon.getPrimaryKey(), "test");
+		Locus.PrimaryKey key = new Locus.PrimaryKey(TAXON1.getPrimaryKey(), "test");
 		Locus first = new Locus(key.getTaxonId(), key.getId(), 1, false, null),
 				second = new Locus(key.getTaxonId(), key.getId(), 1, true, "description");
 		return Stream.of(Arguments.of(key, new Locus[0], false),
@@ -92,27 +82,27 @@ public class LocusRepositoryTests extends RepositoryTests {
 	}
 
 	private static Stream<Arguments> save_params() {
-		Locus.PrimaryKey key = new Locus.PrimaryKey(taxon.getPrimaryKey(), "3three");
+		Locus.PrimaryKey key = new Locus.PrimaryKey(TAXON1.getPrimaryKey(), "3three");
 		Locus first = new Locus(key.getTaxonId(), key.getId(), 1, false, null),
 				second = new Locus(key.getTaxonId(), key.getId(), 2, false, "description");
-		return Stream.of(Arguments.of(first, new Locus[0], new Locus[]{state[0], state[1], first}, true, 2, 2),
-				Arguments.of(second, new Locus[]{first}, new Locus[]{state[0], state[1], first, second}, true, 1, 1),
-				Arguments.of(null, new Locus[0], state, false, 0, 0));
+		return Stream.of(Arguments.of(first, new Locus[0], new Locus[]{STATE[0], STATE[1], first}, true, 2, 2),
+				Arguments.of(second, new Locus[]{first}, new Locus[]{STATE[0], STATE[1], first, second}, true, 1, 1),
+				Arguments.of(null, new Locus[0], STATE, false, 0, 0));
 	}
 
 	private static Stream<Arguments> remove_params() {
-		Locus.PrimaryKey key = new Locus.PrimaryKey(taxon.getPrimaryKey(), "3three");
+		Locus.PrimaryKey key = new Locus.PrimaryKey(TAXON1.getPrimaryKey(), "3three");
 		Locus first = new Locus(key.getTaxonId(), key.getId(), 1, false, null),
 				second = new Locus(key.getTaxonId(), key.getId(), 1, true, null);
-		return Stream.of(Arguments.of(key, new Locus[0], state, false),
-				Arguments.of(key, new Locus[]{first}, new Locus[]{state[0], state[1], second}, true),
-				Arguments.of(null, new Locus[0], state, false));
+		return Stream.of(Arguments.of(key, new Locus[0], STATE, false),
+				Arguments.of(key, new Locus[]{first}, new Locus[]{STATE[0], STATE[1], second}, true),
+				Arguments.of(null, new Locus[0], STATE, false));
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
 		List<Entity<Locus.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(), references3 = new ArrayList<>(), references4 = new ArrayList<>();
-		Entity<Locus.PrimaryKey> reference1 = new Entity<>(new Locus.PrimaryKey(taxon.getPrimaryKey(), state[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				reference2 = new Entity<>(new Locus.PrimaryKey(taxon.getPrimaryKey(), state[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
+		Entity<Locus.PrimaryKey> reference1 = new Entity<>(new Locus.PrimaryKey(TAXON1.getPrimaryKey(), STATE[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
+				reference2 = new Entity<>(new Locus.PrimaryKey(TAXON1.getPrimaryKey(), STATE[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
 				notReference = new Entity<>(new Locus.PrimaryKey("not", "not"), EntityRepository.CURRENT_VERSION_VALUE, false);
 		references1.add(reference1);
 		references2.add(reference1);
@@ -153,7 +143,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
 				"l.name as name, ld.description as description\n" +
 				"ORDER BY t.id, l.id, version";
-		Result result = query(new Query(statement, taxon.getPrimaryKey()));
+		Result result = query(new Query(statement, TAXON1.getPrimaryKey()));
 		if (result == null) return new Locus[0];
 		return StreamSupport.stream(result.spliterator(), false)
 				.map(this::parse)
@@ -169,14 +159,14 @@ public class LocusRepositoryTests extends RepositoryTests {
 
 	@BeforeEach
 	public void init() {
-		taxonRepository.save(taxon);
+		taxonRepository.save(TAXON1);
 	}
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
 	public void findAll(int page, Locus[] state, Locus[] expected) {
 		store(state);
-		Optional<List<Locus>> result = locusRepository.findAll(page, LIMIT, taxon.getPrimaryKey());
+		Optional<List<Locus>> result = locusRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -190,7 +180,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("find_params")
 	public void find(Locus.PrimaryKey key, long version, Locus[] state, Locus expected) {
-		store(LocusRepositoryTests.state);
+		store(LocusRepositoryTests.STATE);
 		store(state);
 		Optional<Locus> result = locusRepository.find(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
@@ -201,7 +191,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("exists_params")
 	public void exists(Locus.PrimaryKey key, Locus[] state, boolean expected) {
-		store(LocusRepositoryTests.state);
+		store(LocusRepositoryTests.STATE);
 		store(state);
 		boolean result = locusRepository.exists(key);
 		assertEquals(expected, result);
@@ -210,7 +200,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("save_params")
 	public void save(Locus user, Locus[] state, Locus[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
-		store(LocusRepositoryTests.state);
+		store(LocusRepositoryTests.STATE);
 		store(state);
 		Optional<QueryStatistics> result = locusRepository.save(user);
 		if (executed) {
@@ -226,7 +216,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("remove_params")
 	public void remove(Locus.PrimaryKey key, Locus[] state, Locus[] expectedState, boolean expectedResult) {
-		store(LocusRepositoryTests.state);
+		store(LocusRepositoryTests.STATE);
 		store(state);
 		boolean result = locusRepository.remove(key);
 		Locus[] stateResult = findAll();
@@ -239,7 +229,7 @@ public class LocusRepositoryTests extends RepositoryTests {
 	@ParameterizedTest
 	@MethodSource("anyMissing_params")
 	public void anyMissing(List<Entity<Locus.PrimaryKey>> references, boolean expected) {
-		store(LocusRepositoryTests.state);
+		store(LocusRepositoryTests.STATE);
 		boolean result = locusRepository.anyMissing(references);
 		assertEquals(expected, result);
 	}
