@@ -22,7 +22,7 @@ public class FastaFormatterTests extends FormatterTests {
 	public static Allele[] alleles(String taxon, String locus, UUID project, String[] sequences) {
 		return IntStream.range(0, sequences.length)
 				.filter(i -> sequences[i] != null)
-				.mapToObj(i -> new Allele(taxon, locus, "nusA_" + (i + 1), sequences[i], project))
+				.mapToObj(i -> new Allele(taxon, locus, String.valueOf(i + 1), sequences[i], project))
 				.toArray(Allele[]::new);
 	}
 
@@ -78,7 +78,7 @@ public class FastaFormatterTests extends FormatterTests {
 		FastaFormatter formatter = new FastaFormatter();
 		String[] alleles = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String expected = readFile("fasta", "f-1-1.txt");
-		String formatted = formatter.format(Arrays.asList(alleles("taxon", "locus", UUID.randomUUID(), alleles)), 17);
+		String formatted = formatter.format(Arrays.asList(alleles("taxon", "nusA", UUID.randomUUID(), alleles)), 17);
 		assertEquals(expected, formatted);
 	}
 
@@ -87,7 +87,7 @@ public class FastaFormatterTests extends FormatterTests {
 		FastaFormatter formatter = new FastaFormatter();
 		String[] alleles = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String expected = readFile("fasta", "f-2-a.txt");
-		String formatted = formatter.format(Arrays.asList(alleles("taxon", "locus", UUID.randomUUID(), alleles)), 17);
+		String formatted = formatter.format(Arrays.asList(alleles("taxon", "nusA", UUID.randomUUID(), alleles)), 17);
 		assertEquals(expected, formatted);
 	}
 

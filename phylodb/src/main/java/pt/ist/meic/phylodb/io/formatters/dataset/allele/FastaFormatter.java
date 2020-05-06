@@ -29,10 +29,12 @@ public class FastaFormatter extends Formatter<Allele> {
 	@Override
 	protected boolean parse(String line, boolean last, Consumer<Allele> add) {
 		if (line.startsWith(">")) {
-			String nextId = line.substring(1);
 			if (id != null && sequence.length() > 0)
 				add.accept(new Allele(taxon, locus, id, sequence.toString(), projet));
-			id = nextId;
+			int idIndex = line.lastIndexOf("_");
+			if(idIndex == -1 || idIndex == line.length() - 1)
+				return false;
+			id = line.substring(idIndex + 1);
 			sequence = new StringBuilder();
 		} else if (id != null && line.matches("^[ACTG ]*$")) {
 			sequence.append(line);
@@ -50,6 +52,8 @@ public class FastaFormatter extends Formatter<Allele> {
 		StringBuilder formatted = new StringBuilder();
 		for (Allele allele : alleles)
 			formatted.append(">")
+					.append(allele.getPrimaryKey().getLocusId())
+					.append("_")
 					.append(allele.getPrimaryKey().getId())
 					.append("\n")
 					.append(formatSequence(allele.getSequence(), (int) params[0]))
