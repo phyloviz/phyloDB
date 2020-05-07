@@ -83,11 +83,11 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected Result store(Isolate isolate) {
+	protected void store(Isolate isolate) {
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
 		Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE p.deprecated = false AND d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 		composeStore(query, isolate);
-		return execute(query);
+		execute(query);
 	}
 
 	@Override

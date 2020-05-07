@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.utils.db;
 
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 
@@ -26,7 +25,7 @@ public abstract class EntityRepository<E, K> extends Repository {
 
 	protected abstract boolean isPresent(K key);
 
-	protected abstract Result store(E entity);
+	protected abstract void store(E entity);
 
 	protected abstract void delete(K key);
 
@@ -53,10 +52,11 @@ public abstract class EntityRepository<E, K> extends Repository {
 		return key != null && isPresent(key);
 	}
 
-	public Optional<QueryStatistics> save(E entity) {
+	public boolean save(E entity) {
 		if (entity == null)
-			return Optional.empty();
-		return Optional.of(store(entity).queryStatistics());
+			return false;
+		store(entity);
+		return true;
 	}
 
 	public boolean remove(K key) {

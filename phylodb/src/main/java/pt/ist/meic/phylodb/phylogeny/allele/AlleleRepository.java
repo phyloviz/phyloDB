@@ -75,7 +75,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 	}
 
 	@Override
-	protected Result store(Allele allele) {
+	protected void store(Allele allele) {
 		Object[] params = new Object[]{allele.getTaxonId(), allele.getLocusId()};
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false\n";
@@ -85,7 +85,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		}
 		Query query = new Query(statement, params);
 		composeStore(query, allele);
-		return execute(query);
+		execute(query);
 	}
 
 	@Override

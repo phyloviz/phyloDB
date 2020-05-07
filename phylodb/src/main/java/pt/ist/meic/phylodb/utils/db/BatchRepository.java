@@ -1,15 +1,11 @@
 package pt.ist.meic.phylodb.utils.db;
 
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.session.Session;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.List;
-import java.util.Optional;
 
 public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepository<T, K> {
-
-	public static final String SKIP = "skip", UPDATE = "update";
 
 	protected BatchRepository(Session session) {
 		super(session);
@@ -21,14 +17,22 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 
 	protected abstract void arrange(Query query, String... params);
 
-	public Optional<QueryStatistics> saveAll(List<T> entities, String... params) {
-		if (params.length == 0 || entities.size() == 0)
-			return Optional.empty();
+	public boolean saveAll(List<T> entities, int execute, String... params) {
+		if (params.length == 0 || entities.size() == 0 || execute < 1)
+			return false;
+		int i = 0;
 		Query query = init(params);
-		for (T e : entities)
-			batch(query, e);
+		while(i != entities.size()) {
+			batch(query, entities.get(i));
+			if(++i % execute == 0) {
+				arrange(query, params);
+				execute(query).queryStatistics();
+				query = init(params);
+			}
+		}
 		arrange(query, params);
-		return Optional.of(execute(query).queryStatistics());
+		execute(query);
+		return true;
 	}
 
 }

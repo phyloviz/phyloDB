@@ -67,7 +67,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	}
 
 	@Override
-	protected Result store(Project project) {
+	protected void store(Project project) {
 		String statement = "MERGE (p:Project {id: $}) SET p.deprecated = false WITH p\n" +
 				"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
@@ -76,7 +76,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 				"WITH pd\n";
 		Query query = new Query(statement, project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription());
 		composeUsers(query, project.getUsers());
-		return execute(query);
+		execute(query);
 	}
 
 	@Override

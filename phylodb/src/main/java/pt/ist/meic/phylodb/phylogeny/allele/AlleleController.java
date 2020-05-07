@@ -75,7 +75,7 @@ public class AlleleController extends Controller<Allele> {
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
-	@PostMapping(path = "/files")
+	@PostMapping(path = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> postAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
@@ -87,7 +87,7 @@ public class AlleleController extends Controller<Allele> {
 	}
 
 	@Authorized(role = Role.USER, permission = Permission.WRITE)
-	@PutMapping(path = "/files")
+	@PutMapping(path = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> putAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,

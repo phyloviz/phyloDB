@@ -89,11 +89,11 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
-	protected Result store(Profile profile) {
+	protected void store(Profile profile) {
 		Profile.PrimaryKey key = profile.getPrimaryKey();
 		Query query = new Query("MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 		composeStore(query, profile);
-		return execute(query);
+		execute(query);
 	}
 
 	@Override

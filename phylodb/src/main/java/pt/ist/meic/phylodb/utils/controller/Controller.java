@@ -1,10 +1,12 @@
 package pt.ist.meic.phylodb.utils.controller;
 
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.io.output.BatchOutputModel;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -49,8 +51,9 @@ public abstract class Controller<T extends Entity<?>> {
 		return execute(input, o -> output(map.apply(o), id.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
-	public ResponseEntity<?> fileStatus(Getter<Boolean> input) throws IOException {
-		return output(input.get()).toResponseEntity();
+	public ResponseEntity<?> fileStatus(Getter<Optional<Pair<Integer[], String[]>>> input) throws IOException {
+		Optional<Pair<Integer[], String[]>> invalids = input.get();
+		return (invalids.map(this::output).orElseGet(() -> output(null))).toResponseEntity();
 	}
 
 	public ResponseEntity<?> status(Supplier<Boolean> input) {
@@ -62,6 +65,10 @@ public abstract class Controller<T extends Entity<?>> {
 				.map(map)
 				.orElse(error.get())
 				.toResponseEntity();
+	}
+
+	private OutputModel output(Pair<Integer[], String[]> result) {
+		return result == null ? new ErrorOutputModel(Problem.UNAUTHORIZED) : new BatchOutputModel(result.getKey(), result.getValue());
 	}
 
 	private OutputModel output(boolean result) {

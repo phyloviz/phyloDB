@@ -49,7 +49,7 @@ public class DatasetService {
 			if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) && profiles.isPresent() && profiles.get().size() > 0)
 				return false;
 		}
-		return datasetRepository.save(dataset).isPresent();
+		return datasetRepository.save(dataset);
 	}
 
 	@Transactional

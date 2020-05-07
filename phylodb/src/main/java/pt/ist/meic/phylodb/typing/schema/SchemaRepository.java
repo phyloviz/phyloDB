@@ -74,10 +74,10 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	@Override
-	protected Result store(Schema schema) {
+	protected void store(Schema schema) {
 		if (isPresent(schema.getPrimaryKey()))
-			return put(schema);
-		return post(schema);
+			put(schema);
+		post(schema);
 	}
 
 	@Override

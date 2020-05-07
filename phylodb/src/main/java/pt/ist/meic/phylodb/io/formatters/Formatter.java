@@ -1,7 +1,6 @@
 package pt.ist.meic.phylodb.io.formatters;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javafx.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -15,32 +14,28 @@ import java.util.stream.Stream;
 
 public abstract class Formatter<T> {
 
-	protected static final Logger LOG = LoggerFactory.getLogger(Formatter.class);
-
 	protected abstract boolean init(Iterator<String> it, Object... params);
 
 	protected abstract boolean parse(String line, boolean last, Consumer<T> add);
 
 	public abstract String format(List<T> entities, Object... params);
 
-	public List<T> parse(MultipartFile file, Object... params) throws IOException {
+	public Pair<List<T>, List<Integer>> parse(MultipartFile file, Object... params) throws IOException {
 		try (Stream<String> lines = new BufferedReader(new InputStreamReader(file.getInputStream())).lines()) {
 			Iterator<String> it = lines.iterator();
 			List<T> entities = new ArrayList<>();
-			StringBuilder errors = new StringBuilder();
+			List<Integer> errors = new ArrayList<>();
 			if (!it.hasNext())
-				return entities;
+				return new Pair<>(entities, errors);
 			int count = 0;
 			if (!init(it, params))
-				return entities;
+				return new Pair<>(entities, errors);
 			while (it.hasNext()) {
 				count++;
 				if (!parse(it.next(), !it.hasNext(), entities::add))
-					errors.append(count).append(',');
+					errors.add(count);
 			}
-			if (errors.length() > 0)
-				LOG.info(String.format("The following lines of file %s were not valid: %s", file.getName(), errors.substring(0, errors.length() - 1)));
-			return entities;
+			return new Pair<>(entities, errors);
 		}
 	}
 

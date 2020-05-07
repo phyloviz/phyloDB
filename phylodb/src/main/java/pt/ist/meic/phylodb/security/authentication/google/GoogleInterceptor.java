@@ -29,7 +29,7 @@ public class GoogleInterceptor extends AuthenticationInterceptor {
 		connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod(HttpMethod.GET.name());
 		return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-				.readValue(connection.getInputStream(), TokenInfo.class);
+				.readValue(connection.getInputStream(), GoogleToken.class);
 	}
 
 	@Override

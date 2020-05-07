@@ -38,7 +38,7 @@ public class SchemaService {
 		if (locusRepository.anyMissing(schema.getLociReferences()) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
 			return false;
-		return schemaRepository.save(schema).isPresent();
+		return schemaRepository.save(schema);
 	}
 
 	@Transactional

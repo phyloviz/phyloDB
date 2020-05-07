@@ -67,7 +67,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	}
 
 	@Override
-	protected Result store(Dataset dataset) {
+	protected void store(Dataset dataset) {
 		String statement = "MATCH (p:Project {id: $})\n" +
 				"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = false WITH d\n" +
 				"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
@@ -80,7 +80,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 				"CREATE (dd)-[:HAS {version: r.version}]->(s)";
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
 		Query query = new Query(statement, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId(), dataset.getDescription(), schemaKey.getId(), schemaKey.getTaxonId());
-		return execute(query);
+		execute(query);
 	}
 
 	@Override

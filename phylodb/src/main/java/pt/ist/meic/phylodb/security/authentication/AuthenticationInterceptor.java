@@ -36,7 +36,7 @@ public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 		if (!provider.equals(req.getParameter(PROVIDER)))
 			return !isLastHandler() || handleProblem(res, Problem.INVALID_REQUEST);
 		String[] authorization;
-		if (auth == null || !(authorization = auth.split(" "))[0].equals(HttpHeaders.WWW_AUTHENTICATE))
+		if (auth == null || !(authorization = auth.split(" "))[0].equals(AUTHENTICATION_SCHEME))
 			return handleProblem(res, Problem.INVALID_REQUEST);
 		try {
 			TokenInfo info = introspect(authorization[1]);

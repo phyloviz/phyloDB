@@ -1,5 +1,7 @@
 package pt.ist.meic.phylodb.phylogeny.allele;
 
+import javafx.util.Pair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -7,17 +9,19 @@ import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.db.BatchRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 public class AlleleService {
+
+	@Value("${application.repository.batch}")
+	private String batch;
 
 	private LocusRepository locusRepository;
 	private AlleleRepository alleleRepository;
@@ -41,7 +45,7 @@ public class AlleleService {
 	public boolean saveAllele(Allele allele) {
 		if (allele == null) return false;
 		return locusRepository.exists(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) &&
-				alleleRepository.save(allele).isPresent();
+				alleleRepository.save(allele);
 	}
 
 	@Transactional
@@ -50,23 +54,32 @@ public class AlleleService {
 	}
 
 	@Transactional
-	public boolean saveAllelesOnConflictSkip(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
-		return saveAll(taxonId, locusId, project, BatchRepository.SKIP, file);
+	public Optional<Pair<Integer[], String[]>> saveAllelesOnConflictSkip(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
+		return saveAll(taxonId, locusId, project, false, file);
 	}
 
 	@Transactional
-	public boolean saveAllelesOnConflictUpdate(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
-		return saveAll(taxonId, locusId, project, BatchRepository.UPDATE, file);
+	public Optional<Pair<Integer[], String[]>> saveAllelesOnConflictUpdate(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
+		return saveAll(taxonId, locusId, project, true, file);
 	}
 
-	private boolean saveAll(String taxonId, String locusId, UUID project, String conflict, MultipartFile file) throws IOException {
+	private Optional<Pair<Integer[], String[]>> saveAll(String taxonId, String locusId, UUID project, boolean conflict, MultipartFile file) throws IOException {
 		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
-			return false;
-		Predicate<Allele> canSave = conflict.equals(BatchRepository.UPDATE) ? a -> true : a -> !alleleRepository.exists(a.getPrimaryKey());
-		List<Allele> alleles = new FastaFormatter().parse(file, taxonId, locusId, project).stream()
-				.filter(canSave)
-				.collect(Collectors.toList());
-		return alleleRepository.saveAll(alleles, taxonId, locusId, project != null ? project.toString() : null).isPresent();
+			return Optional.empty();
+		Predicate<Allele> canSave = conflict ? a -> true : a -> !alleleRepository.exists(a.getPrimaryKey());
+		Pair<List<Allele>, List<Integer>> parsed = new FastaFormatter().parse(file, taxonId, locusId, project);
+		List<String> invalids = new ArrayList<>();
+		List<Allele> alleles = parsed.getKey(), toSave = new ArrayList<>();
+		for (Allele allele : alleles) {
+			if (canSave.test(allele)) {
+				toSave.add(allele);
+				continue;
+			}
+			invalids.add(allele.getPrimaryKey().getId());
+		}
+		return alleleRepository.saveAll(alleles, Integer.parseInt(batch), taxonId, locusId, project != null ? project.toString() : null) ?
+				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
+				Optional.empty();
 	}
 
 }

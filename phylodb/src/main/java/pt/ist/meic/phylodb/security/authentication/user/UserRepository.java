@@ -58,13 +58,13 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 	}
 
 	@Override
-	protected Result store(User user) {
+	protected void store(User user) {
 		String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = false WITH u\n" +
 				"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
-		return execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));
+		execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));
 	}
 
 	@Override

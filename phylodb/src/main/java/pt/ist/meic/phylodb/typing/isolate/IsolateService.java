@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.typing.isolate;
 
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,21 +11,18 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
-import pt.ist.meic.phylodb.utils.db.BatchRepository;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 public class IsolateService {
 
-	@Value("${application.profiles.missing}")
+	@Value("${application.missing}")
 	private String missing;
+	@Value("${application.repository.batch}")
+	private String batch;
 
 	private DatasetRepository datasetRepository;
 	private IsolateRepository isolateRepository;
@@ -58,7 +56,7 @@ public class IsolateService {
 				.filter(a -> !a.getValue().matches(String.format("[\\s%s]*", missing)))
 				.toArray(Ancillary[]::new);
 		Isolate save = new Isolate(key.getProjectId(), key.getDatasetId(), key.getId(), isolate.getVersion(), isolate.isDeprecated(), isolate.getDescription(), ancillaries, isolate.getProfile());
-		return isolateRepository.save(save).isPresent();
+		return isolateRepository.save(save);
 	}
 
 	@Transactional
@@ -67,23 +65,32 @@ public class IsolateService {
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictSkip(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
-		return saveAll(projectId, datasetId, idColumn, BatchRepository.SKIP, file);
+	public Optional<Pair<Integer[], String[]>> saveIsolatesOnConflictSkip(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, idColumn, false, file);
 	}
 
 	@Transactional
-	public boolean saveIsolatesOnConflictUpdate(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
-		return saveAll(projectId, datasetId, idColumn, BatchRepository.UPDATE, file);
+	public Optional<Pair<Integer[], String[]>> saveIsolatesOnConflictUpdate(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+		return saveAll(projectId, datasetId, idColumn, true, file);
 	}
 
-	private boolean saveAll(UUID projectId, UUID datasetId, int idColumn, String conflict, MultipartFile file) throws IOException {
+	private Optional<Pair<Integer[], String[]>> saveAll(UUID projectId, UUID datasetId, int idColumn, boolean conflict, MultipartFile file) throws IOException {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
-			return false;
-		Predicate<Isolate> canSave = conflict.equals(BatchRepository.UPDATE) ? i -> true : i -> !isolateRepository.exists(i.getPrimaryKey());
-		List<Isolate> isolates = new IsolatesFormatter().parse(file, projectId, datasetId, idColumn, missing).stream()
-				.filter(i -> canSave.test(i) && (i.getProfile() == null || profileRepository.exists(i.getProfile().getPrimaryKey())))
-				.collect(Collectors.toList());
-		return isolateRepository.saveAll(isolates, projectId.toString(), datasetId.toString()).isPresent();
+			return Optional.empty();
+		Predicate<Isolate> canSave = conflict ? i -> true : i -> !isolateRepository.exists(i.getPrimaryKey());
+		Pair<List<Isolate>, List<Integer>> parsed = new IsolatesFormatter().parse(file, projectId, datasetId, idColumn, missing);
+		List<String> invalids = new ArrayList<>();
+		List<Isolate> isolates = parsed.getKey(), toSave = new ArrayList<>();
+		for (Isolate isolate : isolates) {
+			if(canSave.test(isolate) && (isolate.getProfile() == null || profileRepository.exists(isolate.getProfile().getPrimaryKey()))) {
+				toSave.add(isolate);
+				continue;
+			}
+			invalids.add(isolate.getPrimaryKey().getId());
+		}
+		return isolateRepository.saveAll(toSave, Integer.parseInt(batch), projectId.toString(), datasetId.toString()) ?
+				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
+				Optional.empty();
 	}
 
 }

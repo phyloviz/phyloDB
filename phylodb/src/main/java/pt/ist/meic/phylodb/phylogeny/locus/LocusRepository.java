@@ -59,7 +59,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 	}
 
 	@Override
-	protected Result store(Locus locus) {
+	protected void store(Locus locus) {
 		String statement = "MATCH (t:Taxon {id: $})\n" +
 				"WHERE t.deprecated = false\n" +
 				"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = false WITH l\n" +
@@ -67,7 +67,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $})";
-		return execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.getDescription()));
+		execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.getDescription()));
 	}
 
 	@Override
