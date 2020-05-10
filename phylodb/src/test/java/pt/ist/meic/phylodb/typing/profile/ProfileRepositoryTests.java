@@ -186,7 +186,7 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 			statement = "MATCH (sd)-[:HAS {part: %s}]->(l:Locus)\n" +
 					"MATCH (l)-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 					"WHERE NOT EXISTS(r.to) AND %s\n" +
-					"CREATE (pd)-[:HAS {version: r.version}]->(a)\n" +
+					"CREATE (pd)-[:HAS {version: r.version, part: %s, total: %s}]->(a)\n" +
 					"WITH pj, d, pd, sd\n";
 			List<Entity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
 			for (int i = 0; i < allelesIds.size(); i++) {
@@ -195,7 +195,7 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 					continue;
 				String referenceId = reference.getPrimaryKey().getId();
 				String where = reference.getPrimaryKey().getProjectId() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";
-				query.appendQuery(statement, i + 1, where).addParameter(referenceId);
+				query.appendQuery(statement, i + 1, where, i + 1, allelesIds.size()).addParameter(referenceId);
 			}
 			query.subQuery(query.length() - "WITH pj, d, pd, sd\n".length());
 			execute(query);
@@ -203,11 +203,12 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Profile parse(Map<String, Object> row) {
-		int size = Math.toIntExact((long) row.get("size"));
-		ArrayList<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
+		Map<String, Object>[] alleles = (Map<String, Object>[]) row.get("alleles");
+		int size = Math.toIntExact((long) alleles[0].get("total"));
+		List<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 			allelesReferences.add(null);
-		for (Map<String, Object> a : (Map<String, Object>[]) row.get("alleles")) {
+		for (Map<String, Object> a : alleles) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
 			UUID project = projectId == null ? null : UUID.fromString((String) projectId);
@@ -226,15 +227,11 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Profile[] findAll() {
-		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
-				"MATCH (dd)-[h:HAS]->(s:Schema)-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[sp:HAS]->(:Locus)\n" +
-				"WHERE r.version = h.version\n" +
-				"WITH pj, d, s, sd, COUNT(sp) as schemaSize\n" +
-				"MATCH (sd)-[sp:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l)\n" +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
+				"MATCH (pd)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
-				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, schemaSize as size, r.version as version, p.deprecated as deprecated,\n" +
-				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:sp.part}) as alleles\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated,\n" +
+				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:h.part, total:h.total}) as alleles\n" +
 				"ORDER BY pj.id, d.id, p.id, version";
 		Result result = query(new Query(statement, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId()));
 		if (result == null) return new Profile[0];

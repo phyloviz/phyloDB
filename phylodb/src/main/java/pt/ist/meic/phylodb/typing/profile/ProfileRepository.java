@@ -26,17 +26,12 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	protected Result getAll(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
-		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
-				"WHERE pj.deprecated = false AND d.deprecated = false\n" +
-				"MATCH (dd)-[h:HAS]->(s:Schema)-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[sp:HAS]->(:Locus) \n" +
-				"WHERE r.version = h.version\n" +
-				"WITH pj, d, s, sd, COUNT(sp) as schemaSize\n" +
-				"MATCH (sd)-[sp:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l)\n" +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
+				"MATCH (pd)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
-				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, schemaSize as size, r.version as version, p.deprecated as deprecated,\n" +
-				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:sp.part}) as alleles\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated,\n" +
+				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:h.part, total: h.total}) as alleles\n" +
 				"ORDER BY pj.id, d.id, size(p.id), p.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], page, limit));
 	}
@@ -44,27 +39,24 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	@Override
 	protected Result get(Profile.PrimaryKey key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
-		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
-				"MATCH (dd)-[h:HAS]->(s:Schema)-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[sp:HAS]->(:Locus) \n" +
-				"WHERE r.version = h.version\n" +
-				"WITH pj, d, s, sd, COUNT(sp) as schemaSize\n" +
-				"MATCH (sd)-[sp:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l)\n" +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
+				"MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"WHERE " + where + "\n" +
 				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
-				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, schemaSize as size, r.version as version, p.deprecated as deprecated,\n" +
-				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:sp.part}) as alleles";
+				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated,\n" +
+				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:h.part, total: h.total}) as alleles";
 		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), version));
 
 	}
 
 	@Override
 	protected Profile parse(Map<String, Object> row) {
-		int size = Math.toIntExact((long) row.get("size"));
-		ArrayList<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
+		Map<String, Object>[] alleles = (Map<String, Object>[]) row.get("alleles");
+		int size = Math.toIntExact((long) alleles[0].get("total"));
+		List<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 			allelesReferences.add(null);
-		for (Map<String, Object> a : (Map<String, Object>[]) row.get("alleles")) {
+		for (Map<String, Object> a : alleles) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
 			UUID project = projectId == null ? null : UUID.fromString((String) projectId);
@@ -127,15 +119,15 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 				"UNWIND param.alleles as n\n" +
 				"MATCH (sd)-[:HAS {part: n.part}]->(l:Locus)\n" +
 				"CALL apoc.do.when(param.project = TRUE,\n" +
-				"    \"MATCH (l)-[:CONTAINS]->(a:Allele {id: id})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
+				"    \"MATCH (l)-[:CONTAINS]->(a:Allele {id: n.id})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"    WHERE NOT EXISTS(r.to) AND (a)<-[:CONTAINS]-(pj)\n" +
-				"    CREATE (pd)-[:HAS {version: r.version}]->(a)" +
+				"    CREATE (pd)-[:HAS {version: r.version, part: n.part, total: n.total}]->(a)" +
 				"    RETURN TRUE\",\n" +
-				"    \"MATCH (l)-[:CONTAINS]->(a:Allele {id: id})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
+				"    \"MATCH (l)-[:CONTAINS]->(a:Allele {id: n.id})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"    WHERE NOT EXISTS(r.to) AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
-				"    CREATE (pd)-[:HAS {version: r.version}]->(a)\n" +
+				"    CREATE (pd)-[:HAS {version: r.version, part: n.part, total: n.total}]->(a)\n" +
 				"    RETURN TRUE\"\n" +
-				", {l: l, pd: pd, id: n.id, pj: pj}) YIELD value\n" +
+				", {l: l, pd: pd, n: n, pj: pj}) YIELD value\n" +
 				"RETURN 0";
 	}
 
@@ -153,6 +145,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 					.mapToObj(i -> references.get(i) != null ? new Object(){
 						public final String id = references.get(i).getPrimaryKey().getId();
 						public final int part = i + 1;
+						public final int total = references.size();
 					} : null)
 					.toArray();
 		};
