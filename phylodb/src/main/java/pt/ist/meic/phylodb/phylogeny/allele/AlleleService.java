@@ -1,7 +1,6 @@
 package pt.ist.meic.phylodb.phylogeny.allele;
 
 import javafx.util.Pair;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +18,6 @@ import java.util.function.Predicate;
 
 @Service
 public class AlleleService {
-
-	@Value("${application.repository.batch}")
-	private String batch;
 
 	private LocusRepository locusRepository;
 	private AlleleRepository alleleRepository;
@@ -77,7 +73,7 @@ public class AlleleService {
 			}
 			invalids.add(allele.getPrimaryKey().getId());
 		}
-		return alleleRepository.saveAll(alleles, Integer.parseInt(batch), taxonId, locusId, project != null ? project.toString() : null) ?
+		return alleleRepository.saveAll(toSave) ?
 				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
 				Optional.empty();
 	}

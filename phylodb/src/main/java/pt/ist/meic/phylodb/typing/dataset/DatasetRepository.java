@@ -35,7 +35,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 
 	@Override
 	protected Result get(Dataset.PrimaryKey id, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r1.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r1.to)" : "r1.version = $";
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE r2.version = h.version AND " + where + "\n" +
 				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +

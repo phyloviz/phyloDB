@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.phylogeny.allele;
 
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,6 +18,7 @@ import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
+import pt.ist.meic.phylodb.io.output.BatchOutputModel;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -141,12 +143,15 @@ public class AlleleControllerTests extends ControllerTestsContext {
 		});
 		req2.param("project", PROJECTID.toString());
 		MockHttpServletRequestBuilder req4 = put(String.format(uri, TAXONID, LOCUSID));
-		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req2, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req2, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
-				Arguments.of(req4, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+		Integer[] invalidLines = {1, 2, 3};
+		String[] invalidIds = {"4, 5"};
+		return Stream.of(Arguments.of(req1, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req1, new Pair<>(new Integer[0], new String[0]), HttpStatus.OK, new BatchOutputModel(new Integer[0], new String[0])),
+				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req2, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req2, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req4, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> postAlleles_params() {
@@ -156,12 +161,15 @@ public class AlleleControllerTests extends ControllerTestsContext {
 				req2 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file).param("project", PROJECTID.toString()),
 				req3 = multipart(String.format(uri, TAXONID, LOCUSID)),
 				req4 = post(String.format(uri, TAXONID, LOCUSID));
-		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req2, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req2, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
-				Arguments.of(req4, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+		Integer[] invalidLines = {1, 2, 3};
+		String[] invalidIds = {"4, 5"};
+		return Stream.of(Arguments.of(req1, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req1, new Pair<>(new Integer[0], new String[0]), HttpStatus.OK, new BatchOutputModel(new Integer[0], new String[0])),
+				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req2, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req2, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req4, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> deleteAllele_params() {
@@ -240,22 +248,26 @@ public class AlleleControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("putAlleles_params")
-	public void putAlleles(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(alleleService.saveAllelesOnConflictUpdate(anyString(), anyString(), any(), any())).thenReturn(ret);
+	public void putAlleles(MockHttpServletRequestBuilder req, Pair<Integer[], String[]> invalids, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(alleleService.saveAllelesOnConflictUpdate(anyString(), anyString(), any(), any())).thenReturn(Optional.ofNullable(invalids));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(BatchOutputModel.class, result));
 	}
 
 	@ParameterizedTest
 	@MethodSource("postAlleles_params")
-	public void postAlleles(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(alleleService.saveAllelesOnConflictSkip(anyString(), anyString(), any(), any())).thenReturn(ret);
+	public void postAlleles(MockHttpServletRequestBuilder req, Pair<Integer[], String[]> invalids, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(alleleService.saveAllelesOnConflictSkip(anyString(), anyString(), any(), any())).thenReturn(Optional.ofNullable(invalids));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(BatchOutputModel.class, result));
 	}
 
 	@ParameterizedTest

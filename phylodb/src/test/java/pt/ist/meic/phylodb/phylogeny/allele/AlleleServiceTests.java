@@ -7,14 +7,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.formatters.FastaFormatterTests;
 import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.io.IOException;
 import java.util.*;
@@ -50,10 +48,10 @@ public class AlleleServiceTests extends ServiceTestsContext {
 	}
 
 	private static Stream<Arguments> saveAllele_params() {
-		return Stream.of(Arguments.of(STATE[0], true, new MockResult().queryStatistics()),
-				Arguments.of(STATE[1], true, null),
-				Arguments.of(STATE[1], false, null),
-				Arguments.of(null, false, null));
+		return Stream.of(Arguments.of(STATE[0], true, true),
+				Arguments.of(STATE[1], true, false),
+				Arguments.of(STATE[1], false, false),
+				Arguments.of(null, false, false));
 	}
 
 	private static Stream<Arguments> deleteAllele_params() {
@@ -61,19 +59,42 @@ public class AlleleServiceTests extends ServiceTestsContext {
 				Arguments.of(STATE[0].getPrimaryKey(), false));
 	}
 
-	private static Stream<Arguments> saveAll_params() throws IOException {
+	private static Stream<Arguments> saveAllOnConflictSkip_params() throws IOException {
 		Locus.PrimaryKey key = new Locus.PrimaryKey(TAXONID, LOCUSID);
-		MultipartFile file = FormatterTests.createFile("fasta", "f-2-a.txt");
-		List<Allele> alleles = Arrays.asList(FastaFormatterTests.alleles(TAXONID, LOCUSID, null, new String[]{"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"}));
-		List<Pair<Allele, Boolean>> existsNone = alleles.stream().map(a -> new Pair<>(a, false)).collect(Collectors.toList());
-		List<Pair<Allele, Boolean>> existsAll = alleles.stream().map(a -> new Pair<>(a, true)).collect(Collectors.toList());
+		MultipartFile file1 = FormatterTests.createFile("fasta", "f-2-a.txt");
+		MultipartFile file2 = FormatterTests.createFile("fasta", "f-3-d.txt");
+		List<Allele> alleles1 = Arrays.asList(FastaFormatterTests.alleles(TAXONID, LOCUSID, null, new String[]{"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"}));
+		List<Pair<Allele, Boolean>> existsNone = alleles1.stream().map(a -> new Pair<>(a, false)).collect(Collectors.toList());
+		List<Pair<Allele, Boolean>> existsNone2 = Collections.singletonList(new Pair<>(new Allele(TAXONID, LOCUSID, "2", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", null), false));
+		List<Pair<Allele, Boolean>> existsAll1 = alleles1.stream().map(a -> new Pair<>(a, true)).collect(Collectors.toList());
 		List<Pair<Allele, Boolean>> existsSome = new ArrayList<>();
-		existsSome.add(new Pair<>(alleles.get(0), true));
-		existsSome.add(new Pair<>(alleles.get(1), false));
-		return Stream.of(Arguments.of(key, file, true, existsNone, new MockResult().queryStatistics()),
-				Arguments.of(key, file, true, existsAll, new MockResult().queryStatistics()),
-				Arguments.of(key, file, true, existsSome, new MockResult().queryStatistics()),
-				Arguments.of(key, file, false, existsSome, null));
+		existsSome.add(new Pair<>(alleles1.get(0), true));
+		existsSome.add(new Pair<>(alleles1.get(1), false));
+		return Stream.of(Arguments.of(key, file1, true, existsNone, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(key, file1, true, existsAll1, false, null),
+				Arguments.of(key, file1, true, existsSome, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(key, file1, true, existsSome, false, null),
+				Arguments.of(key, file1, false, existsSome, true, null),
+				Arguments.of(key, file2, true, existsNone2, true, new Pair<>(new Integer[] {2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17}, new String[0])));
+	}
+
+	private static Stream<Arguments> saveAllOnConflictUpdate_params() throws IOException {
+		Locus.PrimaryKey key = new Locus.PrimaryKey(TAXONID, LOCUSID);
+		MultipartFile file1 = FormatterTests.createFile("fasta", "f-2-a.txt");
+		MultipartFile file2 = FormatterTests.createFile("fasta", "f-3-d.txt");
+		List<Allele> alleles1 = Arrays.asList(FastaFormatterTests.alleles(TAXONID, LOCUSID, null, new String[]{"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"}));
+		List<Pair<Allele, Boolean>> existsNone = alleles1.stream().map(a -> new Pair<>(a, false)).collect(Collectors.toList());
+		List<Pair<Allele, Boolean>> existsAll1 = alleles1.stream().map(a -> new Pair<>(a, true)).collect(Collectors.toList());
+		List<Pair<Allele, Boolean>> existsNone2 = Collections.singletonList(new Pair<>(new Allele(TAXONID, LOCUSID, "2", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", null), false));
+		List<Pair<Allele, Boolean>> existsSome = new ArrayList<>();
+		existsSome.add(new Pair<>(alleles1.get(0), true));
+		existsSome.add(new Pair<>(alleles1.get(1), false));
+		return Stream.of(Arguments.of(key, file1, true, existsNone, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(key, file1, true, existsAll1, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(key, file1, true, existsSome, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(key, file1, true, existsSome, false, null),
+				Arguments.of(key, file1, false, existsSome, true, null),
+				Arguments.of(key, file2, true, existsNone2, true, new Pair<>(new Integer[] {2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17}, new String[0])));
 	}
 
 	@BeforeEach
@@ -101,7 +122,7 @@ public class AlleleServiceTests extends ServiceTestsContext {
 	@MethodSource("getAllele_params")
 	public void getAllele(Allele.PrimaryKey key, long version, Allele expected) {
 		Mockito.when(alleleRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(expected));
-		Optional<Allele> result = alleleService.getAllele(key.getTaxonId(), key.getLocusId(), key.getId(), key.getProject(), version);
+		Optional<Allele> result = alleleService.getAllele(key.getTaxonId(), key.getLocusId(), key.getId(), key.getProjectId(), version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
 		if (expected != null)
 			assertEquals(expected, result.get());
@@ -109,43 +130,53 @@ public class AlleleServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveAllele_params")
-	public void saveAllele(Allele allele, boolean exists, QueryStatistics expected) {
+	public void saveAllele(Allele allele, boolean exists, boolean expected) {
 		Mockito.when(locusRepository.exists(any())).thenReturn(exists);
-		Mockito.when(alleleRepository.save(any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(alleleRepository.save(any())).thenReturn(expected);
 		boolean result = alleleService.saveAllele(allele);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
 	@MethodSource("deleteAllele_params")
 	public void deleteAllele(Allele.PrimaryKey key, boolean expected) {
 		Mockito.when(alleleRepository.remove(any())).thenReturn(expected);
-		boolean result = alleleService.deleteAllele(key.getTaxonId(), key.getLocusId(), key.getId(), key.getProject());
+		boolean result = alleleService.deleteAllele(key.getTaxonId(), key.getLocusId(), key.getId(), key.getProjectId());
 		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
-	@MethodSource("saveAll_params")
-	public void saveAllelesOnConflictSkip(Locus.PrimaryKey key, MultipartFile file, boolean locusExists, List<Pair<Allele, Boolean>> canSaves, QueryStatistics expected) throws IOException {
+	@MethodSource("saveAllOnConflictSkip_params")
+	public void saveAllelesOnConflictSkip(Locus.PrimaryKey key, MultipartFile file, boolean locusExists, List<Pair<Allele, Boolean>> canSaves, boolean expected, Pair<Integer[], String[]> invalids) throws IOException {
 		Mockito.when(locusRepository.exists(any())).thenReturn(locusExists);
 		for (Pair<Allele, Boolean> canSave : canSaves)
 			Mockito.when(alleleRepository.exists(canSave.getKey().getPrimaryKey())).thenReturn(canSave.getValue());
 		List<Allele> alleles = canSaves.stream().filter(p -> !p.getValue()).map(Pair::getKey).collect(Collectors.toList());
-		Mockito.when(alleleRepository.saveAll(alleles, TAXONID, LOCUSID, null)).thenReturn(Optional.ofNullable(expected));
-		boolean result = alleleService.saveAllelesOnConflictSkip(key.getTaxonId(), key.getId(), null, file);
-		assertEquals(expected != null, result);
+		Mockito.when(alleleRepository.saveAll(alleles)).thenReturn(expected);
+		Optional<Pair<Integer[], String[]>> result = alleleService.saveAllelesOnConflictSkip(key.getTaxonId(), key.getId(), null, file);
+		if(invalids != null) {
+			assertTrue(result.isPresent());
+			assertArrayEquals(invalids.getKey(), result.get().getKey());
+			assertArrayEquals(invalids.getValue(), result.get().getValue());
+		} else
+			assertFalse(result.isPresent());
 	}
 
 	@ParameterizedTest
-	@MethodSource("saveAll_params")
-	public void saveAllelesOnConflictUpdate(Locus.PrimaryKey key, MultipartFile file, boolean locusExists, List<Pair<Allele, Boolean>> canSaves, QueryStatistics expected) throws IOException {
+	@MethodSource("saveAllOnConflictUpdate_params")
+	public void saveAlleles(Locus.PrimaryKey key, MultipartFile file, boolean locusExists, List<Pair<Allele, Boolean>> canSaves, boolean expected, Pair<Integer[], String[]> invalids) throws IOException {
 		Mockito.when(locusRepository.exists(any())).thenReturn(locusExists);
 		for (Pair<Allele, Boolean> canSave : canSaves)
 			Mockito.when(alleleRepository.exists(canSave.getKey().getPrimaryKey())).thenReturn(canSave.getValue());
 		List<Allele> alleles = canSaves.stream().map(Pair::getKey).collect(Collectors.toList());
-		Mockito.when(alleleRepository.saveAll(alleles, TAXONID, LOCUSID, null)).thenReturn(Optional.ofNullable(expected));
-		boolean result = alleleService.saveAllelesOnConflictUpdate(key.getTaxonId(), key.getId(), null, file);
-		assertEquals(expected != null, result);
+		Mockito.when(alleleRepository.saveAll(alleles)).thenReturn(expected);
+		Optional<Pair<Integer[], String[]>> result = alleleService.saveAllelesOnConflictUpdate(key.getTaxonId(), key.getId(), null, file);
+		if(invalids != null) {
+			assertTrue(result.isPresent());
+			assertArrayEquals(invalids.getKey(), result.get().getKey());
+			assertArrayEquals(invalids.getValue(), result.get().getValue());
+		} else
+			assertFalse(result.isPresent());
 	}
 
 }

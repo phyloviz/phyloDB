@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.formatters;
 
+import javafx.util.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SnpFormatterTests extends ProfilesFormatterTests {
@@ -26,8 +28,8 @@ public class SnpFormatterTests extends ProfilesFormatterTests {
 		UUID project = UUID.randomUUID(), dataset = UUID.randomUUID();
 		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		Schema otherSchema = new Schema("taxon", "id", Method.MLST, "description", Arrays.copyOfRange(headers, 0, 2));
-		return Stream.of(Arguments.of(project, dataset, otherSchema, "snp-d-2.txt"),
-				Arguments.of(project, dataset, fileSchema, "snp-d-0.txt"));
+		return Stream.of(Arguments.of(project, dataset, otherSchema, "snp-d-2.txt", new Integer[] {1, 2}),
+				Arguments.of(project, dataset, fileSchema, "snp-d-0.txt", new Integer[0]));
 	}
 
 	private static Stream<Arguments> nonemptyListParams() {
@@ -37,29 +39,38 @@ public class SnpFormatterTests extends ProfilesFormatterTests {
 		String[][] alleles1 = {{"1", "0", "0", "1", "0"}, {"0", "1", "1", "0", "1"}};
 		String[][] alleles2 = {{"a", "0", "0", "1", "0"}, {"0", "1", "1", "0", "1"}, {"1", "3", "0", "1", "0"}};
 		String[][] alleles3 = {{"1", "0", "0", "1", null}, {null, "1", null, "0", "1"}};
-		return Stream.of(Arguments.of(project, dataset, schema, "snp-d-1.txt", profiles(project, dataset, schema, alleles, true), true),
-				Arguments.of(project, dataset, schema, "snp-d-2.txt", profiles(project, dataset, schema, alleles1, false), false),
-				Arguments.of(project, dataset, schema, "snp-a-3.txt", profiles(project, dataset, schema, alleles2, true), true),
-				Arguments.of(project, dataset, schema, "snp-d-2-m.txt", profiles(project, dataset, schema, alleles3, false), false));
+		Pair<Profile[], Integer[]> expected1 = new Pair<>(profiles(project, dataset, schema, alleles, true), new Integer[0]);
+		Pair<Profile[], Integer[]> expected2 = new Pair<>(profiles(project, dataset, schema, alleles1, false), new Integer[0]);
+		Pair<Profile[], Integer[]> expected3 = new Pair<>(profiles(project, dataset, schema, alleles2, true), new Integer[0]);
+		Pair<Profile[], Integer[]> expected4 = new Pair<>(profiles(project, dataset, schema, alleles3, false), new Integer[0]);
+		Pair<Profile[], Integer[]> expected5 = new Pair<>(profiles(project, dataset, schema, alleles3, false), new Integer[] {3});
+		return Stream.of(Arguments.of(project, dataset, schema, "snp-d-1.txt", expected1, true),
+				Arguments.of(project, dataset, schema, "snp-d-2.txt", expected2, false),
+				Arguments.of(project, dataset, schema, "snp-a-3.txt", expected3, true),
+				Arguments.of(project, dataset, schema, "snp-d-2-m.txt", expected4, false),
+				Arguments.of(project, dataset, schema, "snp-d-2-m-d.txt", expected5, false));
 	}
 
 	@ParameterizedTest
 	@MethodSource("emptyListParams")
-	public void parse_emptyList(UUID project, UUID dataset, Schema schema, String filename) throws IOException {
+	public void parse_emptyList(UUID project, UUID dataset, Schema schema, String filename, Integer[] errors) throws IOException {
 		SnpFormatter formatter = new SnpFormatter();
-		List<Profile> profiles = formatter.parse(createFile("snp", filename), project, dataset, schema, " ", false);
-		assertEquals(0, profiles.size());
+		Pair<List<Profile>, List<Integer>> profiles = formatter.parse(createFile("snp", filename), project, dataset, schema, " ", false);
+		assertEquals(0, profiles.getKey().size());
+		assertArrayEquals(errors, profiles.getValue().toArray());
 	}
 
 	@ParameterizedTest
 	@MethodSource("nonemptyListParams")
-	public void parse_nonemptyList(UUID project, UUID dataset, Schema schema, String filename, Profile[] expected, boolean authorized) throws IOException {
+	public void parse_nonemptyList(UUID project, UUID dataset, Schema schema, String filename, Pair<Profile[], Integer[]> expected, boolean authorized) throws IOException {
 		SnpFormatter formatter = new SnpFormatter();
-		List<Profile> profiles = formatter.parse(createFile("snp", filename), project, dataset, schema, " ", authorized);
-		assertEquals(expected.length, profiles.size());
+		Pair<List<Profile>, List<Integer>> result = formatter.parse(createFile("snp", filename), project, dataset, schema, " ", authorized);
+		List<Profile> profiles = result.getKey();
+		assertEquals(expected.getKey().length, profiles.size());
+		assertArrayEquals(expected.getValue(), result.getValue().toArray());
 		for (int i = 0; i < profiles.size(); i++) {
-			assertEquals(expected[i].getPrimaryKey().getId(), profiles.get(i).getPrimaryKey().getId());
-			assertEquals(expected[i].getAllelesReferences(), profiles.get(i).getAllelesReferences());
+			assertEquals(expected.getKey()[i].getPrimaryKey().getId(), profiles.get(i).getPrimaryKey().getId());
+			assertEquals(expected.getKey()[i].getAllelesReferences(), profiles.get(i).getAllelesReferences());
 		}
 	}
 

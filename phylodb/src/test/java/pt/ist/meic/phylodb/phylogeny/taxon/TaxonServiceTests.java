@@ -6,10 +6,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
-import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,9 +43,9 @@ public class TaxonServiceTests extends ServiceTestsContext {
 	}
 
 	private static Stream<Arguments> saveTaxon_params() {
-		return Stream.of(Arguments.of(STATE[0], new MockResult().queryStatistics()),
-				Arguments.of(STATE[1], null),
-				Arguments.of(null, null));
+		return Stream.of(Arguments.of(STATE[0], true),
+				Arguments.of(STATE[1], false),
+				Arguments.of(null, false));
 	}
 
 	private static Stream<Arguments> deleteTaxon_params() {
@@ -88,10 +86,10 @@ public class TaxonServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveTaxon_params")
-	public void saveTaxon(Taxon taxon, QueryStatistics expected) {
-		Mockito.when(taxonRepository.save(any())).thenReturn(Optional.ofNullable(expected));
+	public void saveTaxon(Taxon taxon, boolean expected) {
+		Mockito.when(taxonRepository.save(any())).thenReturn(expected);
 		boolean result = taxonService.saveTaxon(taxon);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest

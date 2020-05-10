@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.formatters;
 
+import javafx.util.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IsolatesFormatterTests extends FormatterTests {
@@ -52,12 +54,12 @@ public class IsolatesFormatterTests extends FormatterTests {
 	}
 
 	private static Stream<Arguments> emptyListParams() {
-		return Stream.of(Arguments.of("i-0.txt", -1),
-				Arguments.of("i-ia-0.txt", 0),
-				Arguments.of("i-iap-0.txt", 0),
-				Arguments.of("i-ip-0.txt", 0),
-				Arguments.of("i-ap-1.txt", 10),
-				Arguments.of("i-i-0.txt", 0));
+		return Stream.of(Arguments.of("i-0.txt", -1, new Integer[0]),
+				Arguments.of("i-ia-0.txt", 0, new Integer[0]),
+				Arguments.of("i-iap-0.txt", 0, new Integer[0]),
+				Arguments.of("i-ip-0.txt", 0, new Integer[0]),
+				Arguments.of("i-ap-1.txt", 10, new Integer[0]),
+				Arguments.of("i-i-0.txt", 0, new Integer[0]));
 	}
 
 	private static Stream<Arguments> nonemptyListParams() {
@@ -70,40 +72,54 @@ public class IsolatesFormatterTests extends FormatterTests {
 		isolates1.add(new Isolate(UUID.randomUUID(), UUID.randomUUID(), "1", null, new Ancillary[0], null));
 		isolates2.add(new Isolate(UUID.randomUUID(), UUID.randomUUID(), "1", null, new Ancillary[0], null));
 		isolates2.add(new Isolate(UUID.randomUUID(), UUID.randomUUID(), "2", null, new Ancillary[0], null));
-		return Stream.of(Arguments.of("i-iap-3-ve.txt", 0, isolates(projectId, datasetId, ancillary, new String[]{"", "", "103"})),
-				Arguments.of("i-iap-2-ve-p.txt", 0, isolates(projectId, datasetId, ancillary1, new String[]{"102", "103"})),
-				Arguments.of("i-iap-3-vd-p.txt", 0, isolates(projectId, datasetId, ancillary2, new String[]{"102", "", "103"})),
-				Arguments.of("i-iap-3-me-p.txt", 0, isolates(projectId, datasetId, ancillary3, new String[]{"102", "102", "103"})),
-				Arguments.of("i-iap-1-ve-p.txt", 0, isolates(projectId, datasetId, Arrays.copyOfRange(ancillary1, 0, 1), new String[]{"102"})),
-				Arguments.of("i-ia-2-ve.txt", 0, isolates(projectId, datasetId, ancillary4, null)),
-				Arguments.of("i-ia-1-ve.txt", 0, isolates(projectId, datasetId, Arrays.copyOfRange(ancillary4, 0, 1), null)),
-				Arguments.of("i-ip-2-ve-p.txt", 0, isolates(new String[]{"102", "102"})),
-				Arguments.of("i-ip-1-ve-p.txt", 0, isolates(new String[]{"102"})),
-				Arguments.of("i-i-1.txt", 0, isolates1),
-				Arguments.of("i-i-2.txt", 0, isolates2));
+		Pair<List<Isolate>, Integer[]> expected1 = new Pair<>(isolates(projectId, datasetId, ancillary, new String[]{"", "", "103"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected2 = new Pair<>(isolates(projectId, datasetId, ancillary1, new String[]{"102", "103"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected3 = new Pair<>(isolates(projectId, datasetId, ancillary2, new String[]{"102", "", "103"}), new Integer[] {2});
+		Pair<List<Isolate>, Integer[]> expected4 = new Pair<>(isolates(projectId, datasetId, ancillary3, new String[]{"102", "102", "103"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected5 = new Pair<>(isolates(projectId, datasetId, Arrays.copyOfRange(ancillary1, 0, 1), new String[]{"102"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected6 = new Pair<>(isolates(projectId, datasetId, ancillary4, null), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected7 = new Pair<>(isolates(projectId, datasetId, Arrays.copyOfRange(ancillary4, 0, 1), null), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected8 = new Pair<>(isolates(new String[]{"102", "102"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected9 = new Pair<>(isolates(new String[]{"102"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected10 = new Pair<>(isolates1, new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected11 = new Pair<>(isolates2, new Integer[0]);
+		return Stream.of(Arguments.of("i-iap-3-ve.txt", 0, expected1),
+				Arguments.of("i-iap-2-ve-p.txt", 0, expected2),
+				Arguments.of("i-iap-3-vd-p.txt", 0, expected3),
+				Arguments.of("i-iap-3-me-p.txt", 0, expected4),
+				Arguments.of("i-iap-1-ve-p.txt", 0, expected5),
+				Arguments.of("i-ia-2-ve.txt", 0, expected6),
+				Arguments.of("i-ia-1-ve.txt", 0, expected7),
+				Arguments.of("i-ip-2-ve-p.txt", 0, expected8),
+				Arguments.of("i-ip-1-ve-p.txt", 0, expected9),
+				Arguments.of("i-i-1.txt", 0, expected10),
+				Arguments.of("i-i-2.txt", 0, expected11));
 	}
 
 	@ParameterizedTest
 	@MethodSource("emptyListParams")
-	public void parse_emptyList(String filename, int id) throws IOException {
+	public void parse_emptyList(String filename, int id, Integer[] errors) throws IOException {
 		IsolatesFormatter formatter = new IsolatesFormatter();
-		List<Isolate> profiles = formatter.parse(createFile("isolates", filename), UUID.randomUUID(), UUID.randomUUID(), id, missing);
-		assertEquals(0, profiles.size());
+		Pair<List<Isolate>, List<Integer>> result = formatter.parse(createFile("isolates", filename), UUID.randomUUID(), UUID.randomUUID(), id, missing);
+		assertEquals(0, result.getKey().size());
+		assertArrayEquals(errors, result.getValue().toArray());
 	}
 
 	@ParameterizedTest
 	@MethodSource("nonemptyListParams")
-	public void parse_nonemptyList(String filename, int id, List<Isolate> expected) throws IOException {
+	public void parse_nonemptyList(String filename, int id, Pair<List<Isolate>, Integer[]> expected) throws IOException {
 		IsolatesFormatter formatter = new IsolatesFormatter();
-		List<Isolate> isolates = formatter.parse(createFile("isolates", filename), projectId, datasetId, id, missing);
-		assertEquals(expected.size(), isolates.size());
+		Pair<List<Isolate>, List<Integer>> result = formatter.parse(createFile("isolates", filename), projectId, datasetId, id, missing);
+		List<Isolate> isolates = result.getKey();
+		assertEquals(expected.getKey().size(), isolates.size());
+		assertArrayEquals(expected.getValue(), result.getValue().toArray());
 		for (int i = 0; i < isolates.size(); i++) {
-			assertEquals(expected.get(i).getPrimaryKey().getId(), isolates.get(i).getPrimaryKey().getId());
-			assertEquals(expected.get(i).getProfile(), isolates.get(i).getProfile());
-			assertEquals(expected.get(i).getAncillaries().length, isolates.get(i).getAncillaries().length);
+			assertEquals(expected.getKey().get(i).getPrimaryKey().getId(), isolates.get(i).getPrimaryKey().getId());
+			assertEquals(expected.getKey().get(i).getProfile(), isolates.get(i).getProfile());
+			assertEquals(expected.getKey().get(i).getAncillaries().length, isolates.get(i).getAncillaries().length);
 			for (int j = 0; j < isolates.get(i).getAncillaries().length; j++) {
-				assertEquals(expected.get(i).getAncillaries()[j].getKey(), isolates.get(i).getAncillaries()[j].getKey());
-				assertEquals(expected.get(i).getAncillaries()[j].getValue(), isolates.get(i).getAncillaries()[j].getValue());
+				assertEquals(expected.getKey().get(i).getAncillaries()[j].getKey(), isolates.get(i).getAncillaries()[j].getKey());
+				assertEquals(expected.getKey().get(i).getAncillaries()[j].getValue(), isolates.get(i).getAncillaries()[j].getValue());
 			}
 		}
 	}

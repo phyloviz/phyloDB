@@ -3,6 +3,8 @@ package pt.ist.meic.phylodb.io.output;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+
 public class BatchOutputModel implements OutputModel {
 
 	private Integer[] invalid_lines;
@@ -29,4 +31,12 @@ public class BatchOutputModel implements OutputModel {
 		return ResponseEntity.status(HttpStatus.OK).body(this);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		BatchOutputModel that = (BatchOutputModel) o;
+		return Arrays.equals(invalid_lines, that.invalid_lines) &&
+				Arrays.equals(invalid_entities, that.invalid_entities);
+	}
 }

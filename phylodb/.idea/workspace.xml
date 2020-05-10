@@ -3,32 +3,50 @@
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/Formatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/Formatter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/error/ExceptionHandlerAdvice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/error/ExceptionHandlerAdvice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/error/Problem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/error/Problem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/allele/FastaFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/allele/FastaFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/isolate/IsolatesFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/isolate/IsolatesFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/output/BatchOutputModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/output/BatchOutputModel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/AuthenticationInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/AuthenticationInterceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/google/GoogleInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/google/GoogleInterceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/user/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/user/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/user/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/Allele.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/model/Allele.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/project/ProjectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/project/ProjectRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/project/ProjectService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/project/ProjectService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/model/DatasetInputModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/model/DatasetInputModel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/controller/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/controller/Controller.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/db/BatchRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/db/BatchRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/db/EntityRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/db/EntityRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/RepositoryTestsContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/RepositoryTestsContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/FastaFormatterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/FastaFormatterTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/IsolatesFormatterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/IsolatesFormatterTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/MlFormatterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/MlFormatterTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/SnpFormatterTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/formatters/SnpFormatterTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleControllerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleControllerTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/locus/LocusRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/locus/LocusRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/locus/LocusServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/locus/LocusServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/security/project/ProjectRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/security/project/ProjectRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/security/project/ProjectServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/security/project/ProjectServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/security/user/UserRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/security/user/UserRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/dataset/DatasetRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/dataset/DatasetRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/dataset/DatasetServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/dataset/DatasetServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/isolate/IsolateControllerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/isolate/IsolateControllerTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/isolate/IsolateRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/isolate/IsolateRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/isolate/IsolateServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/isolate/IsolateServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileControllerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileControllerTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/schema/SchemaRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/schema/SchemaRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/schema/SchemaServiceTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/schema/SchemaServiceTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/utils/MockResult.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +96,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="extract.method.default.visibility" value="private" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test/java/resources/formatters/snp" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Java" />
   </component>
   <component name="RecentsManager">
@@ -90,11 +108,11 @@
       <recent name="pt.ist.meic.phylodb.phylogeny.taxon.model" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\test\java\resources\formatters\snp" />
+      <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\snp" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\pt\ist\meic\phylodb\phylogeny\locus" />
-      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\pt\ist\meic\phylodb\phylogeny\taxon" />
-      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\pt\ist\meic\phylodb\security\project" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="pt.ist.meic.phylodb.typing.isolate" />
@@ -108,21 +126,8 @@
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.PhylodbApplication">
-    <configuration name="PhylodbApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.PhylodbApplication" />
-      <module name="phylodb.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="FastaFormatterTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.pt.ist.meic.phylodb in phylodb.test">
+    <configuration name="IsolatesFormatterTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
       <extension name="coverage">
         <pattern>
@@ -131,8 +136,54 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.FastaFormatterTests" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.IsolatesFormatterTests" />
       <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MlFormatterTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.formatters.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.MlFormatterTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SnpFormatterTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.formatters.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.SnpFormatterTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SnpFormatterTests.parse_nonemptyList" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.formatters.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.formatters" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.formatters.SnpFormatterTests" />
+      <option name="METHOD_NAME" value="parse_nonemptyList(java.util.UUID,java.util.UUID,pt.ist.meic.phylodb.typing.schema.model.Schema,java.lang.String,javafx.util.Pair,boolean)" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -151,48 +202,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="pt.ist.meic.phylodb.phylogeny in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.phylogeny.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.phylogeny" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="pt.ist.meic.phylodb.security in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.security.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.security" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <list>
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.phylogeny in phylodb.test" />
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.security in phylodb.test" />
+      <item itemvalue="JUnit.MlFormatterTests" />
+      <item itemvalue="JUnit.SnpFormatterTests" />
+      <item itemvalue="JUnit.SnpFormatterTests.parse_nonemptyList" />
+      <item itemvalue="JUnit.IsolatesFormatterTests" />
       <item itemvalue="JUnit.pt.ist.meic.phylodb in phylodb.test" />
-      <item itemvalue="JUnit.FastaFormatterTests" />
-      <item itemvalue="Application.PhylodbApplication" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.PhylodbApplication" />
         <item itemvalue="JUnit.pt.ist.meic.phylodb in phylodb.test" />
-        <item itemvalue="JUnit.FastaFormatterTests" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb.security in phylodb.test" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb.phylogeny in phylodb.test" />
+        <item itemvalue="JUnit.IsolatesFormatterTests" />
+        <item itemvalue="JUnit.SnpFormatterTests" />
+        <item itemvalue="JUnit.SnpFormatterTests.parse_nonemptyList" />
+        <item itemvalue="JUnit.MlFormatterTests" />
       </list>
     </recent_temporary>
   </component>
@@ -246,41 +269,41 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1582030876972" />
-    <state x="74" y="73" width="1389" height="679" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1588803945055">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="-1828" y="92" width="1736" height="856" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1589106840155">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1828" y="92" width="1736" height="856" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587401425049" />
-    <state x="-1828" y="92" width="1736" height="856" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588536719216" />
+    <state x="-1828" y="92" width="1736" height="856" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589106840155" />
     <state x="74" y="73" width="1389" height="679" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824@0.0.1536.824" timestamp="1588803945055" />
-    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser" timestamp="1588881172686">
+    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser" timestamp="1588889746126">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1585584805220" />
-    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588881172686" />
+    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588889746126" />
     <state x="574" y="114" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1588784635085" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1586285936267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1182" y="428" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586117374450" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1536.824@0.0.1536.824" timestamp="1586285936267" />
-    <state x="605" y="301" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1587682836418">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="-1164" y="380" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1589100282432">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="-1164" y="380" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586026007706" />
+    <state x="-1164" y="380" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589100282432" />
     <state x="605" y="301" width="512" height="287" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824@0.0.1536.824" timestamp="1587682836418" />
     <state x="-1173" y="350" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog" timestamp="1588450957912">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1173" y="350" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588450957912" />
-    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1588797074629">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="-1509" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1589014461023">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="-1509" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586535037908" />
+    <state x="-1509" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589014461023" />
     <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1588797074629" />
-    <state x="552" y="212" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1587586097106">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="-1230" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1588888266581">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="-1230" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586384881897" />
+    <state x="-1230" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588888266581" />
     <state x="552" y="212" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1587586097106" />
     <state x="-1230" y="267" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog" timestamp="1587241599900">
       <screen x="-1920" y="0" width="1920" height="1040" />
@@ -295,64 +318,68 @@
     </state>
     <state width="405" height="466" key="DebuggerActiveHint/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1587312528174" />
     <state width="418" height="370" key="DebuggerActiveHint/0.0.1536.824@0.0.1536.824" timestamp="1587660418472" />
-    <state x="549" y="168" key="FileChooserDialogImpl" timestamp="1581373830246">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state x="-1234" y="212" key="FileChooserDialogImpl" timestamp="1588924084117">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1581341617942" />
+    <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588924084117" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1581373830246" />
-    <state width="1877" height="305" key="GridCell.Tab.0.bottom" timestamp="1588870501382">
+    <state width="1877" height="206" key="GridCell.Tab.0.bottom" timestamp="1589121257158">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="305" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="206" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589121257158" />
     <state width="1493" height="206" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="305" key="GridCell.Tab.0.center" timestamp="1588870501382">
+    <state width="1877" height="206" key="GridCell.Tab.0.center" timestamp="1589121257158">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="305" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="206" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589121257158" />
     <state width="1493" height="206" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="305" key="GridCell.Tab.0.left" timestamp="1588870501382">
+    <state width="1877" height="206" key="GridCell.Tab.0.left" timestamp="1589121257158">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="305" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="206" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589121257158" />
     <state width="1493" height="206" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="305" key="GridCell.Tab.0.right" timestamp="1588870501382">
+    <state width="1877" height="206" key="GridCell.Tab.0.right" timestamp="1589121257158">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="305" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="206" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589121257158" />
     <state width="1493" height="206" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="305" key="GridCell.Tab.1.bottom" timestamp="1588870501382">
+    <state width="1877" height="305" key="GridCell.Tab.1.bottom" timestamp="1589120167694">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
-    <state width="1877" height="305" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="305" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589120167694" />
     <state width="1493" height="229" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1588811903134" />
-    <state width="1877" height="305" key="GridCell.Tab.1.center" timestamp="1588870501382">
+    <state width="1877" height="305" key="GridCell.Tab.1.center" timestamp="1589120167693">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
-    <state width="1877" height="305" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="305" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589120167693" />
     <state width="1493" height="229" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1588811903134" />
-    <state width="1877" height="305" key="GridCell.Tab.1.left" timestamp="1588870501382">
+    <state width="1877" height="305" key="GridCell.Tab.1.left" timestamp="1589120167693">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844232" />
-    <state width="1877" height="305" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="305" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589120167693" />
     <state width="1493" height="229" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1588811903133" />
-    <state width="1877" height="305" key="GridCell.Tab.1.right" timestamp="1588870501382">
+    <state width="1877" height="305" key="GridCell.Tab.1.right" timestamp="1589120167694">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
-    <state width="1877" height="305" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588870501382" />
+    <state width="1877" height="305" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589120167694" />
     <state width="1493" height="229" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1588811903134" />
     <state x="620" y="360" key="ReplaceDuplicatesPrompt" timestamp="1588720714296">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1145" y="454" key="ReplaceDuplicatesPrompt/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1583165720570" />
     <state x="620" y="360" key="ReplaceDuplicatesPrompt/0.0.1536.824@0.0.1536.824" timestamp="1588720714296" />
+    <state x="-1268" y="222" key="RollbackChangesDialog" timestamp="1589013497329">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1268" y="222" key="RollbackChangesDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589013497329" />
     <state x="277" y="55" key="SettingsEditor" timestamp="1586197450898">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -361,6 +388,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="776" height="420" key="XDebugger.FullValuePopup/0.0.1536.824@0.0.1536.824" timestamp="1582067689388" />
+    <state x="-1828" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1589105839044">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1828" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589105839044" />
     <state x="465" y="238" key="com.intellij.ide.util.TipDialog" timestamp="1587489942223">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -418,11 +449,6 @@
           <line>37</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetService.java</url>
-          <line>47</line>
-          <option name="timeStamp" value="144" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
@@ -435,6 +461,9 @@
         <watch expression="x[1]" />
         <watch expression="((java.util.ArrayList)((QueryResultModel)r).result).get(8)" custom="java.util.ArrayList,org.neo4j.ogm.response.model.QueryResultModel" />
         <watch expression="stateResult[1].allelesIds" />
+      </configuration>
+      <configuration name="Application">
+        <watch expression="isolates.get(1)" />
       </configuration>
     </watches-manager>
   </component>

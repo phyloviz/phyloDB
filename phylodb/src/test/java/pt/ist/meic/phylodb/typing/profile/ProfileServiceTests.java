@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.formatters.FormatterTests;
@@ -17,8 +16,6 @@ import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.MockResult;
-import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.io.IOException;
@@ -67,13 +64,13 @@ public class ProfileServiceTests extends ServiceTestsContext {
 		Profile profile2 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, ALLELE11P.getPrimaryKey().getId()), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null));
 		Profile profile3 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Collections.singletonList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated())));
 		Profile profile4 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(null, null));
-		return Stream.of(Arguments.of(profile1, true, true, false, new MockResult().queryStatistics()),
-				Arguments.of(profile2, false, true, false, new MockResult().queryStatistics()),
-				Arguments.of(profile2, false, true, true, null),
-				Arguments.of(profile3, false, true, false, null),
-				Arguments.of(profile4, true, true, false, null),
-				Arguments.of(profile1, true, false, false, null),
-				Arguments.of(null, false, true, false, null));
+		return Stream.of(Arguments.of(profile1, true, true, false, true),
+				Arguments.of(profile2, false, true, false, true),
+				Arguments.of(profile2, false, true, true, false),
+				Arguments.of(profile3, false, true, false, false),
+				Arguments.of(profile4, true, true, false, false),
+				Arguments.of(profile1, true, false, false, false),
+				Arguments.of(null, false, true, false, false));
 	}
 
 	private static Stream<Arguments> deleteProfile_params() {
@@ -87,37 +84,41 @@ public class ProfileServiceTests extends ServiceTestsContext {
 		Dataset dataset = new Dataset(PROJECTID, datasetId, null, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId());
 		String[][] alleles1 = {{"1", "1", "1", "1", "1"}};
 		String[][] alleles2 = {{"1", "1", "1", "1", " "}, {" ", "1", " ", "3", "3"}};
+		String[][] alleles3 = {{"1", "1", "1", "1", " "}};
 		MultipartFile fileNone = FormatterTests.createFile("ml", "ml-d-0.txt"), file1 = FormatterTests.createFile("ml", "ml-h-d-1.txt"),
-				fileN = FormatterTests.createFile("ml", "ml-h-d-2-m.txt");
+				fileN = FormatterTests.createFile("ml", "ml-h-d-2-m.txt"), fileNBad = FormatterTests.createFile("ml", "ml-h-d-2-d.txt");
 		List<Profile> profiles1 = Arrays.asList(ProfilesFormatterTests.profiles(PROJECTID, datasetId, schema, alleles1, false));
 		List<Profile> profilesN = Arrays.asList(ProfilesFormatterTests.profiles(PROJECTID, datasetId, schema, alleles2, false));
+		List<Profile> profilesNBad = Arrays.asList(ProfilesFormatterTests.profiles(PROJECTID, datasetId, schema, alleles3, false));
 		boolean[] existsAll1 = new boolean[]{true}, notExists1 = new boolean[]{false},
 				notExistsN = new boolean[]{false, false}, existsAllN = new boolean[]{true, true},
 				existsSomeN = new boolean[]{true, false};
 		boolean[] missing1 = new boolean[]{true}, missingN = new boolean[]{true, false},
 				notMissing1 = new boolean[]{false}, notMissingN = new boolean[]{false, false};
-		return Stream.of(Arguments.of(BatchRepository.SKIP, fileNone, dataset, schema, Collections.emptyList(), new boolean[0], new boolean[0], null),
-				Arguments.of(BatchRepository.SKIP, file1, dataset, schema, profiles1, notExists1, notMissing1, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, notExistsN, notMissingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, file1, dataset, schema, profiles1, notExists1, missing1, null),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, notExistsN, missingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, file1, dataset, schema, profiles1, existsAll1, notMissing1, null),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, existsAllN, notMissingN, null),
-				Arguments.of(BatchRepository.SKIP, file1, dataset, schema, profiles1, existsAll1, missing1, null),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, existsAllN, missingN, null),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, existsSomeN, notMissingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, existsSomeN, missingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, dataset, schema, profiles1, notExists1, notMissing1, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, dataset, schema, profilesN, notExistsN, notMissingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, dataset, schema, profiles1, notExists1, missing1, null),
-				Arguments.of(BatchRepository.UPDATE, fileN, dataset, schema, profilesN, notExistsN, missingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, dataset, schema, profiles1, existsAll1, notMissing1, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, dataset, schema, profilesN, existsAllN, notMissingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, dataset, schema, profiles1, existsAll1, missing1, null),
-				Arguments.of(BatchRepository.UPDATE, fileN, dataset, schema, profilesN, existsAllN, missingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, dataset, schema, profilesN, existsSomeN, notMissingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, dataset, schema, profilesN, existsSomeN, missingN, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileN, dataset, schema, profilesN, existsSomeN, missingN, null));
+		return Stream.of(Arguments.of(false, fileNone, dataset, schema, Collections.emptyList(), new boolean[0], new boolean[0], false, null),
+				Arguments.of(false, file1, dataset, schema, profiles1, notExists1, notMissing1, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(false, fileN, dataset, schema, profilesN, notExistsN, notMissingN, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(false, file1, dataset, schema, profiles1, notExists1, missing1, false, null),
+				Arguments.of(false, fileN, dataset, schema, profilesN, notExistsN, missingN, true, new Pair<>(new Integer[] {1}, new String[] {"1"})),
+				Arguments.of(false, file1, dataset, schema, profiles1, existsAll1, notMissing1, false, null),
+				Arguments.of(false, fileN, dataset, schema, profilesN, existsAllN, notMissingN, false, null),
+				Arguments.of(false, file1, dataset, schema, profiles1, existsAll1, missing1, false, null),
+				Arguments.of(false, fileN, dataset, schema, profilesN, existsAllN, missingN, false, null),
+				Arguments.of(false, fileN, dataset, schema, profilesN, existsSomeN, notMissingN, true, new Pair<>(new Integer[] {1}, new String[] {"1"})),
+				Arguments.of(false, fileN, dataset, schema, profilesN, existsSomeN, missingN, true, new Pair<>(new Integer[] {1}, new String[] {"1"})),
+				Arguments.of(false, fileNBad, dataset, schema, profilesNBad, notExists1, notMissing1, true, new Pair<>(new Integer[] {1, 3}, new String[0])),
+				Arguments.of(true, file1, dataset, schema, profiles1, notExists1, notMissing1, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(true, fileN, dataset, schema, profilesN, notExistsN, notMissingN, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(true, file1, dataset, schema, profiles1, notExists1, missing1, false, null),
+				Arguments.of(true, fileN, dataset, schema, profilesN, notExistsN, missingN, true, new Pair<>(new Integer[] {1}, new String[] {"1"})),
+				Arguments.of(true, file1, dataset, schema, profiles1, existsAll1, notMissing1, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(true, fileN, dataset, schema, profilesN, existsAllN, notMissingN, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(true, file1, dataset, schema, profiles1, existsAll1, missing1, false, null),
+				Arguments.of(true, fileN, dataset, schema, profilesN, existsAllN, missingN, true, new Pair<>(new Integer[] {1}, new String[] {"1"})),
+				Arguments.of(true, fileN, dataset, schema, profilesN, existsSomeN, notMissingN, true, new Pair<>(new Integer[] {1}, new String[0])),
+				Arguments.of(true, fileN, dataset, schema, profilesN, existsSomeN, missingN, true, new Pair<>(new Integer[] {1}, new String[] {"1"})),
+				Arguments.of(true, fileNBad, dataset, schema, profilesNBad, notExists1, notMissing1, true, new Pair<>(new Integer[] {1, 3}, new String[0])),
+				Arguments.of(false, fileN, dataset, schema, profilesN, existsSomeN, missingN, false, null));
 	}
 
 	@BeforeEach
@@ -156,15 +157,15 @@ public class ProfileServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveProfile_params")
-	public void saveProfile(Profile profile, boolean authorized, boolean dataset, boolean anyMissing, QueryStatistics expected) {
+	public void saveProfile(Profile profile, boolean authorized, boolean dataset, boolean anyMissing, boolean expected) {
 		Schema schema = new Schema(TAXONID, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
 		Mockito.when(datasetRepository.exists(any())).thenReturn(dataset);
 		Mockito.when(schemaRepository.find(any())).thenReturn(Optional.of(schema));
 		Mockito.when(alleleRepository.anyMissing(any())).thenReturn(anyMissing);
 		if (profile != null)
-			Mockito.when(profileRepository.save(profile.updateReferences(schema, "", authorized))).thenReturn(Optional.ofNullable(expected));
+			Mockito.when(profileRepository.save(profile.updateReferences(schema, "", authorized))).thenReturn(expected);
 		boolean result = profileService.saveProfile(profile, authorized);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
@@ -177,7 +178,7 @@ public class ProfileServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveProfiles(String flag, MultipartFile file, Dataset dataset, Schema schema, List<Profile> profiles, boolean[] exists, boolean[] missing, QueryStatistics expected) throws IOException {
+	public void saveProfiles(boolean flag, MultipartFile file, Dataset dataset, Schema schema, List<Profile> profiles, boolean[] exists, boolean[] missing, boolean expected, Pair<Integer[], String[]> invalids) throws IOException {
 		Mockito.when(datasetRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(dataset));
 		Mockito.when(schemaRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(schema));
 		List<Profile> updated = profiles.stream().map(p -> p.getAllelesReferences().stream().noneMatch(a -> a.getPrimaryKey().getId().matches(" ")) ? p :
@@ -190,18 +191,23 @@ public class ProfileServiceTests extends ServiceTestsContext {
 		IntStream.range(0, profiles.size()).forEach(i -> {
 			Mockito.when(profileRepository.exists(updated.get(i).getPrimaryKey())).thenReturn(exists[i]);
 			Mockito.when(alleleRepository.anyMissing(updated.get(i).getAllelesReferences())).thenReturn(missing[i]);
-			if (flag.equals(BatchRepository.SKIP) && !exists[i] && !missing[i])
+			if (!flag && !exists[i] && !missing[i])
 				toSave.add(updated.get(i));
-			else if (flag.equals(BatchRepository.UPDATE) && !missing[i])
+			else if (flag && !missing[i])
 				toSave.add(updated.get(i));
 		});
-		Mockito.when(profileRepository.saveAll(toSave, PROJECTID.toString(), datasetId.toString())).thenReturn(Optional.ofNullable(expected));
-		boolean result;
-		if (flag.equals(BatchRepository.SKIP))
+		Mockito.when(profileRepository.saveAll(toSave)).thenReturn(expected);
+		Optional<Pair<Integer[], String[]>> result;
+		if (!flag)
 			result = profileService.saveProfilesOnConflictSkip(PROJECTID, datasetId, false, file);
 		else
 			result = profileService.saveProfilesOnConflictUpdate(PROJECTID, datasetId, false, file);
-		assertEquals(expected != null, result);
+		if(invalids != null) {
+			assertTrue(result.isPresent());
+			assertArrayEquals(invalids.getKey(), result.get().getKey());
+			assertArrayEquals(invalids.getValue(), result.get().getValue());
+		} else
+			assertFalse(result.isPresent());
 	}
 
 }

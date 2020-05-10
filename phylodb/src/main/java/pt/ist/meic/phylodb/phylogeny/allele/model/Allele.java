@@ -44,13 +44,13 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 		private final String taxonId;
 		private final String locusId;
 		private final String id;
-		private final UUID project;
+		private final UUID projectId;
 
-		public PrimaryKey(String taxonId, String locusId, String id, UUID project) {
+		public PrimaryKey(String taxonId, String locusId, String id, UUID projectId) {
 			this.taxonId = taxonId;
 			this.locusId = locusId;
 			this.id = id;
-			this.project = project;
+			this.projectId = projectId;
 		}
 
 		public PrimaryKey(String taxonId, String locusId, String id) {
@@ -69,8 +69,8 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 			return id;
 		}
 
-		public UUID getProject() {
-			return project;
+		public UUID getProjectId() {
+			return projectId;
 		}
 
 		@Override
@@ -81,7 +81,7 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 			return Objects.equals(taxonId, that.taxonId) &&
 					Objects.equals(locusId, that.locusId) &&
 					Objects.equals(id, that.id) &&
-					Objects.equals(project, that.project);
+					Objects.equals(projectId, that.projectId);
 		}
 
 	}

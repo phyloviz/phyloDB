@@ -19,6 +19,7 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.profile.MlFormatter;
 import pt.ist.meic.phylodb.io.formatters.dataset.profile.SnpFormatter;
+import pt.ist.meic.phylodb.io.output.BatchOutputModel;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -127,7 +128,7 @@ public class ProfileControllerTests extends ControllerTestsContext {
 		req2.with(r -> {
 			r.setMethod(HttpMethod.PUT.name());
 			return r;
-		});
+		}).param("private_alleles", "true");
 		req3.with(r -> {
 			r.setMethod(HttpMethod.PUT.name());
 			return r;
@@ -137,12 +138,15 @@ public class ProfileControllerTests extends ControllerTestsContext {
 			return r;
 		});
 		MockHttpServletRequestBuilder req5 = put(String.format(uri, TAXONID, LOCUSID));
-		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req2, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req2, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
-				Arguments.of(req5, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+		Integer[] invalidLines = {1, 2, 3};
+		String[] invalidIds = {"4, 5"};
+		return Stream.of(Arguments.of(req1, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req1, new Pair<>(new Integer[0], new String[0]), HttpStatus.OK, new BatchOutputModel(new Integer[0], new String[0])),
+				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req2, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req2, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req5, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> postProfiles_params() {
@@ -151,10 +155,13 @@ public class ProfileControllerTests extends ControllerTestsContext {
 		MockHttpServletRequestBuilder req1 = multipart(String.format(uri, PROJECTID, DATASETID)).file(file),
 				req3 = multipart(String.format(uri, PROJECTID, DATASETID)),
 				req4 = post(String.format(uri, TAXONID, LOCUSID));
-		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
-				Arguments.of(req4, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+		Integer[] invalidLines = {1, 2, 3};
+		String[] invalidIds = {"4, 5"};
+		return Stream.of(Arguments.of(req1, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req1, new Pair<>(new Integer[0], new String[0]), HttpStatus.OK, new BatchOutputModel(new Integer[0], new String[0])),
+				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req4, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> deleteProfile_params() {
@@ -236,22 +243,26 @@ public class ProfileControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("putProfiles_params")
-	public void putProfiles(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(profileService.saveProfilesOnConflictUpdate(any(), any(), anyBoolean(), any())).thenReturn(ret);
+	public void putProfiles(MockHttpServletRequestBuilder req, Pair<Integer[], String[]> invalids, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(profileService.saveProfilesOnConflictUpdate(any(), any(), anyBoolean(), any())).thenReturn(Optional.ofNullable(invalids));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(BatchOutputModel.class, result));
 	}
 
 	@ParameterizedTest
 	@MethodSource("postProfiles_params")
-	public void postProfiles(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(profileService.saveProfilesOnConflictSkip(any(), any(), anyBoolean(), any())).thenReturn(ret);
+	public void postProfiles(MockHttpServletRequestBuilder req, Pair<Integer[], String[]> invalids, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(profileService.saveProfilesOnConflictSkip(any(), any(), anyBoolean(), any())).thenReturn(Optional.ofNullable(invalids));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(BatchOutputModel.class, result));
 	}
 
 	@ParameterizedTest

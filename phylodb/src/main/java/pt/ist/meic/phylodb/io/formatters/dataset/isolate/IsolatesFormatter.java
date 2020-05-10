@@ -38,10 +38,10 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	@Override
 	protected boolean parse(String line, boolean last, Consumer<Isolate> add) {
 		String[] columns = line.split("\\t", -1);
-		String id = columns[this.id];
-		String profile = st == -1 || columns[st].matches(String.format("[\\s%s]*", missing)) ? null : columns[st];
 		if (columns.length != headers.size())
 			return false;
+		String id = columns[this.id];
+		String profile = st == -1 || columns[st].matches(String.format("[\\s%s]*", missing)) ? null : columns[st];
 		Ancillary[] ancillaries = IntStream.range(0, columns.length)
 				.filter(i -> !columns[i].matches(String.format("[\\s%s]*", missing)) && i != this.id && i != st)
 				.mapToObj(i -> new Ancillary(headers.get(i), columns[i]))

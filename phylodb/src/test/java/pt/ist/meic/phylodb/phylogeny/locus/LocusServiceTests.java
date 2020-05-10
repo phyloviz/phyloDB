@@ -6,10 +6,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,10 +43,10 @@ public class LocusServiceTests extends ServiceTestsContext {
 	}
 
 	private static Stream<Arguments> saveLocus_params() {
-		return Stream.of(Arguments.of(STATE[0], true, new MockResult().queryStatistics()),
-				Arguments.of(STATE[1], true, null),
-				Arguments.of(STATE[1], false, null),
-				Arguments.of(null, false, null));
+		return Stream.of(Arguments.of(STATE[0], true, true),
+				Arguments.of(STATE[1], true, false),
+				Arguments.of(STATE[1], false, false),
+				Arguments.of(null, false, false));
 	}
 
 	private static Stream<Arguments> deleteLocus_params() {
@@ -89,11 +87,11 @@ public class LocusServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveLocus_params")
-	public void saveLocus(Locus locus, boolean exists, QueryStatistics expected) {
+	public void saveLocus(Locus locus, boolean exists, boolean expected) {
 		Mockito.when(taxonRepository.exists(any())).thenReturn(exists);
-		Mockito.when(locusRepository.save(any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(locusRepository.save(any())).thenReturn(expected);
 		boolean result = locusService.saveLocus(locus);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest

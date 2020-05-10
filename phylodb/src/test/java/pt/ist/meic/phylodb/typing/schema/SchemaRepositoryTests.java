@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
@@ -302,13 +301,15 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 	public void save(Schema schema, Schema[] state, Schema[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(SchemaRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = schemaRepository.save(schema);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = schemaRepository.save(schema);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		Schema[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);
 	}

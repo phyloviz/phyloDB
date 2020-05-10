@@ -26,8 +26,6 @@ public class ProfileService {
 
 	@Value("${application.missing}")
 	private String missing;
-	@Value("${application.repository.batch}")
-	private String batch;
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;
@@ -101,7 +99,7 @@ public class ProfileService {
 			}
 			invalids.add(profile.getPrimaryKey().getId());
 		}
-		return profileRepository.saveAll(toSave, Integer.parseInt(batch), projectId.toString(), datasetId.toString()) ?
+		return profileRepository.saveAll(toSave) ?
 				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
 				Optional.empty();
 	}

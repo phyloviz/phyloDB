@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
@@ -80,9 +79,9 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> save_params() {
 		UUID id = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
 		Project first = new Project(id, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{USER1.getPrimaryKey()});
+				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{USER1.getPrimaryKey(), USER2.getPrimaryKey()});
 		return Stream.of(Arguments.of(first, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2], first}, true, 2, 2),
-				Arguments.of(second, new Project[]{first}, new Project[]{STATE[0], STATE[1], STATE[2], first, second}, true, 1, 2),
+				Arguments.of(second, new Project[]{first}, new Project[]{STATE[0], STATE[1], STATE[2], first, second}, true, 1, 3),
 				Arguments.of(null, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false, 0, 0));
 	}
 
@@ -129,6 +128,8 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	private Project[] findAll() {
 		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
+				"WITH p, r, pd, u\n" +
+				"ORDER BY p.id, u.id, u.provider\n" +
 				"RETURN p.id as id, p.deprecated as deprecated, r.version as version, " +
 				"pd.name as name, pd.type as type, pd.description as description, collect(DISTINCT {id : u.id, provider: u.provider}) as users\n" +
 				"ORDER BY p.id, r.version";
@@ -195,13 +196,15 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	public void save(Project project, Project[] state, Project[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(ProjectRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = projectRepository.save(project);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = projectRepository.save(project);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		Project[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);
 	}

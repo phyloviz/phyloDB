@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
@@ -210,13 +209,15 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	public void save(Dataset dataset, Dataset[] state, Dataset[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(DatasetRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = datasetRepository.save(dataset);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = datasetRepository.save(dataset);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		Dataset[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);
 	}

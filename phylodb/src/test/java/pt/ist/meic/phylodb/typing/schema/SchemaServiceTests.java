@@ -6,11 +6,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,10 +45,10 @@ public class SchemaServiceTests extends ServiceTestsContext {
 
 	private static Stream<Arguments> saveSchema_params() {
 		Schema different = new Schema(TAXON1.getPrimaryKey(), "different", 1, false, Method.MLST, null, null);
-		return Stream.of(Arguments.of(STATE[0], false, STATE[0], new MockResult().queryStatistics()),
-				Arguments.of(STATE[1], false, different, null),
-				Arguments.of(STATE[0], true, STATE[0], null),
-				Arguments.of(null, false, STATE[0], null));
+		return Stream.of(Arguments.of(STATE[0], false, STATE[0], true),
+				Arguments.of(STATE[1], false, different, false),
+				Arguments.of(STATE[0], true, STATE[0], false),
+				Arguments.of(null, false, STATE[0], false));
 	}
 
 	private static Stream<Arguments> deleteSchema_params() {
@@ -91,12 +89,12 @@ public class SchemaServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveSchema_params")
-	public void saveSchema(Schema schema, boolean missing, Schema dbSchema, QueryStatistics expected) {
+	public void saveSchema(Schema schema, boolean missing, Schema dbSchema, boolean expected) {
 		Mockito.when(locusRepository.anyMissing(any())).thenReturn(missing);
 		Mockito.when(schemaRepository.find(any(), any(), any())).thenReturn(Optional.ofNullable(dbSchema));
-		Mockito.when(schemaRepository.save(any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(schemaRepository.save(any())).thenReturn(expected);
 		boolean result = schemaService.saveSchema(schema);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest

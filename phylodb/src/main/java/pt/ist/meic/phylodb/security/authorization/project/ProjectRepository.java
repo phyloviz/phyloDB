@@ -73,9 +73,15 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
 				"WITH p, COALESCE(r.version, 0) + 1 as v\n" +
 				"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProjectDetails {name: $, type: $, description: $})\n" +
-				"WITH pd\n";
-		Query query = new Query(statement, project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription());
-		composeUsers(query, project.getUsers());
+				"WITH pd\n" +
+				"UNWIND $ as param\n" +
+				"MATCH (u:User {id: param.id, provider: param.provider}) WHERE u.deprecated = false CREATE (pd)-[:HAS]->(u)";
+		Query query = new Query(statement, project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription(),
+				Arrays.stream(project.getUsers()).map(u -> new Object() {
+					public final String id = u.getId();
+					public final String provider = u.getProvider();
+				})
+		);
 		execute(query);
 	}
 
@@ -87,14 +93,6 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 				"MATCH (p)-[:CONTAINS]->(pf:Profile) SET pf.deprecated = true WITH d\n" +
 				"MATCH (p)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true";
 		execute(new Query(statement, key));
-	}
-
-	private void composeUsers(Query query, User.PrimaryKey[] users) {
-		for (User.PrimaryKey user : users) {
-			query.appendQuery("MATCH (u:User {id: $, provider: $}) WHERE u.deprecated = false CREATE (pd)-[:HAS]->(u) WITH pd\n");
-			query.addParameter(user.getId(), user.getProvider());
-		}
-		query.subQuery(query.length() - "WITH pd\n".length());
 	}
 
 }

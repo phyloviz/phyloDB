@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
@@ -93,10 +92,10 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> find_params() {
 		Allele.PrimaryKey key = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "test"),
 				keyP = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "test", PROJECTID);
-		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProject()),
-				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 2, false, null, key.getProject()),
-				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProject()),
-				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 2, false, null, keyP.getProject());
+		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProjectId()),
+				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 2, false, null, key.getProjectId()),
+				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProjectId()),
+				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 2, false, null, keyP.getProjectId());
 		return Stream.of(Arguments.of(key, 1, new Allele[0], null),
 				Arguments.of(key, 1, new Allele[]{first}, first),
 				Arguments.of(key, 2, new Allele[]{first, second}, second),
@@ -115,10 +114,10 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> exists_params() {
 		Allele.PrimaryKey key = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "test"),
 				keyP = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "test", PROJECTID);
-		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProject()),
-				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, true, null, key.getProject()),
-				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProject()),
-				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, true, null, keyP.getProject());
+		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProjectId()),
+				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, true, null, key.getProjectId()),
+				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProjectId()),
+				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, true, null, keyP.getProjectId());
 		return Stream.of(Arguments.of(key, new Allele[0], false),
 				Arguments.of(key, new Allele[]{first}, true),
 				Arguments.of(key, new Allele[]{second}, false),
@@ -131,10 +130,10 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> save_params() {
 		Allele.PrimaryKey key = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "3"),
 				keyP = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "3", PROJECTID);
-		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProject()),
-				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 2, false, null, key.getProject()),
-				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProject()),
-				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 2, false, null, keyP.getProject());
+		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProjectId()),
+				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 2, false, null, key.getProjectId()),
+				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProjectId()),
+				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 2, false, null, keyP.getProjectId());
 		return Stream.of(Arguments.of(first, new Allele[0], null, new Allele[]{STATE[0], STATE[1], first}, true, 2, 2),
 				Arguments.of(second, new Allele[]{first}, null, new Allele[]{STATE[0], STATE[1], first, second}, true, 1, 1),
 				Arguments.of(firstP, new Allele[0], PROJECTID, new Allele[]{STATE[2], STATE[3], firstP}, true, 2, 3),
@@ -146,10 +145,10 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> remove_params() {
 		Allele.PrimaryKey key = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "3"),
 				keyP = new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "3", PROJECTID);
-		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProject()),
-				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, true, null, key.getProject()),
-				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProject()),
-				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, true, null, keyP.getProject());
+		Allele first = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, false, null, key.getProjectId()),
+				second = new Allele(key.getTaxonId(), key.getLocusId(), key.getId(), 1, true, null, key.getProjectId()),
+				firstP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, false, null, keyP.getProjectId()),
+				secondP = new Allele(keyP.getTaxonId(), keyP.getLocusId(), keyP.getId(), 1, true, null, keyP.getProjectId());
 		return Stream.of(Arguments.of(key, new Allele[0], null, new Allele[]{STATE[0], STATE[1]}, false),
 				Arguments.of(key, new Allele[]{first}, null, new Allele[]{STATE[0], STATE[1], second}, true),
 				Arguments.of(null, new Allele[0], null, new Allele[]{STATE[0], STATE[1]}, false),
@@ -191,8 +190,8 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> saveAll_params() {
 		Allele.PrimaryKey firstKey = ALLELE11.getPrimaryKey(), firstPkey = ALLELE11P.getPrimaryKey();
-		Allele firstConflict = new Allele(firstKey.getTaxonId(), firstKey.getLocusId(), firstKey.getId(), 2, false, "teste", firstKey.getProject()),
-				firstPConflict = new Allele(firstPkey.getTaxonId(), firstPkey.getLocusId(), firstPkey.getId(), 2, false, "sequencep", firstPkey.getProject());
+		Allele firstConflict = new Allele(firstKey.getTaxonId(), firstKey.getLocusId(), firstKey.getId(), 2, false, "teste", firstKey.getProjectId()),
+				firstPConflict = new Allele(firstPkey.getTaxonId(), firstPkey.getLocusId(), firstPkey.getId(), 2, false, "sequencep", firstPkey.getProjectId());
 		return Stream.of(Arguments.of(Collections.emptyList(), new Allele[]{STATE[0], STATE[1]}, null, new Allele[]{STATE[0], STATE[1]}, false, 0, 0),
 				Arguments.of(Collections.singletonList(STATE[0]), new Allele[]{STATE[1]}, null, new Allele[]{STATE[0], STATE[1]}, true, 2, 2),
 				Arguments.of(Collections.singletonList(firstConflict), new Allele[]{STATE[0]}, null, new Allele[]{STATE[0], firstConflict}, true, 1, 1),
@@ -210,8 +209,8 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 			String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})\n" +
 					"WHERE t.deprecated = false AND l.deprecated = false\n";
 			String project = "";
-			if (allele.getPrimaryKey().getProject() != null) {
-				params = new Object[]{allele.getTaxonId(), allele.getLocusId(), allele.getPrimaryKey().getProject()};
+			if (allele.getPrimaryKey().getProjectId() != null) {
+				params = new Object[]{allele.getTaxonId(), allele.getLocusId(), allele.getPrimaryKey().getProjectId()};
 				statement += "MATCH(p:Project {id: $}) WHERE p.deprecated = false WITH t, l, p\n";
 				project = "<-[:CONTAINS]-(p)";
 			}
@@ -320,14 +319,16 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	public void save(Allele allele, Allele[] state, UUID projectId, Allele[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(AlleleRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = alleleRepository.save(allele);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = alleleRepository.save(allele);
 		Allele[] stateResult = findAll(projectId);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		assertArrayEquals(expectedState, stateResult);
 	}
 
@@ -354,15 +355,15 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("saveAll_params")
 	public void saveAll(List<Allele> alleles, Allele[] state, UUID projectId, Allele[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(state);
-		Optional<QueryStatistics> result = projectId == null ?
-				alleleRepository.saveAll(alleles, LOCUS1.getPrimaryKey().getTaxonId(), LOCUS1.getPrimaryKey().getId(), null) :
-				alleleRepository.saveAll(alleles, LOCUS1.getPrimaryKey().getTaxonId(), LOCUS1.getPrimaryKey().getId(), projectId.toString());
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = alleleRepository.saveAll(alleles);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		Allele[] stateResult = findAll(projectId);
 		assertArrayEquals(expectedState, stateResult);
 	}

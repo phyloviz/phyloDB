@@ -11,27 +11,14 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 		super(session);
 	}
 
-	protected abstract Query init(String... params);
+	protected abstract Query init(Query query, List<T> entities);
 
-	protected abstract void batch(Query query, T entity);
+	protected abstract Query batch(Query query);
 
-	protected abstract void arrange(Query query, String... params);
-
-	public boolean saveAll(List<T> entities, int execute, String... params) {
-		if (params.length == 0 || entities.size() == 0 || execute < 1)
+	public boolean saveAll(List<T> entities) {
+		if (entities.size() == 0)
 			return false;
-		int i = 0;
-		Query query = init(params);
-		while(i != entities.size()) {
-			batch(query, entities.get(i));
-			if(++i % execute == 0) {
-				arrange(query, params);
-				execute(query).queryStatistics();
-				query = init(params);
-			}
-		}
-		arrange(query, params);
-		execute(query);
+		execute(batch(init(new Query("UNWIND $ as param\n"), entities)));
 		return true;
 	}
 

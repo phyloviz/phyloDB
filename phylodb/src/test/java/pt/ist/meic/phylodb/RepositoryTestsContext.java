@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb;
 
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +15,10 @@ import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 
+import java.util.HashMap;
+
 @Transactional
 public abstract class RepositoryTestsContext extends TestContext {
-
 
 	@Autowired
 	protected Session session;
@@ -41,7 +41,6 @@ public abstract class RepositoryTestsContext extends TestContext {
 	@Autowired
 	protected IsolateRepository isolateRepository;
 
-
 	protected Result query(Query query) {
 		return session.query(query.getExpression(), query.getParameters());
 	}
@@ -50,10 +49,19 @@ public abstract class RepositoryTestsContext extends TestContext {
 		return session.queryForObject(_class, query.getExpression(), query.getParameters());
 	}
 
-	protected QueryStatistics execute(Query query) {
-		QueryStatistics statistics = session.query(query.getExpression(), query.getParameters()).queryStatistics();
+	protected void execute(Query query) {
+		session.query(query.getExpression(), query.getParameters());
 		session.clear();
-		return statistics;
+	}
+
+	protected int countNodes() {
+		Integer count = session.queryForObject(Integer.class, "MATCH (n) RETURN COUNT(n)", new HashMap<>());
+		return count == null ? 0 : count;
+	}
+
+	protected int countRelationships() {
+		Integer count = session.queryForObject(Integer.class, "MATCH (n)-[r]->() RETURN COUNT(r)", new HashMap<>());
+		return count == null ? 0 : count;
 	}
 
 }

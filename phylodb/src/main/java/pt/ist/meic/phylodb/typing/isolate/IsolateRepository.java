@@ -11,6 +11,7 @@ import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,12 +31,12 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 				"OPTIONAL MATCH (id)-[h:HAS]->(p:Profile)\n" +
 				"OPTIONAL MATCH (id)-[:HAS]->(a:Ancillary)\n" +
 				"WITH pj, d, r, i, id, h, p, a\n" +
-				"ORDER BY pj.id, d.id, i.id, a.key\n" +
+				"ORDER BY pj.id, d.id, size(i.id), i.id, a.key\n" +
 				"WITH pj, d, r, i, id, h, p, collect(DISTINCT {key: a.key, value: a.value}) as ancillary\n" +
 				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated as deprecated, r.version as version, " +
 				"p.id as profileId, p.deprecated as profileDeprecated, h.version as profileVersion, " +
 				"id.description as description, ancillary as ancillaries\n" +
-				"SKIP $ LIMIT $";
+				"ORDER BY pj.id, d.id, size(i.id), i.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], page, limit));
 	}
 
@@ -84,10 +85,8 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 
 	@Override
 	protected void store(Isolate isolate) {
-		Isolate.PrimaryKey key = isolate.getPrimaryKey();
-		Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE p.deprecated = false AND d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
-		composeStore(query, isolate);
-		execute(query);
+		String statement = String.format("WITH $ AS param\n%s", getInsertStatement());
+		execute(new Query(statement, getInsertParam(isolate)));
 	}
 
 	@Override
@@ -99,53 +98,49 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected Query init(String... params) {
-		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
+	protected Query init(Query query, List<Isolate> profiles) {
+		query.addParameter((Object) profiles.stream().map(this::getInsertParam).toArray());
+		return query;
+	}
+
+	@Override
+	protected Query batch(Query query) {
+		return query.appendQuery(getInsertStatement());
+	}
+
+	private String getInsertStatement() {
+		return "MATCH (p:Project {id: param.projectId})-[:CONTAINS]->(d:Dataset {id: param.datasetId})\n" +
 				"WHERE p.deprecated = false AND d.deprecated = false\n" +
-				"WITH d\n";
-		return new Query(statement, params[0], params[1]);
-	}
-
-	@Override
-	protected void batch(Query query, Isolate isolate) {
-		composeStore(query, isolate);
-		query.appendQuery("WITH d\n");
-	}
-
-	@Override
-	protected void arrange(Query query, String... params) {
-		query.subQuery(query.length() - "WITH d\n".length());
-	}
-
-	private void composeStore(Query query, Isolate isolate) {
-		String statement = "MERGE (d)-[:CONTAINS]->(i:Isolate {id: $}) SET i.deprecated = false WITH d, i\n" +
+				"MERGE (d)-[:CONTAINS]->(i:Isolate {id: param.id}) SET i.deprecated = false WITH param, d, i\n" +
 				"OPTIONAL MATCH (i)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
 				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
-				"WITH d, i, COALESCE(MAX(r.version), 0) + 1 as v\n" +
-				"CREATE (i)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(id:IsolateDetails {description: $})\n";
-		query.appendQuery(statement).addParameter(isolate.getPrimaryKey().getId(), isolate.getDescription());
-		composeProfile(query, isolate);
-		composeAncillary(query, isolate);
+				"WITH param, d, i, COALESCE(MAX(r.version), 0) + 1 as v\n" +
+				"CREATE (i)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(id:IsolateDetails {description: param.description})\n" +
+				"WITH param, d, id\n" +
+				"CALL apoc.do.when(param.profile IS NOT NULL,\n" +
+				"    \"MATCH (d2)-[:CONTAINS]->(p:Profile {id: pid})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
+				"    WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"    CREATE (id2)-[:HAS {version: r.version}]->(p)\n" +
+				"    RETURN true\",\n" +
+				"    \"RETURN true\"\n" +
+				", {d2: d, id2: id, pid: param.profile}) YIELD value as ignored\n" +
+				"WITH param, d, id\n" +
+				"UNWIND param.ancillary as an\n" +
+				"MERGE (a:Ancillary {key: an.key, value: an.value})\n" +
+				"CREATE (id)-[:HAS]->(a)";
 	}
 
-	private void composeProfile(Query query, Isolate isolate) {
-		if (isolate.getProfile() == null) return;
-		String statement = "WITH d, id\n" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"CREATE (id)-[:HAS {version: r.version}]->(p)\n";
-		query.appendQuery(statement).addParameter(isolate.getProfile().getPrimaryKey().getId());
-	}
-
-	private void composeAncillary(Query query, Isolate isolate) {
-		query.appendQuery("WITH d, id\n");
-		Ancillary[] ancillaries = isolate.getAncillaries();
-		for (Ancillary ancillary : ancillaries) {
-			query.appendQuery("MERGE (a:Ancillary {key: $, value: $}) WITH d, id, a\n")
-					.appendQuery("CREATE (id)-[:HAS]->(a) WITH d, id\n")
-					.addParameter(ancillary.getKey(), ancillary.getValue());
-		}
-		query.subQuery(query.length() - "WITH d, id\n".length());
+	private Object getInsertParam(Isolate isolate) {
+		Isolate.PrimaryKey key = isolate.getPrimaryKey();
+		String profileId = isolate.getProfile() != null ? isolate.getProfile().getPrimaryKey().getId() : null;
+		return new Object() {
+			public final UUID projectId = key.getProjectId();
+			public final UUID datasetId = key.getDatasetId();
+			public final String id = key.getId();
+			public final String description = isolate.getDescription();
+			public final String profile = profileId;
+			public final Object[] ancillary = isolate.getAncillaries();
+		};
 	}
 
 }

@@ -21,8 +21,6 @@ public class IsolateService {
 
 	@Value("${application.missing}")
 	private String missing;
-	@Value("${application.repository.batch}")
-	private String batch;
 
 	private DatasetRepository datasetRepository;
 	private IsolateRepository isolateRepository;
@@ -88,7 +86,7 @@ public class IsolateService {
 			}
 			invalids.add(isolate.getPrimaryKey().getId());
 		}
-		return isolateRepository.saveAll(toSave, Integer.parseInt(batch), projectId.toString(), datasetId.toString()) ?
+		return isolateRepository.saveAll(toSave) ?
 				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
 				Optional.empty();
 	}

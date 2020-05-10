@@ -3,7 +3,6 @@ package pt.ist.meic.phylodb.security.user;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
@@ -171,14 +170,16 @@ public class UserRepositoryTests extends RepositoryTestsContext {
 	public void save(User user, User[] state, User[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(UserRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = userRepository.save(user);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = userRepository.save(user);
 		User[] stateResult = findAll();
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		assertArrayEquals(expectedState, stateResult);
 	}
 

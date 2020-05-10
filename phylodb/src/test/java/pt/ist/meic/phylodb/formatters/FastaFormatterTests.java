@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.formatters;
 
+import javafx.util.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FastaFormatterTests extends FormatterTests {
@@ -29,8 +31,8 @@ public class FastaFormatterTests extends FormatterTests {
 	private static Stream<Arguments> emptyListParams() {
 		String taxon = "taxon", locus = "locus";
 		UUID project = UUID.randomUUID();
-		return Stream.of(Arguments.of(taxon, locus, project, "f-0-1.txt"),
-				Arguments.of(taxon, locus, project, "f-0-2.txt"));
+		return Stream.of(Arguments.of(taxon, locus, project, "f-0-1.txt", new Integer[0]),
+				Arguments.of(taxon, locus, project, "f-0-2.txt", new Integer[] {1, 2, 3, 4, 5, 6}));
 	}
 
 	private static Stream<Arguments> nonemptyListParams() {
@@ -39,29 +41,36 @@ public class FastaFormatterTests extends FormatterTests {
 		String[] alleles = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String[] alleles2 = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String[] alleles3 = {null, "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
-		return Stream.of(Arguments.of(taxon, locus, project, "f-1-1.txt", alleles(taxon, locus, project, alleles)),
-				Arguments.of(taxon, locus, project, "f-1-2.txt", alleles(taxon, locus, project, alleles)),
-				Arguments.of(taxon, locus, project, "f-2-a.txt", alleles(taxon, locus, project, alleles2)),
-				Arguments.of(taxon, locus, project, "f-3-d.txt", alleles(taxon, locus, project, alleles3)));
+		Pair<Allele[], Integer[]> expected1 = new Pair<>(alleles(taxon, locus, project, alleles), new Integer[0]);
+		Pair<Allele[], Integer[]> expected2 = new Pair<>(alleles(taxon, locus, project, alleles), new Integer[] {1, 2, 3, 4, 5, 6});
+		Pair<Allele[], Integer[]> expected3 = new Pair<>(alleles(taxon, locus, project, alleles2), new Integer[0]);
+		Pair<Allele[], Integer[]> expected4 = new Pair<>(alleles(taxon, locus, project, alleles3), new Integer[] {2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17});
+		return Stream.of(Arguments.of(taxon, locus, project, "f-1-1.txt", expected1),
+				Arguments.of(taxon, locus, project, "f-1-2.txt", expected2),
+				Arguments.of(taxon, locus, project, "f-2-a.txt", expected3),
+				Arguments.of(taxon, locus, project, "f-3-d.txt", expected4));
 	}
 
 	@ParameterizedTest
 	@MethodSource("emptyListParams")
-	public void parse_emptyList(String taxon, String locus, UUID project, String filename) throws IOException {
+	public void parse_emptyList(String taxon, String locus, UUID project, String filename, Integer[] errorLines) throws IOException {
 		FastaFormatter formatter = new FastaFormatter();
-		List<Allele> alleles = formatter.parse(createFile("fasta", filename), taxon, locus, project);
-		assertEquals(0, alleles.size());
+		Pair<List<Allele>, List<Integer>> result = formatter.parse(createFile("fasta", filename), taxon, locus, project);
+		assertEquals(0, result.getKey().size());
+		assertArrayEquals(errorLines, result.getValue().toArray());
 	}
 
 	@ParameterizedTest
 	@MethodSource("nonemptyListParams")
-	public void parse_nonemptyList(String taxon, String locus, UUID project, String filename, Allele[] expected) throws IOException {
+	public void parse_nonemptyList(String taxon, String locus, UUID project, String filename, Pair<Allele[], Integer[]> expected) throws IOException {
 		FastaFormatter formatter = new FastaFormatter();
-		List<Allele> alleles = formatter.parse(createFile("fasta", filename), taxon, locus, project);
-		assertEquals(expected.length, alleles.size());
+		Pair<List<Allele>, List<Integer>> result = formatter.parse(createFile("fasta", filename), taxon, locus, project);
+		List<Allele> alleles = result.getKey();
+		assertEquals(expected.getKey().length, alleles.size());
+		assertArrayEquals(expected.getValue(), result.getValue().toArray());
 		for (int i = 0; i < alleles.size(); i++) {
-			assertEquals(expected[i].getPrimaryKey().getId(), alleles.get(i).getPrimaryKey().getId());
-			assertEquals(expected[i].getSequence(), alleles.get(i).getSequence());
+			assertEquals(expected.getKey()[i].getPrimaryKey().getId(), alleles.get(i).getPrimaryKey().getId());
+			assertEquals(expected.getKey()[i].getSequence(), alleles.get(i).getSequence());
 		}
 	}
 

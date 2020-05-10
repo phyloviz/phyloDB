@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.typing.isolate;
 
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,6 +18,7 @@ import pt.ist.meic.phylodb.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
+import pt.ist.meic.phylodb.io.output.BatchOutputModel;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -117,10 +119,13 @@ public class IsolateControllerTests extends ControllerTestsContext {
 			return r;
 		});
 		MockHttpServletRequestBuilder req3 = put(String.format(uri, TAXONID, LOCUSID));
-		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
-				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+		Integer[] invalidLines = {1, 2, 3};
+		String[] invalidIds = {"4, 5"};
+		return Stream.of(Arguments.of(req1, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req1, new Pair<>(new Integer[0], new String[0]), HttpStatus.OK, new BatchOutputModel(new Integer[0], new String[0])),
+				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req2, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> postIsolates_params() {
@@ -129,10 +134,13 @@ public class IsolateControllerTests extends ControllerTestsContext {
 		MockHttpServletRequestBuilder req1 = multipart(String.format(uri, PROJECTID, DATASETID)).file(file),
 				req3 = multipart(String.format(uri, PROJECTID, DATASETID)),
 				req4 = post(String.format(uri, TAXONID, LOCUSID));
-		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
-				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
-				Arguments.of(req3, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
-				Arguments.of(req4, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
+		Integer[] invalidLines = {1, 2, 3};
+		String[] invalidIds = {"4, 5"};
+		return Stream.of(Arguments.of(req1, new Pair<>(invalidLines, invalidIds), HttpStatus.OK, new BatchOutputModel(invalidLines, invalidIds)),
+				Arguments.of(req1, new Pair<>(new Integer[0], new String[0]), HttpStatus.OK, new BatchOutputModel(new Integer[0], new String[0])),
+				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
+				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
+				Arguments.of(req4, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> deleteIsolate_params() {
@@ -211,22 +219,26 @@ public class IsolateControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("putIsolates_params")
-	public void putIsolates(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(isolateService.saveIsolatesOnConflictUpdate(any(), any(), anyInt(), any())).thenReturn(ret);
+	public void putIsolates(MockHttpServletRequestBuilder req, Pair<Integer[], String[]> invalids, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(isolateService.saveIsolatesOnConflictUpdate(any(), any(), anyInt(), any())).thenReturn(Optional.ofNullable(invalids));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(BatchOutputModel.class, result));
 	}
 
 	@ParameterizedTest
 	@MethodSource("postIsolates_params")
-	public void postIsolates(MockHttpServletRequestBuilder req, boolean ret, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
-		Mockito.when(isolateService.saveIsolatesOnConflictSkip(any(), any(), anyInt(), any())).thenReturn(ret);
+	public void postIsolates(MockHttpServletRequestBuilder req, Pair<Integer[], String[]> invalids, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+		Mockito.when(isolateService.saveIsolatesOnConflictSkip(any(), any(), anyInt(), any())).thenReturn(Optional.ofNullable(invalids));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is4xxClientError())
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
+		else
+			assertEquals(expectedResult, http.parseResult(BatchOutputModel.class, result));
 	}
 
 	@ParameterizedTest

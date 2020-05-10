@@ -6,11 +6,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
-import pt.ist.meic.phylodb.utils.MockResult;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -44,9 +42,9 @@ public class ProjectServiceTests extends ServiceTestsContext {
 	}
 
 	private static Stream<Arguments> saveProject_params() {
-		return Stream.of(Arguments.of(STATE[0], USER1.getPrimaryKey(), false, new MockResult().queryStatistics()),
-				Arguments.of(STATE[1], USER2.getPrimaryKey(), true, null),
-				Arguments.of(null, USER2.getPrimaryKey(), false, null));
+		return Stream.of(Arguments.of(STATE[0], USER1.getPrimaryKey(), false, true),
+				Arguments.of(STATE[1], USER2.getPrimaryKey(), true, false),
+				Arguments.of(null, USER2.getPrimaryKey(), false, false));
 	}
 
 	private static Stream<Arguments> deleteProject_params() {
@@ -87,11 +85,11 @@ public class ProjectServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveProject_params")
-	public void saveProject(Project project, User.PrimaryKey user, boolean missing, QueryStatistics expected) {
+	public void saveProject(Project project, User.PrimaryKey user, boolean missing, boolean expected) {
 		Mockito.when(userRepository.anyMissing(any())).thenReturn(missing);
-		Mockito.when(projectRepository.save(any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(projectRepository.save(any())).thenReturn(expected);
 		boolean result = projectService.saveProject(project, user);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest

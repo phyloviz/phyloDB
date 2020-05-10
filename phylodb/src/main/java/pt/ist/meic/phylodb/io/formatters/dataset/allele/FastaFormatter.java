@@ -12,7 +12,7 @@ public class FastaFormatter extends Formatter<Allele> {
 
 	private String taxon;
 	private String locus;
-	private UUID projet;
+	private UUID project;
 	private String id;
 	private StringBuilder sequence;
 
@@ -20,7 +20,7 @@ public class FastaFormatter extends Formatter<Allele> {
 	protected boolean init(Iterator<String> it, Object... params) {
 		taxon = (String) params[0];
 		locus = (String) params[1];
-		projet = params[2] != null ? (UUID) params[2] : null;
+		project = params[2] != null ? (UUID) params[2] : null;
 		id = null;
 		sequence = new StringBuilder();
 		return true;
@@ -30,7 +30,7 @@ public class FastaFormatter extends Formatter<Allele> {
 	protected boolean parse(String line, boolean last, Consumer<Allele> add) {
 		if (line.startsWith(">")) {
 			if (id != null && sequence.length() > 0)
-				add.accept(new Allele(taxon, locus, id, sequence.toString(), projet));
+				add.accept(new Allele(taxon, locus, id, sequence.toString(), project));
 			int idIndex = line.lastIndexOf("_");
 			if(idIndex == -1 || idIndex == line.length() - 1)
 				return false;
@@ -40,10 +40,11 @@ public class FastaFormatter extends Formatter<Allele> {
 			sequence.append(line);
 		} else {
 			id = null;
+			sequence = new StringBuilder();
 			return false;
 		}
 		if (last && id != null && sequence.length() > 0)
-			add.accept(new Allele(taxon, locus, id, sequence.toString(), projet));
+			add.accept(new Allele(taxon, locus, id, sequence.toString(), project));
 		return true;
 	}
 

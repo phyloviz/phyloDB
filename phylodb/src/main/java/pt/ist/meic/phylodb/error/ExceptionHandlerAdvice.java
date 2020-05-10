@@ -20,11 +20,6 @@ public class ExceptionHandlerAdvice {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandlerAdvice.class);
 
-	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-	public final ResponseEntity<ErrorOutputModel> handle(HttpMediaTypeNotSupportedException ex) {
-		return handle(ex, Problem.CONTENT_TYPE);
-	}
-
 	@ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
 	public final ResponseEntity<ErrorOutputModel> handle(HttpMediaTypeNotAcceptableException ex) {
 		return handle(ex, Problem.NOT_ACCEPTABLE);
@@ -45,7 +40,8 @@ public class ExceptionHandlerAdvice {
 			MissingServletRequestParameterException.class,
 			MissingServletRequestPartException.class,
 			MultipartException.class,
-			MethodArgumentTypeMismatchException.class
+			MethodArgumentTypeMismatchException.class,
+			HttpMediaTypeNotSupportedException.class
 	})
 	public final ResponseEntity<ErrorOutputModel> handle400(Exception ex) {
 		return handle(ex, Problem.BAD_REQUEST);

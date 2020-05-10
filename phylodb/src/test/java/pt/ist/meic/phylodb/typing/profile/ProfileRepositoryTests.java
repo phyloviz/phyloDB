@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
@@ -195,7 +194,7 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 				if (reference == null || reference.getPrimaryKey().getId().matches(MISSING))
 					continue;
 				String referenceId = reference.getPrimaryKey().getId();
-				String where = reference.getPrimaryKey().getProject() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";
+				String where = reference.getPrimaryKey().getProjectId() != null ? "(a)<-[:CONTAINS]-(pj)" : "NOT (a)<-[:CONTAINS]-(:Project)";
 				query.appendQuery(statement, i + 1, where).addParameter(referenceId);
 			}
 			query.subQuery(query.length() - "WITH pj, d, pd, sd\n".length());
@@ -300,13 +299,15 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	public void save(Profile profile, Profile[] state, Profile[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(ProfileRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = profileRepository.save(profile);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = profileRepository.save(profile);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		Profile[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);
 	}
@@ -326,13 +327,15 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("saveAll_params")
 	public void saveAll(List<Profile> profiles, Profile[] state, Profile[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(state);
-		Optional<QueryStatistics> result = profileRepository.saveAll(profiles, PROJECT1.getPrimaryKey().toString(), DATASET1.getPrimaryKey().getId().toString());
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = profileRepository.saveAll(profiles);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 
 		Profile[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);

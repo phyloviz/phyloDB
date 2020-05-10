@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
@@ -312,13 +311,15 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 	public void save(Isolate profile, Isolate[] state, Isolate[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(IsolateRepositoryTests.STATE);
 		store(state);
-		Optional<QueryStatistics> result = isolateRepository.save(profile);
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = isolateRepository.save(profile);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 		Isolate[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);
 	}
@@ -338,13 +339,15 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("saveAll_params")
 	public void saveAll(List<Isolate> isolates, Isolate[] state, Isolate[] expectedState, boolean executed, int nodesCreated, int relationshipsCreated) {
 		store(state);
-		Optional<QueryStatistics> result = isolateRepository.saveAll(isolates, PROJECT1.getPrimaryKey().toString(), DATASET1.getPrimaryKey().getId().toString());
+		int nodes = countNodes();
+		int relationships = countRelationships();
+		boolean result = isolateRepository.saveAll(isolates);
 		if (executed) {
-			assertTrue(result.isPresent());
-			assertEquals(nodesCreated, result.get().getNodesCreated());
-			assertEquals(relationshipsCreated, result.get().getRelationshipsCreated());
+			assertTrue(result);
+			assertEquals(nodes + nodesCreated, countNodes());
+			assertEquals(relationships + relationshipsCreated, countRelationships());
 		} else
-			assertFalse(result.isPresent());
+			assertFalse(result);
 
 		Isolate[] stateResult = findAll();
 		assertArrayEquals(expectedState, stateResult);

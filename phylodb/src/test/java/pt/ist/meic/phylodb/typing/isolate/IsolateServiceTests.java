@@ -1,20 +1,18 @@
 package pt.ist.meic.phylodb.typing.isolate;
 
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.formatters.IsolatesFormatterTests;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
-import pt.ist.meic.phylodb.utils.MockResult;
-import pt.ist.meic.phylodb.utils.db.BatchRepository;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,11 +50,11 @@ public class IsolateServiceTests extends ServiceTestsContext {
 	private static Stream<Arguments> saveIsolate_params() {
 		Isolate isolate1 = isolate(STATE[0].getPrimaryKey().getId(), 1, false, null, new Ancillary[0], PROFILE1),
 				isolate2 = isolate(STATE[0].getPrimaryKey().getId(), 1, false, null, new Ancillary[0], null);
-		return Stream.of(Arguments.of(isolate1, true, true, new MockResult().queryStatistics()),
-				Arguments.of(isolate2, true, true, new MockResult().queryStatistics()),
-				Arguments.of(isolate1, true, false, null),
-				Arguments.of(isolate1, false, true, null),
-				Arguments.of(null, true, true, null));
+		return Stream.of(Arguments.of(isolate1, true, true, true),
+				Arguments.of(isolate2, true, true, true),
+				Arguments.of(isolate1, true, false, false),
+				Arguments.of(isolate1, false, true, false),
+				Arguments.of(null, true, true, false));
 	}
 
 	private static Stream<Arguments> deleteIsolate_params() {
@@ -78,30 +76,30 @@ public class IsolateServiceTests extends ServiceTestsContext {
 				existsSomeN = new boolean[]{true, false};
 		boolean[] notExistsProfile = new boolean[]{false}, notExistsProfiles = new boolean[]{false, true},
 				existsProfile = new boolean[]{true}, existProfiles = new boolean[]{true, true};
-		return Stream.of(Arguments.of(BatchRepository.SKIP, fileNone, true, Collections.emptyList(), new boolean[0], new boolean[0], null),
-				Arguments.of(BatchRepository.SKIP, file1, true, isolates1, notExists1, existsProfile, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileN, true, isolatesN, notExistsN, existProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, file1, true, isolates1, notExists1, notExistsProfile, null),
-				Arguments.of(BatchRepository.SKIP, fileN, true, isolatesN, notExistsN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, file1, true, isolates1, existsAll1, existsProfile, null),
-				Arguments.of(BatchRepository.SKIP, fileN, true, isolatesN, existsAllN, existProfiles, null),
-				Arguments.of(BatchRepository.SKIP, file1, true, isolates1, existsAll1, notExistsProfile, null),
-				Arguments.of(BatchRepository.SKIP, fileN, true, isolatesN, existsAllN, notExistsProfiles, null),
-				Arguments.of(BatchRepository.SKIP, fileN, true, isolatesN, existsSomeN, existProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileN, true, isolatesN, existsSomeN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileNWithoutProfile, true, isolatesNWithoutProfile, existsSomeN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, true, isolates1, notExists1, existsProfile, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, true, isolatesN, notExistsN, existProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, true, isolates1, notExists1, notExistsProfile, null),
-				Arguments.of(BatchRepository.UPDATE, fileN, true, isolatesN, notExistsN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, true, isolates1, existsAll1, existsProfile, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, true, isolatesN, existsAllN, existProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, file1, true, isolates1, existsAll1, notExistsProfile, null),
-				Arguments.of(BatchRepository.UPDATE, fileN, true, isolatesN, existsAllN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, true, isolatesN, existsSomeN, existProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileN, true, isolatesN, existsSomeN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.UPDATE, fileNWithoutProfile, true, isolatesNWithoutProfile, existsSomeN, notExistsProfiles, new MockResult().queryStatistics()),
-				Arguments.of(BatchRepository.SKIP, fileN, false, isolatesN, existsSomeN, notExistsProfiles, null));
+		return Stream.of(Arguments.of(false, fileNone, true, Collections.emptyList(), new boolean[0], new boolean[0], false, null),
+				Arguments.of(false, file1, true, isolates1, notExists1, existsProfile, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(false, fileN, true, isolatesN, notExistsN, existProfiles, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(false, file1, true, isolates1, notExists1, notExistsProfile, false, null),
+				Arguments.of(false, fileN, true, isolatesN, notExistsN, notExistsProfiles, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(false, file1, true, isolates1, existsAll1, existsProfile, false, null),
+				Arguments.of(false, fileN, true, isolatesN, existsAllN, existProfiles, false, null),
+				Arguments.of(false, file1, true, isolates1, existsAll1, notExistsProfile, false, null),
+				Arguments.of(false, fileN, true, isolatesN, existsAllN, notExistsProfiles, false, null),
+				Arguments.of(false, fileN, true, isolatesN, existsSomeN, existProfiles, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(false, fileN, true, isolatesN, existsSomeN, notExistsProfiles, false, null),
+				Arguments.of(false, fileNWithoutProfile, true, isolatesNWithoutProfile, existsSomeN, notExistsProfiles, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(true, file1, true, isolates1, notExists1, existsProfile, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(true, fileN, true, isolatesN, notExistsN, existProfiles, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(true, file1, true, isolates1, notExists1, notExistsProfile, false, null),
+				Arguments.of(true, fileN, true, isolatesN, notExistsN, notExistsProfiles, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(true, file1, true, isolates1, existsAll1, existsProfile, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(true, fileN, true, isolatesN, existsAllN, existProfiles, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(true, file1, true, isolates1, existsAll1, notExistsProfile, false, null),
+				Arguments.of(true, fileN, true, isolatesN, existsAllN, notExistsProfiles, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(true, fileN, true, isolatesN, existsSomeN, existProfiles, true, new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(true, fileN, true, isolatesN, existsSomeN, notExistsProfiles, true, new Pair<>(new Integer[0], new String[] {"1"})),
+				Arguments.of(true, fileNWithoutProfile, true, isolatesNWithoutProfile, existsSomeN, notExistsProfiles, true,new Pair<>(new Integer[0], new String[0])),
+				Arguments.of(false, fileN, false, isolatesN, existsSomeN, notExistsProfiles, false, null));
 	}
 
 	@BeforeEach
@@ -137,13 +135,13 @@ public class IsolateServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveIsolate_params")
-	public void saveIsolate(Isolate isolate, boolean dataset, boolean profile, QueryStatistics expected) {
+	public void saveIsolate(Isolate isolate, boolean dataset, boolean profile, boolean expected) {
 		Mockito.when(datasetRepository.exists(any())).thenReturn(dataset);
 		Mockito.when(profileRepository.exists(any())).thenReturn(profile);
 		if (isolate != null)
-			Mockito.when(isolateRepository.save(isolate)).thenReturn(Optional.ofNullable(expected));
+			Mockito.when(isolateRepository.save(isolate)).thenReturn(expected);
 		boolean result = isolateService.saveIsolate(isolate);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest
@@ -156,25 +154,30 @@ public class IsolateServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveAll_params")
-	public void saveIsolates(String flag, MultipartFile file, boolean dataset, List<Isolate> isolates, boolean[] existsIsolates, boolean[] existsProfile, QueryStatistics expected) throws IOException {
+	public void saveIsolates(boolean update, MultipartFile file, boolean dataset, List<Isolate> isolates, boolean[] existsIsolates, boolean[] existsProfile, boolean expected, Pair<Integer[], String[]> invalids) throws IOException {
 		Mockito.when(datasetRepository.exists(any())).thenReturn(dataset);
 		List<Isolate> toSave = new ArrayList<>();
 		IntStream.range(0, isolates.size()).forEach(i -> {
 			Mockito.when(isolateRepository.exists(isolates.get(i).getPrimaryKey())).thenReturn(existsIsolates[i]);
 			if(isolates.get(i).getProfile() != null)
 				Mockito.when(profileRepository.exists(isolates.get(i).getProfile().getPrimaryKey())).thenReturn(existsProfile[i]);
-			if (flag.equals(BatchRepository.SKIP) && !existsIsolates[i] && (isolates.get(i).getProfile() == null || existsProfile[i]))
+			if (!update && !existsIsolates[i] && (isolates.get(i).getProfile() == null || existsProfile[i]))
 				toSave.add(isolates.get(i));
-			else if (flag.equals(BatchRepository.UPDATE) && (isolates.get(i).getProfile() == null || existsProfile[i]))
+			else if (update && (isolates.get(i).getProfile() == null || existsProfile[i]))
 				toSave.add(isolates.get(i));
 		});
-		Mockito.when(isolateRepository.saveAll(toSave, PROJECTID.toString(), DATASETID.toString())).thenReturn(Optional.ofNullable(expected));
-		boolean result;
-		if (flag.equals(BatchRepository.SKIP))
+		Mockito.when(isolateRepository.saveAll(toSave)).thenReturn(expected);
+		Optional<Pair<Integer[], String[]>> result;
+		if (!update)
 			result = isolateService.saveIsolatesOnConflictSkip(PROJECTID, DATASETID, 0, file);
 		else
 			result = isolateService.saveIsolatesOnConflictUpdate(PROJECTID, DATASETID, 0, file);
-		assertEquals(expected != null, result);
+		if(invalids != null) {
+			assertTrue(result.isPresent());
+			assertArrayEquals(invalids.getKey(), result.get().getKey());
+			assertArrayEquals(invalids.getValue(), result.get().getValue());
+		} else
+			assertFalse(result.isPresent());
 	}
 
 }

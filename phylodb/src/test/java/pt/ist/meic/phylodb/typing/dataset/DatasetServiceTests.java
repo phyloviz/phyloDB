@@ -6,12 +6,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.neo4j.ogm.model.QueryStatistics;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.MockResult;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.ArrayList;
@@ -50,13 +48,13 @@ public class DatasetServiceTests extends ServiceTestsContext {
 	private static Stream<Arguments> saveDataset_params() {
 		Dataset withDifferentSchema = new Dataset(PROJECT1.getPrimaryKey(), STATE[0].getPrimaryKey().getId(), 1, false, "name1", new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false));
 		List<Profile> profiles = Collections.singletonList(new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "id", 1, false, "aka", null));
-		return Stream.of(Arguments.of(STATE[0], true, null, null, new MockResult().queryStatistics()),
-				Arguments.of(STATE[1], false, null, null, null),
-				Arguments.of(STATE[0], true, withDifferentSchema, Collections.emptyList(), new MockResult().queryStatistics()),
-				Arguments.of(STATE[0], true, STATE[0], Collections.emptyList(), new MockResult().queryStatistics()),
-				Arguments.of(STATE[0], true, withDifferentSchema, profiles, null),
-				Arguments.of(STATE[0], true, STATE[0], profiles, new MockResult().queryStatistics()),
-				Arguments.of(null, false, null, null, null));
+		return Stream.of(Arguments.of(STATE[0], true, null, null, true),
+				Arguments.of(STATE[1], false, null, null, false),
+				Arguments.of(STATE[0], true, withDifferentSchema, Collections.emptyList(), true),
+				Arguments.of(STATE[0], true, STATE[0], Collections.emptyList(), false),
+				Arguments.of(STATE[0], true, withDifferentSchema, profiles, false),
+				Arguments.of(STATE[0], true, STATE[0], profiles, true),
+				Arguments.of(null, false, null, null, false));
 	}
 
 	private static Stream<Arguments> deleteDataset_params() {
@@ -97,13 +95,13 @@ public class DatasetServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveDataset_params")
-	public void saveDataset(Dataset dataset, boolean exists, Dataset dbDataset, List<Profile> profiles, QueryStatistics expected) {
+	public void saveDataset(Dataset dataset, boolean exists, Dataset dbDataset, List<Profile> profiles, boolean expected) {
 		Mockito.when(schemaRepository.exists(any())).thenReturn(exists);
 		Mockito.when(datasetRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(dbDataset));
 		Mockito.when(profileRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(profiles));
-		Mockito.when(datasetRepository.save(any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(datasetRepository.save(any())).thenReturn(expected);
 		boolean result = datasetService.saveDataset(dataset);
-		assertEquals(expected != null, result);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest

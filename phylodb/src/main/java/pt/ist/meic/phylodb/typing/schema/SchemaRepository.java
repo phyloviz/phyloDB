@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Repository
 public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey> {
@@ -75,8 +76,10 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 
 	@Override
 	protected void store(Schema schema) {
-		if (isPresent(schema.getPrimaryKey()))
+		if (isPresent(schema.getPrimaryKey())) {
 			put(schema);
+			return;
+		}
 		post(schema);
 	}
 
@@ -125,35 +128,47 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 		return Optional.of(parse(result.iterator().next()));
 	}
 
-	private Result post(Schema schema) {
+	private void post(Schema schema) {
 		String statement = "CREATE (s:Schema {id: $, type: $, deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(sd:SchemaDetails {description: $}) WITH sd\n " +
-				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false WITH t, sd\n";
-		Query query = new Query(statement, schema.getPrimaryKey().getId(), schema.getType().getName(), schema.getDescription(), schema.getPrimaryKey().getTaxonId());
-		composeLoci(schema, query);
-		return execute(query);
+				"MATCH (t:Taxon {id: $}) WHERE t.deprecated = false\n" +
+				"WITH t, sd\n" +
+				"UNWIND $ as param\n" +
+				"MATCH (t)-[:CONTAINS]->(l:Locus {id: param.id})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
+				"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"CREATE (sd)-[:HAS {part: param.part, version: r.version}]->(l)";
+		List<Entity<Locus.PrimaryKey>> loci = schema.getLociReferences();
+		Query query = new Query(statement, schema.getPrimaryKey().getId(), schema.getType().getName(), schema.getDescription(), schema.getPrimaryKey().getTaxonId(),
+				IntStream.range(0, loci.size())
+						.mapToObj(i -> new Object() {
+							public final String id = loci.get(i).getPrimaryKey().getId();
+							public final int part = i + 1;
+						})
+						.toArray()
+		);
+		execute(query);
 	}
 
-	private Result put(Schema schema) {
+	private void put(Schema schema) {
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
 				"WHERE NOT EXISTS(r.to)\n" +
 				"WITH t, s, r, sd, collect(l.id) as loci\n" +
 				"SET s.deprecated = false, r.to = datetime() WITH t, s, r.version + 1 as v\n" +
 				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(sd:SchemaDetails {description: $})\n" +
-				"WITH t, sd\n";
-		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId(), schema.getDescription());
-		composeLoci(schema, query);
-		return execute(query);
-	}
-
-	private void composeLoci(Schema schema, Query query) {
-		String[] ids = schema.getLociIds().toArray(new String[0]);
-		for (int i = 0; i < ids.length; i++) {
-			query.appendQuery("MATCH (t)-[:CONTAINS]->(l:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
-					"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
-					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l) WITH sd, t\n", i + 1)
-					.addParameter(ids[i]);
-		}
-		query.subQuery(query.length() - "WITH sd, t\n".length());
+				"WITH t, sd\n" +
+				"UNWIND $ as param\n" +
+				"MATCH (t)-[:CONTAINS]->(l:Locus {id: param.id})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
+				"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"CREATE (sd)-[:HAS {part: param.part, version: r.version}]->(l)";
+		List<Entity<Locus.PrimaryKey>> loci = schema.getLociReferences();
+		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId(), schema.getDescription(),
+				IntStream.range(0, loci.size())
+						.mapToObj(i -> new Object() {
+							public final String id = loci.get(i).getPrimaryKey().getId();
+							public final int part = i + 1;
+						})
+						.toArray()
+		);
+		execute(query);
 	}
 
 }
