@@ -1,14 +1,14 @@
-package pt.ist.meic.phylodb.job.repository;
+package pt.ist.meic.phylodb.analysis.visualization;
 
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JobRepository {
+public class VisualizationRepository {
 
 	private Session session;
 
-	public JobRepository(Session session) {
+	public VisualizationRepository(Session session) {
 		this.session = session;
 	}
 
