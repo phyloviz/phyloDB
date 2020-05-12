@@ -9,11 +9,9 @@ import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 @Repository
 public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryKey> {
@@ -46,7 +44,6 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated,\n" +
 				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:h.part, total: h.total}) as alleles";
 		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), version));
-
 	}
 
 	@Override
@@ -103,6 +100,28 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	@Override
 	protected Query batch(Query query) {
 		return query.appendQuery(getInsertStatement());
+	}
+
+
+	public boolean anyMissing(List<Entity<Profile.PrimaryKey>> references) {
+		Optional<Entity<Profile.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
+		if (!optional.isPresent())
+			return true;
+		UUID project = optional.get().getPrimaryKey().getProjectId();
+		UUID dataset = optional.get().getPrimaryKey().getDatasetId();
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) UNWIND $ as param\n" +
+				"OPTIONAL MATCH (d)-[:CONTAINS]->(p:Profile {id: param.profile})\n" +
+				"RETURN p.id as present";
+		Result result = query(new Query(statement, project, dataset, references
+				.stream()
+				.filter(Objects::nonNull)
+				.map(r -> r.getPrimaryKey().getId())
+				.toArray()));
+		Iterator<Map<String, Object>> it = result.iterator();
+		if(!it.hasNext())
+			return true;
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false)
+				.anyMatch(r -> r.get("present") == null);
 	}
 
 	private String getInsertStatement() {
