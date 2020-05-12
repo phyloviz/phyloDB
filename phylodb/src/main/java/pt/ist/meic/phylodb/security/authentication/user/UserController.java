@@ -10,7 +10,7 @@ import pt.ist.meic.phylodb.security.authentication.user.model.GetUsersOutputMode
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authentication.user.model.UserInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
@@ -41,7 +41,7 @@ public class UserController extends Controller<User> {
 		return get(() -> service.getUser(userId, provider, version), GetUserOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
+	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
 	@PutMapping(path = "/{user}")
 	public ResponseEntity<?> putUser(
 			@PathVariable("user") String userId,
@@ -51,7 +51,7 @@ public class UserController extends Controller<User> {
 		return put(() -> input.toDomainEntity(userId, provider), service::updateUser);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
+	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{user}")
 	public ResponseEntity<?> deleteUser(
 			@PathVariable("user") String userId,

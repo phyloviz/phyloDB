@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.schema.model.GetSchemaOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.GetSchemasOutputModel;
@@ -44,7 +44,7 @@ public class SchemaController extends Controller<Schema> {
 		return get(() -> service.getSchema(taxonId, schemaId, version), GetSchemaOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
+	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
 	@PutMapping(path = "/{schema}")
 	public ResponseEntity<?> putSchema(
 			@PathVariable("taxon") String taxonId,
@@ -54,7 +54,7 @@ public class SchemaController extends Controller<Schema> {
 		return put(() -> input.toDomainEntity(taxonId, schemaId), service::saveSchema);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
+	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{schema}")
 	public ResponseEntity<?> deleteSchema(
 			@PathVariable("taxon") String taxonId,

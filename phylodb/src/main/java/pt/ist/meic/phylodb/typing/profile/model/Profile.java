@@ -55,7 +55,9 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 				.mapToObj(i -> {
 					Entity<Allele.PrimaryKey> ref = alleles.get(i);
 					if (ref != null)
-						return !ref.getPrimaryKey().getId().matches(String.format("[\\s%s]*", missing)) ? new Entity<>(cons.apply(loci.get(i).getPrimaryKey().getId(), ref.getPrimaryKey().getId()), ref.getVersion(), ref.isDeprecated()) : null;
+						return !ref.getPrimaryKey().getId().matches(String.format("[\\s%s]*", missing)) && !ref.getPrimaryKey().getId().isEmpty() ?
+								new Entity<>(cons.apply(loci.get(i).getPrimaryKey().getId(), ref.getPrimaryKey().getId()), ref.getVersion(), ref.isDeprecated()) :
+								null;
 					return null;
 				})
 				.collect(Collectors.toList()));

@@ -41,9 +41,9 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 		if (columns.length != headers.size())
 			return false;
 		String id = columns[this.id];
-		String profile = st == -1 || columns[st].matches(String.format("[\\s%s]*", missing)) ? null : columns[st];
+		String profile = st == -1 || columns[st].matches(String.format("[\\s%s]*", missing)) || columns[st].isEmpty() ? null : columns[st];
 		Ancillary[] ancillaries = IntStream.range(0, columns.length)
-				.filter(i -> !columns[i].matches(String.format("[\\s%s]*", missing)) && i != this.id && i != st)
+				.filter(i -> !columns[i].matches(String.format("[\\s%s]*", missing)) && !columns[i].isEmpty() && i != this.id && i != st)
 				.mapToObj(i -> new Ancillary(headers.get(i), columns[i]))
 				.toArray(Ancillary[]::new);
 		add.accept(new Isolate(projectId, datasetId, id, null, ancillaries, profile));

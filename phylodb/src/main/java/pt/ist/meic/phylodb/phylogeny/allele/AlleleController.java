@@ -14,7 +14,7 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.GetAlleleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.GetAllelesOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
@@ -36,7 +36,7 @@ public class AlleleController extends Controller<Allele> {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ, required = false)
+	@Authorized(role = Role.USER, permission = Operation.READ, required = false)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getAlleles(
 			@PathVariable("taxon") String taxonId,
@@ -50,7 +50,7 @@ public class AlleleController extends Controller<Allele> {
 				(a) -> new FileOutputModel(new FastaFormatter().format(a, Integer.parseInt(lineLength))));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ, required = false)
+	@Authorized(role = Role.USER, permission = Operation.READ, required = false)
 	@GetMapping(path = "/{allele}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getAllele(
 			@PathVariable("taxon") String taxonId,
@@ -62,7 +62,7 @@ public class AlleleController extends Controller<Allele> {
 		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), GetAlleleOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/{allele}")
 	public ResponseEntity<?> saveAllele(
 			@PathVariable("taxon") String taxonId,
@@ -74,7 +74,7 @@ public class AlleleController extends Controller<Allele> {
 		return put(() -> input.toDomainEntity(taxonId, locusId, alleleId, project), service::saveAllele);
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PostMapping(path = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> postAlleles(
 			@PathVariable("taxon") String taxonId,
@@ -86,7 +86,7 @@ public class AlleleController extends Controller<Allele> {
 		return fileStatus(() -> service.saveAllelesOnConflictSkip(taxonId, locusId, project, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> putAlleles(
 			@PathVariable("taxon") String taxonId,
@@ -98,7 +98,7 @@ public class AlleleController extends Controller<Allele> {
 		return fileStatus(() -> service.saveAllelesOnConflictUpdate(taxonId, locusId, project, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{allele}")
 	public ResponseEntity<?> deleteAllele(
 			@PathVariable("taxon") String taxonId,

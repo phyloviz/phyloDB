@@ -9,7 +9,7 @@ import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.isolate.model.GetIsolateOutputModel;
 import pt.ist.meic.phylodb.typing.isolate.model.GetIsolatesOutputModel;
@@ -32,7 +32,7 @@ public class IsolateController extends Controller<Isolate> {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getIsolates(
 			@PathVariable("project") UUID projectId,
@@ -45,7 +45,7 @@ public class IsolateController extends Controller<Isolate> {
 				(i) -> new FileOutputModel(new IsolatesFormatter().format(i)));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "/{isolate}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolate(
 			@PathVariable("project") UUID projectId,
@@ -56,7 +56,7 @@ public class IsolateController extends Controller<Isolate> {
 		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), GetIsolateOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/{isolate}")
 	public ResponseEntity<?> putIsolate(
 			@PathVariable("project") UUID projectId,
@@ -67,7 +67,7 @@ public class IsolateController extends Controller<Isolate> {
 		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), isolateId), service::saveIsolate);
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postIsolates(
 			@PathVariable("project") UUID projectId,
@@ -78,7 +78,7 @@ public class IsolateController extends Controller<Isolate> {
 		return fileStatus(() -> service.saveIsolatesOnConflictSkip(projectId, datasetId, id, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putIsolates(
 			@PathVariable("project") UUID projectId,
@@ -90,7 +90,7 @@ public class IsolateController extends Controller<Isolate> {
 		return fileStatus(() -> service.saveIsolatesOnConflictUpdate(projectId, datasetId, id, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{isolate}")
 	public ResponseEntity<?> deleteIsolate(
 			@PathVariable("project") UUID projectId,

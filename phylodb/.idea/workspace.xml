@@ -3,8 +3,23 @@
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/AnalysisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/AnalysisController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/AnalysisService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/AnalysisService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/isolate/IsolatesFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/io/formatters/dataset/isolate/IsolatesFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/allele/AlleleRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/locus/LocusController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/phylogeny/taxon/TaxonController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/user/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authentication/user/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/AuthorizationInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/AuthorizationInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/Authorized.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/Authorized.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/project/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/authorization/project/ProjectController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/isolate/IsolateController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/typing/profile/ProfileRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/Profile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/model/Profile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/schema/SchemaController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,8 +51,8 @@
       <list>
         <option value="AnnotationType" />
         <option value="Interface" />
-        <option value="Enum" />
         <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -54,23 +69,20 @@
   </component>
   <component name="PropertiesComponent">
     <property name="extract.method.default.visibility" value="private" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test/java/resources/formatters/snp" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/model" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Java" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="pt.ist.meic.phylodb.typing.profile.model" />
-      <recent name="pt.ist.meic.phylodb.typing.dataset.model" />
-      <recent name="pt.ist.meic.phylodb.typing.schema.model" />
-      <recent name="pt.ist.meic.phylodb.phylogeny.locus.model" />
-      <recent name="pt.ist.meic.phylodb.phylogeny.taxon.model" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\main\resources" />
+      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\main\java\pt\ist\meic\phylodb\analysis\inference\model" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\test\java\resources\formatters\snp" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\snp" />
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
-      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\pt\ist\meic\phylodb\phylogeny\locus" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="pt.ist.meic.phylodb.typing.isolate" />
@@ -79,9 +91,12 @@
       <recent name="pt.ist.meic.phylodb.typing.schema" />
       <recent name="pt.ist.meic.phylodb.phylogeny.allele" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Bruno\Desktop\Projeto\Project\PhyloDB\phylodb\src\main\resources" />
-      <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="pt.ist.meic.phylodb.typing.profile.model" />
+      <recent name="pt.ist.meic.phylodb.typing.dataset.model" />
+      <recent name="pt.ist.meic.phylodb.typing.schema.model" />
+      <recent name="pt.ist.meic.phylodb.phylogeny.locus.model" />
+      <recent name="pt.ist.meic.phylodb.phylogeny.taxon.model" />
     </key>
   </component>
   <component name="RunManager" selected="JUnit.pt.ist.meic.phylodb in phylodb.test">
@@ -233,31 +248,31 @@
     <state x="-1828" y="92" width="1736" height="856" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587401425049" />
     <state x="-1828" y="92" width="1736" height="856" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589106840155" />
     <state x="74" y="73" width="1389" height="679" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824@0.0.1536.824" timestamp="1588803945055" />
-    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser" timestamp="1588889746126">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state x="574" y="114" key="#com.intellij.ide.util.MemberChooser" timestamp="1589307400615">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1585584805220" />
-    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588889746126" />
-    <state x="574" y="114" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1588784635085" />
+    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589142209482" />
+    <state x="574" y="114" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1589307400615" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1586285936267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1182" y="428" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1586117374450" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1536.824@0.0.1536.824" timestamp="1586285936267" />
-    <state x="-1164" y="380" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1589100282432">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state x="605" y="301" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1589222199438">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1164" y="380" width="503" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589100282432" />
-    <state x="605" y="301" width="512" height="287" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824@0.0.1536.824" timestamp="1587682836418" />
+    <state x="605" y="301" width="512" height="287" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824@0.0.1536.824" timestamp="1589222199438" />
     <state x="-1173" y="350" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog" timestamp="1588450957912">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1173" y="350" key="#com.intellij.refactoring.move.moveInstanceMethod.MoveInstanceMethodDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588450957912" />
-    <state x="-1509" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1589014461023">
-      <screen x="-1920" y="0" width="1920" height="1040" />
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1589235985041">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="-1509" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589014461023" />
-    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1588797074629" />
+    <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1589235985041" />
     <state x="-1230" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1588888266581">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -281,29 +296,29 @@
     </state>
     <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588924084117" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1581373830246" />
-    <state width="1877" height="206" key="GridCell.Tab.0.bottom" timestamp="1589137731351">
+    <state width="1877" height="271" key="GridCell.Tab.0.bottom" timestamp="1589138318482">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="206" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589137731351" />
+    <state width="1877" height="271" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589138318482" />
     <state width="1493" height="206" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="206" key="GridCell.Tab.0.center" timestamp="1589137731351">
+    <state width="1877" height="271" key="GridCell.Tab.0.center" timestamp="1589138318482">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="206" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589137731351" />
+    <state width="1877" height="271" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589138318482" />
     <state width="1493" height="206" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="206" key="GridCell.Tab.0.left" timestamp="1589137731351">
+    <state width="1877" height="271" key="GridCell.Tab.0.left" timestamp="1589138318482">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="206" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589137731351" />
+    <state width="1877" height="271" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589138318482" />
     <state width="1493" height="206" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
-    <state width="1877" height="206" key="GridCell.Tab.0.right" timestamp="1589137731351">
+    <state width="1877" height="271" key="GridCell.Tab.0.right" timestamp="1589138318482">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="206" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589137731351" />
+    <state width="1877" height="271" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589138318482" />
     <state width="1493" height="206" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1588853376583" />
     <state width="1877" height="305" key="GridCell.Tab.1.bottom" timestamp="1589120167694">
       <screen x="-1920" y="0" width="1920" height="1040" />

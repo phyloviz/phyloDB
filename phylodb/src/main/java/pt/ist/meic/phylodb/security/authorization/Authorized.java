@@ -11,7 +11,7 @@ public @interface Authorized {
 
 	Role role();
 
-	Permission permission();
+	Operation permission();
 
 	boolean required() default true;
 

@@ -8,7 +8,7 @@ import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.SecurityInterceptor;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectOutputModel;
 import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectsOutputModel;
@@ -43,7 +43,7 @@ public class ProjectController extends Controller<Project> {
 		return getAll(type, l -> service.getProjects(new User.PrimaryKey(userId, provider), page, l), GetProjectsOutputModel::new, null);
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "/{project}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProject(
 			@PathVariable("project") UUID projectId,
@@ -62,7 +62,7 @@ public class ProjectController extends Controller<Project> {
 		return post(input::toDomainEntity, p -> service.saveProject(p, new User.PrimaryKey(userId, provider)), Entity::getPrimaryKey);
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/{project}")
 	public ResponseEntity<?> putProject(
 			@PathVariable("project") UUID projectId,
@@ -74,7 +74,7 @@ public class ProjectController extends Controller<Project> {
 		return put(() -> input.toDomainEntity(projectId.toString()), (p) -> service.saveProject(p, new User.PrimaryKey(userId, provider)));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{project}")
 	public ResponseEntity<?> deleteProject(
 			@PathVariable("project") String projectId

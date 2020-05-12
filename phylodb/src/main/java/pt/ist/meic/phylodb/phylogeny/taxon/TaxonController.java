@@ -10,7 +10,7 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
@@ -40,7 +40,7 @@ public class TaxonController extends Controller<Taxon> {
 		return get(() -> service.getTaxon(taxonId, version), GetTaxonOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
+	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
 	@PutMapping(path = "/{taxon}")
 	public ResponseEntity<?> saveTaxon(
 			@PathVariable("taxon") String taxonId,
@@ -49,7 +49,7 @@ public class TaxonController extends Controller<Taxon> {
 		return put(() -> input.toDomainEntity(taxonId), service::saveTaxon);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Permission.WRITE)
+	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{taxon}")
 	public ResponseEntity<?> deleteTaxon(
 			@PathVariable("taxon") String taxonId

@@ -32,38 +32,28 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 
 	@Override
 	public boolean handle(HttpServletRequest req, HttpServletResponse res, Object handler) {
-		HandlerMethod hm = (HandlerMethod) handler;
-		Authorized methodAnnotation = hm.getMethodAnnotation(Authorized.class);
-		if (methodAnnotation == null || req.getAttribute(ROLE).equals(Role.ADMIN))
+		Authorized annotation = ((HandlerMethod) handler).getMethodAnnotation(Authorized.class);
+		if (annotation == null || req.getAttribute(ROLE).equals(Role.ADMIN))
 			return true;
-		Role methodRole = methodAnnotation.role();
-		Permission methodPermission = methodAnnotation.permission();
+		Operation operation = annotation.permission();
 		String userId = req.getAttribute(ID).toString();
 		String provider = req.getAttribute(PROVIDER).toString();
-		Optional<String> optional = getProjectId(req);
-		if (optional.isPresent()) {
-			Optional<Project> optionalProject = optional.flatMap(i -> projectService.getProject(UUID.fromString(i), CURRENT_VERSION_VALUE));
+		Map<String, Object> pathVariables = (Map<String, Object>) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		Object projectId = pathVariables.getOrDefault(PROJECT, req.getParameter(PROJECT));
+		if (projectId != null) {
+			Optional<Project> optionalProject = projectService.getProject(UUID.fromString(projectId.toString()), CURRENT_VERSION_VALUE);
 			if (optionalProject.isPresent()) {
 				Project project = optionalProject.get();
 				boolean included = Arrays.stream(project.getUsers()).anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
-				if (methodRole.equals(Role.USER) &&
-						((methodPermission.equals(Permission.WRITE) && included) ||
-								(methodPermission.equals(Permission.READ) && (included || project.getType().equals("public")))))
+				if (annotation.role().equals(Role.USER) &&
+						((operation == Operation.WRITE && included) ||
+								(operation == Operation.READ && (included || project.getType().equals("public")))))
 					return true;
 			}
-		} else if (!methodAnnotation.required())
+		} else if (!annotation.required())
 			return true;
 		res.setStatus(Problem.UNAUTHORIZED.getStatus().value());
 		return false;
-	}
-
-	private Optional<String> getProjectId(HttpServletRequest req) {
-		Object projectId = req.getParameter(PROJECT);
-		if (projectId == null) {
-			Map<String, Object> pathVariables = (Map<String, Object>) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-			projectId = pathVariables.get(PROJECT);
-		}
-		return projectId != null ? Optional.of(projectId.toString()) : Optional.empty();
 	}
 
 }

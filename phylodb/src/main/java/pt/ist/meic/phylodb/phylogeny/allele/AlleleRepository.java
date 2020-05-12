@@ -9,6 +9,7 @@ import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 @Repository
 public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey> {
@@ -106,26 +107,30 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		if (!optional.isPresent())
 			return true;
 		String taxon = optional.get().getPrimaryKey().getTaxonId();
-		Query query = new Query("MATCH (t:Taxon {id: $}) WITH t, 0 as c\n", taxon);
-		for (Entity<Allele.PrimaryKey> reference : references) {
-			if (reference == null)
-				continue;
-			String where = "NOT (a)<-[:CONTAINS]-(:Project)";
-			List<Object> params = new ArrayList<Object>() {{
-				add(reference.getPrimaryKey().getLocusId());
-				add(reference.getPrimaryKey().getId());
-			}};
-			if (reference.getPrimaryKey().getProjectId() != null) {
-				where = "(a)<-[:CONTAINS]-(:Project {id: $})";
-				params.add(reference.getPrimaryKey().getProjectId());
-			}
-			query.appendQuery("OPTIONAL MATCH (t)-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})\n" +
-					"WHERE " + where + "\n" +
-					"WITH t, c + COALESCE(COUNT(a.id), 0) as c\n")
-					.addParameter(params.toArray());
-		}
-		query.appendQuery("RETURN c");
-		return query(Integer.class, query) != references.stream().filter(Objects::nonNull).count();
+		String statement = "MATCH (t:Taxon {id: $}) UNWIND $ as param\n" +
+				"CALL apoc.when(param.project IS NOT NULL,\n" +
+				"\"OPTIONAL MATCH (t)-[:CONTAINS]->(l:Locus {id: param.locus})-[:CONTAINS]->(a:Allele {id: param.allele})\n" +
+				"WHERE (a)<-[:CONTAINS]-(:Project {id: param.project})\n" +
+				"RETURN a.id as result\",\n" +
+				"\"OPTIONAL MATCH (t)-[:CONTAINS]->(l:Locus {id: param.locus})-[:CONTAINS]->(a:Allele {id: param.allele})\n" +
+				"WHERE NOT (a)<-[:CONTAINS]-(:Project)\n" +
+				"RETURN a.id as result\",\n" +
+				"{t: t, param: param}) YIELD value RETURN value.result as present";
+		Result result = query(new Query(statement, taxon, references
+				.stream()
+				.filter(Objects::nonNull)
+				.map(r -> new Object() {
+					public final String locus = r.getPrimaryKey().getLocusId();
+					public final String allele = r.getPrimaryKey().getId();
+					public final UUID project = r.getPrimaryKey().getProjectId();
+				})
+				.toArray())
+		);
+		Iterator<Map<String, Object>> it = result.iterator();
+		if(!it.hasNext())
+			return true;
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false)
+				.anyMatch(r -> r.get("present") == null);
 	}
 
 	private Object getInsertParam(Allele allele) {

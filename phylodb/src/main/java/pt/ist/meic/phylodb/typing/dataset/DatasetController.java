@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
@@ -28,7 +28,7 @@ public class DatasetController extends Controller<Dataset> {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getDatasets(
 			@PathVariable("project") UUID projectId,
@@ -38,7 +38,7 @@ public class DatasetController extends Controller<Dataset> {
 		return getAll(type, l -> service.getDatasets(projectId, page, l), GetDatasetsOutputModel::new, null);
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "/{dataset}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getDataset(
 			@PathVariable("project") UUID projectId,
@@ -48,7 +48,7 @@ public class DatasetController extends Controller<Dataset> {
 		return get(() -> service.getDataset(projectId, datasetId, version), GetDatasetOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postDataset(
 			@PathVariable("project") UUID projectId,
@@ -57,7 +57,7 @@ public class DatasetController extends Controller<Dataset> {
 		return post(() -> input.toDomainEntity(projectId.toString()), service::saveDataset, d -> d.getPrimaryKey().getId());
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/{dataset}")
 	public ResponseEntity<?> putDataset(
 			@PathVariable("project") UUID projectId,
@@ -67,7 +67,7 @@ public class DatasetController extends Controller<Dataset> {
 		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString()), service::saveDataset);
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{dataset}")
 	public ResponseEntity<?> deleteDataset(
 			@PathVariable("project") UUID projectId,

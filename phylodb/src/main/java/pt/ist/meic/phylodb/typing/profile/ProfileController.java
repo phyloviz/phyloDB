@@ -9,7 +9,7 @@ import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.profile.ProfilesFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
-import pt.ist.meic.phylodb.security.authorization.Permission;
+import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.profile.model.GetProfileOutputModel;
 import pt.ist.meic.phylodb.typing.profile.model.GetProfilesOutputModel;
@@ -32,7 +32,7 @@ public class ProfileController extends Controller<Profile> {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getProfiles(
 			@PathVariable("project") UUID projectId,
@@ -45,7 +45,7 @@ public class ProfileController extends Controller<Profile> {
 				p -> new FileOutputModel(ProfilesFormatter.get(p.getKey().getType().getName()).format(p.getValue(), p.getKey())));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.READ)
+	@Authorized(role = Role.USER, permission = Operation.READ)
 	@GetMapping(path = "/{profile}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProfile(
 			@PathVariable("project") UUID projectId,
@@ -56,7 +56,7 @@ public class ProfileController extends Controller<Profile> {
 		return get(() -> service.getProfile(projectId, datasetId, profileId, version), GetProfileOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/{profile}")
 	public ResponseEntity<?> putProfile(
 			@PathVariable("project") UUID projectId,
@@ -68,7 +68,7 @@ public class ProfileController extends Controller<Profile> {
 		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), profileId), p -> service.saveProfile(p, authorized));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postProfiles(
 			@PathVariable("project") UUID projectId,
@@ -79,7 +79,7 @@ public class ProfileController extends Controller<Profile> {
 		return fileStatus(() -> service.saveProfilesOnConflictSkip(projectId, datasetId, authorized, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putProfiles(
 			@PathVariable("project") UUID projectId,
@@ -90,7 +90,7 @@ public class ProfileController extends Controller<Profile> {
 		return fileStatus(() -> service.saveProfilesOnConflictUpdate(projectId, datasetId, authorized, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Permission.WRITE)
+	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{profile}")
 	public ResponseEntity<?> deleteProfile(
 			@PathVariable("project") UUID projectId,
