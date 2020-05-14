@@ -1,26 +1,34 @@
 package pt.ist.meic.phylodb.analysis.inference.model;
 
-import pt.ist.meic.phylodb.utils.service.Entity;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
-public class Analysis extends Entity<Analysis.PrimaryKey> {
+public class Analysis {
 
+	private final PrimaryKey primaryKey;
+	private final boolean deprecated;
 	private final InferenceAlgorithm algorithm;
 	private final List<Edge> edges;
 
-	public Analysis(UUID projectId, UUID datasetId, UUID id, long version, boolean deprecated, InferenceAlgorithm algorithm, List<Edge> edges) {
-		super(new PrimaryKey(projectId, datasetId, id, algorithm), version, deprecated);
+	public Analysis(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, boolean deprecated, List<Edge> edges) {
+		this.primaryKey = new PrimaryKey(projectId, datasetId, id);
+		this.deprecated = deprecated;
 		this.algorithm = algorithm;
 		this.edges = edges;
 	}
 
 	public Analysis(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, List<Edge> edges) {
-		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, algorithm, edges);
+		this(projectId, datasetId, id, algorithm, false, edges);
+	}
+
+	public PrimaryKey getPrimaryKey() {
+		return primaryKey;
+	}
+
+	public boolean isDeprecated() {
+		return deprecated;
 	}
 
 	public InferenceAlgorithm getAlgorithm() {
@@ -31,18 +39,27 @@ public class Analysis extends Entity<Analysis.PrimaryKey> {
 		return edges;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Analysis analysis = (Analysis) o;
+		return deprecated == analysis.deprecated &&
+				Objects.equals(primaryKey, analysis.primaryKey) &&
+				algorithm == analysis.algorithm &&
+				Objects.equals(edges, analysis.edges);
+	}
+
 	public static class PrimaryKey {
 
 		private final UUID projectId;
 		private final UUID datasetId;
 		private final UUID id;
-		private final InferenceAlgorithm algorithm;
 
-		public PrimaryKey(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm) {
+		public PrimaryKey(UUID projectId, UUID datasetId, UUID id) {
 			this.projectId = projectId;
 			this.datasetId = datasetId;
 			this.id = id;
-			this.algorithm = algorithm;
 		}
 
 		public UUID getProjectId() {
@@ -57,10 +74,6 @@ public class Analysis extends Entity<Analysis.PrimaryKey> {
 			return id;
 		}
 
-		public InferenceAlgorithm getAlgorithm() {
-			return algorithm;
-		}
-
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
@@ -68,8 +81,7 @@ public class Analysis extends Entity<Analysis.PrimaryKey> {
 			PrimaryKey that = (PrimaryKey) o;
 			return Objects.equals(projectId, that.projectId) &&
 					Objects.equals(datasetId, that.datasetId) &&
-					Objects.equals(id, that.id) &&
-					algorithm == that.algorithm;
+					Objects.equals(id, that.id);
 		}
 	}
 

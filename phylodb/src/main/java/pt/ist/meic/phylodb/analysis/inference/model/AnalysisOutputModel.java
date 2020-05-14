@@ -12,8 +12,6 @@ public class AnalysisOutputModel implements OutputModel {
 	protected UUID project_id;
 	protected UUID dataset_id;
 	protected UUID id;
-	protected String algorithm;
-	protected long version;
 	protected boolean deprecated;
 
 	public AnalysisOutputModel() {
@@ -23,8 +21,6 @@ public class AnalysisOutputModel implements OutputModel {
 		this.project_id = analysis.getPrimaryKey().getProjectId();
 		this.dataset_id = analysis.getPrimaryKey().getDatasetId();
 		this.id = analysis.getPrimaryKey().getId();
-		this.algorithm = analysis.getPrimaryKey().getAlgorithm().getName();
-		this.version = analysis.getVersion();
 		this.deprecated = analysis.isDeprecated();
 	}
 
@@ -38,14 +34,6 @@ public class AnalysisOutputModel implements OutputModel {
 
 	public UUID getId() {
 		return id;
-	}
-
-	public String getAlgorithm() {
-		return algorithm;
-	}
-
-	public long getVersion() {
-		return version;
 	}
 
 	public boolean isDeprecated() {
@@ -62,12 +50,10 @@ public class AnalysisOutputModel implements OutputModel {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		AnalysisOutputModel that = (AnalysisOutputModel) o;
-		return version == that.version &&
-				deprecated == that.deprecated &&
+		return deprecated == that.deprecated &&
 				Objects.equals(project_id, that.project_id) &&
 				Objects.equals(dataset_id, that.dataset_id) &&
-				Objects.equals(id, that.id) &&
-				Objects.equals(algorithm, that.algorithm);
+				Objects.equals(id, that.id);
 	}
 
 }

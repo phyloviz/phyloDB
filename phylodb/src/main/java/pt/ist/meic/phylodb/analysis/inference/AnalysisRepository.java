@@ -7,7 +7,7 @@ import pt.ist.meic.phylodb.analysis.inference.model.Analysis;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.AlgorithmsRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Repository
-public class AnalysisRepository extends EntityRepository<Analysis, Analysis.PrimaryKey> {
+public class AnalysisRepository extends AlgorithmsRepository<Analysis, Analysis.PrimaryKey> {
 
 	protected AnalysisRepository(Session session) {
 		super(session);
@@ -38,7 +38,7 @@ public class AnalysisRepository extends EntityRepository<Analysis, Analysis.Prim
 	}
 
 	@Override
-	protected Result get(Analysis.PrimaryKey key, long ignored) {
+	protected Result get(Analysis.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
 				"RETURN pj.id as projectId, ds.id as datasetId, d.id as id, d.deprecated as deprecated, d.algorithm\n" +
@@ -60,9 +60,8 @@ public class AnalysisRepository extends EntityRepository<Analysis, Analysis.Prim
 		return new Analysis(projectId,
 				datasetId,
 				UUID.fromString(row.get("id").toString()),
-				1,
-				(boolean) row.get("deprecated"),
 				InferenceAlgorithm.valueOf(row.get("algorithm").toString()),
+				(boolean) row.get("deprecated"),
 				list
 		);
 	}
@@ -71,7 +70,8 @@ public class AnalysisRepository extends EntityRepository<Analysis, Analysis.Prim
 	protected boolean isPresent(Analysis.PrimaryKey key) {
 		String statement = "OPTIONAL MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"OPTIONAL MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"RETURN COALESCE(d.deprecated = false, false)";
+				"WITH d.deprecated as deprecated, collect(d) as ignored\n" +
+				"RETURN COALESCE(deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 

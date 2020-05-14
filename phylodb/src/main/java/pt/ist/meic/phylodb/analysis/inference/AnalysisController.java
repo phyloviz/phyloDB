@@ -41,13 +41,12 @@ public class AnalysisController extends Controller<Analysis> {
 	public ResponseEntity<?> getAnalysis(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("analysis") String analysis,
-			@RequestParam("algorithm") String algorithm,
+			@PathVariable("analysis") UUID analysisId,
 			@RequestParam(value = "format", defaultValue = TreeFormatter.NEWICK) String format
 	) {
 		if(!format.equals(TreeFormatter.NEWICK) && !format.equals(TreeFormatter.NEXUS))
 			return new ErrorOutputModel(Problem.BAD_REQUEST).toResponseEntity();
-		return get(() -> service.getAnalysis(projectId, datasetId, analysis, algorithm),
+		return get(() -> service.getAnalysis(projectId, datasetId, analysisId),
 				a -> new GetAnalysisOutputModel(a, format),
 				() -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
@@ -70,9 +69,9 @@ public class AnalysisController extends Controller<Analysis> {
 	public ResponseEntity<?> deleteAnalysis(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("analysis") String analysis
+			@PathVariable("analysis") UUID analysisId
 	) {
-		return status(() -> service.deleteAnalysis(projectId, datasetId, analysis));
+		return status(() -> service.deleteAnalysis(projectId, datasetId, analysisId));
 	}
 
 }

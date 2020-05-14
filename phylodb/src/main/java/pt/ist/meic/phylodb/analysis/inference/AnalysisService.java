@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.analysis.inference;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.meic.phylodb.analysis.inference.model.Analysis;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
@@ -12,7 +13,6 @@ import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.io.IOException;
@@ -38,17 +38,17 @@ public class AnalysisService {
 		this.analysisRepository = analysisRepository;
 	}
 
+	@Transactional(readOnly = true)
 	public Optional<List<Analysis>> getAnalyses(UUID projectId, UUID datasetId, int page, int limit) {
 		return analysisRepository.findAll(page, limit, projectId, datasetId);
 	}
 
-	public Optional<Analysis> getAnalysis(UUID projectId, UUID datasetId, UUID id, String algorithm) {
-
-		return InferenceAlgorithm.exists(algorithm) ?
-				analysisRepository.find(new Analysis.PrimaryKey(projectId, datasetId, id, InferenceAlgorithm.valueOf(algorithm)), EntityRepository.CURRENT_VERSION_VALUE) :
-				Optional.empty();
+	@Transactional(readOnly = true)
+	public Optional<Analysis> getAnalysis(UUID projectId, UUID datasetId, UUID id) {
+		return analysisRepository.find(new Analysis.PrimaryKey(projectId, datasetId, id));
 	}
 
+	@Transactional
 	public Optional<UUID> saveAnalysis(UUID projectId, UUID datasetId, String algorithm, String format, MultipartFile file) throws IOException {
 		TreeFormatter formatter;
 		if(!InferenceAlgorithm.exists(algorithm) || (formatter = TreeFormatter.get(format)) == null ||
@@ -69,8 +69,9 @@ public class AnalysisService {
 		return Optional.of(id);
 	}
 
-	public boolean deleteAnalysis(UUID projectId, UUID datasetId, UUID id, String algorithm) {
-		return InferenceAlgorithm.exists(algorithm) && analysisRepository.remove(new Analysis.PrimaryKey(projectId, datasetId, id, InferenceAlgorithm.valueOf(algorithm)));
+	@Transactional
+	public boolean deleteAnalysis(UUID projectId, UUID datasetId, UUID id) {
+		return analysisRepository.remove(new Analysis.PrimaryKey(projectId, datasetId, id));
 	}
 
 }
