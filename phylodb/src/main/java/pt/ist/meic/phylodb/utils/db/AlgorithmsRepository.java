@@ -7,20 +7,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class EntityRepository<E, K> extends Repository<E, K> {
+public abstract class AlgorithmsRepository<E, K> extends Repository<E, K> {
 
-	public static final long CURRENT_VERSION_VALUE = -1;
-	public static final String CURRENT_VERSION = "" + CURRENT_VERSION_VALUE;
-
-	protected EntityRepository(Session session) {
+	protected AlgorithmsRepository(Session session) {
 		super(session);
 	}
 
-	protected abstract Result get(K key, long version);
+	protected abstract Result get(K key);
 
-	public Optional<E> find(K key, long version) {
+	public Optional<E> find(K key) {
 		if (key == null) return Optional.empty();
-		Result result = get(key, version);
+		Result result = get(key);
 		if (result == null) return Optional.empty();
 		Iterator<Map<String, Object>> it = result.iterator();
 		return !it.hasNext() ? Optional.empty() : Optional.of(parse(it.next()));

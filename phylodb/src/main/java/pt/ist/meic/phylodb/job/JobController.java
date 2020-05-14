@@ -15,27 +15,27 @@ public class JobController {
 		this.service = service;
 	}
 
-	@GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity getJobs() {
+	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getJobs() {
 		return null;
 	}
 
 	@GetMapping(path = "/{job}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity getJob(
+	public ResponseEntity<?> getJob(
 			@PathVariable("job") String job
 	) {
 		return null;
 	}
 
 	@PostMapping(path = "")
-	public ResponseEntity postJob(
+	public ResponseEntity<?> postJob(
 			@RequestBody JobInputModel job
 	) {
 		return null;
 	}
 
 	@DeleteMapping(path = "/{job}")
-	public ResponseEntity deleteJob(
+	public ResponseEntity<?> deleteJob(
 			@PathVariable("job") String schemaId
 	) {
 		return null;

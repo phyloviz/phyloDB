@@ -1,23 +1,21 @@
 package pt.ist.meic.phylodb.analysis.visualization.model;
 
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
+import pt.ist.meic.phylodb.typing.profile.model.Profile;
 
-@NodeEntity(label = "Coordinate")
 public class Coordinate {
 
-	@Id
-	@GeneratedValue
-	private Long id;
+	private final Profile.PrimaryKey profileId;
+	private final int x;
+	private final int y;
 
-	@Property(name = "x")
-	private int x;
-	@Property(name = "y")
-	private int y;
+	public Coordinate(Profile.PrimaryKey profileId, int x, int y) {
+		this.profileId = profileId;
+		this.x = x;
+		this.y = y;
+	}
 
-	public Coordinate() {
+	public Profile.PrimaryKey getProfileId() {
+		return profileId;
 	}
 
 	public int getX() {

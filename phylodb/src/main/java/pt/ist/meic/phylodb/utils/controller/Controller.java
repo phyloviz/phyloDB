@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class Controller<T extends Entity<?>> {
+public abstract class Controller<T> {
 
 	@Value("${application.limits.pagination.json}")
 	protected String jsonLimit;
