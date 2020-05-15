@@ -13,7 +13,6 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.isolate.model.GetIsolateOutputModel;
 import pt.ist.meic.phylodb.typing.isolate.model.GetIsolatesOutputModel;
-import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.isolate.model.IsolateInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
@@ -24,7 +23,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("projects/{project}/datasets/{dataset}/isolates")
-public class IsolateController extends Controller<Isolate> {
+public class IsolateController extends Controller {
 
 	private IsolateService service;
 

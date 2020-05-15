@@ -9,7 +9,6 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.io.output.FileOutputModel;
-import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.GetAlleleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.GetAllelesOutputModel;
@@ -25,7 +24,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
-public class AlleleController extends Controller<Allele> {
+public class AlleleController extends Controller {
 
 	@Value("${application.limits.files.fasta.line}")
 	private String lineLength;

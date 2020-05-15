@@ -13,7 +13,6 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.profile.model.GetProfileOutputModel;
 import pt.ist.meic.phylodb.typing.profile.model.GetProfilesOutputModel;
-import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.profile.model.ProfileInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
@@ -24,7 +23,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController("SequenceTypeController")
 @RequestMapping("projects/{project}/datasets/{dataset}/profiles")
-public class ProfileController extends Controller<Profile> {
+public class ProfileController extends Controller {
 
 	private ProfileService service;
 

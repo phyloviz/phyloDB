@@ -7,7 +7,6 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.phylogeny.locus.model.GetLociOutputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.GetLocusOutputModel;
-import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
@@ -18,7 +17,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci")
-public class LocusController extends Controller<Locus> {
+public class LocusController extends Controller {
 	private LocusService service;
 
 	public LocusController(LocusService service) {

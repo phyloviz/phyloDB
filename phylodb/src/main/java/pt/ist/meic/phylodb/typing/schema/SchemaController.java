@@ -10,7 +10,6 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.typing.schema.model.GetSchemaOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.GetSchemasOutputModel;
-import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
@@ -18,7 +17,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/schemas")
-public class SchemaController extends Controller<Schema> {
+public class SchemaController extends Controller {
 
 	private SchemaService service;
 

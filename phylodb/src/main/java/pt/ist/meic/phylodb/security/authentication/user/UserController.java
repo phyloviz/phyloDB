@@ -7,7 +7,6 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.authentication.user.model.GetUserOutputModel;
 import pt.ist.meic.phylodb.security.authentication.user.model.GetUsersOutputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authentication.user.model.UserInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
@@ -18,7 +17,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/users")
-public class UserController extends Controller<User> {
+public class UserController extends Controller {
 
 	private UserService service;
 

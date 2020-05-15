@@ -8,7 +8,6 @@ import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetOutputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetsOutputModel;
@@ -20,7 +19,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("projects/{project}/datasets")
-public class DatasetController extends Controller<Dataset> {
+public class DatasetController extends Controller {
 
 	private DatasetService service;
 

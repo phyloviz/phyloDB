@@ -12,7 +12,6 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectOutputModel;
 import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectsOutputModel;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.security.authorization.project.model.ProjectInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 import pt.ist.meic.phylodb.utils.service.Entity;
@@ -24,7 +23,7 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/projects")
-public class ProjectController extends Controller<Project> {
+public class ProjectController extends Controller {
 
 	private ProjectService service;
 
@@ -77,9 +76,9 @@ public class ProjectController extends Controller<Project> {
 	@Authorized(role = Role.USER, permission = Operation.WRITE)
 	@DeleteMapping(path = "/{project}")
 	public ResponseEntity<?> deleteProject(
-			@PathVariable("project") String projectId
+			@PathVariable("project") UUID projectId
 	) {
-		return status(() -> service.deleteProject(UUID.fromString(projectId)));
+		return status(() -> service.deleteProject(projectId));
 	}
 
 }

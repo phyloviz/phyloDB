@@ -7,7 +7,6 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
@@ -16,7 +15,7 @@ import pt.ist.meic.phylodb.utils.controller.Controller;
 
 @RestController
 @RequestMapping("/taxons")
-public class TaxonController extends Controller<Taxon> {
+public class TaxonController extends Controller {
 
 	private TaxonService service;
 

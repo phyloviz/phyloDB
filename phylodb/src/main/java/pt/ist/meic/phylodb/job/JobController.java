@@ -3,11 +3,20 @@ package pt.ist.meic.phylodb.job;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.ist.meic.phylodb.error.ErrorOutputModel;
+import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
+import pt.ist.meic.phylodb.job.model.GetJobsOutputModel;
 import pt.ist.meic.phylodb.job.model.JobInputModel;
+import pt.ist.meic.phylodb.job.model.JobRequest;
+import pt.ist.meic.phylodb.utils.controller.Controller;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/jobs")
-public class JobController {
+@RequestMapping("projects/{project}/jobs")
+public class JobController extends Controller {
 
 	private JobService service;
 
@@ -16,29 +25,34 @@ public class JobController {
 	}
 
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getJobs() {
-		return null;
-	}
-
-	@GetMapping(path = "/{job}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getJob(
-			@PathVariable("job") String job
+	public ResponseEntity<?> getJobs(
+			@PathVariable("project") UUID projectId,
+			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		return null;
+		String type = MediaType.APPLICATION_JSON_VALUE;
+		return getAll(type, l -> service.getJobs(projectId, page, l), GetJobsOutputModel::new, null);
 	}
 
 	@PostMapping(path = "")
 	public ResponseEntity<?> postJob(
-			@RequestBody JobInputModel job
+			@PathVariable("project") UUID projectId,
+			@RequestBody JobInputModel inputModel
 	) {
-		return null;
+		Optional<JobRequest> jobRequest = inputModel.toDomainEntity();
+		if(!jobRequest.isPresent())
+			return new ErrorOutputModel(Problem.BAD_REQUEST).toResponseEntity();
+		Optional<UUID> optional = service.createJob(projectId, jobRequest.get());
+		return optional.isPresent() ?
+				new CreatedOutputModel(optional.get()).toResponseEntity() :
+				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}
 
 	@DeleteMapping(path = "/{job}")
 	public ResponseEntity<?> deleteJob(
-			@PathVariable("job") String schemaId
+			@PathVariable("project") UUID projectId,
+			@PathVariable("job") UUID jobId
 	) {
-		return null;
+		return status(() -> service.deleteJob(projectId, jobId));
 	}
 
 }

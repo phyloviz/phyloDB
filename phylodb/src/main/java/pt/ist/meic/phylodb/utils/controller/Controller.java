@@ -10,7 +10,6 @@ import pt.ist.meic.phylodb.io.output.BatchOutputModel;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -18,7 +17,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class Controller<T> {
+public abstract class Controller {
 
 	@Value("${application.limits.pagination.json}")
 	protected String jsonLimit;
@@ -43,11 +42,11 @@ public abstract class Controller<T> {
 		return execute(input, map, error);
 	}
 
-	protected ResponseEntity<?> put(Supplier<Optional<T>> input, Function<T, Boolean> map) {
+	protected <R> ResponseEntity<?> put(Supplier<Optional<R>> input, Function<R, Boolean> map) {
 		return execute(input, o -> output(map.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
-	protected ResponseEntity<?> post(Supplier<Optional<T>> input, Function<T, Boolean> map, Function<T, UUID> id) {
+	protected <R> ResponseEntity<?> post(Supplier<Optional<R>> input, Function<R, Boolean> map, Function<R, UUID> id) {
 		return execute(input, o -> output(map.apply(o), id.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
