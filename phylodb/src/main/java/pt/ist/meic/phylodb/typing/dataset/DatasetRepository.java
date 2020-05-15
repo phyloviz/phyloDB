@@ -29,7 +29,7 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 				"WITH p, d, r1, dd, h, s, t, collect(l) as loci\n" +
 				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version, " +
 				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
-				"ORDER BY p.id, d.id SKIP $ LIMIT $";
+				"ORDER BY p.id, size(d.id), d.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
 

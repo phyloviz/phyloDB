@@ -28,7 +28,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 				"WHERE t.deprecated = false AND l.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
 				"l.name as name, ld.description as description\n" +
-				"ORDER BY t.id, l.id SKIP $ LIMIT $";
+				"ORDER BY t.id, size(l.id), l.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
 

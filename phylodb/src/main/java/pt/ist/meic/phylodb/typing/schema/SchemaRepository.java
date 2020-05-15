@@ -35,7 +35,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				"WITH t, s, r, sd, collect(DISTINCT {taxon: t.id, id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
 				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version, " +
 				"sd.description as description, lociIds\n" +
-				"ORDER BY t.id, s.id SKIP $ LIMIT $";
+				"ORDER BY t.id, size(s.id), s.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
 

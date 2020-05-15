@@ -25,8 +25,9 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 	protected Result getAll(int page, int limit, Object... filters) {
 		String statement = "CALL apoc.periodic.list() YIELD name, done, cancelled\n" +
 				"WHERE name STARTS WITH $\n" +
-				"RETURN name as name, done as completed, cancelled as cancelled";
-		return query(new Query(statement, filters[0]));
+				"RETURN name as name, done as completed, cancelled as cancelled\n" +
+				"ORDER BY size(name), name SKIP $ LIMIT $";
+		return query(new Query(statement, filters[0], page, limit));
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 				"WHERE {id: $, provider: $} IN users OR pd.type = \"public\"\n" +
 				"RETURN p.id as id, p.deprecated as deprecated, r.version as version,\n" +
 				"pd.name as name, pd.type as type, pd.description as description, users as users\n" +
-				"ORDER BY p.id SKIP $ LIMIT $";
+				"ORDER BY size(p.id), p.id SKIP $ LIMIT $";
 		return query(new Query(statement, id.getId(), id.getProvider(), page, limit));
 	}
 

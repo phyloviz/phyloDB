@@ -22,7 +22,7 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 				"WHERE t.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"RETURN t.id as id, t.deprecated as deprecated, r.version as version,\n" +
 				"t.name as name, td.description as description\n" +
-				"ORDER BY t.id SKIP $ LIMIT $";
+				"ORDER BY size(t.id), t.id SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
 	}
 

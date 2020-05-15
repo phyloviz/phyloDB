@@ -27,7 +27,7 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 				"WHERE u.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
 				"ud.role as role\n" +
-				"ORDER BY u.id, u.provider SKIP $ LIMIT $";
+				"ORDER BY size(u.id), u.id, size(u.provider), u.provider SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
 	}
 
