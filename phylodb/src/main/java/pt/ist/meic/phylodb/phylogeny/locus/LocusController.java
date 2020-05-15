@@ -42,7 +42,7 @@ public class LocusController extends Controller {
 		return get(() -> service.getLocus(taxonId, locusId, version), GetLocusOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@PutMapping(path = "/{locus}")
 	public ResponseEntity<?> putLocus(
 			@PathVariable("taxon") String taxonId,
@@ -52,7 +52,7 @@ public class LocusController extends Controller {
 		return put(() -> input.toDomainEntity(taxonId, locusId), service::saveLocus);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{locus}")
 	public ResponseEntity<?> deleteLocus(
 			@PathVariable("taxon") String taxonId,

@@ -9,9 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Authorized {
 
+	Activity activity() default Activity.MANAGEMENT;
+
 	Role role();
 
-	Operation permission();
+	Operation operation();
 
 	boolean required() default true;
 

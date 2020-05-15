@@ -27,7 +27,7 @@ public class DatasetController extends Controller {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getDatasets(
 			@PathVariable("project") UUID projectId,
@@ -37,7 +37,7 @@ public class DatasetController extends Controller {
 		return getAll(type, l -> service.getDatasets(projectId, page, l), GetDatasetsOutputModel::new, null);
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{dataset}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getDataset(
 			@PathVariable("project") UUID projectId,
@@ -47,7 +47,7 @@ public class DatasetController extends Controller {
 		return get(() -> service.getDataset(projectId, datasetId, version), GetDatasetOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postDataset(
 			@PathVariable("project") UUID projectId,
@@ -56,7 +56,7 @@ public class DatasetController extends Controller {
 		return post(() -> input.toDomainEntity(projectId.toString()), service::saveDataset, d -> d.getPrimaryKey().getId());
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{dataset}")
 	public ResponseEntity<?> putDataset(
 			@PathVariable("project") UUID projectId,
@@ -66,7 +66,7 @@ public class DatasetController extends Controller {
 		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString()), service::saveDataset);
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{dataset}")
 	public ResponseEntity<?> deleteDataset(
 			@PathVariable("project") UUID projectId,

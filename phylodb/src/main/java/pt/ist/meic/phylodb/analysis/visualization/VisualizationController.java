@@ -7,6 +7,9 @@ import pt.ist.meic.phylodb.analysis.visualization.model.GetVisualizationOutputMo
 import pt.ist.meic.phylodb.analysis.visualization.model.GetVisualizationsOutputModel;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
+import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Operation;
+import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.util.UUID;
@@ -21,6 +24,7 @@ public class VisualizationController extends Controller {
 		this.service = service;
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getVisualizations(
 			@PathVariable("project") UUID projectId,
@@ -32,6 +36,7 @@ public class VisualizationController extends Controller {
 		return getAll(type, l -> service.getVisualizations(projectId, datasetId, analysisId, page, l), GetVisualizationsOutputModel::new, null);
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{visualization}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getVisualization(
 			@PathVariable("project") UUID projectId,
@@ -44,6 +49,7 @@ public class VisualizationController extends Controller {
 				() -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{visualization}")
 	public ResponseEntity<?> deleteVisualization(
 			@PathVariable("project") UUID projectId,

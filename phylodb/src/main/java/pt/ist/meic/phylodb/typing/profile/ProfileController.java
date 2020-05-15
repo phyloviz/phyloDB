@@ -31,7 +31,7 @@ public class ProfileController extends Controller {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getProfiles(
 			@PathVariable("project") UUID projectId,
@@ -44,7 +44,7 @@ public class ProfileController extends Controller {
 				p -> new FileOutputModel(ProfilesFormatter.get(p.getKey().getType().getName()).format(p.getValue(), p.getKey())));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{profile}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProfile(
 			@PathVariable("project") UUID projectId,
@@ -55,7 +55,7 @@ public class ProfileController extends Controller {
 		return get(() -> service.getProfile(projectId, datasetId, profileId, version), GetProfileOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{profile}")
 	public ResponseEntity<?> putProfile(
 			@PathVariable("project") UUID projectId,
@@ -67,7 +67,7 @@ public class ProfileController extends Controller {
 		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), profileId), p -> service.saveProfile(p, authorized));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postProfiles(
 			@PathVariable("project") UUID projectId,
@@ -78,7 +78,7 @@ public class ProfileController extends Controller {
 		return fileStatus(() -> service.saveProfilesOnConflictSkip(projectId, datasetId, authorized, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putProfiles(
 			@PathVariable("project") UUID projectId,
@@ -89,7 +89,7 @@ public class ProfileController extends Controller {
 		return fileStatus(() -> service.saveProfilesOnConflictUpdate(projectId, datasetId, authorized, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{profile}")
 	public ResponseEntity<?> deleteProfile(
 			@PathVariable("project") UUID projectId,

@@ -35,7 +35,7 @@ public class AlleleController extends Controller {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ, required = false)
+	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getAlleles(
 			@PathVariable("taxon") String taxonId,
@@ -49,7 +49,7 @@ public class AlleleController extends Controller {
 				(a) -> new FileOutputModel(new FastaFormatter().format(a, Integer.parseInt(lineLength))));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ, required = false)
+	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
 	@GetMapping(path = "/{allele}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getAllele(
 			@PathVariable("taxon") String taxonId,
@@ -61,7 +61,7 @@ public class AlleleController extends Controller {
 		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), GetAlleleOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{allele}")
 	public ResponseEntity<?> saveAllele(
 			@PathVariable("taxon") String taxonId,
@@ -73,7 +73,7 @@ public class AlleleController extends Controller {
 		return put(() -> input.toDomainEntity(taxonId, locusId, alleleId, project), service::saveAllele);
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> postAlleles(
 			@PathVariable("taxon") String taxonId,
@@ -85,7 +85,7 @@ public class AlleleController extends Controller {
 		return fileStatus(() -> service.saveAllelesOnConflictSkip(taxonId, locusId, project, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> putAlleles(
 			@PathVariable("taxon") String taxonId,
@@ -97,7 +97,7 @@ public class AlleleController extends Controller {
 		return fileStatus(() -> service.saveAllelesOnConflictUpdate(taxonId, locusId, project, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{allele}")
 	public ResponseEntity<?> deleteAllele(
 			@PathVariable("taxon") String taxonId,

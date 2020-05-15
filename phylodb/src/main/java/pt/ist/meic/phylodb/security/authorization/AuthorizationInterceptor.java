@@ -35,20 +35,24 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 		Authorized annotation = ((HandlerMethod) handler).getMethodAnnotation(Authorized.class);
 		if (annotation == null || req.getAttribute(ROLE).equals(Role.ADMIN))
 			return true;
-		Operation operation = annotation.permission();
+		Operation operation = annotation.operation();
 		String userId = req.getAttribute(ID).toString();
 		String provider = req.getAttribute(PROVIDER).toString();
 		Map<String, Object> pathVariables = (Map<String, Object>) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		Object projectId = pathVariables.getOrDefault(PROJECT, req.getParameter(PROJECT));
 		if (projectId != null) {
-			Optional<Project> optionalProject = projectService.getProject(UUID.fromString(projectId.toString()), CURRENT_VERSION_VALUE);
-			if (optionalProject.isPresent()) {
-				Project project = optionalProject.get();
-				boolean included = Arrays.stream(project.getUsers()).anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
-				if (annotation.role().equals(Role.USER) &&
-						((operation == Operation.WRITE && included) ||
-								(operation == Operation.READ && (included || project.getType().equals("public")))))
-					return true;
+			if(annotation.role() == Role.USER) {
+				Optional<Project> optional = projectService.getProject(UUID.fromString(projectId.toString()), CURRENT_VERSION_VALUE);
+				if (optional.isPresent()) {
+					Project project = optional.get();
+					boolean included = Arrays.stream(project.getUsers())
+							.anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
+					if(annotation.activity() == Activity.MANAGEMENT && ((operation == Operation.WRITE && included) ||
+							(operation == Operation.READ && (included || project.getType().equals("public")))))
+						return true;
+					else if (included || project.getType().equals("public"))
+						return true;
+				}
 			}
 		} else if (!annotation.required())
 			return true;

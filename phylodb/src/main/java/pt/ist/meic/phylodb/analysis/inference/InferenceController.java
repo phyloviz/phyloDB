@@ -10,6 +10,9 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
+import pt.ist.meic.phylodb.security.authorization.Authorized;
+import pt.ist.meic.phylodb.security.authorization.Operation;
+import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
@@ -26,6 +29,7 @@ public class InferenceController extends Controller {
 		this.service = service;
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getAnalyses(
 			@PathVariable("project") UUID projectId,
@@ -36,6 +40,7 @@ public class InferenceController extends Controller {
 		return getAll(type, l -> service.getAnalyses(projectId, datasetId, page, l), GetInferencesOutputModel::new, null);
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{analysis}", produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<?> getAnalysis(
 			@PathVariable("project") UUID projectId,
@@ -50,6 +55,7 @@ public class InferenceController extends Controller {
 				() -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postAnalysis(
 			@PathVariable("project") UUID projectId,
@@ -64,6 +70,7 @@ public class InferenceController extends Controller {
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}
 
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{analysis}")
 	public ResponseEntity<?> deleteAnalysis(
 			@PathVariable("project") UUID projectId,

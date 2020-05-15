@@ -31,7 +31,7 @@ public class IsolateController extends Controller {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getIsolates(
 			@PathVariable("project") UUID projectId,
@@ -44,7 +44,7 @@ public class IsolateController extends Controller {
 				(i) -> new FileOutputModel(new IsolatesFormatter().format(i)));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{isolate}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolate(
 			@PathVariable("project") UUID projectId,
@@ -55,7 +55,7 @@ public class IsolateController extends Controller {
 		return get(() -> service.getIsolate(projectId, datasetId, isolateId, version), GetIsolateOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{isolate}")
 	public ResponseEntity<?> putIsolate(
 			@PathVariable("project") UUID projectId,
@@ -66,7 +66,7 @@ public class IsolateController extends Controller {
 		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), isolateId), service::saveIsolate);
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postIsolates(
 			@PathVariable("project") UUID projectId,
@@ -77,7 +77,7 @@ public class IsolateController extends Controller {
 		return fileStatus(() -> service.saveIsolatesOnConflictSkip(projectId, datasetId, id, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putIsolates(
 			@PathVariable("project") UUID projectId,
@@ -89,7 +89,7 @@ public class IsolateController extends Controller {
 		return fileStatus(() -> service.saveIsolatesOnConflictUpdate(projectId, datasetId, id, file));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{isolate}")
 	public ResponseEntity<?> deleteIsolate(
 			@PathVariable("project") UUID projectId,

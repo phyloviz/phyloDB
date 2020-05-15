@@ -43,7 +43,7 @@ public class SchemaController extends Controller {
 		return get(() -> service.getSchema(taxonId, schemaId, version), GetSchemaOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@PutMapping(path = "/{schema}")
 	public ResponseEntity<?> putSchema(
 			@PathVariable("taxon") String taxonId,
@@ -53,7 +53,7 @@ public class SchemaController extends Controller {
 		return put(() -> input.toDomainEntity(taxonId, schemaId), service::saveSchema);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{schema}")
 	public ResponseEntity<?> deleteSchema(
 			@PathVariable("taxon") String taxonId,

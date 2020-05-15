@@ -42,7 +42,7 @@ public class ProjectController extends Controller {
 		return getAll(type, l -> service.getProjects(new User.PrimaryKey(userId, provider), page, l), GetProjectsOutputModel::new, null);
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.READ)
+	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{project}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProject(
 			@PathVariable("project") UUID projectId,
@@ -61,7 +61,7 @@ public class ProjectController extends Controller {
 		return post(input::toDomainEntity, p -> service.saveProject(p, new User.PrimaryKey(userId, provider)), Entity::getPrimaryKey);
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{project}")
 	public ResponseEntity<?> putProject(
 			@PathVariable("project") UUID projectId,
@@ -73,7 +73,7 @@ public class ProjectController extends Controller {
 		return put(() -> input.toDomainEntity(projectId.toString()), (p) -> service.saveProject(p, new User.PrimaryKey(userId, provider)));
 	}
 
-	@Authorized(role = Role.USER, permission = Operation.WRITE)
+	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{project}")
 	public ResponseEntity<?> deleteProject(
 			@PathVariable("project") UUID projectId

@@ -39,7 +39,7 @@ public class TaxonController extends Controller {
 		return get(() -> service.getTaxon(taxonId, version), GetTaxonOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@PutMapping(path = "/{taxon}")
 	public ResponseEntity<?> saveTaxon(
 			@PathVariable("taxon") String taxonId,
@@ -48,7 +48,7 @@ public class TaxonController extends Controller {
 		return put(() -> input.toDomainEntity(taxonId), service::saveTaxon);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{taxon}")
 	public ResponseEntity<?> deleteTaxon(
 			@PathVariable("taxon") String taxonId

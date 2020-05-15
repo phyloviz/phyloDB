@@ -40,7 +40,7 @@ public class UserController extends Controller {
 		return get(() -> service.getUser(userId, provider, version), GetUserOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@PutMapping(path = "/{user}")
 	public ResponseEntity<?> putUser(
 			@PathVariable("user") String userId,
@@ -50,7 +50,7 @@ public class UserController extends Controller {
 		return put(() -> input.toDomainEntity(userId, provider), service::updateUser);
 	}
 
-	@Authorized(role = Role.ADMIN, permission = Operation.WRITE)
+	@Authorized(role = Role.ADMIN, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{user}")
 	public ResponseEntity<?> deleteUser(
 			@PathVariable("user") String userId,
