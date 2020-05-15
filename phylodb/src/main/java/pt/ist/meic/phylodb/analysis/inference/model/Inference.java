@@ -5,21 +5,21 @@ import java.util.Objects;
 import java.util.UUID;
 
 
-public class Analysis {
+public class Inference {
 
 	private final PrimaryKey primaryKey;
 	private final boolean deprecated;
 	private final InferenceAlgorithm algorithm;
 	private final List<Edge> edges;
 
-	public Analysis(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, boolean deprecated, List<Edge> edges) {
+	public Inference(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, boolean deprecated, List<Edge> edges) {
 		this.primaryKey = new PrimaryKey(projectId, datasetId, id);
 		this.deprecated = deprecated;
 		this.algorithm = algorithm;
 		this.edges = edges;
 	}
 
-	public Analysis(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, List<Edge> edges) {
+	public Inference(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, List<Edge> edges) {
 		this(projectId, datasetId, id, algorithm, false, edges);
 	}
 
@@ -43,7 +43,7 @@ public class Analysis {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		Analysis analysis = (Analysis) o;
+		Inference analysis = (Inference) o;
 		return deprecated == analysis.deprecated &&
 				Objects.equals(primaryKey, analysis.primaryKey) &&
 				algorithm == analysis.algorithm &&

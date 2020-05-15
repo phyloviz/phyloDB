@@ -9,17 +9,17 @@ import java.util.stream.Collectors;
 
 public class GetVisualizationsOutputModel implements OutputModel {
 
-	private final List<VisualizationOutputModel> entities;
+	private final List<VisualizationOutputModel> visualizations;
 
 	public GetVisualizationsOutputModel(List<Visualization> entities) {
-		this.entities = entities.stream()
+		this.visualizations = entities.stream()
 				.map(VisualizationOutputModel::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public ResponseEntity<List<VisualizationOutputModel>> toResponseEntity() {
-		return ResponseEntity.status(HttpStatus.OK).body(entities);
+		return ResponseEntity.status(HttpStatus.OK).body(visualizations);
 	}
 
 }

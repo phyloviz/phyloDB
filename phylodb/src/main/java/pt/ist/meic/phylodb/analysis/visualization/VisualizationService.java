@@ -2,7 +2,6 @@ package pt.ist.meic.phylodb.analysis.visualization;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.analysis.inference.AnalysisRepository;
 import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
 
 import java.util.List;

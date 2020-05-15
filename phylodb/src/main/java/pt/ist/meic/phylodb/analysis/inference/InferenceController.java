@@ -4,9 +4,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pt.ist.meic.phylodb.analysis.inference.model.Analysis;
-import pt.ist.meic.phylodb.analysis.inference.model.GetAnalysesOutputModel;
-import pt.ist.meic.phylodb.analysis.inference.model.GetAnalysisOutputModel;
+import pt.ist.meic.phylodb.analysis.inference.model.GetInferencesOutputModel;
+import pt.ist.meic.phylodb.analysis.inference.model.GetInferenceOutputModel;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
@@ -19,11 +18,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("projects/{project}/datasets/{dataset}/analyses")
-public class AnalysisController extends Controller<Analysis> {
+public class InferenceController extends Controller {
 
-	private AnalysisService service;
+	private InferenceService service;
 
-	public AnalysisController(AnalysisService service) {
+	public InferenceController(InferenceService service) {
 		this.service = service;
 	}
 
@@ -34,7 +33,7 @@ public class AnalysisController extends Controller<Analysis> {
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getAnalyses(projectId, datasetId, page, l), GetAnalysesOutputModel::new, null);
+		return getAll(type, l -> service.getAnalyses(projectId, datasetId, page, l), GetInferencesOutputModel::new, null);
 	}
 
 	@GetMapping(path = "/{analysis}", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -47,7 +46,7 @@ public class AnalysisController extends Controller<Analysis> {
 		if(!format.equals(TreeFormatter.NEWICK) && !format.equals(TreeFormatter.NEXUS))
 			return new ErrorOutputModel(Problem.BAD_REQUEST).toResponseEntity();
 		return get(() -> service.getAnalysis(projectId, datasetId, analysisId),
-				a -> new GetAnalysisOutputModel(a, format),
+				a -> new GetInferenceOutputModel(a, format),
 				() -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
@@ -60,7 +59,7 @@ public class AnalysisController extends Controller<Analysis> {
 			@RequestParam("file") MultipartFile file
 	) throws IOException {
 		Optional<UUID> optional = service.saveAnalysis(projectId, datasetId, algorithm, format, file);
-		return  optional.isPresent() ?
+		return optional.isPresent() ?
 				new CreatedOutputModel(optional.get()).toResponseEntity() :
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}

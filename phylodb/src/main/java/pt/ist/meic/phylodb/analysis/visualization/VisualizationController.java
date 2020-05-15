@@ -3,10 +3,8 @@ package pt.ist.meic.phylodb.analysis.visualization;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pt.ist.meic.phylodb.analysis.inference.model.GetAnalysesOutputModel;
 import pt.ist.meic.phylodb.analysis.visualization.model.GetVisualizationOutputModel;
 import pt.ist.meic.phylodb.analysis.visualization.model.GetVisualizationsOutputModel;
-import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.utils.controller.Controller;
@@ -15,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("projects/{project}/datasets/{dataset}/analyses/{analysis}/visualizations")
-public class VisualizationController extends Controller<Visualization> {
+public class VisualizationController extends Controller {
 
 	private VisualizationService service;
 
@@ -24,7 +22,7 @@ public class VisualizationController extends Controller<Visualization> {
 	}
 
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity getVisualizations(
+	public ResponseEntity<?> getVisualizations(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("analysis") UUID analysisId,
@@ -35,7 +33,7 @@ public class VisualizationController extends Controller<Visualization> {
 	}
 
 	@GetMapping(path = "/{visualization}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity getVisualization(
+	public ResponseEntity<?> getVisualization(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("analysis") UUID analysisId,
@@ -47,7 +45,7 @@ public class VisualizationController extends Controller<Visualization> {
 	}
 
 	@DeleteMapping(path = "/{visualization}")
-	public ResponseEntity deleteVisualization(
+	public ResponseEntity<?> deleteVisualization(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@PathVariable("analysis") UUID analysisId,

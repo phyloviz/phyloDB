@@ -7,17 +7,17 @@ import pt.ist.meic.phylodb.io.output.OutputModel;
 import java.util.Objects;
 import java.util.UUID;
 
-public class AnalysisOutputModel implements OutputModel {
+public class InferenceOutputModel implements OutputModel {
 
 	protected UUID project_id;
 	protected UUID dataset_id;
 	protected UUID id;
 	protected boolean deprecated;
 
-	public AnalysisOutputModel() {
+	public InferenceOutputModel() {
 	}
 
-	public AnalysisOutputModel(Analysis analysis) {
+	public InferenceOutputModel(Inference analysis) {
 		this.project_id = analysis.getPrimaryKey().getProjectId();
 		this.dataset_id = analysis.getPrimaryKey().getDatasetId();
 		this.id = analysis.getPrimaryKey().getId();
@@ -41,7 +41,7 @@ public class AnalysisOutputModel implements OutputModel {
 	}
 
 	@Override
-	public ResponseEntity<AnalysisOutputModel> toResponseEntity() {
+	public ResponseEntity<InferenceOutputModel> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(this);
 	}
 
@@ -49,7 +49,7 @@ public class AnalysisOutputModel implements OutputModel {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		AnalysisOutputModel that = (AnalysisOutputModel) o;
+		InferenceOutputModel that = (InferenceOutputModel) o;
 		return deprecated == that.deprecated &&
 				Objects.equals(project_id, that.project_id) &&
 				Objects.equals(dataset_id, that.dataset_id) &&

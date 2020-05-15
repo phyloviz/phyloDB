@@ -7,18 +7,18 @@ import pt.ist.meic.phylodb.io.output.OutputModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetAnalysesOutputModel implements OutputModel {
+public class GetInferencesOutputModel implements OutputModel {
 
-	private final List<AnalysisOutputModel> analyses;
+	private final List<InferenceOutputModel> analyses;
 
-	public GetAnalysesOutputModel(List<Analysis> analyses) {
+	public GetInferencesOutputModel(List<Inference> analyses) {
 		this.analyses = analyses.stream()
-				.map(AnalysisOutputModel::new)
+				.map(InferenceOutputModel::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<AnalysisOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<InferenceOutputModel>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(analyses);
 	}
 

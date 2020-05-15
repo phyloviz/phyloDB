@@ -4,15 +4,15 @@ import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 
 import java.util.Objects;
 
-public class GetAnalysisOutputModel extends AnalysisOutputModel {
+public class GetInferenceOutputModel extends InferenceOutputModel {
 
 	private String algorithm;
 	private String tree;
 
-	public GetAnalysisOutputModel() {
+	public GetInferenceOutputModel() {
 	}
 
-	public GetAnalysisOutputModel(Analysis analysis, String format) {
+	public GetInferenceOutputModel(Inference analysis, String format) {
 		super(analysis);
 		this.algorithm = analysis.getAlgorithm().getName();
 		this.tree = TreeFormatter.get(format).format(analysis.getEdges());
@@ -31,7 +31,7 @@ public class GetAnalysisOutputModel extends AnalysisOutputModel {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		if (!super.equals(o)) return false;
-		GetAnalysisOutputModel that = (GetAnalysisOutputModel) o;
+		GetInferenceOutputModel that = (GetInferenceOutputModel) o;
 		return Objects.equals(tree, that.tree);
 	}
 

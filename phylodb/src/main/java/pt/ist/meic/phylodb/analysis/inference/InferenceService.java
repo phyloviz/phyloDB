@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import pt.ist.meic.phylodb.analysis.inference.model.Analysis;
+import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
@@ -23,29 +23,29 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class AnalysisService {
+public class InferenceService {
 
 	@Value("${application.missing}")
 	private String missing;
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;
-	private AnalysisRepository analysisRepository;
+	private InferenceRepository analysisRepository;
 
-	public AnalysisService(DatasetRepository datasetRepository, ProfileRepository profileRepository, AnalysisRepository analysisRepository) {
+	public InferenceService(DatasetRepository datasetRepository, ProfileRepository profileRepository, InferenceRepository analysisRepository) {
 		this.datasetRepository = datasetRepository;
 		this.profileRepository = profileRepository;
 		this.analysisRepository = analysisRepository;
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Analysis>> getAnalyses(UUID projectId, UUID datasetId, int page, int limit) {
+	public Optional<List<Inference>> getAnalyses(UUID projectId, UUID datasetId, int page, int limit) {
 		return analysisRepository.findAll(page, limit, projectId, datasetId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Analysis> getAnalysis(UUID projectId, UUID datasetId, UUID id) {
-		return analysisRepository.find(new Analysis.PrimaryKey(projectId, datasetId, id));
+	public Optional<Inference> getAnalysis(UUID projectId, UUID datasetId, UUID id) {
+		return analysisRepository.find(new Inference.PrimaryKey(projectId, datasetId, id));
 	}
 
 	@Transactional
@@ -65,13 +65,13 @@ public class AnalysisService {
 		if(profileRepository.anyMissing(profiles))
 			return Optional.empty();
 		UUID id = UUID.randomUUID();
-		analysisRepository.save(new Analysis(projectId, datasetId, id, InferenceAlgorithm.valueOf(algorithm), edges));
+		analysisRepository.save(new Inference(projectId, datasetId, id, InferenceAlgorithm.valueOf(algorithm), edges));
 		return Optional.of(id);
 	}
 
 	@Transactional
 	public boolean deleteAnalysis(UUID projectId, UUID datasetId, UUID id) {
-		return analysisRepository.remove(new Analysis.PrimaryKey(projectId, datasetId, id));
+		return analysisRepository.remove(new Inference.PrimaryKey(projectId, datasetId, id));
 	}
 
 }
