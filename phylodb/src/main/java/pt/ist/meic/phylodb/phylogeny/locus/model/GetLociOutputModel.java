@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class GetLociOutputModel implements OutputModel {
 
-	private final List<LocusOutputModel> entities;
+	private final List<LocusOutputModel.Resumed> entities;
 
 	public GetLociOutputModel(List<Locus> entities) {
 		this.entities = entities.stream()
-				.map(LocusOutputModel::new)
+				.map(LocusOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<LocusOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<LocusOutputModel.Resumed>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 

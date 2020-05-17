@@ -194,8 +194,6 @@ public class ProfileControllerTests extends ControllerTestsContext {
 			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
-					assertEquals(expectedResult.get(i).getProject_id().toString(), p.get("project_id"));
-					assertEquals(expectedResult.get(i).getDataset_id().toString(), p.get("dataset_id"));
 					assertEquals(expectedResult.get(i).getId(), p.get("id"));
 					assertEquals(expectedResult.get(i).getVersion(), Long.parseLong(p.get("version").toString()));
 					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
@@ -224,9 +222,9 @@ public class ProfileControllerTests extends ControllerTestsContext {
 		Mockito.when(profileService.getProfile(any(), any(), anyString(), anyLong())).thenReturn(Optional.ofNullable(profile));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
-		if (expectedStatus.is2xxSuccessful())
+		if (expectedStatus.is2xxSuccessful()) {
 			assertEquals(expectedResult, http.parseResult(GetProfileOutputModel.class, result));
-		else
+		} else
 			assertEquals(expectedResult, http.parseResult(ErrorOutputModel.class, result));
 	}
 

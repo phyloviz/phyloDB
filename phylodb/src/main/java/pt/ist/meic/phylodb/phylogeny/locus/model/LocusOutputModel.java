@@ -1,5 +1,7 @@
 package pt.ist.meic.phylodb.phylogeny.locus.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -9,6 +11,7 @@ import java.util.Objects;
 
 public class LocusOutputModel implements OutputModel {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected String taxon_id;
 	protected String id;
 	protected long version;
@@ -61,6 +64,20 @@ public class LocusOutputModel implements OutputModel {
 				deprecated == that.deprecated &&
 				Objects.equals(taxon_id, that.taxon_id) &&
 				Objects.equals(id, that.id);
+	}
+
+
+
+	@JsonIgnoreProperties({"taxon_id"})
+	public static class Resumed extends LocusOutputModel{
+
+		public Resumed() {
+		}
+
+		public Resumed(Locus locus) {
+			super(locus);
+		}
+
 	}
 
 }

@@ -1,5 +1,7 @@
 package pt.ist.meic.phylodb.typing.dataset.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 public class DatasetOutputModel implements OutputModel {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected UUID project_id;
 	protected UUID id;
 	protected long version;
@@ -54,6 +57,19 @@ public class DatasetOutputModel implements OutputModel {
 				deprecated == that.deprecated &&
 				Objects.equals(project_id, that.project_id) &&
 				Objects.equals(id, that.id);
+	}
+
+
+	@JsonIgnoreProperties({"project_id"})
+	public static class Resumed extends DatasetOutputModel {
+
+		public Resumed() {
+		}
+
+		public Resumed(Dataset dataset) {
+			super(dataset);
+		}
+
 	}
 
 }

@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class GetDatasetsOutputModel implements OutputModel {
 
-	private final List<DatasetOutputModel> entities;
+	private final List<DatasetOutputModel.Resumed> entities;
 
 	public GetDatasetsOutputModel(List<Dataset> entities) {
 		this.entities = entities.stream()
-				.map(DatasetOutputModel::new)
+				.map(DatasetOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<DatasetOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<DatasetOutputModel.Resumed>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 

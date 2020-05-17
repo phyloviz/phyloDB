@@ -1,5 +1,7 @@
 package pt.ist.meic.phylodb.typing.schema.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -9,6 +11,7 @@ import java.util.Objects;
 
 public class SchemaOutputModel implements OutputModel {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected String taxon_id;
 	protected String id;
 	protected long version;
@@ -17,11 +20,11 @@ public class SchemaOutputModel implements OutputModel {
 	public SchemaOutputModel() {
 	}
 
-	public SchemaOutputModel(Schema dataset) {
-		this.taxon_id = dataset.getPrimaryKey().getTaxonId();
-		this.id = dataset.getPrimaryKey().getId();
-		this.version = dataset.getVersion();
-		this.deprecated = dataset.isDeprecated();
+	public SchemaOutputModel(Schema schema) {
+		this.taxon_id = schema.getPrimaryKey().getTaxonId();
+		this.id = schema.getPrimaryKey().getId();
+		this.version = schema.getVersion();
+		this.deprecated = schema.isDeprecated();
 	}
 
 	public SchemaOutputModel(Entity<Schema.PrimaryKey> reference) {
@@ -61,6 +64,18 @@ public class SchemaOutputModel implements OutputModel {
 				deprecated == that.deprecated &&
 				Objects.equals(taxon_id, that.taxon_id) &&
 				Objects.equals(id, that.id);
+	}
+
+	@JsonIgnoreProperties({"taxon_id"})
+	public static class Resumed extends SchemaOutputModel {
+
+		public Resumed() {
+		}
+
+		public Resumed(Schema schema) {
+			super(schema);
+		}
+
 	}
 
 }

@@ -4,18 +4,21 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 
 public class Coordinate {
 
-	private final Profile.PrimaryKey profileId;
-	private final int x;
-	private final int y;
+	private Profile.PrimaryKey profile;
+	private int x;
+	private int y;
+
+	public Coordinate() {
+	}
 
 	public Coordinate(Profile.PrimaryKey profileId, int x, int y) {
-		this.profileId = profileId;
+		this.profile = profileId;
 		this.x = x;
 		this.y = y;
 	}
 
-	public Profile.PrimaryKey getProfileId() {
-		return profileId;
+	public Profile.PrimaryKey getProfile() {
+		return profile;
 	}
 
 	public int getX() {

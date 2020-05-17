@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class GetIsolatesOutputModel implements OutputModel {
 
-	private final List<IsolateOutputModel> entities;
+	private final List<IsolateOutputModel.Resumed> entities;
 
 	public GetIsolatesOutputModel(List<Isolate> entities) {
 		this.entities = entities.stream()
-				.map(IsolateOutputModel::new)
+				.map(IsolateOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<IsolateOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<IsolateOutputModel.Resumed>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 

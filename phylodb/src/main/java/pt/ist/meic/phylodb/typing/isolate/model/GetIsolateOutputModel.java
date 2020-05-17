@@ -11,7 +11,7 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 
 	private String description;
 	private Ancillary[] ancillaries;
-	private ProfileOutputModel profile;
+	private ProfileOutputModel.Resumed profile;
 
 	public GetIsolateOutputModel() {
 	}
@@ -22,7 +22,7 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 		this.ancillaries = isolate.getAncillaries();
 		Entity<Profile.PrimaryKey> profile = isolate.getProfile();
 		if(isolate.getProfile() != null)
-			this.profile = new ProfileOutputModel(profile);
+			this.profile = new ProfileOutputModel.Resumed(profile);
 	}
 
 	public String getDescription() {
@@ -33,7 +33,7 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 		return ancillaries;
 	}
 
-	public ProfileOutputModel getProfile() {
+	public ProfileOutputModel.Resumed getProfile() {
 		return profile;
 	}
 

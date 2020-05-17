@@ -11,7 +11,7 @@ import java.util.Objects;
 public class GetProfileOutputModel extends ProfileOutputModel {
 
 	private String aka;
-	private AlleleOutputModel[] alleles;
+	private AlleleOutputModel.Resumed[] alleles;
 
 	public GetProfileOutputModel() {
 	}
@@ -20,11 +20,11 @@ public class GetProfileOutputModel extends ProfileOutputModel {
 		super(profile);
 		this.aka = profile.getAka();
 		List<Entity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
-		AlleleOutputModel[] alleles = new AlleleOutputModel[references.size()];
+		AlleleOutputModel.Resumed[] alleles = new AlleleOutputModel.Resumed[references.size()];
 		for (int i = 0; i < references.size(); i++) {
 			Entity<Allele.PrimaryKey> reference = references.get(i);
 			if (reference != null)
-				alleles[i] = new AlleleOutputModel(reference);
+				alleles[i] = new AlleleOutputModel.Resumed(reference);
 		}
 		this.alleles = alleles;
 	}
@@ -33,7 +33,7 @@ public class GetProfileOutputModel extends ProfileOutputModel {
 		return aka;
 	}
 
-	public AlleleOutputModel[] getAlleles() {
+	public AlleleOutputModel.Resumed[] getAlleles() {
 		return alleles;
 	}
 

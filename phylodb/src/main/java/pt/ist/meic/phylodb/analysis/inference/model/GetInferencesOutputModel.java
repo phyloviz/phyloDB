@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class GetInferencesOutputModel implements OutputModel {
 
-	private final List<InferenceOutputModel> analyses;
+	private final List<InferenceOutputModel.Resumed> analyses;
 
 	public GetInferencesOutputModel(List<Inference> analyses) {
 		this.analyses = analyses.stream()
-				.map(InferenceOutputModel::new)
+				.map(InferenceOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<InferenceOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<InferenceOutputModel.Resumed>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(analyses);
 	}
 

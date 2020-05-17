@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class GetAllelesOutputModel implements OutputModel {
 
-	private final List<AlleleOutputModel> entities;
+	private final List<AlleleOutputModel.Resumed> entities;
 
 	public GetAllelesOutputModel(List<Allele> entities) {
 		this.entities = entities.stream()
-				.map(AlleleOutputModel::new)
+				.map(AlleleOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<AlleleOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<AlleleOutputModel.Resumed>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 

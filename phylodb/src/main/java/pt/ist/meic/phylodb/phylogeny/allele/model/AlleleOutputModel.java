@@ -1,5 +1,7 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -9,7 +11,9 @@ import java.util.Objects;
 
 public class AlleleOutputModel implements OutputModel {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected String taxon_id;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected String locus_id;
 	protected String id;
 	protected long version;
@@ -69,6 +73,22 @@ public class AlleleOutputModel implements OutputModel {
 				Objects.equals(taxon_id, that.taxon_id) &&
 				Objects.equals(locus_id, that.locus_id) &&
 				Objects.equals(id, that.id);
+	}
+
+	@JsonIgnoreProperties({"taxon_id, locus_id"})
+	public static class Resumed extends AlleleOutputModel {
+
+		public Resumed() {
+		}
+
+		public Resumed(Allele allele) {
+			super(allele);
+		}
+
+		public Resumed(Entity<Allele.PrimaryKey> allele) {
+			super(allele);
+		}
+
 	}
 
 }
