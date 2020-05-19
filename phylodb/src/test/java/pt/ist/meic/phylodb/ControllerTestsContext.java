@@ -2,6 +2,9 @@ package pt.ist.meic.phylodb;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import pt.ist.meic.phylodb.analysis.inference.InferenceService;
+import pt.ist.meic.phylodb.analysis.visualization.VisualizationService;
+import pt.ist.meic.phylodb.job.JobService;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleService;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusService;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonService;
@@ -42,5 +45,12 @@ public abstract class ControllerTestsContext extends TestContext {
 	protected ProfileService profileService;
 	@MockBean
 	protected IsolateService isolateService;
+	@MockBean
+	protected InferenceService inferenceService;
+	@MockBean
+	protected VisualizationService visualizationService;
+	@MockBean
+	protected JobService jobService;
+
 
 }

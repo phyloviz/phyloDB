@@ -9,6 +9,7 @@ import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.job.model.GetJobsOutputModel;
 import pt.ist.meic.phylodb.job.model.JobInputModel;
 import pt.ist.meic.phylodb.job.model.JobRequest;
+import pt.ist.meic.phylodb.security.authorization.Activity;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
@@ -27,7 +28,7 @@ public class JobController extends Controller {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.READ)
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getJobs(
 			@PathVariable("project") UUID projectId,
@@ -37,7 +38,7 @@ public class JobController extends Controller {
 		return getAll(type, l -> service.getJobs(projectId, page, l), GetJobsOutputModel::new, null);
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.WRITE)
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postJob(
 			@PathVariable("project") UUID projectId,
@@ -52,7 +53,7 @@ public class JobController extends Controller {
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.WRITE)
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{job}")
 	public ResponseEntity<?> deleteJob(
 			@PathVariable("project") UUID projectId,

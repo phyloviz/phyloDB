@@ -39,17 +39,17 @@ public class InferenceService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Inference>> getAnalyses(UUID projectId, UUID datasetId, int page, int limit) {
+	public Optional<List<Inference>> getInferences(UUID projectId, UUID datasetId, int page, int limit) {
 		return analysisRepository.findAll(page, limit, projectId, datasetId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Inference> getAnalysis(UUID projectId, UUID datasetId, UUID id) {
+	public Optional<Inference> getInference(UUID projectId, UUID datasetId, UUID id) {
 		return analysisRepository.find(new Inference.PrimaryKey(projectId, datasetId, id));
 	}
 
 	@Transactional
-	public Optional<UUID> saveAnalysis(UUID projectId, UUID datasetId, String algorithm, String format, MultipartFile file) throws IOException {
+	public Optional<UUID> saveInference(UUID projectId, UUID datasetId, String algorithm, String format, MultipartFile file) throws IOException {
 		TreeFormatter formatter;
 		if(!InferenceAlgorithm.exists(algorithm) || (formatter = TreeFormatter.get(format)) == null ||
 				!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
@@ -62,15 +62,15 @@ public class InferenceService {
 				.flatMap(e -> Stream.of(e.getFrom(), e.getTo()))
 				.distinct()
 				.collect(Collectors.toList());
-		if(profileRepository.anyMissing(profiles))
+		if(edges.size() == 0 || profileRepository.anyMissing(profiles))
 			return Optional.empty();
 		UUID id = UUID.randomUUID();
-		analysisRepository.save(new Inference(projectId, datasetId, id, InferenceAlgorithm.valueOf(algorithm), edges));
+		analysisRepository.save(new Inference(projectId, datasetId, id, InferenceAlgorithm.valueOf(algorithm.toUpperCase()), edges));
 		return Optional.of(id);
 	}
 
 	@Transactional
-	public boolean deleteAnalysis(UUID projectId, UUID datasetId, UUID id) {
+	public boolean deleteInference(UUID projectId, UUID datasetId, UUID id) {
 		return analysisRepository.remove(new Inference.PrimaryKey(projectId, datasetId, id));
 	}
 

@@ -4,6 +4,9 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ist.meic.phylodb.analysis.inference.InferenceRepository;
+import pt.ist.meic.phylodb.analysis.visualization.VisualizationRepository;
+import pt.ist.meic.phylodb.job.JobRepository;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
@@ -22,6 +25,7 @@ public abstract class RepositoryTestsContext extends TestContext {
 
 	@Autowired
 	protected Session session;
+
 	@Autowired
 	protected UserRepository userRepository;
 	@Autowired
@@ -40,6 +44,14 @@ public abstract class RepositoryTestsContext extends TestContext {
 	protected ProfileRepository profileRepository;
 	@Autowired
 	protected IsolateRepository isolateRepository;
+
+	@Autowired
+	protected InferenceRepository inferenceRepository;
+	@Autowired
+	protected VisualizationRepository visualizationRepository;
+
+	@Autowired
+	protected JobRepository jobRepository;
 
 	protected Result query(Query query) {
 		return session.query(query.getExpression(), query.getParameters());

@@ -29,7 +29,8 @@ public class NexusFormatter extends NewickFormatter {
 
 	@Override
 	public String format(List<Edge> entities, Object... params) {
-		return String.format("BEGIN TREES;\n\tTree result = %s\nEND;", super.format(entities));
+		String format = super.format(entities);
+		return String.format("BEGIN TREES;\n\tTree result = %s\nEND;", format);
 	}
 
 }

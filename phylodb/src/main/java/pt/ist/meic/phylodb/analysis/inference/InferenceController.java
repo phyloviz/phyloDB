@@ -10,6 +10,7 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
+import pt.ist.meic.phylodb.security.authorization.Activity;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
@@ -20,7 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("projects/{project}/datasets/{dataset}/analyses")
+@RequestMapping("projects/{project}/datasets/{dataset}/inferences")
 public class InferenceController extends Controller {
 
 	private InferenceService service;
@@ -29,55 +30,55 @@ public class InferenceController extends Controller {
 		this.service = service;
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.READ)
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getAnalyses(
+	public ResponseEntity<?> getInferences(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getAnalyses(projectId, datasetId, page, l), GetInferencesOutputModel::new, null);
+		return getAll(type, l -> service.getInferences(projectId, datasetId, page, l), GetInferencesOutputModel::new, null);
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.READ)
-	@GetMapping(path = "/{analysis}", produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<?> getAnalysis(
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
+	@GetMapping(path = "/{inference}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getInference(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("analysis") UUID analysisId,
+			@PathVariable("inference") UUID inferenceId,
 			@RequestParam(value = "format", defaultValue = TreeFormatter.NEWICK) String format
 	) {
 		if(!format.equals(TreeFormatter.NEWICK) && !format.equals(TreeFormatter.NEXUS))
 			return new ErrorOutputModel(Problem.BAD_REQUEST).toResponseEntity();
-		return get(() -> service.getAnalysis(projectId, datasetId, analysisId),
+		return get(() -> service.getInference(projectId, datasetId, inferenceId),
 				a -> new GetInferenceOutputModel(a, format),
 				() -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.WRITE)
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "")
-	public ResponseEntity<?> postAnalysis(
+	public ResponseEntity<?> postInference(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("algorithm") String algorithm,
-			@PathVariable("format") String format,
+			@RequestParam("algorithm") String algorithm,
+			@RequestParam("format") String format,
 			@RequestParam("file") MultipartFile file
 	) throws IOException {
-		Optional<UUID> optional = service.saveAnalysis(projectId, datasetId, algorithm, format, file);
+		Optional<UUID> optional = service.saveInference(projectId, datasetId, algorithm, format, file);
 		return optional.isPresent() ?
 				new CreatedOutputModel(optional.get()).toResponseEntity() :
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}
 
-	@Authorized(role = Role.USER, operation = Operation.WRITE)
-	@DeleteMapping(path = "/{analysis}")
-	public ResponseEntity<?> deleteAnalysis(
+	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
+	@DeleteMapping(path = "/{inference}")
+	public ResponseEntity<?> deleteInference(
 			@PathVariable("project") UUID projectId,
 			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("analysis") UUID analysisId
+			@PathVariable("inference") UUID inferenceId
 	) {
-		return status(() -> service.deleteAnalysis(projectId, datasetId, analysisId));
+		return status(() -> service.deleteInference(projectId, datasetId, inferenceId));
 	}
 
 }

@@ -109,14 +109,15 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 			return true;
 		UUID project = optional.get().getPrimaryKey().getProjectId();
 		UUID dataset = optional.get().getPrimaryKey().getDatasetId();
-		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) UNWIND $ as param\n" +
-				"OPTIONAL MATCH (d)-[:CONTAINS]->(p:Profile {id: param.profile})\n" +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
+				"UNWIND $ as param\n" +
+				"OPTIONAL MATCH (d)-[:CONTAINS]->(p:Profile {id: param})\n" +
 				"RETURN p.id as present";
-		Result result = query(new Query(statement, project, dataset, references
-				.stream()
+		Object[] ids = references.stream()
 				.filter(Objects::nonNull)
 				.map(r -> r.getPrimaryKey().getId())
-				.toArray()));
+				.toArray();
+		Result result = query(new Query(statement, project, dataset, ids));
 		Iterator<Map<String, Object>> it = result.iterator();
 		if(!it.hasNext())
 			return true;

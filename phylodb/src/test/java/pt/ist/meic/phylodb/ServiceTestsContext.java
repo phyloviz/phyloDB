@@ -2,6 +2,12 @@ package pt.ist.meic.phylodb;
 
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import pt.ist.meic.phylodb.analysis.inference.InferenceRepository;
+import pt.ist.meic.phylodb.analysis.inference.InferenceService;
+import pt.ist.meic.phylodb.analysis.visualization.VisualizationRepository;
+import pt.ist.meic.phylodb.analysis.visualization.VisualizationService;
+import pt.ist.meic.phylodb.job.JobRepository;
+import pt.ist.meic.phylodb.job.JobService;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleRepository;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleService;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
@@ -41,6 +47,12 @@ public abstract class ServiceTestsContext extends TestContext {
 	protected ProfileRepository profileRepository;
 	@MockBean
 	protected IsolateRepository isolateRepository;
+	@MockBean
+	protected InferenceRepository inferenceRepository;
+	@MockBean
+	protected VisualizationRepository visualizationRepository;
+	@MockBean
+	protected JobRepository jobRepository;
 
 	@InjectMocks
 	protected UserService userService;
@@ -60,4 +72,10 @@ public abstract class ServiceTestsContext extends TestContext {
 	protected ProfileService profileService;
 	@InjectMocks
 	protected IsolateService isolateService;
+	@InjectMocks
+	protected InferenceService inferenceService;
+	@InjectMocks
+	protected VisualizationService visualizationService;
+	@InjectMocks
+	protected JobService jobService;
 }

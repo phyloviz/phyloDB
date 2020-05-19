@@ -105,7 +105,6 @@ public class SchemaControllerTests extends ControllerTestsContext {
 					Map<String, Object> p = parsed.get(i);
 					assertEquals(expectedResult.get(i).getId(), p.get("id"));
 					assertEquals(expectedResult.get(i).getVersion(), Long.parseLong(p.get("version").toString()));
-					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
 				}
 			}
 		} else

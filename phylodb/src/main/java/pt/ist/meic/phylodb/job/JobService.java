@@ -1,6 +1,7 @@
 package pt.ist.meic.phylodb.job;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.analysis.inference.InferenceRepository;
 import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.job.model.Job;
@@ -23,10 +24,12 @@ public class JobService {
 	private DatasetRepository datasetRepository;
 	private InferenceRepository inferenceRepository;
 
+	@Transactional(readOnly = true)
 	public Optional<List<Job>> getJobs(UUID projectId, int page, Integer limit) {
 		return jobRepository.findAll(page, limit, projectId);
 	}
 
+	@Transactional
 	public Optional<UUID> createJob(UUID projectId, JobRequest jobRequest) {
 		if (!valid(projectId, jobRequest))
 			return Optional.empty();
@@ -35,6 +38,7 @@ public class JobService {
 		return Optional.of(id);
 	}
 
+	@Transactional
 	public boolean deleteJob(UUID projectId, UUID jobId) {
 		return jobRepository.remove(new Job.PrimaryKey(projectId, jobId));
 	}

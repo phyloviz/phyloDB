@@ -77,7 +77,7 @@ public class ProfileOutputModel implements OutputModel {
 	}
 
 
-	@JsonIgnoreProperties({"project_id, dataset_id"})
+	@JsonIgnoreProperties({"project_id", "dataset_id", "deprecated"})
 	public static class Resumed extends ProfileOutputModel {
 
 		public Resumed() {
@@ -89,6 +89,15 @@ public class ProfileOutputModel implements OutputModel {
 
 		public Resumed(Entity<Profile.PrimaryKey> profile) {
 			super(profile);
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			ProfileOutputModel that = (ProfileOutputModel) o;
+			return version == that.version &&
+					Objects.equals(id, that.id);
 		}
 
 	}

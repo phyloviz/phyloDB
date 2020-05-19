@@ -25,22 +25,22 @@ public class NewickFormatter extends TreeFormatter {
 
 	@Override
 	protected boolean parse(String line, boolean last, Consumer<Edge> add) {
-		String newick = line.trim();
+		StringBuilder newick = new StringBuilder(line.trim());
 		Stack<List<Edge>> levels = new Stack<>();
 		while (newick.length() > 0) {
 			switch (newick.charAt(0)) {
 				case ';':
 					if (!levels.isEmpty())
 						return false;
-					newick = newick.substring(1);
+					newick.delete(0, 1);
 					break;
-				case ',': newick = newick.substring(1);
+				case ',': newick.delete(0, 1);
 					break;
 				case '(': levels.push(new ArrayList<>());
-					newick = newick.substring(1);
+					newick.delete(0, 1);
 					break;
 				case ')':
-					newick = newick.substring(1);
+					newick.delete(0, 1);
 					List<Edge> children = new ArrayList<>(levels.pop());
 					String parentId = parseNode(newick, levels);
 					if(parentId == null)
@@ -68,18 +68,19 @@ public class NewickFormatter extends TreeFormatter {
 				.filter(p -> entities.stream().noneMatch(e -> e.getTo().equals(p)))
 				.distinct()
 				.collect(Collectors.toList());
+		List<Edge> edges = new ArrayList<>(entities);
 		for (Entity<Profile.PrimaryKey> root : roots) {
-			format(entities, root, data);
-			data.append(root).append(';');
+			format(edges, root, data);
+			data.append(root.getPrimaryKey().getId()).append(';');
 		}
 		return data.toString();
 	}
 
-	private String parseNode(String newick, Stack<List<Edge>> levels) {
-		String info = newick.split("[),;]", 2)[0];
-		newick = newick.substring(info.length());
+	private String parseNode(StringBuilder newick, Stack<List<Edge>> levels) {
+		String info = newick.toString().split("[),;]", 2)[0];
+		newick.delete(0, info.length());
 		String[] values = info.split(":", 2);
-		if (newick.length() > 0 && !newick.startsWith(";")) {
+		if (newick.length() > 0 && newick.charAt(0) != ';') {
 			if (values.length != 2 || Arrays.stream(values).anyMatch(s -> s.matches(String.format("[\\s%s]*", missing)) || s.isEmpty()) ||
 					!values[1].matches("[\\d]*"))
 				return null;

@@ -60,7 +60,7 @@ public class DatasetOutputModel implements OutputModel {
 	}
 
 
-	@JsonIgnoreProperties({"project_id"})
+	@JsonIgnoreProperties({"project_id", "deprecated"})
 	public static class Resumed extends DatasetOutputModel {
 
 		public Resumed() {

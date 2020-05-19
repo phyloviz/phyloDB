@@ -10,8 +10,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 import pt.ist.meic.phylodb.TestContext;
+import pt.ist.meic.phylodb.analysis.inference.InferenceController;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleController;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonController;
@@ -52,6 +54,8 @@ public class AuthorizationInterceptorTests extends TestContext {
 		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, String.class, AlleleInputModel.class));
 		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, UUID.class, int.class, String.class));
 		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxons", int.class));
+		HandlerMethod handler5 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("postInference", UUID.class, UUID.class, String.class, String.class, MultipartFile.class));
+		HandlerMethod handler6 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("getInferences", UUID.class, UUID.class, int.class));
 		return Stream.of(Arguments.of(request(userKey, Role.ADMIN, null), response, handler1, null, true),
 				Arguments.of(request(userKey, Role.ADMIN, null), response, handler2, null, true),
 				Arguments.of(request(userKey, Role.USER, null), response, handler1, null, false),
@@ -66,7 +70,15 @@ public class AuthorizationInterceptorTests extends TestContext {
 				Arguments.of(request(userKey, Role.USER, null), response, handler4, null, true),
 				Arguments.of(request(userKey, Role.ADMIN, null), response, handler4, null, true),
 				Arguments.of(request(userKey, Role.ADMIN, null), response, handler2, null, true),
-				Arguments.of(request(userKey, Role.USER, null), response, handler2, null, false));
+				Arguments.of(request(userKey, Role.USER, null), response, handler2, null, false),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler6, userProject, true),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler6, userPublicProject, true),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler6, otherProject, false),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler6, otherPublicProject, true),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler5, userProject, true),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler5, userPublicProject, true),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler5, otherProject, false),
+				Arguments.of(request(userKey, Role.USER, ID), response, handler5, otherPublicProject, true));
 	}
 
 	private static MockHttpServletRequest request(User.PrimaryKey key, Role userRole, String projectId) {

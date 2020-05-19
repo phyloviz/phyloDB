@@ -66,7 +66,7 @@ public class SchemaOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
-	@JsonIgnoreProperties({"taxon_id"})
+	@JsonIgnoreProperties({"taxon_id", "deprecated"})
 	public static class Resumed extends SchemaOutputModel {
 
 		public Resumed() {

@@ -67,7 +67,7 @@ public class IsolateOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
-	@JsonIgnoreProperties({"project_id, dataset_id"})
+	@JsonIgnoreProperties({"project_id", "dataset_id", "deprecated"})
 	public static class Resumed extends IsolateOutputModel {
 
 		public Resumed() {

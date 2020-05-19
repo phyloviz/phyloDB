@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.phylogeny.taxon.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -46,6 +47,18 @@ public class TaxonOutputModel implements OutputModel {
 		return version == that.version &&
 				deprecated == that.deprecated &&
 				Objects.equals(id, that.id);
+	}
+
+	@JsonIgnoreProperties({"deprecated"})
+	public static class Resumed extends TaxonOutputModel {
+
+		public Resumed() {
+		}
+
+		public Resumed(Taxon taxon) {
+			super(taxon);
+		}
+
 	}
 
 }

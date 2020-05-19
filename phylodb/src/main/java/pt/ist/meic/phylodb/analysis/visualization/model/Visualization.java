@@ -10,6 +10,7 @@ public class Visualization {
 	private final boolean deprecated;
 	private final VisualizationAlgorithm algorithm;
 	private final List<Coordinate> coordinates;
+
 	public Visualization(UUID projectId, UUID datasetId, UUID analysisId, UUID id, boolean deprecated, VisualizationAlgorithm algorithm, List<Coordinate> coordinates) {
 		this.primaryKey = new PrimaryKey(projectId, datasetId, analysisId, id);
 		this.deprecated = deprecated;

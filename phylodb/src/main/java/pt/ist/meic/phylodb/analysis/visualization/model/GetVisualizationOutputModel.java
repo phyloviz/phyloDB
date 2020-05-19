@@ -39,9 +39,12 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 
 	public static class CoordinateOutputModel {
 
-		private final String profile_id;
-		private final int x;
-		private final int y;
+		private String profile_id;
+		private int x;
+		private int y;
+
+		public CoordinateOutputModel() {
+		}
 
 		public CoordinateOutputModel(Coordinate coordinate) {
 			this.profile_id = coordinate.getProfile().getId();

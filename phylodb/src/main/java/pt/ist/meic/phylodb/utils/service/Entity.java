@@ -36,4 +36,9 @@ public class Entity<K> {
 				Objects.equals(id, entity.id);
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, version, deprecated);
+	}
+
 }

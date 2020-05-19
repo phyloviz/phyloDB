@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 public class GetTaxonsOutputModel implements OutputModel {
 
-	private final List<TaxonOutputModel> entities;
+	private final List<TaxonOutputModel.Resumed> entities;
 
 	public GetTaxonsOutputModel(List<Taxon> entities) {
 		this.entities = entities.stream()
-				.map(TaxonOutputModel::new)
+				.map(TaxonOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ResponseEntity<List<TaxonOutputModel>> toResponseEntity() {
+	public ResponseEntity<List<TaxonOutputModel.Resumed>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 

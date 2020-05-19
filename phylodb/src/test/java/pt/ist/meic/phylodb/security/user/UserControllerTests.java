@@ -110,7 +110,6 @@ public class UserControllerTests extends ControllerTestsContext {
 					assertEquals(expectedResult.get(i).getEmail(), p.get("email"));
 					assertEquals(expectedResult.get(i).getProvider(), p.get("provider"));
 					assertEquals(expectedResult.get(i).getVersion(), Long.parseLong(p.get("version").toString()));
-					assertEquals(expectedResult.get(i).isDeprecated(), p.get("deprecated"));
 				}
 			}
 		} else

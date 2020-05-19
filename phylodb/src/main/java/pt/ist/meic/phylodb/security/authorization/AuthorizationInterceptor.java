@@ -50,7 +50,7 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 					if(annotation.activity() == Activity.MANAGEMENT && ((operation == Operation.WRITE && included) ||
 							(operation == Operation.READ && (included || project.getType().equals("public")))))
 						return true;
-					else if (annotation.activity() == Activity.ALGORITHM && (included || project.getType().equals("public")))
+					else if (annotation.activity() == Activity.ALGORITHMS && (included || project.getType().equals("public")))
 						return true;
 				}
 			}

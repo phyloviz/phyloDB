@@ -8,6 +8,7 @@ import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
@@ -131,6 +132,28 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 		return Stream.of(Arguments.of(key, new Profile[0], STATE, false),
 				Arguments.of(key, new Profile[]{first}, new Profile[]{STATE[0], STATE[1], firstDeleted}, true),
 				Arguments.of(null, new Profile[0], STATE, false));
+	}
+
+	private static Stream<Arguments> anyMissing_params() {
+		List<Entity<Profile.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(),
+				references3 = new ArrayList<>(), references4 = new ArrayList<>(), references5 = new ArrayList<>();
+		Entity<Profile.PrimaryKey> reference1 = new Entity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), STATE[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
+				reference2 = new Entity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), STATE[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
+				notReference1 = new Entity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "not"), EntityRepository.CURRENT_VERSION_VALUE, false);
+		references1.add(reference1);
+		references2.add(notReference1);
+		references3.add(reference1);
+		references3.add(reference2);
+		references4.add(reference2);
+		references4.add(null);
+		references5.add(notReference1);
+		references5.add(reference1);
+		references5.add(null);
+		return Stream.of(Arguments.of(references1, false),
+				Arguments.of(references2, true),
+				Arguments.of(references3, false),
+				Arguments.of(references4, false),
+				Arguments.of(references5, true));
 	}
 
 	private static Stream<Arguments> saveAll_params() {
@@ -318,6 +341,15 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 		Profile[] stateResult = findAll();
 		assertEquals(expectedResult, result);
 		assertArrayEquals(expectedState, stateResult);
+	}
+
+
+	@ParameterizedTest
+	@MethodSource("anyMissing_params")
+	public void anyMissing(List<Entity<Profile.PrimaryKey>> references, boolean expected) {
+		store(STATE);
+		boolean result = profileRepository.anyMissing(references);
+		assertEquals(expected, result);
 	}
 
 	@ParameterizedTest

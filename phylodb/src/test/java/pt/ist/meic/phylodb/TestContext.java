@@ -2,6 +2,12 @@ package pt.ist.meic.phylodb;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import pt.ist.meic.phylodb.analysis.inference.model.Edge;
+import pt.ist.meic.phylodb.analysis.inference.model.Inference;
+import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
+import pt.ist.meic.phylodb.analysis.visualization.model.Coordinate;
+import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
+import pt.ist.meic.phylodb.analysis.visualization.model.VisualizationAlgorithm;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
@@ -49,10 +55,24 @@ public abstract class TestContext {
 			Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
 	protected static final Profile PROFILE2 = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "2", 1, false, null,
 			Arrays.asList(new Entity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())));
+	protected static final Profile PROFILE3 = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 1, false, null,
+			Arrays.asList(new Entity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())));
 	protected static final Ancillary ANCILLARY1 = new Ancillary("key1", "value1");
 	protected static final Ancillary ANCILLARY2 = new Ancillary("key2", "value2");
 	protected static final Isolate ISOLATE1 = isolate("1", 1, false, null, new Ancillary[]{ANCILLARY1, ANCILLARY2}, PROFILE1);
 	protected static final Isolate ISOLATE2 = isolate("2", 1, false, null, new Ancillary[]{ANCILLARY1, ANCILLARY2}, PROFILE2);
+	protected static final Edge EDGES1 = new Edge(new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), 1);
+	protected static final Edge EDGES2 = new Edge(new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), new Entity<>(PROFILE3.getPrimaryKey(), PROFILE3.getVersion(), PROFILE3.isDeprecated()), 2);
+	protected static final Inference INFERENCE1 = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), UUID.fromString("5023b71c-704f-425e-8dcf-b26fc84300e7"), false, InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
+	protected static final Inference INFERENCE2 = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), UUID.fromString("6023b71c-704f-425e-8dcf-b26fc84300e7"), false, InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
+	protected static final Coordinate COORDINATE11 = new Coordinate(PROFILE1.getPrimaryKey(), 11, 11);
+	protected static final Coordinate COORDINATE12 = new Coordinate(PROFILE2.getPrimaryKey(), 12, 12);
+	protected static final Coordinate COORDINATE13 = new Coordinate(PROFILE3.getPrimaryKey(), 13, 13);
+	protected static final Coordinate COORDINATE21 = new Coordinate(PROFILE1.getPrimaryKey(), 21, 21);
+	protected static final Coordinate COORDINATE22 = new Coordinate(PROFILE2.getPrimaryKey(), 22, 22);
+	protected static final Coordinate COORDINATE23 = new Coordinate(PROFILE3.getPrimaryKey(), 23, 23);
+	protected static final Visualization VISUALIZATION1 = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), UUID.fromString("2023b71c-704f-425e-8dcf-b26fc84300e7"), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
+	protected static final Visualization VISUALIZATION2 = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), UUID.fromString("3023b71c-704f-425e-8dcf-b26fc84300e7"), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
 
 	protected static Isolate isolate(String id, long version, boolean deprecated, String description, Ancillary[] ancillary, Profile profile) {
 		Entity<Profile.PrimaryKey> reference = null;

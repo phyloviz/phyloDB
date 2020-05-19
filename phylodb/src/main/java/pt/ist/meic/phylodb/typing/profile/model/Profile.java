@@ -108,6 +108,11 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 					Objects.equals(id, that.id);
 		}
 
+		@Override
+		public int hashCode() {
+			return Objects.hash(projectId, datasetId, id);
+		}
+
 	}
 
 }

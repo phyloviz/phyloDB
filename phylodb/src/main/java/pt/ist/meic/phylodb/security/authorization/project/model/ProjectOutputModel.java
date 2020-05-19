@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.security.authorization.project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -47,6 +48,18 @@ public class ProjectOutputModel implements OutputModel {
 		return Objects.equals(id, that.getId()) &&
 				version == that.version &&
 				deprecated == that.deprecated;
+	}
+
+	@JsonIgnoreProperties({"deprecated"})
+	public static class Resumed extends ProjectOutputModel {
+
+		public Resumed() {
+		}
+
+		public Resumed(Project project) {
+			super(project);
+		}
+
 	}
 
 }

@@ -68,7 +68,7 @@ public class VisualizationOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
-	@JsonIgnoreProperties({"project_id, dataset_id, analysis_id"})
+	@JsonIgnoreProperties({"project_id", "dataset_id", "analysis_id", "deprecated"})
 	public static class Resumed extends VisualizationOutputModel {
 
 		public Resumed() {

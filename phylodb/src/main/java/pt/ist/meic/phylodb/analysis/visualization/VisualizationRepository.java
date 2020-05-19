@@ -28,24 +28,24 @@ public class VisualizationRepository extends AlgorithmsRepository<Visualization,
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
-				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"WITH pj, ds, d.id as analysis, collect(d) as ignored\n" +
-				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis})\n" +
-				"WHERE c.deprecate = false\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, analysis as analysisId, c.id as id, c.deprecated as deprecated, c.algorithm as algorithm,\n" +
+				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {analysis: $}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"WITH pj, ds, h.analysis as analysis, p, h, c\n" +
+				"ORDER BY  pj.id, ds.id, analysis, size(h.id), h.id, p.id, c.x, c.y\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, analysis as analysisId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +
 				"collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates\n" +
-				"ORDER BY pj.id, d.id, analysis, size(c.id), c.id SKIP $ LIMIT $";
+				"ORDER BY pj.id, ds.id, analysis, size(h.id), h.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], filters[2], page, limit));
 	}
 
 	@Override
 	protected Result get(Visualization.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
-				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"WITH pj, ds, d.id as analysis, collect(d) as ignored\n" +
-				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis, id: $})\n" +
-				"WHERE c.deprecate = false\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, analysis as analysisId, c.id as id, c.deprecated as deprecated, c.algorithm as algorithm,\n" +
+				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {analysis: $, id: $}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"WITH pj, ds, h.analysis as analysis, p, h, c\n" +
+				"ORDER BY pj.id, ds.id, analysis, size(h.id), h.id, p.id, c.x, c.y\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, analysis as analysisId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +
 				"collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates";
 		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getAnalysisId(), key.getId()));
 	}
@@ -57,14 +57,14 @@ public class VisualizationRepository extends AlgorithmsRepository<Visualization,
 		UUID datasetId = UUID.fromString(row.get("datasetId").toString());
 		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
-			list.add(new Coordinate(profile, (int) coordinates.get("x"), (int) coordinates.get("y")));
+			list.add(new Coordinate(profile, Math.toIntExact((long) coordinates.get("x")), Math.toIntExact((long) coordinates.get("y"))));
 		}
 		return new Visualization(projectId,
 				datasetId,
 				UUID.fromString(row.get("analysisId").toString()),
 				UUID.fromString(row.get("id").toString()),
 				(boolean) row.get("deprecated"),
-				VisualizationAlgorithm.valueOf(row.get("algorithm").toString()),
+				VisualizationAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
 				list
 		);
 	}
@@ -72,10 +72,8 @@ public class VisualizationRepository extends AlgorithmsRepository<Visualization,
 	@Override
 	protected boolean isPresent(Visualization.PrimaryKey key) {
 		String statement = "OPTIONAL MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
-				"OPTIONAL MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"WITH pj, ds, d.id as analysis, collect(d) as ignored\n" +
-				"OPTIONAL MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis, id: $})\n" +
-				"WITH c.deprecated as deprecated, collect(c) as ignored\n" +
+				"OPTIONAL MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {analysis: $, id: $}]->(c:Coordinate)\n" +
+				"WITH h.deprecated as deprecated, collect(c) as ignored\n" +
 				"RETURN COALESCE(deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key.getProjectId(), key.getDatasetId(), key.getAnalysisId(), key.getId()));
 	}
@@ -88,11 +86,9 @@ public class VisualizationRepository extends AlgorithmsRepository<Visualization,
 	@Override
 	protected void delete(Visualization.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
-				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"WITH pj, ds, d.id as analysis, collect(d) as ignored\n" +
-				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis, id: $})\n" +
-				"WHERE c.deprecate = false\n" +
-				"SET c.deprecated = true";
+				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {analysis: $, id: $}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"SET h.deprecated = true";
 		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getAnalysisId(), key.getId()));
 	}
 

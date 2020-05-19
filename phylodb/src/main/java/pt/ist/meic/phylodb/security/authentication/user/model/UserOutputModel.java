@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.security.authentication.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -53,6 +54,18 @@ public class UserOutputModel implements OutputModel {
 				deprecated == that.deprecated &&
 				Objects.equals(email, that.email) &&
 				Objects.equals(provider, that.provider);
+	}
+
+	@JsonIgnoreProperties({"deprecated"})
+	public static class Resumed extends UserOutputModel {
+
+		public Resumed() {
+		}
+
+		public Resumed(User user) {
+			super(user);
+		}
+
 	}
 
 }

@@ -1,7 +1,5 @@
 package pt.ist.meic.phylodb.analysis.inference.model;
 
-import pt.ist.meic.phylodb.typing.Method;
-
 import java.util.Arrays;
 
 public enum InferenceAlgorithm {
@@ -9,8 +7,8 @@ public enum InferenceAlgorithm {
 	GOEBURST;
 
 	public static boolean exists(String name) {
-		return Arrays.stream(Method.values())
-				.map(Method::getName)
+		return Arrays.stream(InferenceAlgorithm.values())
+				.map(InferenceAlgorithm::getName)
 				.anyMatch(n -> n.equals(name));
 	}
 

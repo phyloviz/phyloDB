@@ -12,7 +12,7 @@ public class Inference {
 	private final InferenceAlgorithm algorithm;
 	private final List<Edge> edges;
 
-	public Inference(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, boolean deprecated, List<Edge> edges) {
+	public Inference(UUID projectId, UUID datasetId, UUID id, boolean deprecated, InferenceAlgorithm algorithm, List<Edge> edges) {
 		this.primaryKey = new PrimaryKey(projectId, datasetId, id);
 		this.deprecated = deprecated;
 		this.algorithm = algorithm;
@@ -20,7 +20,7 @@ public class Inference {
 	}
 
 	public Inference(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, List<Edge> edges) {
-		this(projectId, datasetId, id, algorithm, false, edges);
+		this(projectId, datasetId, id, false, algorithm, edges);
 	}
 
 	public PrimaryKey getPrimaryKey() {

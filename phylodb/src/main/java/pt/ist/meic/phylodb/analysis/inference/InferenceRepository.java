@@ -30,7 +30,9 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES]->(p2:Profile)\n" +
 				"WHERE d.deprecated = false\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, d.id as id, d.deprecated as deprecated, d.algorithm,\n" +
+				"WITH pj, ds, p1, p2, d\n" +
+				"ORDER BY d.distance\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, d.id as id, d.deprecated as deprecated, d.algorithm as algorithm,\n" +
 				"collect(DISTINCT {from: p1.id, fromVersion: d.fromVersion, fromDeprecated: p1.deprecated, distance: d.distance,\n" +
 				"to: p2.id, toVersion: d.toVersion, toDeprecated: p2.deprecated}) as edges\n" +
 				"ORDER BY pj.id, d.id, size(d.id), d.id SKIP $ LIMIT $";
@@ -41,7 +43,9 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 	protected Result get(Inference.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, d.id as id, d.deprecated as deprecated, d.algorithm\n" +
+				"WITH pj, ds, p1, p2, d\n" +
+				"ORDER BY d.distance\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, d.id as id, d.deprecated as deprecated, d.algorithm as algorithm,\n" +
 				"collect(DISTINCT {from: p1.id, fromVersion: d.fromVersion, fromDeprecated: p1.deprecated, distance: d.distance,\n" +
 				"to: p2.id, toVersion: d.toVersion, toDeprecated: p2.deprecated}) as edges\n";
 		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
@@ -55,13 +59,12 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 		for (Map<String, Object> edge: (Map<String, Object>[]) row.get("edges")) {
 			Entity<Profile.PrimaryKey> from = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("from")), (long) edge.get("fromVersion"), (boolean) edge.get("fromDeprecated"));
 			Entity<Profile.PrimaryKey> to = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("to")), (long) edge.get("toVersion"), (boolean) edge.get("toDeprecated"));
-			list.add(new Edge(from, to, (int) edge.get("distance")));
+			list.add(new Edge(from, to, Math.toIntExact((long) edge.get("distance"))));
 		}
 		return new Inference(projectId,
 				datasetId,
 				UUID.fromString(row.get("id").toString()),
-				InferenceAlgorithm.valueOf(row.get("algorithm").toString()),
-				(boolean) row.get("deprecated"),
+				(boolean) row.get("deprecated"), InferenceAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
 				list
 		);
 	}
@@ -79,16 +82,15 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 	protected void store(Inference analysis) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
 				"WHERE d.deprecated = false\n" +
-				"OPTIONAL MATCH (d)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"WITH d, $ as treeId, COALESCE(d.version, 0) + 1 as v\n" +
+				"WITH d, $ as treeId, $ as algorithm\n" +
 				"UNWIND $ as edge\n" +
 				"MATCH (d)-[:CONTAINS]->(p1:Profile {id: edge.from})-[r1:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
 				"WHERE NOT EXISTS(r1.to)\n" +
 				"MATCH (d)-[:CONTAINS]->(p2:Profile {id: edge.to})-[r2:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
 				"WHERE NOT EXISTS(r2.to)\n" +
-				"CREATE (p1)-[:DISTANCES {id: treeId, version: v, deprecated: false, fromVersion: r1.version, toVersion: r2.version, distance: edge.distance}]";
+				"CREATE (p1)-[:DISTANCES {id: treeId, deprecated: false, algorithm: algorithm, fromVersion: r1.version, toVersion: r2.version, distance: edge.distance}]->(p2)";
 		Inference.PrimaryKey key = analysis.getPrimaryKey();
-		Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), key.getId(),
+		Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), analysis.getAlgorithm().getName(),
 				analysis.getEdges().stream()
 						.map(e -> new Object() {
 							public final String from = e.getFrom().getPrimaryKey().getId();
@@ -101,9 +103,13 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 
 	@Override
 	protected void delete(Inference.PrimaryKey key) {
-		String statement = "MATCH (MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
-				"SET d.deprecated = true";
+				"SET d.deprecated = true\n" +
+				"WITH ds, d.id as analysis, collect(d) as ignored\n" +
+				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis})\n" +
+				"WHERE c.deprecate = false\n" +
+				"SET c.deprecated = true";
 		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 
