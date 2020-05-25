@@ -1,27 +1,23 @@
 package algorithm.inference;
 
-import algorithm.inference.implementation.GoeBURST;
-import algorithm.inference.model.Analysis;
-import algorithm.inference.model.Matrix;
-import algorithm.procedure.Procedure;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.logging.Log;
+import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Mode;
 import org.neo4j.procedure.Name;
+import org.neo4j.procedure.Procedure;
 
-import java.util.UUID;
+public class InferenceProcedures {
 
-public class InferenceProcedures implements Procedure<InferenceAlgorithm, String> {
+	@Context
+	public GraphDatabaseService database;
+	@Context
+	public Log log;
 
-	@Override
-	public void execute(InferenceAlgorithm algorithm, String param) {
-		AnalysisRepository repository =  new AnalysisRepository();
-		Matrix distanceMatrix = repository.findInput(UUID.fromString(param));
-		Analysis phylogeneticTree = algorithm.compute(distanceMatrix);
-		repository.createOutput(phylogeneticTree);
-	}
-
-	@org.neo4j.procedure.Procedure(value = "algorithms.inference.goeBURST", mode = Mode.WRITE)
-	public void goeBURST(@Name("dataset") String dataset) {
-		execute(new GoeBURST(), dataset);
+	@Procedure(value = "algorithms.inference.goeburst", mode = Mode.WRITE)
+	public void goeBURST(@Name("project") String project, @Name("dataset") String dataset, @Name("inference") String analysis, @Name("lvs") Number lvs) {
+		InferenceService service = new InferenceService(database, log);
+		service.goeBURST(project, dataset, analysis, lvs);
 	}
 
 }

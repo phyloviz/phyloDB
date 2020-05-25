@@ -11,7 +11,7 @@
     <name>Neo4j Phylogenitcs Algorithms</name>
 
     <properties>
-        <neo4j.version>3.5.2</neo4j.version>
+        <neo4j.version>3.5.14</neo4j.version>
     </properties>
 
     <dependencies>
@@ -19,7 +19,6 @@
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
             <version>${neo4j.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test Dependencies -->
