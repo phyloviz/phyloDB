@@ -1,12 +1,13 @@
 package pt.ist.meic.phylodb.job;
 
+import javafx.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.job.model.GetJobsOutputModel;
+import pt.ist.meic.phylodb.job.model.JobCreatedOutputModel;
 import pt.ist.meic.phylodb.job.model.JobInputModel;
 import pt.ist.meic.phylodb.job.model.JobRequest;
 import pt.ist.meic.phylodb.security.authorization.Activity;
@@ -47,9 +48,9 @@ public class JobController extends Controller {
 		Optional<JobRequest> jobRequest = inputModel.toDomainEntity();
 		if(!jobRequest.isPresent())
 			return new ErrorOutputModel(Problem.BAD_REQUEST).toResponseEntity();
-		Optional<UUID> optional = service.createJob(projectId, jobRequest.get());
+		Optional<Pair<UUID, UUID>> optional = service.createJob(projectId, jobRequest.get());
 		return optional.isPresent() ?
-				new CreatedOutputModel(optional.get()).toResponseEntity() :
+				new JobCreatedOutputModel(optional.get().getKey(), optional.get().getValue()).toResponseEntity() :
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}
 

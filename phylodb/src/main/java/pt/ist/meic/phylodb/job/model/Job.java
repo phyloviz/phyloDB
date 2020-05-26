@@ -8,6 +8,7 @@ public class Job {
 	private PrimaryKey id;
 	private String algorithm;
 	private String[] params;
+	private UUID analysisId;
 	private boolean completed;
 	private boolean cancelled;
 
@@ -17,9 +18,10 @@ public class Job {
 		this.cancelled = cancelled;
 	}
 
-	public Job(UUID projectId,UUID jobId, String algorithm, String[] params) {
+	public Job(UUID projectId, UUID jobId, String algorithm, UUID analysisId, String[] params) {
 		this.id = new PrimaryKey(projectId, jobId);
 		this.algorithm = algorithm;
+		this.analysisId = analysisId;
 		this.params = params;
 	}
 
@@ -33,6 +35,10 @@ public class Job {
 
 	public String[] getParams() {
 		return params;
+	}
+
+	public UUID getAnalysisId() {
+		return analysisId;
 	}
 
 	public boolean isCompleted() {

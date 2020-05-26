@@ -54,7 +54,7 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 	protected void store(Job job) {
 		Job.PrimaryKey key = job.getPrimaryKey();
 		String jobName = name(key.getProjectId(), key.getId());
-		String params = Strings.join(Arrays.asList(job.getParams()), ',');
+		String params = Strings.join(Arrays.asList(job.getParams()), ',') + "," + job.getAnalysisId();
 		String statement = "CALL apoc.periodic.submit(\"$\", \"CALL $.($)\")";
 		execute(new Query(statement, jobName, String.format(FULLY_QUALIFIED, job.getAlgorithm()), params));
 	}
