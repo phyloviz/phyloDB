@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 
 import java.util.*;
@@ -19,8 +20,8 @@ import static org.mockito.ArgumentMatchers.*;
 public class ProjectServiceTests extends ServiceTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final Project[] STATE = new Project[]{PROJECT1, new Project("26d20a45-470a-4336-81ab-ed057d3f5d66", 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
+	private static final Project[] STATE = new Project[]{PROJECT1, new Project("26d20a45-470a-4336-81ab-ed057d3f5d66", 1, false, "private1", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
 
 	private static Stream<Arguments> getProjects_params() {
 		List<Project> expected1 = new ArrayList<Project>() {{

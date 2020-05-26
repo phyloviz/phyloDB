@@ -8,6 +8,7 @@ import java.util.Objects;
 public class GetProjectOutputModel extends ProjectOutputModel {
 
 	private String name;
+	private String visibility;
 	private String description;
 	private UserKeyOutputModel[] users;
 
@@ -17,12 +18,17 @@ public class GetProjectOutputModel extends ProjectOutputModel {
 	public GetProjectOutputModel(Project project) {
 		super(project);
 		this.name = project.getName();
+		this.visibility = project.getVisibility().getName();
 		this.description = project.getDescription();
 		this.users = Arrays.stream(project.getUsers()).map(UserKeyOutputModel::new).toArray(UserKeyOutputModel[]::new);
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public String getVisibility() {
+		return visibility;
 	}
 
 	public String getDescription() {
@@ -41,6 +47,7 @@ public class GetProjectOutputModel extends ProjectOutputModel {
 		GetProjectOutputModel that = (GetProjectOutputModel) o;
 		return super.equals(that) &&
 				Objects.equals(name, that.name) &&
+				Objects.equals(visibility, that.visibility) &&
 				Objects.equals(description, that.description) &&
 				Arrays.equals(users, that.users);
 	}

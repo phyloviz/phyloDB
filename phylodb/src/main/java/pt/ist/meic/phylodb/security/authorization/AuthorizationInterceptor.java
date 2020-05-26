@@ -47,9 +47,9 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 					boolean included = Arrays.stream(project.getUsers())
 							.anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
 					if(annotation.activity() == Activity.MANAGEMENT && ((operation == Operation.WRITE && included) ||
-							(operation == Operation.READ && (included || project.getType().equals("public")))))
+							(operation == Operation.READ && (included || project.getVisibility() == Visibility.PUBLIC))))
 						return true;
-					else if (annotation.activity() == Activity.ALGORITHMS && (included || project.getType().equals("public")))
+					else if (annotation.activity() == Activity.ALGORITHMS && (included || project.getVisibility() == Visibility.PUBLIC))
 						return true;
 				}
 			}

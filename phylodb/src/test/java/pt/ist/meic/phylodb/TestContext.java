@@ -13,6 +13,7 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
@@ -30,8 +31,8 @@ public abstract class TestContext {
 
 	protected static final User USER1 = new User("1one", "one", 1, false, Role.USER);
 	protected static final User USER2 = new User("2two", "two", 1, false, Role.USER);
-	protected static final Project PROJECT1 = new Project("2023b71c-704f-425e-8dcf-b26fc84300e7", 1, false, "private1", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
-	protected static final Project PROJECT2 = new Project("3023b71c-704f-425e-8dcf-b26fc84300e7", 1, false, "private1", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+	protected static final Project PROJECT1 = new Project("2023b71c-704f-425e-8dcf-b26fc84300e7", 1, false, "private1", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+	protected static final Project PROJECT2 = new Project("3023b71c-704f-425e-8dcf-b26fc84300e7", 1, false, "private1", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 	protected static final Taxon TAXON1 = new Taxon("1one", 1, false, "description");
 	protected static final Taxon TAXON2 = new Taxon("2two", 1, false, null);
 	protected static final Locus LOCUS1 = new Locus(TAXON1.getPrimaryKey(), "1", 1, false, "description");

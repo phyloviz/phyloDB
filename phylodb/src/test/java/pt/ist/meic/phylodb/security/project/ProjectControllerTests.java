@@ -17,6 +17,7 @@ import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectOutputModel;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.security.authorization.project.model.ProjectInputModel;
@@ -35,7 +36,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProjects_params() {
 		String uri = "/projects";
-		Project project = new Project(UUID.randomUUID().toString(), "x", "x", "x", new User.PrimaryKey[0]);
+		Project project = new Project(UUID.randomUUID().toString(), "x", Visibility.PRIVATE, "x", new User.PrimaryKey[0]);
 		List<Project> projects = new ArrayList<Project>() {{
 			add(project);
 		}};
@@ -54,7 +55,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 	private static Stream<Arguments> getProject_params() {
 		String uri = "/projects/%s";
 		String id = UUID.randomUUID().toString();
-		Project project = new Project(id, "x", "x", "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
+		Project project = new Project(id, "x", Visibility.PRIVATE, "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, id)).param("version", "1"),
 				req2 = get(String.format(uri, id));
 		return Stream.of(Arguments.of(req1, project, HttpStatus.OK, new GetProjectOutputModel(project)),
@@ -66,9 +67,9 @@ public class ProjectControllerTests extends ControllerTestsContext {
 	private static Stream<Arguments> putProject_params() {
 		String uri = "/projects/%s";
 		String id = UUID.randomUUID().toString();
-		Project project = new Project(id, "x", "private", "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
+		Project project = new Project(id, "x", Visibility.PRIVATE, "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, id));
-		ProjectInputModel input1 = new ProjectInputModel(project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription(), project.getUsers()),
+		ProjectInputModel input1 = new ProjectInputModel(project.getPrimaryKey(), project.getName(), project.getVisibility().getName(), project.getDescription(), project.getUsers()),
 				input2 = new ProjectInputModel(project.getPrimaryKey(), null, "error", project.getDescription(), null);
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),

@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.utils.db.Query;
 
@@ -18,20 +19,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProjectRepositoryTests extends RepositoryTestsContext {
 
-	private static final Project[] STATE = new Project[]{PROJECT1, new Project("26d20a45-470a-4336-81ab-ed057d3f5d66", 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
+	private static final Project[] STATE = new Project[]{PROJECT1, new Project("26d20a45-470a-4336-81ab-ed057d3f5d66", 1, false, "private1", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
 
 	private static Stream<Arguments> findAll_params() {
 		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7", key2 = "5f809af7-2c99-43f7-b674-4843c77384c7", key3 = "8f809af7-2c99-43f7-b674-4843c77384c7";
-		Project first = new Project(key1, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				firstChanged = new Project(key1, 2, false, "name2", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				second = new Project(key2, 1, false, "name3", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				secondChanged = new Project(key2, 2, false, "name4", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				third = new Project("6f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name5", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fourth = new Project("7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fifth = new Project(key3, 1, false, "name7", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fifthChanged = new Project(key3, 2, false, "name77", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				sixth = new Project("9f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name8", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+		Project first = new Project(key1, 1, false, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				firstChanged = new Project(key1, 2, false, "name2", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(key2, 1, false, "name3", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				secondChanged = new Project(key2, 2, false, "name4", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				third = new Project("6f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name5", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fourth = new Project("7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fifth = new Project(key3, 1, false, "name7", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fifthChanged = new Project(key3, 2, false, "name77", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				sixth = new Project("9f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name8", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(0, new Project[0], new Project[0]),
 				Arguments.of(0, new Project[]{STATE[0]}, new Project[]{STATE[0]}),
 				Arguments.of(0, new Project[]{first, firstChanged}, new Project[]{firstChanged}),
@@ -55,8 +56,8 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> find_params() {
 		String key = "4f809af7-2c99-43f7-b674-4843c77384c7";
-		Project first = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				second = new Project(key, 2, true, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+		Project first = new Project(key, 1, false, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(key, 2, true, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(key, 1, new Project[0], null),
 				Arguments.of(key, 1, new Project[]{first}, first),
 				Arguments.of(key, 2, new Project[]{first, second}, second),
@@ -68,8 +69,8 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> exists_params() {
 		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7";
-		Project first = new Project(key1, 1, false, "name1", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				second = new Project(key1, 1, true, "name2", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()});
+		Project first = new Project(key1, 1, false, "name1", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(key1, 1, true, "name2", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER2.getPrimaryKey()});
 		return Stream.of(Arguments.of(key1, new Project[0], false),
 				Arguments.of(key1, new Project[]{first}, true),
 				Arguments.of(key1, new Project[]{second}, false),
@@ -78,8 +79,8 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> save_params() {
 		String id = "4f809af7-2c99-43f7-b674-4843c77384c7";
-		Project first = new Project(id, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{USER1.getPrimaryKey(), USER2.getPrimaryKey()});
+		Project first = new Project(id, 1, false, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				second = new Project(id, 2, false, "name2", Visibility.PRIVATE, "description", new User.PrimaryKey[]{USER1.getPrimaryKey(), USER2.getPrimaryKey()});
 		return Stream.of(Arguments.of(first, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2], first}, true, 2, 2),
 				Arguments.of(second, new Project[]{first}, new Project[]{STATE[0], STATE[1], STATE[2], first, second}, true, 1, 3),
 				Arguments.of(null, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false, 0, 0));
@@ -87,8 +88,8 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> remove_params() {
 		String key = "4f809af7-2c99-43f7-b674-4843c77384c7";
-		Project before = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				after = new Project(key, 1, true, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+		Project before = new Project(key, 1, false, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				after = new Project(key, 1, true, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(key, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false),
 				Arguments.of(key, new Project[]{before}, new Project[]{STATE[0], STATE[1], STATE[2], after}, true),
 				Arguments.of(null, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false));
@@ -103,7 +104,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 					"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProjectDetails {name: $, type: $, description: $}) WITH p, pd\n" +
 					"CREATE (:Allele {deprecated: false})<-[:CONTAINS]-(p)-[:CONTAINS]->(d:Dataset {deprecated: false})-[:CONTAINS]->(:Profile {deprecated: false})\n" +
 					"WITH pd\n";
-			Query query = new Query(statement, project.getPrimaryKey(), project.isDeprecated(), project.getName(), project.getType(), project.getDescription());
+			Query query = new Query(statement, project.getPrimaryKey(), project.isDeprecated(), project.getName(), project.getVisibility().getName(), project.getDescription());
 			for (User.PrimaryKey u : project.getUsers()) {
 				query.appendQuery("MATCH (u:User {id: $, provider: $}) WHERE u.deprecated = false CREATE (pd)-[:HAS]->(u) WITH pd\n");
 				query.addParameter(u.getId(), u.getProvider());
@@ -121,7 +122,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("name"),
-				(String) row.get("type"),
+				Visibility.valueOf(((String) row.get("type")).toUpperCase()),
 				(String) row.get("description"),
 				userIds);
 	}

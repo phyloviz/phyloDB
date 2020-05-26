@@ -4,6 +4,7 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
@@ -53,7 +54,7 @@ public class ProjectRepository extends EntityRepository<Project, String> {
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("name"),
-				(String) row.get("type"),
+				Visibility.valueOf(((String) row.get("type")).toUpperCase()),
 				(String) row.get("description"),
 				userIds);
 	}
@@ -75,7 +76,7 @@ public class ProjectRepository extends EntityRepository<Project, String> {
 				"WITH pd\n" +
 				"UNWIND $ as param\n" +
 				"MATCH (u:User {id: param.id, provider: param.provider}) WHERE u.deprecated = false CREATE (pd)-[:HAS]->(u)";
-		Query query = new Query(statement, project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription(),
+		Query query = new Query(statement, project.getPrimaryKey(), project.getName(), project.getVisibility().getName(), project.getDescription(),
 				Arrays.stream(project.getUsers()).map(u -> new Object() {
 					public final String id = u.getId();
 					public final String provider = u.getProvider();

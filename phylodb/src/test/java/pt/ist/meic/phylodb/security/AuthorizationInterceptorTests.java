@@ -21,6 +21,7 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.authorization.project.ProjectService;
 import pt.ist.meic.phylodb.security.authorization.project.model.Project;
 
@@ -45,10 +46,10 @@ public class AuthorizationInterceptorTests extends TestContext {
 	private static Stream<Arguments> preHandle_params() throws NoSuchMethodException {
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		User.PrimaryKey userKey = new User.PrimaryKey("id", "provider"), otherKey = new User.PrimaryKey("id2", "provider2");
-		Project userProject = new Project(ID, "t", "private", "t", new User.PrimaryKey[]{userKey});
-		Project userPublicProject = new Project(ID, "t", "public", "t", new User.PrimaryKey[]{userKey});
-		Project otherPublicProject = new Project(ID, "t", "public", "t", new User.PrimaryKey[]{otherKey});
-		Project otherProject = new Project(ID, "t", "private", "t", new User.PrimaryKey[]{otherKey});
+		Project userProject = new Project(ID, "t", Visibility.PRIVATE, "t", new User.PrimaryKey[]{userKey});
+		Project userPublicProject = new Project(ID, "t", Visibility.PUBLIC, "t", new User.PrimaryKey[]{userKey});
+		Project otherPublicProject = new Project(ID, "t", Visibility.PUBLIC, "t", new User.PrimaryKey[]{otherKey});
+		Project otherProject = new Project(ID, "t", Visibility.PRIVATE, "t", new User.PrimaryKey[]{otherKey});
 		HandlerMethod handler1 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("saveTaxon", String.class, TaxonInputModel.class));
 		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, String.class, AlleleInputModel.class));
 		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, String.class, int.class, String.class));
