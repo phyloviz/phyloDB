@@ -54,8 +54,8 @@ public class InferenceRepositoryTests extends RepositoryTests {
 			arrange("inference", "ctx-2p-1a.cypher");
 			Matrix matrix  = repository.read(PROJECT_ID, DATASET_ID);
 			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID)));
-			assertArrayEquals(matrix.getDistances(), new int[][] {{}, {1}});
-			assertArrayEquals(matrix.getIsolates(), new int[] {0, 1});
+			assertArrayEquals(new int[][] {{}, {1}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 1}, matrix.getIsolates());
 			tx.failure();
 		}
 	}
@@ -66,8 +66,8 @@ public class InferenceRepositoryTests extends RepositoryTests {
 			arrange("inference", "ctx-2p-na.cypher");
 			Matrix matrix  = repository.read(PROJECT_ID, DATASET_ID);
 			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID)));
-			assertArrayEquals(matrix.getDistances(), new int[][] {{}, {2}});
-			assertArrayEquals(matrix.getIsolates(), new int[] {0, 0});
+			assertArrayEquals(new int[][] {{}, {2}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 0}, matrix.getIsolates());
 			tx.failure();
 		}
 	}
@@ -78,8 +78,8 @@ public class InferenceRepositoryTests extends RepositoryTests {
 			arrange("inference", "ctx-np-1a.cypher");
 			Matrix matrix  = repository.read(PROJECT_ID, DATASET_ID);
 			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID, PROFILE3_ID)));
-			assertArrayEquals(matrix.getDistances(), new int[][] {{}, {0}, {1, 1}});
-			assertArrayEquals(matrix.getIsolates(), new int[] {0, 0, 1});
+			assertArrayEquals(new int[][] {{}, {0}, {1, 1}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 0, 1}, matrix.getIsolates());
 			tx.failure();
 		}
 	}
@@ -90,8 +90,8 @@ public class InferenceRepositoryTests extends RepositoryTests {
 			arrange("inference", "ctx-np-na.cypher");
 			Matrix matrix  = repository.read(PROJECT_ID, DATASET_ID);
 			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID, PROFILE3_ID)));
-			assertArrayEquals(matrix.getDistances(), new int[][] {{}, {2}, {3, 2}});
-			assertArrayEquals(matrix.getIsolates(), new int[] {0, 0, 0});
+			assertArrayEquals(new int[][] {{}, {2}, {3, 2}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 0, 0}, matrix.getIsolates());
 			tx.failure();
 		}
 	}
@@ -103,8 +103,8 @@ public class InferenceRepositoryTests extends RepositoryTests {
 			arrange("inference", "ctx-np-na-m.cypher");
 			Matrix matrix  = repository.read(PROJECT_ID, DATASET_ID);
 			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID, PROFILE3_ID)));
-			assertArrayEquals(matrix.getDistances(), new int[][] {{}, {2}, {3, 3}});
-			assertArrayEquals(matrix.getIsolates(), new int[] {0, 0, 0});
+			assertArrayEquals(new int[][] {{}, {2}, {3, 2}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 0, 0}, matrix.getIsolates());
 			tx.failure();
 		}
 	}

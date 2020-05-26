@@ -2,27 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../algorithms/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/Repository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../algorithms/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/Algorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/Algorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/AnalysisRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceAlgorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/implementation/InferenceAlgorithm.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceProcedures.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceProcedures.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/implementation/GoeBURST.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/implementation/GoeBURST.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/model/Analysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/model/Inference.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/model/AnalysisKey.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/model/Matrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/model/Matrix.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/procedure/Procedure.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/GraphRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/RepositoryImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationAlgorithm.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationProcedures.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/ForceDirectedLayout.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Visualization.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/GoeBURSTTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/GoeBURSTTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/db/BatchRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/utils/db/BatchRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,17 +100,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="InferenceControllerTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="All in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.analysis.inference.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.analysis.inference" />
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.analysis.inference.InferenceControllerTests" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -178,18 +155,18 @@
     </configuration>
     <list>
       <item itemvalue="JUnit.pt.ist.meic.phylodb in phylodb.test" />
-      <item itemvalue="JUnit.InferenceControllerTests" />
       <item itemvalue="JUnit.VisualizationControllerTests" />
       <item itemvalue="Application.PhylodbApplication" />
       <item itemvalue="JUnit.IsolateControllerTests.getIsolate" />
+      <item itemvalue="JUnit.All in phylodb.test" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.pt.ist.meic.phylodb in phylodb.test" />
-        <item itemvalue="JUnit.IsolateControllerTests.getIsolate" />
         <item itemvalue="Application.PhylodbApplication" />
+        <item itemvalue="JUnit.All in phylodb.test" />
+        <item itemvalue="JUnit.IsolateControllerTests.getIsolate" />
         <item itemvalue="JUnit.VisualizationControllerTests" />
-        <item itemvalue="JUnit.InferenceControllerTests" />
       </list>
     </recent_temporary>
   </component>
@@ -301,54 +278,54 @@
     </state>
     <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1588924084117" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1589914901033" />
-    <state width="1493" height="218" key="GridCell.Tab.0.bottom" timestamp="1589902133530">
+    <state width="1493" height="281" key="GridCell.Tab.0.bottom" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
     <state width="1877" height="292" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813386939" />
-    <state width="1493" height="218" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1589902133530" />
-    <state width="1493" height="218" key="GridCell.Tab.0.center" timestamp="1589902133529">
+    <state width="1493" height="281" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.0.center" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
     <state width="1877" height="292" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813386939" />
-    <state width="1493" height="218" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1589902133529" />
-    <state width="1493" height="218" key="GridCell.Tab.0.left" timestamp="1589902133529">
+    <state width="1493" height="281" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.0.left" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
     <state width="1877" height="292" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813386939" />
-    <state width="1493" height="218" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1589902133529" />
-    <state width="1493" height="218" key="GridCell.Tab.0.right" timestamp="1589902133530">
+    <state width="1493" height="281" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.0.right" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
     <state width="1877" height="292" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813386939" />
-    <state width="1493" height="218" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1589902133530" />
-    <state width="1493" height="281" key="GridCell.Tab.1.bottom" timestamp="1589902073758">
+    <state width="1493" height="281" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.1.bottom" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
     <state width="1877" height="305" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813332443" />
-    <state width="1493" height="281" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1589902073758" />
-    <state width="1493" height="281" key="GridCell.Tab.1.center" timestamp="1589902073758">
+    <state width="1493" height="281" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.1.center" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
     <state width="1877" height="305" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813332443" />
-    <state width="1493" height="281" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1589902073758" />
-    <state width="1493" height="281" key="GridCell.Tab.1.left" timestamp="1589902073758">
+    <state width="1493" height="281" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.1.left" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844232" />
     <state width="1877" height="305" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813332443" />
-    <state width="1493" height="281" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1589902073758" />
-    <state width="1493" height="281" key="GridCell.Tab.1.right" timestamp="1589902073758">
+    <state width="1493" height="281" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
+    <state width="1493" height="281" key="GridCell.Tab.1.right" timestamp="1590498668650">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
     <state width="1877" height="305" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1589813332443" />
-    <state width="1493" height="281" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1589902073758" />
+    <state width="1493" height="281" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1590498668650" />
     <state x="620" y="360" key="ReplaceDuplicatesPrompt" timestamp="1588720714296">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

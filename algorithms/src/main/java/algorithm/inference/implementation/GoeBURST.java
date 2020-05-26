@@ -30,12 +30,12 @@ public class GoeBURST extends InferenceAlgorithm {
 		Iterator<Edge> it = IntStream.range(0, size)
 				.peek(i -> clusters[i] = i)
 				.mapToObj(i -> IntStream.range(0, i)
-						.peek(j -> {
-							lv[i][matrix.distance(i, j) - 1]++;
-							lv[j][matrix.distance(i, j) - 1]++;
-						})
 						.mapToObj(j -> new Edge(j, i, matrix.distance(i, j)))
-						.filter(edge -> edge.distance() > 0 && edge.distance() <= lvs))
+						.filter(edge -> edge.distance() > 0 && edge.distance() <= lvs)
+						.peek(e -> {
+							lv[e.to()][e.distance() - 1]++;
+							lv[e.from()][e.distance() - 1]++;
+						}))
 				.flatMap(i -> i)
 				.sorted(Comparator.comparingInt(Edge::distance).thenComparing((i, j) -> tiebreak(lv, matrix.getIsolates(), matrix.getIds(), i.from(), i.to(), j.from(), j.to())))
 				.iterator();

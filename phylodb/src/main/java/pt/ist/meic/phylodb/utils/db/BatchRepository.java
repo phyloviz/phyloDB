@@ -18,7 +18,9 @@ public abstract class BatchRepository<T extends Entity<K>, K> extends EntityRepo
 	public boolean saveAll(List<T> entities) {
 		if (entities.size() == 0)
 			return false;
+		long start = System.currentTimeMillis();
 		execute(batch(init(new Query("UNWIND $ as param\n"), entities)));
+		System.out.println("Took " + (System.currentTimeMillis() - start) + " milliseconds to insert");
 		return true;
 	}
 

@@ -5,7 +5,6 @@ import algorithm.repository.Repository;
 import algorithm.inference.model.Edge;
 import algorithm.inference.model.Inference;
 import algorithm.inference.model.Matrix;
-import javafx.util.Pair;
 import org.neo4j.graphdb.*;
 
 import java.util.ArrayList;
@@ -28,9 +27,10 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
 		List<Node> profiles = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL)
 				.collect(Collectors.toList());
-		int loci = Math.toIntExact((long) relationships(profiles.get(0), Relation.HAS, Direction.OUTGOING)
+		Node detail = detail(profiles.get(0));
+		int loci = Math.toIntExact((long) relationships(detail, Relation.HAS, Direction.OUTGOING)
 				.findFirst()
-				.orElseThrow(RuntimeException::new)
+				.orElseThrow(() -> new RuntimeException("loci - profiles size:" + profiles.size()))
 				.getProperty(Allele.TOTAL));
 		int lines = profiles.size();
 		String[] ids = new String[lines];
@@ -39,9 +39,9 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 		IntStream.range(0, lines)
 				.peek(i -> ids[i] = (String) profiles.get(i).getProperty(Profile.ID))
 				.peek(i -> isolates[i] = Math.toIntExact(relationships(profiles.get(i), Relation.HAS, Direction.INCOMING).count()))
-				.forEach(i -> relationships(profiles.get(i), Relation.HAS, Direction.OUTGOING)
-						.map(r -> new Pair<>(Math.toIntExact((long)  r.getProperty(Allele.PART)), (String) r.getEndNode().getProperty(Allele.ID)))
-						.forEach(p -> alleles[i][p.getKey() - 1] = p.getValue()));
+				.forEach(i -> relationships(detail(profiles.get(i)), Relation.HAS, Direction.OUTGOING)
+						.map(r -> new Object[] {Math.toIntExact((long)  r.getProperty(Allele.PART)), r.getEndNode().getProperty(Allele.ID)})
+						.forEach(p -> alleles[i][((int)p[0]) - 1] = (String) p[1]));
 		return new Matrix(ids, isolates, alleles);
 	}
 

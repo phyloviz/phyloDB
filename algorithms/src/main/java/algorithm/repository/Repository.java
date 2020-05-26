@@ -16,6 +16,7 @@ public abstract class Repository<T, R> {
 	}
 
 	public abstract R read(String... params) throws Exception;
+
 	public abstract void write(T param);
 
 	protected void createRelationship(Node from, Node to, Relation type, Map<String, Object> params) {
@@ -32,7 +33,7 @@ public abstract class Repository<T, R> {
 				.map(Relationship::getEndNode)
 				.filter(n -> n.hasLabel(Label.label(label)) && n.getProperty("id").equals(id))
 				.findFirst()
-				.orElseThrow(RuntimeException::new);
+				.orElseThrow(() -> new RuntimeException("related " + node.getProperty("id") + " " + relationship.name() + " " + label + " " + id));
 	}
 
 	protected Stream<Node> related(Node node, Relation relationship, Direction direction, String label) {
@@ -51,7 +52,15 @@ public abstract class Repository<T, R> {
 				.filter(r -> r.getProperty("to", null) == null)
 				.findFirst()
 				.map(r -> Math.toIntExact((long) r.getProperty("version")))
-				.orElseThrow(RuntimeException::new);
+				.orElseThrow(() -> new RuntimeException("version " + node.getProperty("id") + " " + node.getLabels().iterator().next().name()));
+	}
+
+	protected Node detail(Node node) {
+		return relationships(node, Relation.CONTAINS_DETAILS, Direction.OUTGOING)
+				.filter(r -> r.getProperty("to", null) == null)
+				.findFirst()
+				.map(Relationship::getEndNode)
+				.orElseThrow(() -> new RuntimeException("detail " + node.getProperty("id") + " " + node.getLabels().iterator().next().name()));
 	}
 
 }
