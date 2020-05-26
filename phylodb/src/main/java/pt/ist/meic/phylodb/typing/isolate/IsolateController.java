@@ -34,8 +34,8 @@ public class IsolateController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getIsolates(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
@@ -47,8 +47,8 @@ public class IsolateController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{isolate}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolate(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@PathVariable("isolate") String isolateId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
@@ -58,8 +58,8 @@ public class IsolateController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{isolate}")
 	public ResponseEntity<?> putIsolate(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@PathVariable("isolate") String isolateId,
 			@RequestBody IsolateInputModel input
 	) {
@@ -69,8 +69,8 @@ public class IsolateController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postIsolates(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "id", defaultValue = "0") int id,
 			@RequestParam("file") MultipartFile file
 	) throws IOException {
@@ -80,8 +80,8 @@ public class IsolateController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putIsolates(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "id", defaultValue = "0") int id,
 			@RequestParam("file") MultipartFile file
 
@@ -92,8 +92,8 @@ public class IsolateController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{isolate}")
 	public ResponseEntity<?> deleteIsolate(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@PathVariable("isolate") String isolateId
 	) {
 		return status(() -> service.deleteIsolate(projectId, datasetId, isolateId));

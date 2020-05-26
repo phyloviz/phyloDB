@@ -11,8 +11,8 @@ import java.util.*;
 
 public abstract class ProfilesFormatter extends Formatter<Profile> {
 
-	protected UUID projectId;
-	protected UUID datasetId;
+	protected String projectId;
+	protected String datasetId;
 	protected Schema schema;
 	protected String missing;
 	protected boolean authorized;
@@ -38,8 +38,8 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 
 	@Override
 	protected boolean init(Iterator<String> it, Object... params) {
-		this.projectId = (UUID) params[0];
-		this.datasetId = (UUID) params[1];
+		this.projectId = (String) params[0];
+		this.datasetId = (String) params[1];
 		this.schema = (Schema) params[2];
 		this.missing = (String) params[3];
 		this.authorized = (boolean) params[4];

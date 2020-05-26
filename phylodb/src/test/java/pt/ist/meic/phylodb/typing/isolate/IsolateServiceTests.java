@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 public class IsolateServiceTests extends ServiceTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final UUID PROJECTID = PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
+	private static final String PROJECTID = PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
 	private static final Isolate[] STATE = new Isolate[]{ISOLATE1, ISOLATE2};
 
 	private static Stream<Arguments> getIsolates_params() {

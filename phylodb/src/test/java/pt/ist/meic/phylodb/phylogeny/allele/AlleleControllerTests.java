@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class AlleleControllerTests extends ControllerTestsContext {
 
 	private static final String TAXONID = TAXON1.getPrimaryKey(), LOCUSID = LOCUS1.getPrimaryKey().getId();
-	private static final UUID PROJECTID = PROJECT1.getPrimaryKey();
+	private static final String PROJECTID = PROJECT1.getPrimaryKey();
 
 	private static Stream<Arguments> getAllelesList_params() {
 		String uri = "/taxons/%s/loci/%s/alleles";

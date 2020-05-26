@@ -33,8 +33,8 @@ public class InferenceController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getInferences(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
@@ -44,9 +44,9 @@ public class InferenceController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{inference}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getInference(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("inference") UUID inferenceId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@PathVariable("inference") String inferenceId,
 			@RequestParam(value = "format", defaultValue = TreeFormatter.NEWICK) String format
 	) {
 		if(!format.equals(TreeFormatter.NEWICK) && !format.equals(TreeFormatter.NEXUS))
@@ -59,13 +59,13 @@ public class InferenceController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "")
 	public ResponseEntity<?> postInference(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam("algorithm") String algorithm,
 			@RequestParam("format") String format,
 			@RequestParam("file") MultipartFile file
 	) throws IOException {
-		Optional<UUID> optional = service.saveInference(projectId, datasetId, algorithm, format, file);
+		Optional<String> optional = service.saveInference(projectId, datasetId, algorithm, format, file);
 		return optional.isPresent() ?
 				new CreatedOutputModel(optional.get()).toResponseEntity() :
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
@@ -74,9 +74,9 @@ public class InferenceController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{inference}")
 	public ResponseEntity<?> deleteInference(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("inference") UUID inferenceId
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@PathVariable("inference") String inferenceId
 	) {
 		return status(() -> service.deleteInference(projectId, datasetId, inferenceId));
 	}

@@ -4,26 +4,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 
-import java.util.UUID;
-
 public class JobCreatedOutputModel implements OutputModel {
 
-	private UUID job_id;
-	private UUID analysis_id;
+	private String job_id;
+	private String analysis_id;
 
 	public JobCreatedOutputModel() {
 	}
 
-	public JobCreatedOutputModel(UUID job_id, UUID analysis_id) {
+	public JobCreatedOutputModel(String job_id, String analysis_id) {
 		this.job_id = job_id;
 		this.analysis_id = analysis_id;
 	}
 
-	public UUID getJob_id() {
+	public String getJob_id() {
 		return job_id;
 	}
 
-	public UUID getAnalysis_id() {
+	public String getAnalysis_id() {
 		return analysis_id;
 	}
 

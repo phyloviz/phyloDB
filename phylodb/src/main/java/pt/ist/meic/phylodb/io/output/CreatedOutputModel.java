@@ -4,20 +4,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class CreatedOutputModel implements OutputModel {
 
-	private UUID id;
+	private String id;
 
 	public CreatedOutputModel() {
 	}
 
-	public CreatedOutputModel(UUID id) {
+	public CreatedOutputModel(String id) {
 		this.id = id;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

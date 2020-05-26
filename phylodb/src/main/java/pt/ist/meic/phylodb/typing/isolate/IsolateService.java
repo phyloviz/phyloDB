@@ -33,12 +33,12 @@ public class IsolateService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Isolate>> getIsolates(UUID projectId, UUID datasetId, int page, int limit) {
+	public Optional<List<Isolate>> getIsolates(String projectId, String datasetId, int page, int limit) {
 		return isolateRepository.findAll(page, limit, projectId, datasetId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Isolate> getIsolate(UUID projectId, UUID datasetId, String isolateId, Long version) {
+	public Optional<Isolate> getIsolate(String projectId, String datasetId, String isolateId, Long version) {
 		return isolateRepository.find(new Isolate.PrimaryKey(projectId, datasetId, isolateId), version);
 	}
 
@@ -58,21 +58,21 @@ public class IsolateService {
 	}
 
 	@Transactional
-	public boolean deleteIsolate(UUID projectId, UUID datasetId, String isolateId) {
+	public boolean deleteIsolate(String projectId, String datasetId, String isolateId) {
 		return isolateRepository.remove(new Isolate.PrimaryKey(projectId, datasetId, isolateId));
 	}
 
 	@Transactional
-	public Optional<Pair<Integer[], String[]>> saveIsolatesOnConflictSkip(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+	public Optional<Pair<Integer[], String[]>> saveIsolatesOnConflictSkip(String projectId, String datasetId, int idColumn, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, idColumn, false, file);
 	}
 
 	@Transactional
-	public Optional<Pair<Integer[], String[]>> saveIsolatesOnConflictUpdate(UUID projectId, UUID datasetId, int idColumn, MultipartFile file) throws IOException {
+	public Optional<Pair<Integer[], String[]>> saveIsolatesOnConflictUpdate(String projectId, String datasetId, int idColumn, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, idColumn, true, file);
 	}
 
-	private Optional<Pair<Integer[], String[]>> saveAll(UUID projectId, UUID datasetId, int idColumn, boolean conflict, MultipartFile file) throws IOException {
+	private Optional<Pair<Integer[], String[]>> saveAll(String projectId, String datasetId, int idColumn, boolean conflict, MultipartFile file) throws IOException {
 		if (!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return Optional.empty();
 		Predicate<Isolate> canSave = conflict ? i -> true : i -> !isolateRepository.exists(i.getPrimaryKey());

@@ -31,7 +31,7 @@ public class ProfileServiceTests extends ServiceTestsContext {
 
 	private static final int LIMIT = 2;
 	private static final String TAXONID = TAXON1.getPrimaryKey(), locusId1 = LOCUS1.getPrimaryKey().getId(), locusId2 = LOCUS2.getPrimaryKey().getId();
-	private static final UUID PROJECTID = PROJECT1.getPrimaryKey(), datasetId = DATASET1.getPrimaryKey().getId();
+	private static final String PROJECTID = PROJECT1.getPrimaryKey(), datasetId = DATASET1.getPrimaryKey().getId();
 	private static final Allele ALLELE21P = new Allele(TAXONID, locusId2, "1", 1, false, null, PROJECTID);
 	private static final Profile PROFILE3 = new Profile(PROJECTID, datasetId, "1", 1, false, null,
 			Arrays.asList(new Entity<>(ALLELE11.getPrimaryKey(), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())));

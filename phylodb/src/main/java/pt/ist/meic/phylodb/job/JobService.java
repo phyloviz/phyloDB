@@ -26,34 +26,27 @@ public class JobService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Job>> getJobs(UUID projectId, int page, Integer limit) {
+	public Optional<List<Job>> getJobs(String projectId, int page, Integer limit) {
 		return jobRepository.findAll(page, limit, projectId);
 	}
 
 	@Transactional
-	public Optional<Pair<UUID, UUID>> createJob(UUID projectId, JobRequest jobRequest) {
+	public Optional<Pair<String, String>> createJob(String projectId, JobRequest jobRequest) {
 		if (!valid(projectId, jobRequest))
 			return Optional.empty();
-		UUID jobId = UUID.randomUUID();
-		UUID analysisId = UUID.randomUUID();
+		String jobId = UUID.randomUUID().toString();
+		String analysisId = UUID.randomUUID().toString();
 		jobRepository.save(new Job(projectId, jobId, jobRequest.getType().getName() + "." + jobRequest.getAlgorithm(), analysisId, jobRequest.getParameters()));
 		return Optional.of(new Pair<>(jobId, analysisId));
 	}
 
 	@Transactional
-	public boolean deleteJob(UUID projectId, UUID jobId) {
+	public boolean deleteJob(String projectId, String jobId) {
 		return jobRepository.remove(new Job.PrimaryKey(projectId, jobId));
 	}
 
-	private boolean valid(UUID projectId, JobRequest jobRequest) {
-		UUID[] params;
-		try {
-			params = Arrays.stream(jobRequest.getParameters())
-					.map(UUID::fromString)
-					.toArray(UUID[]::new);
-		} catch (IllegalArgumentException e) {
-			return false;
-		}
+	private boolean valid(String projectId, JobRequest jobRequest) {
+		String[] params = jobRequest.getParameters();
 		return params.length == JobInputModel.INFERENCE_PARAMETERS_COUNT ?
 				profileRepository.findAll(0, 2, projectId, params[0]).orElse(Collections.emptyList()).size() > 1  :
 				inferenceRepository.exists(new Inference.PrimaryKey(projectId, params[0], params[1]));

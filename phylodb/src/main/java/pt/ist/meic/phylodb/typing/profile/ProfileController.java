@@ -17,7 +17,6 @@ import pt.ist.meic.phylodb.typing.profile.model.ProfileInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
 
@@ -34,8 +33,8 @@ public class ProfileController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> getProfiles(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
@@ -47,8 +46,8 @@ public class ProfileController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{profile}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProfile(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@PathVariable("profile") String profileId,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
@@ -58,20 +57,20 @@ public class ProfileController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{profile}")
 	public ResponseEntity<?> putProfile(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@PathVariable("profile") String profileId,
 			@RequestParam(value = "private_alleles", defaultValue = "false") boolean authorized,
 			@RequestBody ProfileInputModel input
 	) {
-		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), profileId), p -> service.saveProfile(p, authorized));
+		return put(() -> input.toDomainEntity(projectId, datasetId, profileId), p -> service.saveProfile(p, authorized));
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PostMapping(path = "/files")
 	public ResponseEntity<?> postProfiles(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "private_alleles", defaultValue = "false") boolean authorized,
 			@RequestParam("file") MultipartFile file
 	) throws IOException {
@@ -81,8 +80,8 @@ public class ProfileController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/files")
 	public ResponseEntity<?> putProfiles(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "private_alleles", defaultValue = "false") boolean authorized,
 			@RequestParam("file") MultipartFile file
 	) throws IOException {
@@ -92,8 +91,8 @@ public class ProfileController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{profile}")
 	public ResponseEntity<?> deleteProfile(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
 			@PathVariable("profile") String profileId
 	) {
 		return status(() -> service.deleteProfile(projectId, datasetId, profileId));

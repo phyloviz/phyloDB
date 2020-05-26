@@ -7,15 +7,14 @@ import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class InferenceOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	protected UUID project_id;
+	protected String project_id;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	protected UUID dataset_id;
-	protected UUID id;
+	protected String dataset_id;
+	protected String id;
 	protected boolean deprecated;
 
 	public InferenceOutputModel() {
@@ -28,15 +27,15 @@ public class InferenceOutputModel implements OutputModel {
 		this.deprecated = analysis.isDeprecated();
 	}
 
-	public UUID getProject_id() {
+	public String getProject_id() {
 		return project_id;
 	}
 
-	public UUID getDataset_id() {
+	public String getDataset_id() {
 		return dataset_id;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

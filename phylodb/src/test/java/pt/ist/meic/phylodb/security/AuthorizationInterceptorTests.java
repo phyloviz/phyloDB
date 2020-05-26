@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,16 +45,16 @@ public class AuthorizationInterceptorTests extends TestContext {
 	private static Stream<Arguments> preHandle_params() throws NoSuchMethodException {
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		User.PrimaryKey userKey = new User.PrimaryKey("id", "provider"), otherKey = new User.PrimaryKey("id2", "provider2");
-		Project userProject = new Project(UUID.fromString(ID), "t", "private", "t", new User.PrimaryKey[]{userKey});
-		Project userPublicProject = new Project(UUID.fromString(ID), "t", "public", "t", new User.PrimaryKey[]{userKey});
-		Project otherPublicProject = new Project(UUID.fromString(ID), "t", "public", "t", new User.PrimaryKey[]{otherKey});
-		Project otherProject = new Project(UUID.fromString(ID), "t", "private", "t", new User.PrimaryKey[]{otherKey});
+		Project userProject = new Project(ID, "t", "private", "t", new User.PrimaryKey[]{userKey});
+		Project userPublicProject = new Project(ID, "t", "public", "t", new User.PrimaryKey[]{userKey});
+		Project otherPublicProject = new Project(ID, "t", "public", "t", new User.PrimaryKey[]{otherKey});
+		Project otherProject = new Project(ID, "t", "private", "t", new User.PrimaryKey[]{otherKey});
 		HandlerMethod handler1 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("saveTaxon", String.class, TaxonInputModel.class));
 		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, String.class, AlleleInputModel.class));
-		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, UUID.class, int.class, String.class));
+		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, String.class, int.class, String.class));
 		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxons", int.class));
-		HandlerMethod handler5 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("postInference", UUID.class, UUID.class, String.class, String.class, MultipartFile.class));
-		HandlerMethod handler6 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("getInferences", UUID.class, UUID.class, int.class));
+		HandlerMethod handler5 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("postInference", String.class, String.class, String.class, String.class, MultipartFile.class));
+		HandlerMethod handler6 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("getInferences", String.class, String.class, int.class));
 		return Stream.of(Arguments.of(request(userKey, Role.ADMIN, null), response, handler1, null, true),
 				Arguments.of(request(userKey, Role.ADMIN, null), response, handler2, null, true),
 				Arguments.of(request(userKey, Role.USER, null), response, handler1, null, false),
@@ -96,7 +95,7 @@ public class AuthorizationInterceptorTests extends TestContext {
 	@MethodSource("preHandle_params")
 	public void preHandle(HttpServletRequest req, HttpServletResponse res, HandlerMethod hm, Project project, boolean expected) {
 		MockitoAnnotations.initMocks(this);
-		Mockito.when(service.getProject(UUID.fromString(ID), -1)).thenReturn(Optional.ofNullable(project));
+		Mockito.when(service.getProject(ID, -1)).thenReturn(Optional.ofNullable(project));
 		boolean result = interceptor.handle(req, res, hm);
 		assertEquals(expected, result);
 	}

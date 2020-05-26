@@ -55,14 +55,13 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 
 	@Override
 	protected Allele parse(Map<String, Object> row) {
-		UUID project = row.get("project") != null ? UUID.fromString((String) row.get("project")) : null;
 		return new Allele((String) row.get("taxonId"),
 				(String) row.get("locusId"),
 				(String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("sequence"),
-				project);
+				(String) row.get("project"));
 	}
 
 	@Override
@@ -122,7 +121,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 				.map(r -> new Object() {
 					public final String locus = r.getPrimaryKey().getLocusId();
 					public final String allele = r.getPrimaryKey().getId();
-					public final UUID project = r.getPrimaryKey().getProjectId();
+					public final String project = r.getPrimaryKey().getProjectId();
 				})
 				.toArray())
 		);
@@ -137,7 +136,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		return new Object() {
 			public final String taxonId = allele.getPrimaryKey().getTaxonId();
 			public final String locusId = allele.getPrimaryKey().getLocusId();
-			public final UUID projectId = allele.getPrimaryKey().getProjectId();
+			public final String projectId = allele.getPrimaryKey().getProjectId();
 			public final String id = allele.getPrimaryKey().getId();
 			public final String sequence = allele.getSequence();
 		};

@@ -5,18 +5,17 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
-public class Project extends Entity<UUID> {
+public class Project extends Entity<String> {
 
 	private final String name;
 	private final String type;
 	private final String description;
 	private final User.PrimaryKey[] users;
 
-	public Project(UUID id, long version, boolean deprecated, String name, String type, String description, User.PrimaryKey[] users) {
+	public Project(String id, long version, boolean deprecated, String name, String type, String description, User.PrimaryKey[] users) {
 		super(id, version, deprecated);
 		this.name = name;
 		this.type = type;
@@ -24,7 +23,7 @@ public class Project extends Entity<UUID> {
 		this.users = users;
 	}
 
-	public Project(UUID id, String name, String type, String description, User.PrimaryKey[] users) {
+	public Project(String id, String name, String type, String description, User.PrimaryKey[] users) {
 		this(id, CURRENT_VERSION_VALUE, false, name, type, description, users);
 	}
 

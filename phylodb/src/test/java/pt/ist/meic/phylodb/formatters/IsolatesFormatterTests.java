@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class IsolatesFormatterTests extends FormatterTests {
 
 	private static final String[] ANCILLARY = {"isolate", "country", "continent"};
-	private static final UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
-	private static final String missing = "";
+	private static final String PROJECT_ID = UUID.randomUUID().toString(), DATASET_ID = UUID.randomUUID().toString();
+	private static final String MISSING = "";
 
-	public static List<Isolate> isolates(UUID projectId, UUID datasetId, String[][] ancilarry, String[] profiles) {
+	public static List<Isolate> isolates(String projectId, String datasetId, String[][] ancilarry, String[] profiles) {
 		List<Isolate> isolates = new ArrayList<>();
 		for (int i = 0; i < ancilarry.length; i++) {
 			if (ancilarry[i] == null)
@@ -39,7 +39,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 					.mapToObj(d -> new Ancillary(ANCILLARY[d], ancilarry[aux[0]][d]))
 					.toArray(Ancillary[]::new);
 			String profile = null;
-			if(profiles != null && profiles[i] != null && !profiles[i].matches(String.format("[\\s%s]*", missing)))
+			if(profiles != null && profiles[i] != null && !profiles[i].matches(String.format("[\\s%s]*", MISSING)))
 				profile = profiles[i];
 			isolates.add(new Isolate(projectId, datasetId, String.valueOf(i + 1), null, a, profile));
 		}
@@ -49,7 +49,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	private static List<Isolate> isolates(String[] profiles) {
 		return IntStream.range(0, profiles.length)
 				.filter(i -> profiles[i] != null)
-				.mapToObj(i -> new Isolate(projectId, datasetId, String.valueOf(i + 1), null, new Ancillary[0], profiles[i]))
+				.mapToObj(i -> new Isolate(PROJECT_ID, DATASET_ID, String.valueOf(i + 1), null, new Ancillary[0], profiles[i]))
 				.collect(Collectors.toList());
 	}
 
@@ -69,16 +69,16 @@ public class IsolatesFormatterTests extends FormatterTests {
 		String[][] ancillary3 = {{"AU13161", "USA", "North America"}, {"LMG 1231T", "Unknown", ""}, {"LMG 1860", "France", "Europe"}};
 		String[][] ancillary4 = {{"AU13161", "USA", "North America"}, {"LMG 1231T", "Unknown", "Europe"}};
 		List<Isolate> isolates1 = new ArrayList<>(), isolates2 = new ArrayList<>();
-		isolates1.add(new Isolate(UUID.randomUUID(), UUID.randomUUID(), "1", null, new Ancillary[0], null));
-		isolates2.add(new Isolate(UUID.randomUUID(), UUID.randomUUID(), "1", null, new Ancillary[0], null));
-		isolates2.add(new Isolate(UUID.randomUUID(), UUID.randomUUID(), "2", null, new Ancillary[0], null));
-		Pair<List<Isolate>, Integer[]> expected1 = new Pair<>(isolates(projectId, datasetId, ancillary, new String[]{"", "", "103"}), new Integer[0]);
-		Pair<List<Isolate>, Integer[]> expected2 = new Pair<>(isolates(projectId, datasetId, ancillary1, new String[]{"102", "103"}), new Integer[0]);
-		Pair<List<Isolate>, Integer[]> expected3 = new Pair<>(isolates(projectId, datasetId, ancillary2, new String[]{"102", "", "103"}), new Integer[] {2});
-		Pair<List<Isolate>, Integer[]> expected4 = new Pair<>(isolates(projectId, datasetId, ancillary3, new String[]{"102", "102", "103"}), new Integer[0]);
-		Pair<List<Isolate>, Integer[]> expected5 = new Pair<>(isolates(projectId, datasetId, Arrays.copyOfRange(ancillary1, 0, 1), new String[]{"102"}), new Integer[0]);
-		Pair<List<Isolate>, Integer[]> expected6 = new Pair<>(isolates(projectId, datasetId, ancillary4, null), new Integer[0]);
-		Pair<List<Isolate>, Integer[]> expected7 = new Pair<>(isolates(projectId, datasetId, Arrays.copyOfRange(ancillary4, 0, 1), null), new Integer[0]);
+		isolates1.add(new Isolate(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "1", null, new Ancillary[0], null));
+		isolates2.add(new Isolate(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "1", null, new Ancillary[0], null));
+		isolates2.add(new Isolate(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "2", null, new Ancillary[0], null));
+		Pair<List<Isolate>, Integer[]> expected1 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, ancillary, new String[]{"", "", "103"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected2 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, ancillary1, new String[]{"102", "103"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected3 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, ancillary2, new String[]{"102", "", "103"}), new Integer[] {2});
+		Pair<List<Isolate>, Integer[]> expected4 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, ancillary3, new String[]{"102", "102", "103"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected5 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, Arrays.copyOfRange(ancillary1, 0, 1), new String[]{"102"}), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected6 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, ancillary4, null), new Integer[0]);
+		Pair<List<Isolate>, Integer[]> expected7 = new Pair<>(isolates(PROJECT_ID, DATASET_ID, Arrays.copyOfRange(ancillary4, 0, 1), null), new Integer[0]);
 		Pair<List<Isolate>, Integer[]> expected8 = new Pair<>(isolates(new String[]{"102", "102"}), new Integer[0]);
 		Pair<List<Isolate>, Integer[]> expected9 = new Pair<>(isolates(new String[]{"102"}), new Integer[0]);
 		Pair<List<Isolate>, Integer[]> expected10 = new Pair<>(isolates1, new Integer[0]);
@@ -100,7 +100,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@MethodSource("emptyListParams")
 	public void parse_emptyList(String filename, int id, Integer[] errors) throws IOException {
 		IsolatesFormatter formatter = new IsolatesFormatter();
-		Pair<List<Isolate>, List<Integer>> result = formatter.parse(createFile("isolates", filename), UUID.randomUUID(), UUID.randomUUID(), id, missing);
+		Pair<List<Isolate>, List<Integer>> result = formatter.parse(createFile("isolates", filename), UUID.randomUUID().toString(), UUID.randomUUID().toString(), id, MISSING);
 		assertEquals(0, result.getKey().size());
 		assertArrayEquals(errors, result.getValue().toArray());
 	}
@@ -109,7 +109,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@MethodSource("nonemptyListParams")
 	public void parse_nonemptyList(String filename, int id, Pair<List<Isolate>, Integer[]> expected) throws IOException {
 		IsolatesFormatter formatter = new IsolatesFormatter();
-		Pair<List<Isolate>, List<Integer>> result = formatter.parse(createFile("isolates", filename), projectId, datasetId, id, missing);
+		Pair<List<Isolate>, List<Integer>> result = formatter.parse(createFile("isolates", filename), PROJECT_ID, DATASET_ID, id, MISSING);
 		List<Isolate> isolates = result.getKey();
 		assertEquals(expected.getKey().size(), isolates.size());
 		assertArrayEquals(expected.getValue(), result.getValue().toArray());
@@ -127,7 +127,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithAllHeadersAndIsolates() throws IOException {
 		String[][] ancillary = {{"AU13161", "USA", "North America"}, {"LMG 1231T", "Unknown", "Europe"}};
-		List<Isolate> isolates = isolates(projectId, datasetId, ancillary, new String[]{"102", "103"});
+		List<Isolate> isolates = isolates(PROJECT_ID, DATASET_ID, ancillary, new String[]{"102", "103"});
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-iap-2-ve-p.txt");
 		String formatted = formatter.format(isolates);
@@ -137,8 +137,8 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithAllHeadersAndIsolatesWithMissingAncillary() throws IOException {
 		String[][] ancillary = {{"AU13161", "USA", "North America"}, {"LMG 1231T", "Unknown", ""}};
-		List<Isolate> isolates = new ArrayList<>(isolates(projectId, datasetId, ancillary, new String[]{"102", "102"}));
-		isolates.add(new Isolate(projectId, datasetId, "3", null, new Ancillary[]{new Ancillary(ANCILLARY[0], "LMG 1860"),
+		List<Isolate> isolates = new ArrayList<>(isolates(PROJECT_ID, DATASET_ID, ancillary, new String[]{"102", "102"}));
+		isolates.add(new Isolate(PROJECT_ID, DATASET_ID, "3", null, new Ancillary[]{new Ancillary(ANCILLARY[0], "LMG 1860"),
 				new Ancillary(ANCILLARY[1], "France"), new Ancillary(ANCILLARY[2], "Europe")}, "103"));
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-iap-3-me-p.txt");
@@ -149,7 +149,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithAllHeadersAndIsolatesWithMissingProfiles() throws IOException {
 		String[][] ancillary = {{"AU13161", "USA", "North America"}, {"LMG 1231T", "Unknown", "Europe"}, {"LMG 1860", "France", "Europe"}};
-		List<Isolate> isolates = new ArrayList<>(isolates(projectId, datasetId, ancillary, new String[]{null, null, "103"}));
+		List<Isolate> isolates = new ArrayList<>(isolates(PROJECT_ID, DATASET_ID, ancillary, new String[]{null, null, "103"}));
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-iap-3-ve.txt");
 		String formatted = formatter.format(isolates);
@@ -159,7 +159,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithAllHeadersAndIsolate() throws IOException {
 		String[][] ancillary = {{"AU13161", "USA", "North America"}};
-		List<Isolate> isolates = new ArrayList<>(isolates(projectId, datasetId, ancillary, new String[]{"102"}));
+		List<Isolate> isolates = new ArrayList<>(isolates(PROJECT_ID, DATASET_ID, ancillary, new String[]{"102"}));
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-iap-1-ve-p.txt");
 		String formatted = formatter.format(isolates);
@@ -169,7 +169,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithIdAndAncillaryHeadersAndIsolates() throws IOException {
 		String[][] ancillary = {{"AU13161", "USA", "North America"}, {"LMG 1231T", "Unknown", "Europe"}};
-		List<Isolate> isolates = isolates(projectId, datasetId, ancillary, null);
+		List<Isolate> isolates = isolates(PROJECT_ID, DATASET_ID, ancillary, null);
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-ia-2-ve.txt");
 		String formatted = formatter.format(isolates);
@@ -179,7 +179,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithIdAndAncillaryHeadersAndIsolate() throws IOException {
 		String[][] ancillary = {{"AU13161", "USA", "North America"}};
-		List<Isolate> isolates = isolates(projectId, datasetId, ancillary, null);
+		List<Isolate> isolates = isolates(PROJECT_ID, DATASET_ID, ancillary, null);
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-ia-1-ve.txt");
 		String formatted = formatter.format(isolates);
@@ -207,8 +207,8 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithIdHeaderAndIsolates() throws IOException {
 		List<Isolate> isolates = new ArrayList<>();
-		isolates.add(new Isolate(projectId, datasetId, "1", null, new Ancillary[0], null));
-		isolates.add(new Isolate(projectId, datasetId, "2", null, new Ancillary[0], null));
+		isolates.add(new Isolate(PROJECT_ID, DATASET_ID, "1", null, new Ancillary[0], null));
+		isolates.add(new Isolate(PROJECT_ID, DATASET_ID, "2", null, new Ancillary[0], null));
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-i-2.txt");
 		String formatted = formatter.format(isolates);
@@ -218,7 +218,7 @@ public class IsolatesFormatterTests extends FormatterTests {
 	@Test
 	public void format_fileWithIdHeaderAndIsolate() throws IOException {
 		List<Isolate> isolates = new ArrayList<>();
-		isolates.add(new Isolate(projectId, datasetId, "1", null, new Ancillary[0], null));
+		isolates.add(new Isolate(PROJECT_ID, DATASET_ID, "1", null, new Ancillary[0], null));
 		IsolatesFormatter formatter = new IsolatesFormatter();
 		String expected = readFile("isolates", "i-i-1.txt");
 		String formatted = formatter.format(isolates);

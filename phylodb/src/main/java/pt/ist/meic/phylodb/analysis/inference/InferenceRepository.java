@@ -54,8 +54,8 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 	@Override
 	protected Inference parse(Map<String, Object> row) {
 		List<Edge> list = new ArrayList<>();
-		UUID projectId = UUID.fromString(row.get("projectId").toString());
-		UUID datasetId = UUID.fromString(row.get("datasetId").toString());
+		String projectId = row.get("projectId").toString();
+		String datasetId = row.get("datasetId").toString();
 		for (Map<String, Object> edge: (Map<String, Object>[]) row.get("edges")) {
 			Entity<Profile.PrimaryKey> from = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("from")), (long) edge.get("fromVersion"), (boolean) edge.get("fromDeprecated"));
 			Entity<Profile.PrimaryKey> to = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("to")), (long) edge.get("toVersion"), (boolean) edge.get("toDeprecated"));
@@ -63,7 +63,7 @@ public class InferenceRepository extends AlgorithmsRepository<Inference, Inferen
 		}
 		return new Inference(projectId,
 				datasetId,
-				UUID.fromString(row.get("id").toString()),
+				row.get("id").toString(),
 				(boolean) row.get("deprecated"), InferenceAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
 				list
 		);

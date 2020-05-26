@@ -11,7 +11,6 @@ import pt.ist.meic.phylodb.utils.db.EntityRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class DatasetService {
@@ -27,12 +26,12 @@ public class DatasetService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Dataset>> getDatasets(UUID projectId, int page, int limit) {
+	public Optional<List<Dataset>> getDatasets(String projectId, int page, int limit) {
 		return datasetRepository.findAll(page, limit, projectId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Dataset> getDataset(UUID projectId, UUID id, Long version) {
+	public Optional<Dataset> getDataset(String projectId, String id, long version) {
 		return datasetRepository.find(new Dataset.PrimaryKey(projectId, id), version);
 	}
 
@@ -53,7 +52,7 @@ public class DatasetService {
 	}
 
 	@Transactional
-	public boolean deleteDataset(UUID projectId, UUID id) {
+	public boolean deleteDataset(String projectId, String id) {
 		return datasetRepository.remove(new Dataset.PrimaryKey(projectId, id));
 	}
 

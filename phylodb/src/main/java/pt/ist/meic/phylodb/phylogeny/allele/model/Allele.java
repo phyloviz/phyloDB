@@ -3,18 +3,17 @@ package pt.ist.meic.phylodb.phylogeny.allele.model;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class Allele extends Entity<Allele.PrimaryKey> {
 
 	private final String sequence;
 
-	public Allele(String taxonId, String locusId, String id, long version, boolean deprecated, String sequence, UUID project) {
+	public Allele(String taxonId, String locusId, String id, long version, boolean deprecated, String sequence, String project) {
 		super(new PrimaryKey(taxonId, locusId, id, project), version, deprecated);
 		this.sequence = sequence;
 	}
 
-	public Allele(String taxonId, String locusId, String id, String sequence, UUID project) {
+	public Allele(String taxonId, String locusId, String id, String sequence, String project) {
 		this(taxonId, locusId, id, -1, false, sequence, project);
 	}
 
@@ -44,9 +43,9 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 		private final String taxonId;
 		private final String locusId;
 		private final String id;
-		private final UUID projectId;
+		private final String projectId;
 
-		public PrimaryKey(String taxonId, String locusId, String id, UUID projectId) {
+		public PrimaryKey(String taxonId, String locusId, String id, String projectId) {
 			this.taxonId = taxonId;
 			this.locusId = locusId;
 			this.id = id;
@@ -69,7 +68,7 @@ public class Allele extends Entity<Allele.PrimaryKey> {
 			return id;
 		}
 
-		public UUID getProjectId() {
+		public String getProjectId() {
 			return projectId;
 		}
 

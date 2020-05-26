@@ -40,13 +40,13 @@ public class ProfileService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Pair<Schema, List<Profile>>> getProfiles(UUID projectId, UUID datasetId, int page, int limit) {
+	public Optional<Pair<Schema, List<Profile>>> getProfiles(String projectId, String datasetId, int page, int limit) {
 		return profileRepository.findAll(page, limit, projectId, datasetId)
 				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Profile> getProfile(UUID projectId, UUID datasetId, String profileId, Long version) {
+	public Optional<Profile> getProfile(String projectId, String datasetId, String profileId, long version) {
 		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
 	}
 
@@ -68,21 +68,21 @@ public class ProfileService {
 	}
 
 	@Transactional
-	public boolean deleteProfile(UUID projectId, UUID datasetId, String profileId) {
+	public boolean deleteProfile(String projectId, String datasetId, String profileId) {
 		return profileRepository.remove(new Profile.PrimaryKey(projectId, datasetId, profileId));
 	}
 
 	@Transactional
-	public Optional<Pair<Integer[], String[]>> saveProfilesOnConflictSkip(UUID projectId, UUID datasetId, boolean authorized, MultipartFile file) throws IOException {
+	public Optional<Pair<Integer[], String[]>> saveProfilesOnConflictSkip(String projectId, String datasetId, boolean authorized, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, authorized, false, file);
 	}
 
 	@Transactional
-	public Optional<Pair<Integer[], String[]>> saveProfilesOnConflictUpdate(UUID projectId, UUID datasetId, boolean authorized, MultipartFile file) throws IOException {
+	public Optional<Pair<Integer[], String[]>> saveProfilesOnConflictUpdate(String projectId, String datasetId, boolean authorized, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, authorized, true, file);
 	}
 
-	private Optional<Pair<Integer[], String[]>> saveAll(UUID projectId, UUID datasetId, boolean authorized, boolean conflict, MultipartFile file) throws IOException {
+	private Optional<Pair<Integer[], String[]>> saveAll(String projectId, String datasetId, boolean authorized, boolean conflict, MultipartFile file) throws IOException {
 		Optional<Schema> optional = datasetRepository.find(new Dataset.PrimaryKey(projectId, datasetId), EntityRepository.CURRENT_VERSION_VALUE)
 				.flatMap(d -> schemaRepository.find(d.getSchema().getPrimaryKey(), d.getSchema().getVersion()));
 		if (!optional.isPresent())

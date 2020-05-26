@@ -1,24 +1,23 @@
 package pt.ist.meic.phylodb.job.model;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class Job {
 
 	private PrimaryKey id;
 	private String algorithm;
 	private String[] params;
-	private UUID analysisId;
+	private String analysisId;
 	private boolean completed;
 	private boolean cancelled;
 
-	public Job(UUID projectId,UUID jobId, boolean completed, boolean cancelled) {
+	public Job(String projectId, String jobId, boolean completed, boolean cancelled) {
 		this.id = new PrimaryKey(projectId, jobId);
 		this.completed = completed;
 		this.cancelled = cancelled;
 	}
 
-	public Job(UUID projectId, UUID jobId, String algorithm, UUID analysisId, String[] params) {
+	public Job(String projectId, String jobId, String algorithm, String analysisId, String[] params) {
 		this.id = new PrimaryKey(projectId, jobId);
 		this.algorithm = algorithm;
 		this.analysisId = analysisId;
@@ -37,7 +36,7 @@ public class Job {
 		return params;
 	}
 
-	public UUID getAnalysisId() {
+	public String getAnalysisId() {
 		return analysisId;
 	}
 
@@ -52,19 +51,19 @@ public class Job {
 
 	public static class PrimaryKey {
 
-		private final UUID projectId;
-		private final UUID id;
+		private final String projectId;
+		private final String id;
 
-		public PrimaryKey(UUID projectId, UUID id) {
+		public PrimaryKey(String projectId, String id) {
 			this.projectId = projectId;
 			this.id = id;
 		}
 
-		public UUID getProjectId() {
+		public String getProjectId() {
 			return projectId;
 		}
 
-		public UUID getId() {
+		public String getId() {
 			return id;
 		}
 

@@ -100,7 +100,7 @@ public class InferenceServiceTests extends ServiceTestsContext {
 		Mockito.when(datasetRepository.exists(any())).thenReturn(dataset);
 		Mockito.when(profileRepository.anyMissing(any())).thenReturn(profiles);
 		Mockito.when(inferenceRepository.save(any())).thenReturn(expected);
-		Optional<UUID> result = inferenceService.saveInference(UUID.randomUUID(), UUID.randomUUID(), algorithm, format, file);
+		Optional<String> result = inferenceService.saveInference(UUID.randomUUID().toString(), UUID.randomUUID().toString(), algorithm, format, file);
 		assertEquals(expected, result.isPresent());
 	}
 

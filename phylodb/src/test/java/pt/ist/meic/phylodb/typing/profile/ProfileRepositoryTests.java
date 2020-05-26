@@ -234,13 +234,12 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 		for (Map<String, Object> a : alleles) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
-			UUID project = projectId == null ? null : UUID.fromString((String) projectId);
-			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), project);
+			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), (String) projectId);
 			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
 			allelesReferences.set(position - 1, reference);
 		}
-		return new Profile(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
+		return new Profile(row.get("projectId").toString(),
+				row.get("datasetId").toString(),
 				(String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),

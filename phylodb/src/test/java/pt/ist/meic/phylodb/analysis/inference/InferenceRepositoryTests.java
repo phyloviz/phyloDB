@@ -25,13 +25,13 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 	private static final Inference[] STATE = new Inference[]{INFERENCE1, INFERENCE2};
 
 	private static Stream<Arguments> findAll_params() {
-		UUID key1 = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7");
+		String key1 = "6f809af7-2c99-43f7-b674-4843c77384c7", key2 = "7f809af7-2c99-43f7-b674-4843c77384c7";
 		Edge edge3 = new Edge(new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), new Entity<>(PROFILE3.getPrimaryKey(), PROFILE3.getVersion(), PROFILE3.isDeprecated()), 3);
 		Edge edge4 = new Edge(new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), 4);
 		Inference first = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), key1, false, InferenceAlgorithm.GOEBURST, Arrays.asList(edge3, edge4)),
-				second = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), UUID.fromString("6f909af7-2c99-43f7-b674-4843c77384c7"), false, InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2)),
+				second = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2)),
 				third = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), key2, false, InferenceAlgorithm.GOEBURST, Arrays.asList(edge3, edge4)),
-				fourth = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), UUID.fromString("8f809af7-2c99-43f7-b674-4843c77384c7"), false, InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
+				fourth = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "8f809af7-2c99-43f7-b674-4843c77384c7", false, InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
 		return Stream.of(Arguments.of(0, new Inference[0], new Inference[0]),
 				Arguments.of(0, new Inference[]{STATE[0]}, new Inference[]{STATE[0]}),
 				Arguments.of(0, new Inference[]{STATE[0], STATE[1], first}, STATE),
@@ -47,7 +47,7 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> find_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Edge edge3 = new Edge(new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), new Entity<>(PROFILE3.getPrimaryKey(), PROFILE3.getVersion(), PROFILE3.isDeprecated()), 3);
 		Edge edge4 = new Edge(new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), 4);
 		Inference first = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), key, false, InferenceAlgorithm.GOEBURST, Arrays.asList(edge3, edge4));
@@ -57,7 +57,7 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Edge edge3 = new Edge(new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), new Entity<>(PROFILE3.getPrimaryKey(), PROFILE3.getVersion(), PROFILE3.isDeprecated()), 3);
 		Edge edge4 = new Edge(new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), 4);
 		Inference first = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), key, false, InferenceAlgorithm.GOEBURST, Arrays.asList(edge4, edge3)),
@@ -69,7 +69,7 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> save_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Edge edge3 = new Edge(new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), new Entity<>(PROFILE3.getPrimaryKey(), PROFILE3.getVersion(), PROFILE3.isDeprecated()), 3);
 		Edge edge4 = new Edge(new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), 2);
 		Inference first = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), key, false, InferenceAlgorithm.GOEBURST, Arrays.asList(edge4, edge3));
@@ -78,7 +78,7 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> remove_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Edge edge3 = new Edge(new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), new Entity<>(PROFILE3.getPrimaryKey(), PROFILE3.getVersion(), PROFILE3.isDeprecated()), 3);
 		Edge edge4 = new Edge(new Entity<>(PROFILE2.getPrimaryKey(), PROFILE2.getVersion(), PROFILE2.isDeprecated()), new Entity<>(PROFILE1.getPrimaryKey(), PROFILE1.getVersion(), PROFILE1.isDeprecated()), 2);
 		Inference first = new Inference(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), key, false, InferenceAlgorithm.GOEBURST, Arrays.asList(edge4, edge3)),
@@ -114,8 +114,8 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 
 	private Inference parse(Map<String, Object> row) {
 		List<Edge> list = new ArrayList<>();
-		UUID projectId = UUID.fromString(row.get("projectId").toString());
-		UUID datasetId = UUID.fromString(row.get("datasetId").toString());
+		String projectId = (String) row.get("projectId");
+		String datasetId = (String) row.get("datasetId");
 		for (Map<String, Object> edge: (Map<String, Object>[]) row.get("edges")) {
 			Entity<Profile.PrimaryKey> from = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("from")), (long) edge.get("fromVersion"), (boolean) edge.get("fromDeprecated"));
 			Entity<Profile.PrimaryKey> to = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("to")), (long) edge.get("toVersion"), (boolean) edge.get("toDeprecated"));
@@ -123,7 +123,7 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 		}
 		return new Inference(projectId,
 				datasetId,
-				UUID.fromString(row.get("id").toString()),
+				(String) row.get("id"),
 				(boolean) row.get("deprecated"), InferenceAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
 				list
 		);

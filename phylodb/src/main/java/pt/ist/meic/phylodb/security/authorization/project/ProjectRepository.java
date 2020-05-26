@@ -10,10 +10,9 @@ import pt.ist.meic.phylodb.utils.db.Query;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.UUID;
 
 @Repository
-public class ProjectRepository extends EntityRepository<Project, UUID> {
+public class ProjectRepository extends EntityRepository<Project, String> {
 
 	public ProjectRepository(Session session) {
 		super(session);
@@ -35,7 +34,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	}
 
 	@Override
-	protected Result get(UUID key, long version) {
+	protected Result get(String key, long version) {
 		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
 		String statement = "MATCH (p:Project {id: $})-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
 				"WHERE " + where + "\n" +
@@ -50,7 +49,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 		User.PrimaryKey[] userIds = Arrays.stream((Map<String, String>[]) row.get("users"))
 				.map(a -> new User.PrimaryKey(a.get("id"), a.get("provider")))
 				.toArray(User.PrimaryKey[]::new);
-		return new Project(UUID.fromString((String) row.get("id")),
+		return new Project((String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("name"),
@@ -60,7 +59,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	}
 
 	@Override
-	protected boolean isPresent(UUID key) {
+	protected boolean isPresent(String key) {
 		String statement = "OPTIONAL MATCH (p:Project {id: $})\n" +
 				"RETURN COALESCE(p.deprecated = false, false)";
 		return query(Boolean.class, new Query(statement, key));
@@ -86,7 +85,7 @@ public class ProjectRepository extends EntityRepository<Project, UUID> {
 	}
 
 	@Override
-	protected void delete(UUID key) {
+	protected void delete(String key) {
 		String statement = "MATCH (p:Project {id: $}) SET p.deprecated = true WITH p\n" +
 				"MATCH (p)-[:CONTAINS]->(a:Allele) SET a.deprecated = true WITH p\n" +
 				"MATCH (p)-[:CONTAINS]->(d:Dataset) SET d.deprecated = true WITH d\n" +

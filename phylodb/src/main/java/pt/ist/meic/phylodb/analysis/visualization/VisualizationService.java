@@ -18,17 +18,17 @@ public class VisualizationService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Visualization>> getVisualizations(UUID projectId, UUID datasetId, UUID analysisId, int page, int limit) {
+	public Optional<List<Visualization>> getVisualizations(String projectId, String datasetId, String analysisId, int page, int limit) {
 		return visualizationRepository.findAll(page, limit, projectId, datasetId, analysisId);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Visualization> getVisualization(UUID projectId, UUID datasetId, UUID analysisId, UUID visualizationId) {
+	public Optional<Visualization> getVisualization(String projectId, String datasetId, String analysisId, String visualizationId) {
 		return visualizationRepository.find(new Visualization.PrimaryKey(projectId, datasetId, analysisId, visualizationId));
 	}
 
 	@Transactional
-	public boolean deleteVisualization(UUID projectId, UUID datasetId, UUID analysisId, UUID visualizationId) {
+	public boolean deleteVisualization(String projectId, String datasetId, String analysisId, String visualizationId) {
 		return visualizationRepository.remove(new Visualization.PrimaryKey(projectId, datasetId, analysisId, visualizationId));
 	}
 

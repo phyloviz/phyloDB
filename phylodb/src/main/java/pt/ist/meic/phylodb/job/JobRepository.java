@@ -33,8 +33,8 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 	@Override
 	protected Job parse(Map<String, Object> row) {
 		String name = (String) row.get("name");
-		UUID project = UUID.fromString(name.substring(0, UUID_LENGTH));
-		UUID id = UUID.fromString(name.substring(UUID_LENGTH + 1));
+		String project = name.substring(0, UUID_LENGTH);
+		String id = name.substring(UUID_LENGTH + 1);
 		return new Job(project,
 				id,
 				(boolean) row.get("completed"),
@@ -64,8 +64,8 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 		execute(new Query("CALL apoc.periodic.cancel($)", name(key.getProjectId(), key.getId())));
 	}
 
-	private String name(UUID projectId, UUID jobId) {
-		return projectId.toString() + "-" + jobId.toString();
+	private String name(String projectId, String jobId) {
+		return projectId + "-" + jobId;
 	}
 
 }

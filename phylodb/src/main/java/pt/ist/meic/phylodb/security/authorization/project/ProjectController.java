@@ -45,8 +45,8 @@ public class ProjectController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{project}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getProject(
-			@PathVariable("project") UUID projectId,
-			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
+			@PathVariable("project") String projectId,
+			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) long version
 	) {
 		return get(() -> service.getProject(projectId, version), GetProjectOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
 	}
@@ -64,7 +64,7 @@ public class ProjectController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@PutMapping(path = "/{project}")
 	public ResponseEntity<?> putProject(
-			@PathVariable("project") UUID projectId,
+			@PathVariable("project") String projectId,
 			HttpServletRequest req,
 			@RequestBody ProjectInputModel input
 	) {
@@ -76,7 +76,7 @@ public class ProjectController extends Controller {
 	@Authorized(role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{project}")
 	public ResponseEntity<?> deleteProject(
-			@PathVariable("project") UUID projectId
+			@PathVariable("project") String projectId
 	) {
 		return status(() -> service.deleteProject(projectId));
 	}

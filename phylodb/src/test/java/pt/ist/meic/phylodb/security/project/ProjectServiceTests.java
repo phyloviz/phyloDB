@@ -19,8 +19,8 @@ import static org.mockito.ArgumentMatchers.*;
 public class ProjectServiceTests extends ServiceTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final Project[] STATE = new Project[]{PROJECT1, new Project(UUID.fromString("26d20a45-470a-4336-81ab-ed057d3f5d66"), 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-			new Project(UUID.fromString("3f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
+	private static final Project[] STATE = new Project[]{PROJECT1, new Project("26d20a45-470a-4336-81ab-ed057d3f5d66", 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
 
 	private static Stream<Arguments> getProjects_params() {
 		List<Project> expected1 = new ArrayList<Project>() {{
@@ -75,7 +75,7 @@ public class ProjectServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getProject_params")
-	public void getProject(UUID key, long version, Project expected) {
+	public void getProject(String key, long version, Project expected) {
 		Mockito.when(projectRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(expected));
 		Optional<Project> result = projectService.getProject(key, version);
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
@@ -94,7 +94,7 @@ public class ProjectServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("deleteProject_params")
-	public void deleteProject(UUID key, boolean expected) {
+	public void deleteProject(String key, boolean expected) {
 		Mockito.when(projectRepository.remove(any())).thenReturn(expected);
 		boolean result = projectService.deleteProject(key);
 		assertEquals(expected, result);

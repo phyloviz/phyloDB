@@ -8,7 +8,6 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,19 +19,19 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 	private final String aka;
 	private final List<Entity<Allele.PrimaryKey>> allelesIds;
 
-	public Profile(UUID projectId, UUID datasetId, String id, long version, boolean deprecated, String aka, List<Entity<Allele.PrimaryKey>> allelesIds) {
+	public Profile(String projectId, String datasetId, String id, long version, boolean deprecated, String aka, List<Entity<Allele.PrimaryKey>> allelesIds) {
 		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.aka = aka;
 		this.allelesIds = allelesIds;
 	}
 
-	public Profile(UUID projectId, UUID datasetId, String id, String aka, String[] allelesIds) {
+	public Profile(String projectId, String datasetId, String id, String aka, String[] allelesIds) {
 		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, aka, Arrays.stream(allelesIds)
 				.map(a -> a != null ? new Entity<>(new Allele.PrimaryKey(null, null, a, null), CURRENT_VERSION_VALUE, false) : null)
 				.collect(Collectors.toList()));
 	}
 
-	public UUID getDatasetId() {
+	public String getDatasetId() {
 		return id.getDatasetId();
 	}
 
@@ -76,21 +75,21 @@ public class Profile extends Entity<Profile.PrimaryKey> {
 
 	public static class PrimaryKey {
 
-		private final UUID projectId;
-		private final UUID datasetId;
+		private final String projectId;
+		private final String datasetId;
 		private final String id;
 
-		public PrimaryKey(UUID projectId, UUID datasetId, String id) {
+		public PrimaryKey(String projectId, String datasetId, String id) {
 			this.projectId = projectId;
 			this.datasetId = datasetId;
 			this.id = id;
 		}
 
-		public UUID getProjectId() {
+		public String getProjectId() {
 			return projectId;
 		}
 
-		public UUID getDatasetId() {
+		public String getDatasetId() {
 			return datasetId;
 		}
 

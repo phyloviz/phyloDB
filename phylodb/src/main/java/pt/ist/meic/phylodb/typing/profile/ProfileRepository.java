@@ -56,13 +56,12 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		for (Map<String, Object> a : alleles) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
-			UUID project = projectId == null ? null : UUID.fromString((String) projectId);
-			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), project);
+			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), (String) projectId);
 			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
 			allelesReferences.set(position - 1, reference);
 		}
-		return new Profile(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
+		return new Profile((String) row.get("projectId"),
+				(String) row.get("datasetId"),
 				(String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
@@ -107,8 +106,8 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		Optional<Entity<Profile.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
 		if (!optional.isPresent())
 			return true;
-		UUID project = optional.get().getPrimaryKey().getProjectId();
-		UUID dataset = optional.get().getPrimaryKey().getDatasetId();
+		String project = optional.get().getPrimaryKey().getProjectId();
+		String dataset = optional.get().getPrimaryKey().getDatasetId();
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
 				"UNWIND $ as param\n" +
 				"OPTIONAL MATCH (d)-[:CONTAINS]->(p:Profile {id: param})\n" +
@@ -156,8 +155,8 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		List<Entity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
 		boolean priv = references.stream().anyMatch(a -> a != null && a.getPrimaryKey().getProjectId() != null);
 		return new Object(){
-			public final UUID projectId = key.getProjectId();
-			public final UUID datasetId = key.getDatasetId();
+			public final String projectId = key.getProjectId();
+			public final String datasetId = key.getDatasetId();
 			public final String id = key.getId();
 			public final String aka = profile.getAka();
 			public final boolean project = priv;

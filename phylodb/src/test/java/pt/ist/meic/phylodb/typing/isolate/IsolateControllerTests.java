@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class IsolateControllerTests extends ControllerTestsContext {
 
 	private static final String TAXONID = TAXON1.getPrimaryKey(), LOCUSID = LOCUS1.getPrimaryKey().getId();
-	private static final UUID PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
+	private static final String PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
 
 	private static Stream<Arguments> getIsolatesList_params() {
 		String uri = "/projects/%s/datasets/%s/isolates";

@@ -53,16 +53,16 @@ public class VisualizationRepository extends AlgorithmsRepository<Visualization,
 	@Override
 	protected Visualization parse(Map<String, Object> row) {
 		List<Coordinate> list = new ArrayList<>();
-		UUID projectId = UUID.fromString(row.get("projectId").toString());
-		UUID datasetId = UUID.fromString(row.get("datasetId").toString());
+		String projectId = row.get("projectId").toString();
+		String datasetId = row.get("datasetId").toString();
 		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
 			list.add(new Coordinate(profile, Math.toIntExact((long) coordinates.get("x")), Math.toIntExact((long) coordinates.get("y"))));
 		}
 		return new Visualization(projectId,
 				datasetId,
-				UUID.fromString(row.get("analysisId").toString()),
-				UUID.fromString(row.get("id").toString()),
+				row.get("analysisId").toString(),
+				row.get("id").toString(),
 				(boolean) row.get("deprecated"),
 				VisualizationAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
 				list

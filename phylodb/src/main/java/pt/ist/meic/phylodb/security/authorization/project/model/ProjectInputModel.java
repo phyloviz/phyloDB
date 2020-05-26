@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class ProjectInputModel implements InputModel<Project> {
 
-	private UUID id;
+	private String id;
 	private String name;
 	private String type;
 	private String description;
@@ -17,7 +17,7 @@ public class ProjectInputModel implements InputModel<Project> {
 	public ProjectInputModel() {
 	}
 
-	public ProjectInputModel(UUID id, String name, String type, String description, User.PrimaryKey[] users) {
+	public ProjectInputModel(String id, String name, String type, String description, User.PrimaryKey[] users) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
@@ -25,7 +25,7 @@ public class ProjectInputModel implements InputModel<Project> {
 		this.users = users;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -47,8 +47,8 @@ public class ProjectInputModel implements InputModel<Project> {
 
 	@Override
 	public Optional<Project> toDomainEntity(String... params) {
-		UUID id = params.length == 0 ? UUID.randomUUID() : UUID.fromString(params[0]);
-		return (params.length != 0 && !params[0].equals(this.id.toString())) || name == null || users == null ||
+		String id = params.length == 0 ? UUID.randomUUID().toString() :params[0];
+		return (params.length != 0 && !params[0].equals(this.id)) || name == null || users == null ||
 				type == null || (!type.equals("public") && !type.equals("private")) ?
 				Optional.empty() :
 				Optional.of(new Project(id, name, type, description, users));

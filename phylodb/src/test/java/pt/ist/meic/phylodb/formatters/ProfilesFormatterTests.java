@@ -9,11 +9,10 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ProfilesFormatterTests extends FormatterTests {
 
-	public static Profile[] profiles(UUID project, UUID dataset, Schema schema, String[][] profileAlleles, boolean authorized) {
+	public static Profile[] profiles(String project, String dataset, Schema schema, String[][] profileAlleles, boolean authorized) {
 		List<Profile> profiles = new ArrayList<>();
 		List<Entity<Locus.PrimaryKey>> lociReferences = schema.getLociReferences();
 		for (int j = 0; j < profileAlleles.length; ++j) {

@@ -25,7 +25,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 	private static String[] headers = new String[]{"uvrA", "gyrB", "ftsY", "tuf", "gap"};
 
 	private static Stream<Arguments> emptyListParams() {
-		UUID project = UUID.randomUUID(), dataset = UUID.randomUUID();
+		String project = UUID.randomUUID().toString(), dataset = UUID.randomUUID().toString();
 		Schema fileSchema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		Schema otherSchema = new Schema("taxon", "id", Method.MLST, "description", Arrays.copyOfRange(headers, 0, 2));
 		return Stream.of(Arguments.of(project, dataset, otherSchema, "ml-h-d-2.txt", new Integer[] {1, 2, 3}),
@@ -34,7 +34,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 	}
 
 	private static Stream<Arguments> nonemptyListParams() {
-		UUID project = UUID.randomUUID(), dataset = UUID.randomUUID();
+		String project = UUID.randomUUID().toString(), dataset = UUID.randomUUID().toString();
 		Schema schema = new Schema("taxon", "id", Method.MLST, "description", headers);
 		String[][] alleles = {{"1", "1", "1", "1", "1"}};
 		String[][] alleles1 = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}};
@@ -57,7 +57,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 
 	@ParameterizedTest
 	@MethodSource("emptyListParams")
-	public void parse_emptyList(UUID project, UUID dataset, Schema schema, String filename, Integer[] errors) throws IOException {
+	public void parse_emptyList(String project, String dataset, Schema schema, String filename, Integer[] errors) throws IOException {
 		MlFormatter formatter = new MlFormatter();
 		Pair<List<Profile>, List<Integer>> profiles = formatter.parse(createFile("ml", filename), project, dataset, schema, " ", false);
 		assertEquals(0, profiles.getKey().size());
@@ -66,7 +66,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 
 	@ParameterizedTest
 	@MethodSource("nonemptyListParams")
-	public void parse_nonemptyList(UUID project, UUID dataset, Schema schema, String filename, Pair<Profile[], Integer[]> expected, boolean authorized) throws IOException {
+	public void parse_nonemptyList(String project, String dataset, Schema schema, String filename, Pair<Profile[], Integer[]> expected, boolean authorized) throws IOException {
 		MlFormatter formatter = new MlFormatter();
 		Pair<List<Profile>, List<Integer>> result = formatter.parse(createFile("ml", filename), project, dataset, schema, " ", authorized);
 		List<Profile> profiles = result.getKey();
@@ -93,7 +93,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 		MlFormatter formatter = new MlFormatter();
 		String[][] alleles = {{"1", "1", "1", "1", "1"}};
 		String expected = readFile("ml", "ml-h-d-1.txt");
-		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), schema, alleles, false)), schema);
+		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID().toString(), UUID.randomUUID().toString(), schema, alleles, false)), schema);
 		assertEquals(expected, formatted);
 	}
 
@@ -103,7 +103,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 		MlFormatter formatter = new MlFormatter();
 		String[][] alleles = {{"1", "1", "1", "1", "1"}, {"4", "1", "1", "3", "3"}};
 		String expected = readFile("ml", "ml-h-d-2.txt");
-		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), schema, alleles, false)), schema);
+		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID().toString(), UUID.randomUUID().toString(), schema, alleles, false)), schema);
 		assertEquals(expected, formatted);
 	}
 
@@ -113,7 +113,7 @@ public class MlFormatterTests extends ProfilesFormatterTests {
 		MlFormatter formatter = new MlFormatter();
 		String[][] alleles = {{"1", "1", "1", "1", null}, {null, "1", null, "3", "3"}};
 		String expected = readFile("ml", "ml-h-d-2-m.txt");
-		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID(), UUID.randomUUID(), schema, alleles, false)), schema);
+		String formatted = formatter.format(Arrays.asList(profiles(UUID.randomUUID().toString(), UUID.randomUUID().toString(), schema, alleles, false)), schema);
 		assertEquals(expected, formatted);
 	}
 

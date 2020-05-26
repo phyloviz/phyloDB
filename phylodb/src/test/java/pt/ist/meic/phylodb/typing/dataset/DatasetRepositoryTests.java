@@ -14,7 +14,6 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -26,15 +25,15 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	private static final Dataset[] STATE = new Dataset[]{DATASET1, DATASET2};
 
 	private static Stream<Arguments> findAll_params() {
-		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7", key2 = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
 				s2 = new Entity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key1, 1, false, "name", s1),
 				firstChanged = new Dataset(PROJECT1.getPrimaryKey(), key1, 2, false, "name2", s2),
-				second = new Dataset(PROJECT1.getPrimaryKey(), UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name3", s2),
+				second = new Dataset(PROJECT1.getPrimaryKey(), "5f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name3", s2),
 				third = new Dataset(PROJECT1.getPrimaryKey(), key2, 1, false, "name5", s2),
 				thirdChanged = new Dataset(PROJECT1.getPrimaryKey(), key2, 2, false, "name4", s1),
-				fourth = new Dataset(PROJECT1.getPrimaryKey(), UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", s1);
+				fourth = new Dataset(PROJECT1.getPrimaryKey(), "7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", s1);
 		return Stream.of(Arguments.of(0, new Dataset[0], new Dataset[0]),
 				Arguments.of(0, new Dataset[]{STATE[0]}, new Dataset[]{STATE[0]}),
 				Arguments.of(0, new Dataset[]{first, firstChanged}, new Dataset[]{firstChanged}),
@@ -59,7 +58,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> find_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "4f809af7-2c99-43f7-b674-4843c77384c7");
 		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				second = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 2, true, "name", s1);
@@ -73,7 +72,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "4f809af7-2c99-43f7-b674-4843c77384c7");
 		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				second = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 2, true, "name", s1);
@@ -84,7 +83,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> save_params() {
-		UUID key = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "4f809af7-2c99-43f7-b674-4843c77384c7";
 		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
 				s2 = new Entity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key, 1, false, "name", s1),
@@ -95,7 +94,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> remove_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"));
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "4f809af7-2c99-43f7-b674-4843c77384c7");
 		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
 		Dataset before = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				after = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, true, "name", s1);
@@ -127,8 +126,8 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 				(String) row.get("schemaId")),
 				(long) row.get("schemaVersion"),
 				(boolean) row.get("schemaDeprecated"));
-		return new Dataset(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
+		return new Dataset(row.get("projectId").toString(),
+				row.get("datasetId").toString(),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("description"),

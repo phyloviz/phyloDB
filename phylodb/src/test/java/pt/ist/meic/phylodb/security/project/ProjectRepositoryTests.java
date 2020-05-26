@@ -18,20 +18,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProjectRepositoryTests extends RepositoryTestsContext {
 
-	private static final Project[] STATE = new Project[]{PROJECT1, new Project(UUID.fromString("26d20a45-470a-4336-81ab-ed057d3f5d66"), 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-			new Project(UUID.fromString("3f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
+	private static final Project[] STATE = new Project[]{PROJECT1, new Project("26d20a45-470a-4336-81ab-ed057d3f5d66", 1, false, "private1", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
 
 	private static Stream<Arguments> findAll_params() {
-		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("5f809af7-2c99-43f7-b674-4843c77384c7"), key3 = UUID.fromString("8f809af7-2c99-43f7-b674-4843c77384c7");
+		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7", key2 = "5f809af7-2c99-43f7-b674-4843c77384c7", key3 = "8f809af7-2c99-43f7-b674-4843c77384c7";
 		Project first = new Project(key1, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				firstChanged = new Project(key1, 2, false, "name2", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				second = new Project(key2, 1, false, "name3", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				secondChanged = new Project(key2, 2, false, "name4", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				third = new Project(UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name5", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fourth = new Project(UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name6", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				third = new Project("6f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name5", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fourth = new Project("7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
 				fifth = new Project(key3, 1, false, "name7", "public", null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
 				fifthChanged = new Project(key3, 2, false, "name77", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				sixth = new Project(UUID.fromString("9f809af7-2c99-43f7-b674-4843c77384c7"), 1, false, "name8", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+				sixth = new Project("9f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name8", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(0, new Project[0], new Project[0]),
 				Arguments.of(0, new Project[]{STATE[0]}, new Project[]{STATE[0]}),
 				Arguments.of(0, new Project[]{first, firstChanged}, new Project[]{firstChanged}),
@@ -54,7 +54,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> find_params() {
-		UUID key = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "4f809af7-2c99-43f7-b674-4843c77384c7";
 		Project first = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				second = new Project(key, 2, true, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(key, 1, new Project[0], null),
@@ -67,7 +67,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		UUID key1 = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
+		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7";
 		Project first = new Project(key1, 1, false, "name1", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				second = new Project(key1, 1, true, "name2", "private", null, new User.PrimaryKey[]{USER2.getPrimaryKey()});
 		return Stream.of(Arguments.of(key1, new Project[0], false),
@@ -77,7 +77,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> save_params() {
-		UUID id = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
+		String id = "4f809af7-2c99-43f7-b674-4843c77384c7";
 		Project first = new Project(id, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				second = new Project(id, 2, false, "name2", "private", "description", new User.PrimaryKey[]{USER1.getPrimaryKey(), USER2.getPrimaryKey()});
 		return Stream.of(Arguments.of(first, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2], first}, true, 2, 2),
@@ -86,7 +86,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> remove_params() {
-		UUID key = UUID.fromString("4f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "4f809af7-2c99-43f7-b674-4843c77384c7";
 		Project before = new Project(key, 1, false, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
 				after = new Project(key, 1, true, "name", "private", null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
 		return Stream.of(Arguments.of(key, new Project[0], new Project[]{STATE[0], STATE[1], STATE[2]}, false),
@@ -117,7 +117,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 		User.PrimaryKey[] userIds = Arrays.stream((Map<String, String>[]) row.get("users"))
 				.map(a -> new User.PrimaryKey(a.get("id"), a.get("provider")))
 				.toArray(User.PrimaryKey[]::new);
-		return new Project(UUID.fromString((String) row.get("id")),
+		return new Project((String) row.get("id"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("name"),
@@ -140,7 +140,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 				.toArray(Project[]::new);
 	}
 
-	private boolean hasDescendents(UUID key) {
+	private boolean hasDescendents(String key) {
 		String statement = "MATCH (p:Project {id: $})\n" +
 				"OPTIONAL MATCH (p)-[:CONTAINS]->(a:Allele) WHERE a.deprecated = false WITH p, a\n" +
 				"OPTIONAL MATCH (p)-[:CONTAINS]->(d:Dataset) WHERE d.deprecated = false WITH d, a\n" +
@@ -173,7 +173,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("find_params")
-	public void find(UUID key, long version, Project[] state, Project expected) {
+	public void find(String key, long version, Project[] state, Project expected) {
 		store(ProjectRepositoryTests.STATE);
 		store(state);
 		Optional<Project> result = projectRepository.find(key, version);
@@ -184,7 +184,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("exists_params")
-	public void exists(UUID key, Project[] state, boolean expected) {
+	public void exists(String key, Project[] state, boolean expected) {
 		store(ProjectRepositoryTests.STATE);
 		store(state);
 		boolean result = projectRepository.exists(key);
@@ -211,7 +211,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("remove_params")
-	public void remove(UUID key, Project[] state, Project[] expectedState, boolean expectedResult) {
+	public void remove(String key, Project[] state, Project[] expectedState, boolean expectedResult) {
 		store(ProjectRepositoryTests.STATE);
 		store(state);
 		boolean result = projectRepository.remove(key);

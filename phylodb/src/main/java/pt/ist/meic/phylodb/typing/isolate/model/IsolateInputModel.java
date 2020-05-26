@@ -4,7 +4,6 @@ import pt.ist.meic.phylodb.io.input.InputModel;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 public class IsolateInputModel implements InputModel<Isolate> {
 
@@ -46,7 +45,7 @@ public class IsolateInputModel implements InputModel<Isolate> {
 				.filter(a -> a.getKey() != null && a.getValue() != null)
 				.distinct()
 				.toArray(Ancillary[]::new);
-		return Optional.of(new Isolate(UUID.fromString(params[0]), UUID.fromString(params[1]), id, description, ancillaries, profileId));
+		return Optional.of(new Isolate(params[0], params[1], id, description, ancillaries, profileId));
 	}
 
 }

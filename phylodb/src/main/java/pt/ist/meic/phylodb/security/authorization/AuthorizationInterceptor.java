@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
 
@@ -42,7 +41,7 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 		Object projectId = pathVariables.getOrDefault(PROJECT, req.getParameter(PROJECT));
 		if (projectId != null) {
 			if(annotation.role() == Role.USER) {
-				Optional<Project> optional = projectService.getProject(UUID.fromString(projectId.toString()), CURRENT_VERSION_VALUE);
+				Optional<Project> optional = projectService.getProject(projectId.toString(), CURRENT_VERSION_VALUE);
 				if (optional.isPresent()) {
 					Project project = optional.get();
 					boolean included = Arrays.stream(project.getUsers())

@@ -36,7 +36,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getDatasets_params() {
 		String uri = "/projects/%s/datasets";
-		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
+		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
 		Entity<Schema.PrimaryKey> schemaReference = new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false);
 		Dataset dataset = new Dataset(projectId, datasetId, 1, false, "name1", schemaReference);
 		List<Dataset> datasets = new ArrayList<Dataset>() {{
@@ -56,7 +56,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProject_params() {
 		String uri = "/projects/%s/datasets/%s";
-		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
+		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
 		Entity<Schema.PrimaryKey> schemaReference = new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false);
 		Dataset dataset = new Dataset(projectId, datasetId, 1, false, "name1", schemaReference);
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId, datasetId)).param("version", "1"),
@@ -69,10 +69,10 @@ public class DatasetControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> putProject_params() {
 		String uri = "/projects/%s/datasets/%s";
-		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
+		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, projectId, datasetId));
 		DatasetInputModel input1 = new DatasetInputModel(datasetId, "description", "t", "x"),
-				input2 = new DatasetInputModel(UUID.randomUUID(), null, null, "x");
+				input2 = new DatasetInputModel(UUID.randomUUID().toString(), null, null, "x");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -81,10 +81,10 @@ public class DatasetControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> postProject_params() {
 		String uri = "/projects/%s/datasets";
-		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
+		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
 		MockHttpServletRequestBuilder req1 = post(String.format(uri, projectId));
 		DatasetInputModel input1 = new DatasetInputModel(datasetId, "description", "t", "x"),
-				input2 = new DatasetInputModel(UUID.randomUUID(), null, null, "x");
+				input2 = new DatasetInputModel(UUID.randomUUID().toString(), null, null, "x");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.CREATED, null),
 				Arguments.of(req1, input1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req1, input2, false, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -93,7 +93,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> deleteProject_params() {
 		String uri = "/projects/%s/datasets/%s";
-		UUID projectId = UUID.randomUUID(), datasetId = UUID.randomUUID();
+		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
 		MockHttpServletRequestBuilder req1 = delete(String.format(uri, projectId, datasetId));
 		return Stream.of(Arguments.of(req1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
 				Arguments.of(req1, false, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())));
@@ -118,7 +118,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
-					assertEquals(expectedResult.get(i).getId().toString(), p.get("id"));
+					assertEquals(expectedResult.get(i).getId(), p.get("id"));
 					assertEquals(expectedResult.get(i).getVersion(), Long.parseLong(p.get("version").toString()));
 				}
 			}

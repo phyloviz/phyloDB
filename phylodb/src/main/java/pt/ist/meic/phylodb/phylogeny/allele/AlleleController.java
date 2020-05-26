@@ -40,7 +40,7 @@ public class AlleleController extends Controller {
 	public ResponseEntity<?> getAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
-			@RequestParam(value = "project", required = false) UUID project,
+			@RequestParam(value = "project", required = false) String project,
 			@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
 	) {
@@ -55,7 +55,7 @@ public class AlleleController extends Controller {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,
-			@RequestParam(value = "project", required = false) UUID project,
+			@RequestParam(value = "project", required = false) String project,
 			@RequestParam(value = "version", defaultValue = CURRENT_VERSION) Long version
 	) {
 		return get(() -> service.getAllele(taxonId, locusId, alleleId, project, version), GetAlleleOutputModel::new, () -> new ErrorOutputModel(Problem.NOT_FOUND));
@@ -78,7 +78,7 @@ public class AlleleController extends Controller {
 	public ResponseEntity<?> postAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
-			@RequestParam(value = "project", required = false) UUID project,
+			@RequestParam(value = "project", required = false) String project,
 			@RequestParam("file") MultipartFile file
 
 	) throws IOException {
@@ -90,7 +90,7 @@ public class AlleleController extends Controller {
 	public ResponseEntity<?> putAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
-			@RequestParam(value = "project", required = false) UUID project,
+			@RequestParam(value = "project", required = false) String project,
 			@RequestParam("file") MultipartFile file
 
 	) throws IOException {
@@ -103,7 +103,7 @@ public class AlleleController extends Controller {
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@PathVariable("allele") String alleleId,
-			@RequestParam(value = "project", required = false) UUID project
+			@RequestParam(value = "project", required = false) String project
 	) {
 		return status(() -> service.deleteAllele(taxonId, locusId, alleleId, project));
 	}

@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 @Service
@@ -28,12 +27,12 @@ public class AlleleService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Allele>> getAlleles(String taxonId, String locusId, UUID project, int page, int limit) {
+	public Optional<List<Allele>> getAlleles(String taxonId, String locusId, String project, int page, int limit) {
 		return alleleRepository.findAll(page, limit, taxonId, locusId, project);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, UUID project, long version) {
+	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, String project, long version) {
 		return alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId, project), version);
 	}
 
@@ -45,21 +44,21 @@ public class AlleleService {
 	}
 
 	@Transactional
-	public boolean deleteAllele(String taxonId, String locusId, String alleleId, UUID project) {
+	public boolean deleteAllele(String taxonId, String locusId, String alleleId, String project) {
 		return alleleRepository.remove(new Allele.PrimaryKey(taxonId, locusId, alleleId, project));
 	}
 
 	@Transactional
-	public Optional<Pair<Integer[], String[]>> saveAllelesOnConflictSkip(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
+	public Optional<Pair<Integer[], String[]>> saveAllelesOnConflictSkip(String taxonId, String locusId, String project, MultipartFile file) throws IOException {
 		return saveAll(taxonId, locusId, project, false, file);
 	}
 
 	@Transactional
-	public Optional<Pair<Integer[], String[]>> saveAllelesOnConflictUpdate(String taxonId, String locusId, UUID project, MultipartFile file) throws IOException {
+	public Optional<Pair<Integer[], String[]>> saveAllelesOnConflictUpdate(String taxonId, String locusId, String project, MultipartFile file) throws IOException {
 		return saveAll(taxonId, locusId, project, true, file);
 	}
 
-	private Optional<Pair<Integer[], String[]>> saveAll(String taxonId, String locusId, UUID project, boolean conflict, MultipartFile file) throws IOException {
+	private Optional<Pair<Integer[], String[]>> saveAll(String taxonId, String locusId, String project, boolean conflict, MultipartFile file) throws IOException {
 		if (!locusRepository.exists(new Locus.PrimaryKey(taxonId, locusId)))
 			return Optional.empty();
 		Predicate<Allele> canSave = conflict ? a -> true : a -> !alleleRepository.exists(a.getPrimaryKey());

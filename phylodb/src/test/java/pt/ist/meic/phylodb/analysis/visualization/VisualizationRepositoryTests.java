@@ -24,13 +24,13 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 	private static final Visualization[] STATE = new Visualization[]{VISUALIZATION1, VISUALIZATION2};
 
 	private static Stream<Arguments> findAll_params() {
-		UUID key1 = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7"), key2 = UUID.fromString("7f809af7-2c99-43f7-b674-4843c77384c7");
+		String key1 = "6f809af7-2c99-43f7-b674-4843c77384c7", key2 = "7f809af7-2c99-43f7-b674-4843c77384c7";
 		Coordinate coordinate1 = new Coordinate(PROFILE1.getPrimaryKey(), 44, 44);
 		Coordinate coordinate2 = new Coordinate(PROFILE2.getPrimaryKey(), 55, 55);
 		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
-				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), UUID.fromString("6f909af7-2c99-43f7-b674-4843c77384c7"), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
+				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
 				third = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  key2, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
-				fourth = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  UUID.fromString("8f809af7-2c99-43f7-b674-4843c77384c7"), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
+				fourth = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  "8f809af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
 		return Stream.of(Arguments.of(0, new Visualization[0], new Visualization[0]),
 				Arguments.of(0, new Visualization[]{STATE[0]}, new Visualization[]{STATE[0]}),
 				Arguments.of(0, new Visualization[]{STATE[0], STATE[1], first}, STATE),
@@ -46,7 +46,7 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> find_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
 		return Stream.of(Arguments.of(first.getPrimaryKey(), new Visualization[0], null),
 				Arguments.of(first.getPrimaryKey(), new Visualization[]{first}, first),
@@ -54,7 +54,7 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> exists_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
 				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, true, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
 		return Stream.of(Arguments.of(first.getPrimaryKey(), new Visualization[0], false),
@@ -64,7 +64,7 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> remove_params() {
-		UUID key = UUID.fromString("6f809af7-2c99-43f7-b674-4843c77384c7");
+		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
 				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, true, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
 		return Stream.of(Arguments.of(first.getPrimaryKey(), new Visualization[0], new Visualization[]{STATE[0], STATE[1]}, false),
@@ -96,16 +96,16 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	private Visualization parse(Map<String, Object> row) {
 		List<Coordinate> list = new ArrayList<>();
-		UUID projectId = UUID.fromString(row.get("projectId").toString());
-		UUID datasetId = UUID.fromString(row.get("datasetId").toString());
+		String projectId = row.get("projectId").toString();
+		String datasetId = row.get("datasetId").toString();
 		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
 			list.add(new Coordinate(profile, Math.toIntExact((long) coordinates.get("x")), Math.toIntExact((long) coordinates.get("y"))));
 		}
 		return new Visualization(projectId,
 				datasetId,
-				UUID.fromString(row.get("analysisId").toString()),
-				UUID.fromString(row.get("id").toString()),
+				row.get("analysisId").toString(),
+				row.get("id").toString(),
 				(boolean) row.get("deprecated"),
 				VisualizationAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
 				list

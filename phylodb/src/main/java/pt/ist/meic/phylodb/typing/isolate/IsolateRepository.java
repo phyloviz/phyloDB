@@ -58,7 +58,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 
 	@Override
 	protected Isolate parse(Map<String, Object> row) {
-		UUID projectId = UUID.fromString(row.get("projectId").toString()), datasetId = UUID.fromString(row.get("datasetId").toString());
+		String projectId = row.get("projectId").toString(), datasetId = row.get("datasetId").toString();
 		Entity<Profile.PrimaryKey> profile = null;
 		if (row.get("profileId") != null)
 			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
@@ -134,8 +134,8 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 		Isolate.PrimaryKey key = isolate.getPrimaryKey();
 		String profileId = isolate.getProfile() != null ? isolate.getProfile().getPrimaryKey().getId() : null;
 		return new Object() {
-			public final UUID projectId = key.getProjectId();
-			public final UUID datasetId = key.getDatasetId();
+			public final String projectId = key.getProjectId();
+			public final String datasetId = key.getDatasetId();
 			public final String id = key.getId();
 			public final String description = isolate.getDescription();
 			public final String profile = profileId;

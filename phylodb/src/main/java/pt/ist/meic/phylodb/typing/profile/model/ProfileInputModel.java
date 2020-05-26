@@ -3,7 +3,6 @@ package pt.ist.meic.phylodb.typing.profile.model;
 import pt.ist.meic.phylodb.io.input.InputModel;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class ProfileInputModel implements InputModel<Profile> {
 
@@ -35,7 +34,7 @@ public class ProfileInputModel implements InputModel<Profile> {
 	@Override
 	public Optional<Profile> toDomainEntity(String... params) {
 		return !params[2].equals(id) || alleles == null ? Optional.empty() :
-				Optional.of(new Profile(UUID.fromString(params[0]), UUID.fromString(params[1]), id, aka, alleles));
+				Optional.of(new Profile(params[0], params[1], id, aka, alleles));
 	}
 
 }

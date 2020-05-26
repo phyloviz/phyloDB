@@ -13,7 +13,6 @@ import pt.ist.meic.phylodb.io.output.OutputModel;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -46,7 +45,7 @@ public abstract class Controller {
 		return execute(input, o -> output(map.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
-	protected <R> ResponseEntity<?> post(Supplier<Optional<R>> input, Function<R, Boolean> map, Function<R, UUID> id) {
+	protected <R> ResponseEntity<?> post(Supplier<Optional<R>> input, Function<R, Boolean> map, Function<R, String> id) {
 		return execute(input, o -> output(map.apply(o), id.apply(o)), () -> new ErrorOutputModel(Problem.BAD_REQUEST));
 	}
 
@@ -74,7 +73,7 @@ public abstract class Controller {
 		return !result ? new ErrorOutputModel(Problem.UNAUTHORIZED) : new NoContentOutputModel();
 	}
 
-	private OutputModel output(boolean result, UUID id) {
+	private OutputModel output(boolean result, String id) {
 		return !result ? new ErrorOutputModel(Problem.UNAUTHORIZED) : new CreatedOutputModel(id);
 	}
 

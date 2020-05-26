@@ -30,12 +30,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class InferenceControllerTests extends ControllerTestsContext {
 
-	private static final UUID PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
+	private static final String PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
 
 	private static Stream<Arguments> getInferences_params() {
 		String uri = "/projects/%s/datasets/%s/inferences";
-		Inference inference1 = new Inference(PROJECTID, DATASETID, UUID.randomUUID(), InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
-		Inference inference2 = new Inference(PROJECTID, DATASETID, UUID.randomUUID(), InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
+		Inference inference1 = new Inference(PROJECTID, DATASETID, UUID.randomUUID().toString(), InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
+		Inference inference2 = new Inference(PROJECTID, DATASETID, UUID.randomUUID().toString(), InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
 		List<Inference> inferences = new ArrayList<Inference>() {{
 			add(inference1);
 			add(inference2);
@@ -78,7 +78,7 @@ public class InferenceControllerTests extends ControllerTestsContext {
 				req4 = post(String.format(uri, PROJECTID, DATASETID)).param("algorithm", InferenceAlgorithm.GOEBURST.getName()),
 				req5 = multipart(String.format(uri, PROJECTID, DATASETID)).file(file),
 				req6 = multipart(String.format(uri, PROJECTID, DATASETID)).file(file).param("format", TreeFormatter.NEWICK);
-		UUID uuid = UUID.randomUUID();
+		String uuid = UUID.randomUUID().toString();
 		return Stream.of(Arguments.of(req1, uuid, HttpStatus.CREATED, new CreatedOutputModel(uuid)),
 				Arguments.of(req1, null, HttpStatus.UNAUTHORIZED, new ErrorOutputModel(Problem.UNAUTHORIZED.getMessage())),
 				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())),
@@ -136,7 +136,7 @@ public class InferenceControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("postInference_params")
-	public void postInference(MockHttpServletRequestBuilder req, UUID id, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
+	public void postInference(MockHttpServletRequestBuilder req, String id, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {
 		Mockito.when(inferenceService.saveInference(any(), any(), anyString(), anyString(), any())).thenReturn(Optional.ofNullable(id));
 		MockHttpServletResponse result = http.executeFileRequest(req);
 		assertEquals(expectedStatus.value(), result.getStatus());

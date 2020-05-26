@@ -146,7 +146,7 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> findByDataset_params() {
-		Dataset.PrimaryKey key = new Dataset.PrimaryKey(UUID.randomUUID(), UUID.randomUUID());
+		Dataset.PrimaryKey key = new Dataset.PrimaryKey(UUID.randomUUID().toString(), UUID.randomUUID().toString());
 		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
 				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated())),
 				loci2 = Collections.singletonList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
@@ -158,7 +158,7 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 				Arguments.of(key, key, new Schema[]{schema1, schema1Changed}, schema1),
 				Arguments.of(key, key, new Schema[]{schema2}, schema2),
 				Arguments.of(key, key, new Schema[]{schema2, schema2Changed}, schema2),
-				Arguments.of(new Dataset.PrimaryKey(UUID.randomUUID(), UUID.randomUUID()), key, new Schema[]{schema1}, null),
+				Arguments.of(new Dataset.PrimaryKey(UUID.randomUUID().toString(), UUID.randomUUID().toString()), key, new Schema[]{schema1}, null),
 				Arguments.of(null, key, new Schema[]{schema1}, null));
 	}
 

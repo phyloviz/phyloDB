@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FastaFormatterTests extends FormatterTests {
 
-	public static Allele[] alleles(String taxon, String locus, UUID project, String[] sequences) {
+	public static Allele[] alleles(String taxon, String locus, String project, String[] sequences) {
 		return IntStream.range(0, sequences.length)
 				.filter(i -> sequences[i] != null)
 				.mapToObj(i -> new Allele(taxon, locus, String.valueOf(i + 1), sequences[i], project))
@@ -30,14 +30,14 @@ public class FastaFormatterTests extends FormatterTests {
 
 	private static Stream<Arguments> emptyListParams() {
 		String taxon = "taxon", locus = "locus";
-		UUID project = UUID.randomUUID();
+		String project = UUID.randomUUID().toString();
 		return Stream.of(Arguments.of(taxon, locus, project, "f-0-1.txt", new Integer[0]),
 				Arguments.of(taxon, locus, project, "f-0-2.txt", new Integer[] {1, 2, 3, 4, 5, 6}));
 	}
 
 	private static Stream<Arguments> nonemptyListParams() {
 		String taxon = "taxon", locus = "locus";
-		UUID project = UUID.randomUUID();
+		String project = UUID.randomUUID().toString();
 		String[] alleles = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String[] alleles2 = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String[] alleles3 = {null, "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
@@ -53,7 +53,7 @@ public class FastaFormatterTests extends FormatterTests {
 
 	@ParameterizedTest
 	@MethodSource("emptyListParams")
-	public void parse_emptyList(String taxon, String locus, UUID project, String filename, Integer[] errorLines) throws IOException {
+	public void parse_emptyList(String taxon, String locus, String project, String filename, Integer[] errorLines) throws IOException {
 		FastaFormatter formatter = new FastaFormatter();
 		Pair<List<Allele>, List<Integer>> result = formatter.parse(createFile("fasta", filename), taxon, locus, project);
 		assertEquals(0, result.getKey().size());
@@ -62,7 +62,7 @@ public class FastaFormatterTests extends FormatterTests {
 
 	@ParameterizedTest
 	@MethodSource("nonemptyListParams")
-	public void parse_nonemptyList(String taxon, String locus, UUID project, String filename, Pair<Allele[], Integer[]> expected) throws IOException {
+	public void parse_nonemptyList(String taxon, String locus, String project, String filename, Pair<Allele[], Integer[]> expected) throws IOException {
 		FastaFormatter formatter = new FastaFormatter();
 		Pair<List<Allele>, List<Integer>> result = formatter.parse(createFile("fasta", filename), taxon, locus, project);
 		List<Allele> alleles = result.getKey();
@@ -87,7 +87,7 @@ public class FastaFormatterTests extends FormatterTests {
 		FastaFormatter formatter = new FastaFormatter();
 		String[] alleles = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String expected = readFile("fasta", "f-1-1.txt");
-		String formatted = formatter.format(Arrays.asList(alleles("taxon", "nusA", UUID.randomUUID(), alleles)), 17);
+		String formatted = formatter.format(Arrays.asList(alleles("taxon", "nusA", UUID.randomUUID().toString(), alleles)), 17);
 		assertEquals(expected, formatted);
 	}
 
@@ -96,7 +96,7 @@ public class FastaFormatterTests extends FormatterTests {
 		FastaFormatter formatter = new FastaFormatter();
 		String[] alleles = {"TCGAGGAACCGCTCGAGAGGTGATCCTGTCG", "TCGAGGAACCGCTCGAGAGGTGATCCTGTCG"};
 		String expected = readFile("fasta", "f-2-a.txt");
-		String formatted = formatter.format(Arrays.asList(alleles("taxon", "nusA", UUID.randomUUID(), alleles)), 17);
+		String formatted = formatter.format(Arrays.asList(alleles("taxon", "nusA", UUID.randomUUID().toString(), alleles)), 17);
 		assertEquals(expected, formatted);
 	}
 

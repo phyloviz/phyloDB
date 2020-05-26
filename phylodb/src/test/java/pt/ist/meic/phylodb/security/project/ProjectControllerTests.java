@@ -35,7 +35,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProjects_params() {
 		String uri = "/projects";
-		Project project = new Project(UUID.randomUUID(), "x", "x", "x", new User.PrimaryKey[0]);
+		Project project = new Project(UUID.randomUUID().toString(), "x", "x", "x", new User.PrimaryKey[0]);
 		List<Project> projects = new ArrayList<Project>() {{
 			add(project);
 		}};
@@ -53,7 +53,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProject_params() {
 		String uri = "/projects/%s";
-		UUID id = UUID.randomUUID();
+		String id = UUID.randomUUID().toString();
 		Project project = new Project(id, "x", "x", "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, id)).param("version", "1"),
 				req2 = get(String.format(uri, id));
@@ -65,7 +65,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> putProject_params() {
 		String uri = "/projects/%s";
-		UUID id = UUID.randomUUID();
+		String id = UUID.randomUUID().toString();
 		Project project = new Project(id, "x", "private", "x", new User.PrimaryKey[]{new User.PrimaryKey("teste", "teste")});
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, id));
 		ProjectInputModel input1 = new ProjectInputModel(project.getPrimaryKey(), project.getName(), project.getType(), project.getDescription(), project.getUsers()),

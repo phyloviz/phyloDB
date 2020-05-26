@@ -15,14 +15,14 @@ public class IsolatesFormatter extends Formatter<Isolate> {
 	private List<String> headers;
 	private int id;
 	private int st;
-	private UUID projectId;
-	private UUID datasetId;
+	private String projectId;
+	private String datasetId;
 	private String missing;
 
 	@Override
 	protected boolean init(Iterator<String> it, Object... params) {
-		this.projectId = (UUID) params[0];
-		this.datasetId = (UUID) params[1];
+		this.projectId = (String) params[0];
+		this.datasetId = (String) params[1];
 		this.id = (int) params[2];
 		this.missing = (String) params[3];
 		headers = Arrays.asList(it.next().split("\\t"));

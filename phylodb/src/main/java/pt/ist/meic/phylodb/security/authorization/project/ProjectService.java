@@ -29,7 +29,7 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Project> getProject(UUID id, long version) {
+	public Optional<Project> getProject(String id, long version) {
 		return projectRepository.find(id, version);
 	}
 
@@ -48,7 +48,7 @@ public class ProjectService {
 	}
 
 	@Transactional
-	public boolean deleteProject(UUID id) {
+	public boolean deleteProject(String id) {
 		return projectRepository.remove(id);
 	}
 

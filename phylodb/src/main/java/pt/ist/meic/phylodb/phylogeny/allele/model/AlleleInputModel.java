@@ -3,7 +3,6 @@ package pt.ist.meic.phylodb.phylogeny.allele.model;
 import pt.ist.meic.phylodb.io.input.InputModel;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class AlleleInputModel implements InputModel<Allele> {
 
@@ -28,7 +27,7 @@ public class AlleleInputModel implements InputModel<Allele> {
 
 	@Override
 	public Optional<Allele> toDomainEntity(String... params) {
-		UUID project = params[3] != null ? UUID.fromString(params[3]) : null;
+		String project = params[3];
 		return !params[2].equals(id) ? Optional.empty() : Optional.of(new Allele(params[0], params[1], id, sequence, project));
 	}
 

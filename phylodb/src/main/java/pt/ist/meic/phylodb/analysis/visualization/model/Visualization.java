@@ -2,7 +2,6 @@ package pt.ist.meic.phylodb.analysis.visualization.model;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Visualization {
 
@@ -11,7 +10,7 @@ public class Visualization {
 	private final VisualizationAlgorithm algorithm;
 	private final List<Coordinate> coordinates;
 
-	public Visualization(UUID projectId, UUID datasetId, UUID analysisId, UUID id, boolean deprecated, VisualizationAlgorithm algorithm, List<Coordinate> coordinates) {
+	public Visualization(String projectId, String datasetId, String analysisId, String id, boolean deprecated, VisualizationAlgorithm algorithm, List<Coordinate> coordinates) {
 		this.primaryKey = new PrimaryKey(projectId, datasetId, analysisId, id);
 		this.deprecated = deprecated;
 		this.algorithm = algorithm;
@@ -46,31 +45,31 @@ public class Visualization {
 
 	public static class PrimaryKey {
 
-		private final UUID projectId;
-		private final UUID datasetId;
-		private final UUID analysisId;
-		private final UUID id;
+		private final String projectId;
+		private final String datasetId;
+		private final String analysisId;
+		private final String id;
 
-		public PrimaryKey(UUID projectId, UUID datasetId, UUID analysisId, UUID id) {
+		public PrimaryKey(String projectId, String datasetId, String analysisId, String id) {
 			this.projectId = projectId;
 			this.datasetId = datasetId;
 			this.analysisId = analysisId;
 			this.id = id;
 		}
 
-		public UUID getProjectId() {
+		public String getProjectId() {
 			return projectId;
 		}
 
-		public UUID getDatasetId() {
+		public String getDatasetId() {
 			return datasetId;
 		}
 
-		public UUID getAnalysisId() {
+		public String getAnalysisId() {
 			return analysisId;
 		}
 
-		public UUID getId() {
+		public String getId() {
 			return id;
 		}
 

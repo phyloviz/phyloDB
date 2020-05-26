@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AlleleRepositoryTests extends RepositoryTestsContext {
 
 	private static final int LIMIT = 2;
-	private static final UUID PROJECTID = PROJECT1.getPrimaryKey();
+	private static final String PROJECTID = PROJECT1.getPrimaryKey();
 	private static final Allele[] STATE = new Allele[]{ALLELE11, ALLELE12, ALLELE11P, ALLELE12P};
 
 	private static Stream<Arguments> findAllNoProject_params() {
@@ -226,7 +226,7 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Allele parse(Map<String, Object> row) {
-		UUID project = row.get("project") != null ? UUID.fromString((String) row.get("project")) : null;
+		String project = row.get("project") != null ? (String) row.get("project") : null;
 		return new Allele((String) row.get("taxonId"),
 				(String) row.get("locusId"),
 				(String) row.get("id"),

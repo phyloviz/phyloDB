@@ -5,14 +5,13 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class FastaFormatter extends Formatter<Allele> {
 
 	private String taxon;
 	private String locus;
-	private UUID project;
+	private String project;
 	private String id;
 	private StringBuilder sequence;
 
@@ -20,7 +19,7 @@ public class FastaFormatter extends Formatter<Allele> {
 	protected boolean init(Iterator<String> it, Object... params) {
 		taxon = (String) params[0];
 		locus = (String) params[1];
-		project = params[2] != null ? (UUID) params[2] : null;
+		project = params[2] != null ? (String) params[2] : null;
 		id = null;
 		sequence = new StringBuilder();
 		return true;

@@ -218,7 +218,7 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Isolate parse(Map<String, Object> row) {
-		UUID projectId = UUID.fromString(row.get("projectId").toString()), datasetId = UUID.fromString(row.get("datasetId").toString());
+		String projectId = row.get("projectId").toString(), datasetId = row.get("datasetId").toString();
 		Entity<Profile.PrimaryKey> profile = null;
 		if (row.get("profileId") != null)
 			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));

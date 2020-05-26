@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class DatasetInputModel implements InputModel<Dataset> {
 
-	private UUID id;
+	private String id;
 	private String description;
 	private String taxonId;
 	private String schemaId;
@@ -15,14 +15,14 @@ public class DatasetInputModel implements InputModel<Dataset> {
 	public DatasetInputModel() {
 	}
 
-	public DatasetInputModel(UUID id, String description, String taxonId, String schemaId) {
+	public DatasetInputModel(String id, String description, String taxonId, String schemaId) {
 		this.id = id;
 		this.description = description;
 		this.taxonId = taxonId;
 		this.schemaId = schemaId;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -41,8 +41,8 @@ public class DatasetInputModel implements InputModel<Dataset> {
 	@Override
 	public Optional<Dataset> toDomainEntity(String... params) {
 		UUID id = params.length == 1 ? UUID.randomUUID() : UUID.fromString(params[1]);
-		return (params.length != 1 && !params[1].equals(this.id.toString())) || taxonId == null || schemaId == null ? Optional.empty() :
-				Optional.of(new Dataset(UUID.fromString(params[0]), id, description, taxonId, schemaId));
+		return (params.length != 1 && !params[1].equals(this.id)) || taxonId == null || schemaId == null ? Optional.empty() :
+				Optional.of(new Dataset(params[0], id.toString(), description, taxonId, schemaId));
 	}
 
 }

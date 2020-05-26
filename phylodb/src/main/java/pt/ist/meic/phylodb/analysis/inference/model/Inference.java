@@ -2,7 +2,6 @@ package pt.ist.meic.phylodb.analysis.inference.model;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 
 public class Inference {
@@ -12,14 +11,14 @@ public class Inference {
 	private final InferenceAlgorithm algorithm;
 	private final List<Edge> edges;
 
-	public Inference(UUID projectId, UUID datasetId, UUID id, boolean deprecated, InferenceAlgorithm algorithm, List<Edge> edges) {
+	public Inference(String projectId, String datasetId, String id, boolean deprecated, InferenceAlgorithm algorithm, List<Edge> edges) {
 		this.primaryKey = new PrimaryKey(projectId, datasetId, id);
 		this.deprecated = deprecated;
 		this.algorithm = algorithm;
 		this.edges = edges;
 	}
 
-	public Inference(UUID projectId, UUID datasetId, UUID id, InferenceAlgorithm algorithm, List<Edge> edges) {
+	public Inference(String projectId, String datasetId, String id, InferenceAlgorithm algorithm, List<Edge> edges) {
 		this(projectId, datasetId, id, false, algorithm, edges);
 	}
 
@@ -52,25 +51,25 @@ public class Inference {
 
 	public static class PrimaryKey {
 
-		private final UUID projectId;
-		private final UUID datasetId;
-		private final UUID id;
+		private final String projectId;
+		private final String datasetId;
+		private final String id;
 
-		public PrimaryKey(UUID projectId, UUID datasetId, UUID id) {
+		public PrimaryKey(String projectId, String datasetId, String id) {
 			this.projectId = projectId;
 			this.datasetId = datasetId;
 			this.id = id;
 		}
 
-		public UUID getProjectId() {
+		public String getProjectId() {
 			return projectId;
 		}
 
-		public UUID getDatasetId() {
+		public String getDatasetId() {
 			return datasetId;
 		}
 
-		public UUID getId() {
+		public String getId() {
 			return id;
 		}
 

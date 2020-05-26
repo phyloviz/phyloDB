@@ -6,11 +6,10 @@ import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class ProjectOutputModel implements OutputModel {
 
-	protected UUID id;
+	protected String id;
 	protected long version;
 	protected boolean deprecated;
 
@@ -23,7 +22,7 @@ public class ProjectOutputModel implements OutputModel {
 		this.deprecated = project.isDeprecated();
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

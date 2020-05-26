@@ -29,13 +29,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class VisualizationControllerTests extends ControllerTestsContext {
 
-	private static final UUID PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId(),
+	private static final String PROJECTID =  PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId(),
 			INFERENCEID = INFERENCE1.getPrimaryKey().getId();
 
 	private static Stream<Arguments> getVisualizations_params() {
 		String uri = "/projects/%s/datasets/%s/inferences/%s/visualizations";
-		Visualization visualization1 = new Visualization(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12));
-		Visualization visualization2 = new Visualization(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE21, COORDINATE22));
+		Visualization visualization1 = new Visualization(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID().toString(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12));
+		Visualization visualization2 = new Visualization(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID().toString(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE21, COORDINATE22));
 		List<Visualization> visualizations = new ArrayList<Visualization>() {{
 			add(visualization1);
 			add(visualization2);

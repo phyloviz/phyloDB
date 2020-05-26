@@ -10,7 +10,6 @@ import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Repository
 public class DatasetRepository extends EntityRepository<Dataset, Dataset.PrimaryKey> {
@@ -51,8 +50,8 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 				(String) row.get("schemaId")),
 				(long) row.get("schemaVersion"),
 				(boolean) row.get("schemaDeprecated"));
-		return new Dataset(UUID.fromString(row.get("projectId").toString()),
-				UUID.fromString(row.get("datasetId").toString()),
+		return new Dataset((String) row.get("projectId"),
+				(String) row.get("datasetId"),
 				(long) row.get("version"),
 				(boolean) row.get("deprecated"),
 				(String) row.get("description"),

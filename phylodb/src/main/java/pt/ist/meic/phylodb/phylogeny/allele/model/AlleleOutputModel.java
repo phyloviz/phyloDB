@@ -1,6 +1,7 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
@@ -13,6 +14,8 @@ public class AlleleOutputModel implements OutputModel {
 	protected String taxon_id;
 	protected String locus_id;
 	protected String id;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	protected String project_id;
 	protected long version;
 	protected boolean deprecated;
 
@@ -23,6 +26,7 @@ public class AlleleOutputModel implements OutputModel {
 		this.taxon_id = allele.getPrimaryKey().getTaxonId();
 		this.locus_id = allele.getPrimaryKey().getLocusId();
 		this.id = allele.getPrimaryKey().getId();
+		this.project_id = allele.getPrimaryKey().getProjectId();
 		this.version = allele.getVersion();
 		this.deprecated = allele.isDeprecated();
 	}
@@ -31,6 +35,7 @@ public class AlleleOutputModel implements OutputModel {
 		this.taxon_id = reference.getPrimaryKey().getTaxonId();
 		this.locus_id = reference.getPrimaryKey().getLocusId();
 		this.id = reference.getPrimaryKey().getId();
+		this.project_id = reference.getPrimaryKey().getProjectId();
 		this.version = reference.getVersion();
 		this.deprecated = reference.isDeprecated();
 	}
@@ -45,6 +50,10 @@ public class AlleleOutputModel implements OutputModel {
 
 	public String getId() {
 		return id;
+	}
+
+	public String getProject_id() {
+		return project_id;
 	}
 
 	public long getVersion() {

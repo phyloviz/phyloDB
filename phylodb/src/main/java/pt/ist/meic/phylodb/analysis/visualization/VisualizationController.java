@@ -28,9 +28,9 @@ public class VisualizationController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getVisualizations(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("inference") UUID inferenceId,
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@PathVariable("inference") String inferenceId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
 		String type = MediaType.APPLICATION_JSON_VALUE;
@@ -40,10 +40,10 @@ public class VisualizationController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)
 	@GetMapping(path = "/{visualization}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getVisualization(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("inference") UUID inferenceId,
-			@PathVariable("visualization") UUID visualizationId
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@PathVariable("inference") String inferenceId,
+			@PathVariable("visualization") String visualizationId
 	) {
 		return get(() -> service.getVisualization(projectId, datasetId, inferenceId, visualizationId),
 				GetVisualizationOutputModel::new,
@@ -53,10 +53,10 @@ public class VisualizationController extends Controller {
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
 	@DeleteMapping(path = "/{visualization}")
 	public ResponseEntity<?> deleteVisualization(
-			@PathVariable("project") UUID projectId,
-			@PathVariable("dataset") UUID datasetId,
-			@PathVariable("inference") UUID inferenceId,
-			@PathVariable("visualization") UUID visualizationId
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@PathVariable("inference") String inferenceId,
+			@PathVariable("visualization") String visualizationId
 	) {
 		return status(() -> service.deleteVisualization(projectId, datasetId, inferenceId, visualizationId));
 	}

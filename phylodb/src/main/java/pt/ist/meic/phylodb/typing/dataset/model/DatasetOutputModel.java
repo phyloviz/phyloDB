@@ -7,13 +7,12 @@ import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class DatasetOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	protected UUID project_id;
-	protected UUID id;
+	protected String project_id;
+	protected String id;
 	protected long version;
 	protected boolean deprecated;
 
@@ -27,11 +26,11 @@ public class DatasetOutputModel implements OutputModel {
 		this.deprecated = dataset.isDeprecated();
 	}
 
-	public UUID getProject_id() {
+	public String getProject_id() {
 		return project_id;
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

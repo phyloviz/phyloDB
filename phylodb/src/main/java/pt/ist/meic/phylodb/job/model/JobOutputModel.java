@@ -1,10 +1,8 @@
 package pt.ist.meic.phylodb.job.model;
 
-import java.util.UUID;
-
 public class JobOutputModel {
 
-	private UUID jobId;
+	private String jobId;
 	private boolean completed;
 	private boolean cancelled;
 
@@ -17,7 +15,7 @@ public class JobOutputModel {
 		this.cancelled = status.isCancelled();
 	}
 
-	public UUID getJobId() {
+	public String getJobId() {
 		return jobId;
 	}
 

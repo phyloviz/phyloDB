@@ -12,14 +12,14 @@ import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALU
 
 public class NewickFormatter extends TreeFormatter {
 
-	private UUID projectId;
-	private UUID datasetId;
+	private String projectId;
+	private String datasetId;
 	protected String missing;
 
 	@Override
 	protected boolean init(Iterator<String> it, Object... params) {
-		this.projectId = (UUID) params[0];
-		this.datasetId = (UUID) params[1];
+		this.projectId = (String) params[0];
+		this.datasetId = (String) params[1];
 		return true;
 	}
 
