@@ -18,9 +18,8 @@ import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
-import java.util.UUID;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
@@ -36,17 +35,14 @@ public class AlleleController extends Controller {
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<?> getAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
 			@RequestParam(value = "project", required = false) String project,
-			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
+			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		return getAll(type, l -> service.getAlleles(taxonId, locusId, project, page, l),
-				GetAllelesOutputModel::new,
-				(a) -> new FileOutputModel(new FastaFormatter().format(a, Integer.parseInt(lineLength))));
+		return getAllJson(l -> service.getAllelesEntities(taxonId, locusId, project, page, l), GetAllelesOutputModel::new);
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
@@ -71,6 +67,17 @@ public class AlleleController extends Controller {
 			@RequestBody AlleleInputModel input
 	) {
 		return put(() -> input.toDomainEntity(taxonId, locusId, alleleId, project), service::saveAllele);
+	}
+
+	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
+	@GetMapping(path = "/files", produces = {MediaType.TEXT_PLAIN_VALUE})
+	public ResponseEntity<?> getAllelesFile(
+			@PathVariable("taxon") String taxonId,
+			@PathVariable("locus") String locusId,
+			@RequestParam(value = "project", required = false) String project,
+			@RequestParam(value = "page", defaultValue = "0") int page
+	) {
+		return getAllFile(l -> service.getAlleles(taxonId, locusId, project, page, l), (a) -> new FileOutputModel(new FastaFormatter().format(a, Integer.parseInt(lineLength))));
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.WRITE)

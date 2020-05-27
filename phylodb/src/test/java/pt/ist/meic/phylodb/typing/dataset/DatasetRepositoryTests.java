@@ -9,7 +9,7 @@ import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -26,8 +26,8 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> findAll_params() {
 		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7", key2 = "6f809af7-2c99-43f7-b674-4843c77384c7";
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
-				s2 = new Entity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
+		VersionedEntity<Schema.PrimaryKey> s1 = new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
+				s2 = new VersionedEntity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key1, 1, false, "name", s1),
 				firstChanged = new Dataset(PROJECT1.getPrimaryKey(), key1, 2, false, "name2", s2),
 				second = new Dataset(PROJECT1.getPrimaryKey(), "5f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name3", s2),
@@ -59,7 +59,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> find_params() {
 		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "4f809af7-2c99-43f7-b674-4843c77384c7");
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
+		VersionedEntity<Schema.PrimaryKey> s1 = new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				second = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 2, true, "name", s1);
 		return Stream.of(Arguments.of(key, 1, new Dataset[0], null),
@@ -73,7 +73,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> exists_params() {
 		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "4f809af7-2c99-43f7-b674-4843c77384c7");
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
+		VersionedEntity<Schema.PrimaryKey> s1 = new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				second = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 2, true, "name", s1);
 		return Stream.of(Arguments.of(key, new Dataset[0], false),
@@ -84,8 +84,8 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> save_params() {
 		String key = "4f809af7-2c99-43f7-b674-4843c77384c7";
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
-				s2 = new Entity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
+		VersionedEntity<Schema.PrimaryKey> s1 = new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
+				s2 = new VersionedEntity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
 		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key, 1, false, "name", s1),
 				second = new Dataset(PROJECT1.getPrimaryKey(), key, 2, false, "name", s2);
 		return Stream.of(Arguments.of(first, new Dataset[0], new Dataset[]{STATE[0], STATE[1], first}, true, 2, 3),
@@ -95,7 +95,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> remove_params() {
 		Dataset.PrimaryKey key = new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "4f809af7-2c99-43f7-b674-4843c77384c7");
-		Entity<Schema.PrimaryKey> s1 = new Entity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
+		VersionedEntity<Schema.PrimaryKey> s1 = new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated());
 		Dataset before = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, false, "name", s1),
 				after = new Dataset(PROJECT1.getPrimaryKey(), key.getId(), 1, true, "name", s1);
 		return Stream.of(Arguments.of(key, new Dataset[0], new Dataset[]{STATE[0], STATE[1]}, false),
@@ -122,7 +122,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Dataset parse(Map<String, Object> row) {
-		Entity<Schema.PrimaryKey> schema = new Entity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
+		VersionedEntity<Schema.PrimaryKey> schema = new VersionedEntity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
 				(String) row.get("schemaId")),
 				(long) row.get("schemaVersion"),
 				(boolean) row.get("schemaDeprecated"));
@@ -172,7 +172,7 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Dataset[] state, Dataset[] expected) {
 		store(state);
-		Optional<List<Dataset>> result = datasetRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey());
+		Optional<List<Dataset>> result = datasetRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

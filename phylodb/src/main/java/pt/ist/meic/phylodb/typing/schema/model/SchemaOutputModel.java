@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ public class SchemaOutputModel implements OutputModel {
 		this.deprecated = schema.isDeprecated();
 	}
 
-	public SchemaOutputModel(Entity<Schema.PrimaryKey> reference) {
+	public SchemaOutputModel(VersionedEntity<Schema.PrimaryKey> reference) {
 		this.taxon_id = reference.getPrimaryKey().getTaxonId();
 		this.id = reference.getPrimaryKey().getId();
 		this.version = reference.getVersion();
@@ -72,7 +72,7 @@ public class SchemaOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Schema schema) {
+		public Resumed(VersionedEntity<Schema.PrimaryKey> schema) {
 			super(schema);
 		}
 

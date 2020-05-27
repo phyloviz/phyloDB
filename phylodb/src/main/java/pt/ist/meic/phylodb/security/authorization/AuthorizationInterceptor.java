@@ -6,8 +6,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.SecurityInterceptor;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectService;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
+import pt.ist.meic.phylodb.security.project.ProjectService;
+import pt.ist.meic.phylodb.security.project.model.Project;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
 @Component
 @Order(2)

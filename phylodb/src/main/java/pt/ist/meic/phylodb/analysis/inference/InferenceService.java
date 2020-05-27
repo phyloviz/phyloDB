@@ -14,6 +14,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,8 +40,8 @@ public class InferenceService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Inference>> getInferences(String projectId, String datasetId, int page, int limit) {
-		return analysisRepository.findAll(page, limit, projectId, datasetId);
+	public Optional<List<Entity<Inference.PrimaryKey>>> getInferences(String projectId, String datasetId, int page, int limit) {
+		return analysisRepository.findAllEntities(page, limit, projectId, datasetId);
 	}
 
 	@Transactional(readOnly = true)
@@ -58,7 +59,7 @@ public class InferenceService {
 		if(parsed.getValue().size() > 0)
 			return Optional.empty();
 		List<Edge> edges = parsed.getKey();
-		List<Entity<Profile.PrimaryKey>> profiles = edges.stream()
+		List<VersionedEntity<Profile.PrimaryKey>> profiles = edges.stream()
 				.flatMap(e -> Stream.of(e.getFrom(), e.getTo()))
 				.distinct()
 				.collect(Collectors.toList());

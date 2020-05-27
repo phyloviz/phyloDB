@@ -1,15 +1,15 @@
-package pt.ist.meic.phylodb.security.authorization.project;
+package pt.ist.meic.phylodb.security.project;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.security.authentication.user.UserRepository;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
+import pt.ist.meic.phylodb.security.user.UserRepository;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +24,8 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Project>> getProjects(User.PrimaryKey userId, int page, int limit) {
-		return projectRepository.findAll(page, limit, userId);
+	public Optional<List<VersionedEntity<String>>> getProjects(User.PrimaryKey userId, int page, int limit) {
+		return projectRepository.findAllEntities(page, limit, userId);
 	}
 
 	@Transactional(readOnly = true)

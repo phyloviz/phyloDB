@@ -8,6 +8,7 @@ import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +25,11 @@ public class AlleleService {
 	public AlleleService(LocusRepository locusRepository, AlleleRepository alleleRepository) {
 		this.locusRepository = locusRepository;
 		this.alleleRepository = alleleRepository;
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<List<VersionedEntity<Allele.PrimaryKey>>> getAllelesEntities(String taxonId, String locusId, String project, int page, int limit) {
+		return alleleRepository.findAllEntities(page, limit, taxonId, locusId, project);
 	}
 
 	@Transactional(readOnly = true)

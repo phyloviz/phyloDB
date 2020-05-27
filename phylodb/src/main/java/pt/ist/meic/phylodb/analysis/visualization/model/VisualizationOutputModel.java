@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
@@ -23,6 +24,14 @@ public class VisualizationOutputModel implements OutputModel {
 	}
 
 	public VisualizationOutputModel(Visualization visualization) {
+		this.project_id = visualization.getPrimaryKey().getProjectId();
+		this.dataset_id = visualization.getPrimaryKey().getDatasetId();
+		this.analysis_id = visualization.getPrimaryKey().getAnalysisId();
+		this.id = visualization.getPrimaryKey().getId();
+		this.deprecated = visualization.isDeprecated();
+	}
+
+	public VisualizationOutputModel(Entity<Visualization.PrimaryKey> visualization) {
 		this.project_id = visualization.getPrimaryKey().getProjectId();
 		this.dataset_id = visualization.getPrimaryKey().getDatasetId();
 		this.analysis_id = visualization.getPrimaryKey().getAnalysisId();
@@ -73,7 +82,7 @@ public class VisualizationOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Visualization visualization) {
+		public Resumed(Entity<Visualization.PrimaryKey> visualization) {
 			super(visualization);
 		}
 

@@ -1,9 +1,10 @@
-package pt.ist.meic.phylodb.security.authentication.user.model;
+package pt.ist.meic.phylodb.security.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -18,6 +19,13 @@ public class UserOutputModel implements OutputModel {
 	}
 
 	public UserOutputModel(User user) {
+		this.email = user.getPrimaryKey().getId();
+		this.provider = user.getPrimaryKey().getProvider();
+		this.version = user.getVersion();
+		this.deprecated = user.isDeprecated();
+	}
+
+	public UserOutputModel(VersionedEntity<User.PrimaryKey> user) {
 		this.email = user.getPrimaryKey().getId();
 		this.provider = user.getPrimaryKey().getProvider();
 		this.version = user.getVersion();
@@ -62,7 +70,7 @@ public class UserOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(User user) {
+		public Resumed(VersionedEntity<User.PrimaryKey> user) {
 			super(user);
 		}
 

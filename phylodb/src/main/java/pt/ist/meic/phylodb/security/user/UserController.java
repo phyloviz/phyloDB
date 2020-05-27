@@ -1,19 +1,19 @@
-package pt.ist.meic.phylodb.security.authentication.user;
+package pt.ist.meic.phylodb.security.user;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
-import pt.ist.meic.phylodb.security.authentication.user.model.GetUserOutputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.GetUsersOutputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.UserInputModel;
+import pt.ist.meic.phylodb.security.user.model.GetUserOutputModel;
+import pt.ist.meic.phylodb.security.user.model.GetUsersOutputModel;
+import pt.ist.meic.phylodb.security.user.model.UserInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
 import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/users")
@@ -27,8 +27,7 @@ public class UserController extends Controller {
 
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getUsers(@RequestParam(value = "page", defaultValue = "0") int page) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getUsers(page, l), GetUsersOutputModel::new, null);
+		return getAllJson(l -> service.getUsers(page, l), GetUsersOutputModel::new);
 	}
 
 	@GetMapping(path = "/{user}", produces = MediaType.APPLICATION_JSON_VALUE)

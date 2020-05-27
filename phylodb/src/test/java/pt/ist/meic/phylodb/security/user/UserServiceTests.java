@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pt.ist.meic.phylodb.ServiceTestsContext;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +67,7 @@ public class UserServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getUsers_params")
 	public void getUsers(int page, List<User> expected) {
-		Mockito.when(userRepository.findAll(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(userRepository.findAllEntities(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<User>> result = userService.getUsers(page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

@@ -2,22 +2,22 @@ package pt.ist.meic.phylodb.typing.schema.model;
 
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.Method;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
-public class Schema extends Entity<Schema.PrimaryKey> {
+public class Schema extends VersionedEntity<Schema.PrimaryKey> {
 
 	private final Method type;
 	private final String description;
-	private final List<Entity<Locus.PrimaryKey>> lociIds;
+	private final List<VersionedEntity<Locus.PrimaryKey>> lociIds;
 
-	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<Entity<Locus.PrimaryKey>> lociIds) {
+	public Schema(String taxonId, String id, long version, boolean deprecated, Method type, String description, List<VersionedEntity<Locus.PrimaryKey>> lociIds) {
 		super(new PrimaryKey(taxonId, id), version, deprecated);
 		this.type = type;
 		this.description = description;
@@ -26,7 +26,7 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 
 	public Schema(String taxonId, String id, Method type, String description, String[] lociId) {
 		this(taxonId, id, -1, false, type, description, Arrays.stream(lociId)
-				.map(i -> new Entity<>(new Locus.PrimaryKey(taxonId, i), CURRENT_VERSION_VALUE, false))
+				.map(i -> new VersionedEntity<>(new Locus.PrimaryKey(taxonId, i), CURRENT_VERSION_VALUE, false))
 				.collect(Collectors.toList()));
 	}
 
@@ -38,7 +38,7 @@ public class Schema extends Entity<Schema.PrimaryKey> {
 		return description;
 	}
 
-	public List<Entity<Locus.PrimaryKey>> getLociReferences() {
+	public List<VersionedEntity<Locus.PrimaryKey>> getLociReferences() {
 		return lociIds;
 	}
 

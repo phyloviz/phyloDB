@@ -1,10 +1,10 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model;
 
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
-public class Allele extends Entity<Allele.PrimaryKey> {
+public class Allele extends VersionedEntity<Allele.PrimaryKey> {
 
 	private final String sequence;
 

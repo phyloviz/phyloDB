@@ -13,7 +13,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetOutputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetsOutputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("projects/{project}/datasets")
@@ -31,8 +31,7 @@ public class DatasetController extends Controller {
 			@PathVariable("project") String projectId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getDatasets(projectId, page, l), GetDatasetsOutputModel::new, null);
+		return getAllJson(l -> service.getDatasets(projectId, page, l), GetDatasetsOutputModel::new);
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.READ)

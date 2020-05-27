@@ -14,8 +14,8 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,6 +40,11 @@ public class ProfileService {
 	}
 
 	@Transactional(readOnly = true)
+	public Optional<List<VersionedEntity<Profile.PrimaryKey>>> getProfilesEntities(String projectId, String datasetId, int page, int limit) {
+		return profileRepository.findAllEntities(page, limit, projectId, datasetId);
+	}
+
+	@Transactional(readOnly = true)
 	public Optional<Pair<Schema, List<Profile>>> getProfiles(String projectId, String datasetId, int page, int limit) {
 		return profileRepository.findAll(page, limit, projectId, datasetId)
 				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
@@ -59,8 +64,8 @@ public class ProfileService {
 		if (!datasetRepository.exists(datasetKey) || !optional.isPresent())
 			return false;
 		Schema schema = optional.get();
-		List<Entity<Locus.PrimaryKey>> loci = schema.getLociReferences();
-		List<Entity<Allele.PrimaryKey>> alleles = profile.getAllelesReferences();
+		List<VersionedEntity<Locus.PrimaryKey>> loci = schema.getLociReferences();
+		List<VersionedEntity<Allele.PrimaryKey>> alleles = profile.getAllelesReferences();
 		if (loci.size() != alleles.size())
 			return false;
 		profile = profile.updateReferences(schema, missing, authorized);
@@ -83,7 +88,7 @@ public class ProfileService {
 	}
 
 	private Optional<Pair<Integer[], String[]>> saveAll(String projectId, String datasetId, boolean authorized, boolean conflict, MultipartFile file) throws IOException {
-		Optional<Schema> optional = datasetRepository.find(new Dataset.PrimaryKey(projectId, datasetId), EntityRepository.CURRENT_VERSION_VALUE)
+		Optional<Schema> optional = datasetRepository.find(new Dataset.PrimaryKey(projectId, datasetId), VersionedRepository.CURRENT_VERSION_VALUE)
 				.flatMap(d -> schemaRepository.find(d.getSchema().getPrimaryKey(), d.getSchema().getVersion()));
 		if (!optional.isPresent())
 			return Optional.empty();
@@ -104,7 +109,7 @@ public class ProfileService {
 				Optional.empty();
 	}
 
-	private boolean verifyAlleles(List<Entity<Allele.PrimaryKey>> references) {
+	private boolean verifyAlleles(List<VersionedEntity<Allele.PrimaryKey>> references) {
 		return !alleleRepository.anyMissing(references) && !references.stream().allMatch(Objects::isNull);
 	}
 

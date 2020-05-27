@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ public class LocusOutputModel implements OutputModel {
 		this.deprecated = locus.isDeprecated();
 	}
 
-	public LocusOutputModel(Entity<Locus.PrimaryKey> reference) {
+	public LocusOutputModel(VersionedEntity<Locus.PrimaryKey> reference) {
 		this.taxon_id = reference.getPrimaryKey().getTaxonId();
 		this.id = reference.getPrimaryKey().getId();
 		this.version = reference.getVersion();
@@ -70,7 +70,7 @@ public class LocusOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Locus locus) {
+		public Resumed(VersionedEntity<Locus.PrimaryKey> locus) {
 			super(locus);
 		}
 

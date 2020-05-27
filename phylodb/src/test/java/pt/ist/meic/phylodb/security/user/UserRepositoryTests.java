@@ -5,7 +5,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.db.Query;
 
@@ -134,7 +134,7 @@ public class UserRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, User[] state, User[] expected) {
 		store(state);
-		Optional<List<User>> result = userRepository.findAll(page, LIMIT);
+		Optional<List<User>> result = userRepository.findAllEntities(page, LIMIT);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

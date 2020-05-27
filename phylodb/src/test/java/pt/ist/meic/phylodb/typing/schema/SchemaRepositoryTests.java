@@ -11,7 +11,7 @@ import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,10 +28,10 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
 		String taxonKey = TAXON1.getPrimaryKey();
-		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
-				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci2 = Arrays.asList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
-				new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1 = Arrays.asList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
+				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci2 = Arrays.asList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
+				new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
 		Schema first = new Schema(taxonKey, id1, 1, false, Method.MLST, "description", loci1),
 				firstChanged = new Schema(taxonKey, id1, 2, false, Method.MLST, "description2", loci1),
 				second = new Schema(taxonKey, "4test", 1, false, Method.MLST, null, loci2),
@@ -63,12 +63,12 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> find_params() {
 		Schema.PrimaryKey key = new Schema.PrimaryKey(TAXON1.getPrimaryKey(), "test");
-		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
-				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci1Changed = Arrays.asList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
-				new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci2 = Collections.singletonList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci2Changed = Collections.singletonList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1 = Arrays.asList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
+				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1Changed = Arrays.asList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
+				new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci2 = Collections.singletonList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci2Changed = Collections.singletonList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
 		Schema schema1 = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.MLST, "description", loci1),
 				schema1Changed = new Schema(key.getTaxonId(), key.getId(), 2, false, Method.MLST, "description2", loci1Changed),
 				schema2 = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.SNP, null, loci2),
@@ -88,9 +88,9 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> exists_params() {
 		Schema.PrimaryKey key = new Schema.PrimaryKey(TAXON1.getPrimaryKey(), "test");
-		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
-				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci2 = Collections.singletonList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1 = Arrays.asList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
+				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci2 = Collections.singletonList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
 		Schema schema1 = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.MLST, "description", loci1),
 				schema1Deleted = new Schema(key.getTaxonId(), key.getId(), 1, true, Method.MLST, "description", loci1),
 				schema2 = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.SNP, null, loci2),
@@ -105,11 +105,11 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> save_params() {
 		Schema.PrimaryKey key = new Schema.PrimaryKey(TAXON1.getPrimaryKey(), "3three");
-		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
-				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci2 = Arrays.asList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
-				new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
-		List<Entity<Locus.PrimaryKey>> loci3 = Collections.singletonList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1 = Arrays.asList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
+				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci2 = Arrays.asList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
+				new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci3 = Collections.singletonList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
 		Schema schema1 = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.MLST, "description", loci1),
 				schema1Changed = new Schema(key.getTaxonId(), key.getId(), 2, false, Method.MLST, "description2", loci2),
 				schema2 = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.SNP, "description3", loci3),
@@ -123,8 +123,8 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> remove_params() {
 		Schema.PrimaryKey key = new Schema.PrimaryKey(TAXON1.getPrimaryKey(), "3three");
-		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
-				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1 = Arrays.asList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
+				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
 		Schema first = new Schema(key.getTaxonId(), key.getId(), 1, false, Method.MLST, "description", loci1),
 				second = new Schema(key.getTaxonId(), key.getId(), 1, true, Method.MLST, "description", loci1);
 		return Stream.of(Arguments.of(key, new Schema[0], STATE, false),
@@ -136,7 +136,7 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 		String[] existentLoci = STATE[0].getLociIds().toArray(new String[0]),
 				loci1NotExists = new String[]{"not", "exists"};
 		Schema schema = new Schema(TAXON1.getPrimaryKey(), "3three", 1, false, Method.SNP, null,
-				Collections.singletonList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated())));
+				Collections.singletonList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated())));
 		return Stream.of(Arguments.of(TAXON1.getPrimaryKey(), STATE[0].getType(), existentLoci, STATE, STATE[0]),
 				Arguments.of(TAXON1.getPrimaryKey(), schema.getType(), new String[]{LOCUS2.getPrimaryKey().getId()}, new Schema[]{STATE[0], STATE[1], schema}, schema),
 				Arguments.of(TAXON1.getPrimaryKey(), STATE[0].getType(), loci1NotExists, STATE, null),
@@ -147,9 +147,9 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> findByDataset_params() {
 		Dataset.PrimaryKey key = new Dataset.PrimaryKey(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-		List<Entity<Locus.PrimaryKey>> loci1 = Arrays.asList(new Entity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
-				new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated())),
-				loci2 = Collections.singletonList(new Entity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
+		List<VersionedEntity<Locus.PrimaryKey>> loci1 = Arrays.asList(new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()),
+				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated())),
+				loci2 = Collections.singletonList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
 		Schema schema1 = new Schema(TAXON1.getPrimaryKey(), "3three", 1, false, Method.SNP, "test", loci1),
 				schema1Changed = new Schema(TAXON1.getPrimaryKey(), "3three", 2, false, Method.SNP, "changed", loci2),
 				schema2 = new Schema(TAXON1.getPrimaryKey(), "4fourth", 1, false, Method.MLVA, null, loci2),
@@ -227,8 +227,8 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private Schema parse(Map<String, Object> row) {
 		String taxonId = (String) row.get("taxonId");
-		List<Entity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
-				.map(m -> new Entity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")), (long) m.get("version"), (boolean) m.get("deprecated")))
+		List<VersionedEntity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
+				.map(m -> new VersionedEntity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")), (long) m.get("version"), (boolean) m.get("deprecated")))
 				.collect(Collectors.toList());
 		return new Schema(taxonId,
 				(String) row.get("id"),
@@ -265,7 +265,7 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Schema[] state, Schema[] expected) {
 		store(state);
-		Optional<List<Schema>> result = schemaRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey());
+		Optional<List<Schema>> result = schemaRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

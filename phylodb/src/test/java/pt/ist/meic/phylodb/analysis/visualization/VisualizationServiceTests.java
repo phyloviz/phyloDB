@@ -56,7 +56,7 @@ public class VisualizationServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getInferences_params")
 	public void getVisualizations(int page, List<Visualization> expected) {
-		Mockito.when(visualizationRepository.findAll(anyInt(), anyInt(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(visualizationRepository.findAllEntities(anyInt(), anyInt(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Visualization>> result = visualizationService.getVisualizations(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

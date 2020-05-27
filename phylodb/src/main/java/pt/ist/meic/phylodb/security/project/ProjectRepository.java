@@ -1,26 +1,27 @@
-package pt.ist.meic.phylodb.security.authorization.project;
+package pt.ist.meic.phylodb.security.project;
 
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.Map;
 
 @Repository
-public class ProjectRepository extends EntityRepository<Project, String> {
+public class ProjectRepository extends VersionedRepository<Project, String> {
 
 	public ProjectRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	protected Result getAllEntities(int page, int limit, Object... filters) {
 		if (filters == null || filters.length != 1)
 			return null;
 		User.PrimaryKey id = (User.PrimaryKey) filters[0];
@@ -28,8 +29,7 @@ public class ProjectRepository extends EntityRepository<Project, String> {
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"WITH p, r, pd, collect(DISTINCT {id: u.id, provider: u.provider}) as users\n" +
 				"WHERE {id: $, provider: $} IN users OR pd.type = \"public\"\n" +
-				"RETURN p.id as id, p.deprecated as deprecated, r.version as version,\n" +
-				"pd.name as name, pd.type as type, pd.description as description, users as users\n" +
+				"RETURN p.id as id, p.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY size(p.id), p.id SKIP $ LIMIT $";
 		return query(new Query(statement, id.getId(), id.getProvider(), page, limit));
 	}
@@ -43,6 +43,13 @@ public class ProjectRepository extends EntityRepository<Project, String> {
 				"RETURN p.id as id, p.deprecated as deprecated, r.version as version,\n" +
 				"pd.name as name, pd.type as type, pd.description as description, users as users";
 		return query(new Query(statement, key, version));
+	}
+
+	@Override
+	protected VersionedEntity<String> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>((String) row.get("id"),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
 	}
 
 	@Override

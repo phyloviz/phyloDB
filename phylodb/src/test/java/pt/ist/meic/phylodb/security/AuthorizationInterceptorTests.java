@@ -18,12 +18,12 @@ import pt.ist.meic.phylodb.phylogeny.allele.AlleleController;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonController;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
-import pt.ist.meic.phylodb.security.authorization.project.ProjectService;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
+import pt.ist.meic.phylodb.security.project.ProjectService;
+import pt.ist.meic.phylodb.security.project.model.Project;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

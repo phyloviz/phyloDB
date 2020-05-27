@@ -1,12 +1,13 @@
-package pt.ist.meic.phylodb.security.authentication.user;
+package pt.ist.meic.phylodb.security.user;
 
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,18 +16,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
+public class UserRepository extends VersionedRepository<User, User.PrimaryKey> {
 
 	public UserRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	protected Result getAllEntities(int page, int limit, Object... filters) {
 		String statement = "MATCH (u:User)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE u.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
-				"ud.role as role\n" +
+				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY size(u.id), u.id, size(u.provider), u.provider SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
 	}
@@ -39,6 +39,13 @@ public class UserRepository extends EntityRepository<User, User.PrimaryKey> {
 				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
 				"ud.role as role";
 		return query(new Query(statement, key.getId(), key.getProvider(), version));
+	}
+
+	@Override
+	protected VersionedEntity<User.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new User.PrimaryKey((String) row.get("id"), (String) row.get("provider")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
 	}
 
 	@Override

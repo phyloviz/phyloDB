@@ -152,7 +152,7 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Visualization[] state, Visualization[] expected) {
 		store(state);
-		Optional<List<Visualization>> result = visualizationRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId());
+		Optional<List<Visualization>> result = visualizationRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

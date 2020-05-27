@@ -7,9 +7,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -158,14 +158,14 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
-		List<Entity<Allele.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(), references3 = new ArrayList<>(), references4 = new ArrayList<>(),
+		List<VersionedEntity<Allele.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(), references3 = new ArrayList<>(), references4 = new ArrayList<>(),
 				references5 = new ArrayList<>(), references6 = new ArrayList<>(), references7 = new ArrayList<>();
-		Entity<Allele.PrimaryKey> reference1 = new Entity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				reference2 = new Entity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[2].getPrimaryKey().getId(), PROJECTID), EntityRepository.CURRENT_VERSION_VALUE, false),
-				reference3 = new Entity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				reference4 = new Entity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[3].getPrimaryKey().getId(), PROJECTID), EntityRepository.CURRENT_VERSION_VALUE, false),
-				notReference1 = new Entity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "not"), EntityRepository.CURRENT_VERSION_VALUE, false),
-				notReference2 = new Entity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "not", PROJECTID), EntityRepository.CURRENT_VERSION_VALUE, false);
+		VersionedEntity<Allele.PrimaryKey> reference1 = new VersionedEntity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[0].getPrimaryKey().getId()), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				reference2 = new VersionedEntity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[2].getPrimaryKey().getId(), PROJECTID), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				reference3 = new VersionedEntity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[1].getPrimaryKey().getId()), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				reference4 = new VersionedEntity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), STATE[3].getPrimaryKey().getId(), PROJECTID), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				notReference1 = new VersionedEntity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "not"), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				notReference2 = new VersionedEntity<>(new Allele.PrimaryKey(TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), "not", PROJECTID), VersionedRepository.CURRENT_VERSION_VALUE, false);
 		references1.add(reference1);
 		references2.add(reference2);
 		references3.add(notReference1);
@@ -268,7 +268,7 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAllNoProject_params")
 	public void findAllNoProject(int page, Allele[] state, Allele[] expected) {
 		store(state);
-		Optional<List<Allele>> result = alleleRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), null);
+		Optional<List<Allele>> result = alleleRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), null);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -283,7 +283,7 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAllProject_params")
 	public void findAllProject(int page, Allele[] state, Allele[] expected) {
 		store(state);
-		Optional<List<Allele>> result = alleleRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), PROJECTID);
+		Optional<List<Allele>> result = alleleRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), PROJECTID);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -345,7 +345,7 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("anyMissing_params")
-	public void anyMissing(List<Entity<Allele.PrimaryKey>> references, boolean expected) {
+	public void anyMissing(List<VersionedEntity<Allele.PrimaryKey>> references, boolean expected) {
 		store(AlleleRepositoryTests.STATE);
 		boolean result = alleleRepository.anyMissing(references);
 		assertEquals(expected, result);

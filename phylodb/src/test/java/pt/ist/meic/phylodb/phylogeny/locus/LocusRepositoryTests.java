@@ -7,9 +7,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,10 +99,10 @@ public class LocusRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
-		List<Entity<Locus.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(), references3 = new ArrayList<>(), references4 = new ArrayList<>();
-		Entity<Locus.PrimaryKey> reference1 = new Entity<>(new Locus.PrimaryKey(TAXON1.getPrimaryKey(), STATE[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				reference2 = new Entity<>(new Locus.PrimaryKey(TAXON1.getPrimaryKey(), STATE[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				notReference = new Entity<>(new Locus.PrimaryKey("not", "not"), EntityRepository.CURRENT_VERSION_VALUE, false);
+		List<VersionedEntity<Locus.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(), references3 = new ArrayList<>(), references4 = new ArrayList<>();
+		VersionedEntity<Locus.PrimaryKey> reference1 = new VersionedEntity<>(new Locus.PrimaryKey(TAXON1.getPrimaryKey(), STATE[0].getPrimaryKey().getId()), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				reference2 = new VersionedEntity<>(new Locus.PrimaryKey(TAXON1.getPrimaryKey(), STATE[1].getPrimaryKey().getId()), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				notReference = new VersionedEntity<>(new Locus.PrimaryKey("not", "not"), VersionedRepository.CURRENT_VERSION_VALUE, false);
 		references1.add(reference1);
 		references2.add(reference1);
 		references2.add(reference2);
@@ -165,7 +165,7 @@ public class LocusRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Locus[] state, Locus[] expected) {
 		store(state);
-		Optional<List<Locus>> result = locusRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey());
+		Optional<List<Locus>> result = locusRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -229,7 +229,7 @@ public class LocusRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("anyMissing_params")
-	public void anyMissing(List<Entity<Locus.PrimaryKey>> references, boolean expected) {
+	public void anyMissing(List<VersionedEntity<Locus.PrimaryKey>> references, boolean expected) {
 		store(LocusRepositoryTests.STATE);
 		boolean result = locusRepository.anyMissing(references);
 		assertEquals(expected, result);

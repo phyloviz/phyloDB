@@ -1,10 +1,10 @@
 package pt.ist.meic.phylodb.phylogeny.locus.model;
 
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
-public class Locus extends Entity<Locus.PrimaryKey> {
+public class Locus extends VersionedEntity<Locus.PrimaryKey> {
 
 	private final String description;
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -31,7 +31,7 @@ public class AlleleOutputModel implements OutputModel {
 		this.deprecated = allele.isDeprecated();
 	}
 
-	public AlleleOutputModel(Entity<Allele.PrimaryKey> reference) {
+	public AlleleOutputModel(VersionedEntity<Allele.PrimaryKey> reference) {
 		this.taxon_id = reference.getPrimaryKey().getTaxonId();
 		this.locus_id = reference.getPrimaryKey().getLocusId();
 		this.id = reference.getPrimaryKey().getId();
@@ -91,7 +91,7 @@ public class AlleleOutputModel implements OutputModel {
 			super(allele);
 		}
 
-		public Resumed(Entity<Allele.PrimaryKey> allele) {
+		public Resumed(VersionedEntity<Allele.PrimaryKey> allele) {
 			super(allele);
 		}
 

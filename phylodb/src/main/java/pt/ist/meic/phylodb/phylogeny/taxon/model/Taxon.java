@@ -1,8 +1,8 @@
 package pt.ist.meic.phylodb.phylogeny.taxon.model;
 
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-public class Taxon extends Entity<String> {
+public class Taxon extends VersionedEntity<String> {
 
 	private final String description;
 

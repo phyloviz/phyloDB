@@ -11,6 +11,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,6 +31,11 @@ public class IsolateService {
 		this.datasetRepository = datasetRepository;
 		this.isolateRepository = isolateRepository;
 		this.profileRepository = profileRepository;
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<List<VersionedEntity<Isolate.PrimaryKey>>> getIsolatesEntities(String projectId, String datasetId, int page, int limit) {
+		return isolateRepository.findAllEntities(page, limit, projectId, datasetId);
 	}
 
 	@Transactional(readOnly = true)

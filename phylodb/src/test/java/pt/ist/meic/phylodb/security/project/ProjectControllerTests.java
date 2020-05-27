@@ -16,12 +16,12 @@ import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
-import pt.ist.meic.phylodb.security.authorization.project.model.GetProjectOutputModel;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
-import pt.ist.meic.phylodb.security.authorization.project.model.ProjectInputModel;
-import pt.ist.meic.phylodb.security.authorization.project.model.ProjectOutputModel;
+import pt.ist.meic.phylodb.security.project.model.GetProjectOutputModel;
+import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.security.project.model.ProjectInputModel;
+import pt.ist.meic.phylodb.security.project.model.ProjectOutputModel;
 
 import java.util.*;
 import java.util.stream.Collectors;

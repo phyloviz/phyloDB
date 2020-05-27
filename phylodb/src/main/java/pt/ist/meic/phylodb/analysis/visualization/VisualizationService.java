@@ -3,10 +3,10 @@ package pt.ist.meic.phylodb.analysis.visualization;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class VisualizationService {
@@ -18,8 +18,8 @@ public class VisualizationService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Visualization>> getVisualizations(String projectId, String datasetId, String analysisId, int page, int limit) {
-		return visualizationRepository.findAll(page, limit, projectId, datasetId, analysisId);
+	public Optional<List<Entity<Visualization.PrimaryKey>>> getVisualizations(String projectId, String datasetId, String analysisId, int page, int limit) {
+		return visualizationRepository.findAllEntities(page, limit, projectId, datasetId, analysisId);
 	}
 
 	@Transactional(readOnly = true)

@@ -61,7 +61,7 @@ public class TaxonServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getTaxons_params")
 	public void getTaxons(int page, List<Taxon> expected) {
-		Mockito.when(taxonRepository.findAll(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(taxonRepository.findAllEntities(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Taxon>> result = taxonService.getTaxons(page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

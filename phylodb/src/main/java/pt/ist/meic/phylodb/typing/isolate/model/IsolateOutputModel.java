@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -22,6 +23,14 @@ public class IsolateOutputModel implements OutputModel {
 	}
 
 	public IsolateOutputModel(Isolate isolate) {
+		this.project_id = isolate.getPrimaryKey().getProjectId();
+		this.dataset_id = isolate.getPrimaryKey().getDatasetId();
+		this.id = isolate.getPrimaryKey().getId();
+		this.version = isolate.getVersion();
+		this.deprecated = isolate.isDeprecated();
+	}
+
+	public IsolateOutputModel(VersionedEntity<Isolate.PrimaryKey> isolate) {
 		this.project_id = isolate.getPrimaryKey().getProjectId();
 		this.dataset_id = isolate.getPrimaryKey().getDatasetId();
 		this.id = isolate.getPrimaryKey().getId();
@@ -72,7 +81,7 @@ public class IsolateOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Isolate isolate) {
+		public Resumed(VersionedEntity<Isolate.PrimaryKey> isolate) {
 			super(isolate);
 		}
 

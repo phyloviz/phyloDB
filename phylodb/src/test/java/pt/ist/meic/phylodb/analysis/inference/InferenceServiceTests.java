@@ -71,7 +71,7 @@ public class InferenceServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getInferences_params")
 	public void getInferences(int page, List<Inference> expected) {
-		Mockito.when(inferenceRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(inferenceRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Inference>> result = inferenceService.getInferences(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

@@ -10,7 +10,7 @@ import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -219,9 +219,9 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 
 	private Isolate parse(Map<String, Object> row) {
 		String projectId = row.get("projectId").toString(), datasetId = row.get("datasetId").toString();
-		Entity<Profile.PrimaryKey> profile = null;
+		VersionedEntity<Profile.PrimaryKey> profile = null;
 		if (row.get("profileId") != null)
-			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
+			profile = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
 		Ancillary[] ancillaries = Arrays.stream((Map<String, Object>[]) row.get("ancillaries"))
 				.filter(a -> a.get("key") != null)
 				.map(a -> new Ancillary((String) a.get("key"), (String) a.get("value")))
@@ -275,7 +275,7 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Isolate[] state, Isolate[] expected) {
 		store(state);
-		Optional<List<Isolate>> result = isolateRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
+		Optional<List<Isolate>> result = isolateRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +21,8 @@ public class LocusService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Locus>> getLoci(String taxonId, int page, int limit) {
-		return locusRepository.findAll(page, limit, taxonId);
+	public Optional<List<VersionedEntity<Locus.PrimaryKey>>> getLoci(String taxonId, int page, int limit) {
+		return locusRepository.findAllEntities(page, limit, taxonId);
 	}
 
 	@Transactional(readOnly = true)

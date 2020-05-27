@@ -48,7 +48,7 @@ public class JobService {
 	private boolean valid(String projectId, JobRequest jobRequest) {
 		String[] params = jobRequest.getParameters();
 		return params.length == JobInputModel.INFERENCE_PARAMETERS_COUNT ?
-				profileRepository.findAll(0, 2, projectId, params[0]).orElse(Collections.emptyList()).size() > 1  :
+				profileRepository.findAllEntities(0, 2, projectId, params[0]).orElse(Collections.emptyList()).size() > 1  :
 				inferenceRepository.exists(new Inference.PrimaryKey(projectId, params[0], params[1]));
 	}
 

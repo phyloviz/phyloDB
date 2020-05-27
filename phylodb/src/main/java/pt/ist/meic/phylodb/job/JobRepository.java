@@ -7,12 +7,12 @@ import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.job.model.Job;
 import pt.ist.meic.phylodb.utils.db.Query;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Repository
-public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, Job.PrimaryKey> {
+public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 
 	private static final String FULLY_QUALIFIED = "algorithms.%s";
 	private static final int UUID_LENGTH = UUID.randomUUID().toString().length();
@@ -21,8 +21,34 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 		super(session);
 	}
 
-	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	public Optional<List<Job>> findAll(int page, int limit, Object... filters) {
+		if (page < 0 || limit < 0) return Optional.empty();
+		Result result = getAll(page * limit, limit, filters);
+		if (result == null) return Optional.empty();
+		return Optional.of(StreamSupport.stream(result.spliterator(), false)
+				.map(this::parse)
+				.collect(Collectors.toList()));
+	}
+
+	public boolean exists(Job.PrimaryKey key) {
+		return key != null && isPresent(key);
+	}
+
+	public boolean save(Job entity) {
+		if (entity == null)
+			return false;
+		store(entity);
+		return true;
+	}
+
+	public boolean remove(Job.PrimaryKey key) {
+		if (!exists(key))
+			return false;
+		delete(key);
+		return true;
+	}
+
+	private Result getAll(int page, int limit, Object... filters) {
 		String statement = "CALL apoc.periodic.list() YIELD name, done, cancelled\n" +
 				"WHERE name STARTS WITH $\n" +
 				"RETURN name as name, done as completed, cancelled as cancelled\n" +
@@ -30,8 +56,7 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 		return query(new Query(statement, filters[0], page, limit));
 	}
 
-	@Override
-	protected Job parse(Map<String, Object> row) {
+	private Job parse(Map<String, Object> row) {
 		String name = (String) row.get("name");
 		String project = name.substring(0, UUID_LENGTH);
 		String id = name.substring(UUID_LENGTH + 1);
@@ -42,16 +67,14 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 		);
 	}
 
-	@Override
-	protected boolean isPresent(Job.PrimaryKey key) {
+	private boolean isPresent(Job.PrimaryKey key) {
 		String statement = "CALL apoc.periodic.list() YIELD name, done, cancelled\n" +
 				"WHERE name = $\n" +
 				"RETURN COALESCE(name is not null, false)";
 		return query(Boolean.class, new Query(statement, name(key.getProjectId(), key.getId())));
 	}
 
-	@Override
-	protected void store(Job job) {
+	private void store(Job job) {
 		Job.PrimaryKey key = job.getPrimaryKey();
 		String jobName = name(key.getProjectId(), key.getId());
 		String params = Strings.join(Arrays.asList(job.getParams()), ',') + "," + job.getAnalysisId();
@@ -59,8 +82,7 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository<Job, 
 		execute(new Query(statement, jobName, String.format(FULLY_QUALIFIED, job.getAlgorithm()), params));
 	}
 
-	@Override
-	protected void delete(Job.PrimaryKey key) {
+	private void delete(Job.PrimaryKey key) {
 		execute(new Query("CALL apoc.periodic.cancel($)", name(key.getProjectId(), key.getId())));
 	}
 

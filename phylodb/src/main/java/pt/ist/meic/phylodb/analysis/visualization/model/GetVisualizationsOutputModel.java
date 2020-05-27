@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.analysis.visualization.model;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,7 +12,7 @@ public class GetVisualizationsOutputModel implements OutputModel {
 
 	private final List<VisualizationOutputModel.Resumed> visualizations;
 
-	public GetVisualizationsOutputModel(List<Visualization> entities) {
+	public GetVisualizationsOutputModel(List<Entity<Visualization.PrimaryKey>> entities) {
 		this.visualizations = entities.stream()
 				.map(VisualizationOutputModel.Resumed::new)
 				.collect(Collectors.toList());

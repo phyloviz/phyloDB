@@ -2,7 +2,7 @@ package pt.ist.meic.phylodb.typing.profile.model;
 
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleOutputModel;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,10 +19,10 @@ public class GetProfileOutputModel extends ProfileOutputModel {
 	public GetProfileOutputModel(Profile profile) {
 		super(profile);
 		this.aka = profile.getAka();
-		List<Entity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
+		List<VersionedEntity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
 		AlleleOutputModel.Resumed[] alleles = new AlleleOutputModel.Resumed[references.size()];
 		for (int i = 0; i < references.size(); i++) {
-			Entity<Allele.PrimaryKey> reference = references.get(i);
+			VersionedEntity<Allele.PrimaryKey> reference = references.get(i);
 			if (reference != null)
 				alleles[i] = new AlleleOutputModel.Resumed(reference);
 		}

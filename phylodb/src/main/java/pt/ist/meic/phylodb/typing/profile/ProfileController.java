@@ -18,7 +18,7 @@ import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController("SequenceTypeController")
 @RequestMapping("projects/{project}/datasets/{dataset}/profiles")
@@ -31,16 +31,13 @@ public class ProfileController extends Controller {
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.READ)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<?> getProfiles(
 			@PathVariable("project") String projectId,
 			@PathVariable("dataset") String datasetId,
-			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
+			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		return getAll(type, l -> service.getProfiles(projectId, datasetId, page, l),
-				p -> new GetProfilesOutputModel(p.getValue()),
-				p -> new FileOutputModel(ProfilesFormatter.get(p.getKey().getType().getName()).format(p.getValue(), p.getKey())));
+		return getAllJson(l -> service.getProfilesEntities(projectId, datasetId, page, l), GetProfilesOutputModel::new);
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.READ)
@@ -64,6 +61,16 @@ public class ProfileController extends Controller {
 			@RequestBody ProfileInputModel input
 	) {
 		return put(() -> input.toDomainEntity(projectId, datasetId, profileId), p -> service.saveProfile(p, authorized));
+	}
+
+	@Authorized(role = Role.USER, operation = Operation.READ)
+	@GetMapping(path = "/files", produces = {MediaType.TEXT_PLAIN_VALUE})
+	public ResponseEntity<?> getProfilesFile(
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@RequestParam(value = "page", defaultValue = "0") int page
+	) {
+		return getAllFile(l -> service.getProfiles(projectId, datasetId, page, l), p -> new FileOutputModel(ProfilesFormatter.get(p.getKey().getType().getName()).format(p.getValue(), p.getKey())));
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.WRITE)

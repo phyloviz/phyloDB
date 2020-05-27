@@ -5,7 +5,7 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 
@@ -25,9 +25,9 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 		}}.get(format);
 	}
 
-	protected static List<String> formatAlleles(List<Entity<Allele.PrimaryKey>> alleles) {
+	protected static List<String> formatAlleles(List<VersionedEntity<Allele.PrimaryKey>> alleles) {
 		List<String> output = new ArrayList<>();
-		for (Entity<Allele.PrimaryKey> allele : alleles) {
+		for (VersionedEntity<Allele.PrimaryKey> allele : alleles) {
 			if (allele == null)
 				output.add(" ");
 			else

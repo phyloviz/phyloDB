@@ -21,7 +21,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.DatasetInputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.DatasetOutputModel;
 import pt.ist.meic.phylodb.typing.dataset.model.GetDatasetOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,7 +37,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 	private static Stream<Arguments> getDatasets_params() {
 		String uri = "/projects/%s/datasets";
 		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
-		Entity<Schema.PrimaryKey> schemaReference = new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false);
+		VersionedEntity<Schema.PrimaryKey> schemaReference = new VersionedEntity<>(new Schema.PrimaryKey("t", "x"), 1, false);
 		Dataset dataset = new Dataset(projectId, datasetId, 1, false, "name1", schemaReference);
 		List<Dataset> datasets = new ArrayList<Dataset>() {{
 			add(dataset);
@@ -57,7 +57,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 	private static Stream<Arguments> getProject_params() {
 		String uri = "/projects/%s/datasets/%s";
 		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
-		Entity<Schema.PrimaryKey> schemaReference = new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false);
+		VersionedEntity<Schema.PrimaryKey> schemaReference = new VersionedEntity<>(new Schema.PrimaryKey("t", "x"), 1, false);
 		Dataset dataset = new Dataset(projectId, datasetId, 1, false, "name1", schemaReference);
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId, datasetId)).param("version", "1"),
 				req2 = get(String.format(uri, projectId, datasetId));

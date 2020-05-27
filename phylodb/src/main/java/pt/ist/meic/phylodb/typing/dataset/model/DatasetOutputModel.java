@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -20,6 +21,13 @@ public class DatasetOutputModel implements OutputModel {
 	}
 
 	public DatasetOutputModel(Dataset dataset) {
+		this.project_id = dataset.getPrimaryKey().getProjectId();
+		this.id = dataset.getPrimaryKey().getId();
+		this.version = dataset.getVersion();
+		this.deprecated = dataset.isDeprecated();
+	}
+
+	public DatasetOutputModel(VersionedEntity<Dataset.PrimaryKey> dataset) {
 		this.project_id = dataset.getPrimaryKey().getProjectId();
 		this.id = dataset.getPrimaryKey().getId();
 		this.version = dataset.getVersion();
@@ -65,7 +73,7 @@ public class DatasetOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Dataset dataset) {
+		public Resumed(VersionedEntity<Dataset.PrimaryKey> dataset) {
 			super(dataset);
 		}
 

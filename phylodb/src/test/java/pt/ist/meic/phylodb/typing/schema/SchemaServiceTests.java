@@ -64,7 +64,7 @@ public class SchemaServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getSchemas_params")
 	public void getSchema(int page, List<Schema> expected) {
-		Mockito.when(schemaRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(schemaRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Schema>> result = schemaService.getSchemas(TAXON1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

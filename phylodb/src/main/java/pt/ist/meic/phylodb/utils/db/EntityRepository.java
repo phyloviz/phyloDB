@@ -3,27 +3,40 @@ package pt.ist.meic.phylodb.utils.db;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 
-public abstract class EntityRepository<E, K> extends Repository<E, K> {
-
-	public static final long CURRENT_VERSION_VALUE = -1;
-	public static final String CURRENT_VERSION = "" + CURRENT_VERSION_VALUE;
+public abstract class EntityRepository<E, K> extends Repository {
 
 	protected EntityRepository(Session session) {
 		super(session);
 	}
 
-	protected abstract Result get(K key, long version);
+	protected abstract Result getAllEntities(int page, int limit, Object... filters);
 
-	public Optional<E> find(K key, long version) {
-		if (key == null) return Optional.empty();
-		Result result = get(key, version);
-		if (result == null) return Optional.empty();
-		Iterator<Map<String, Object>> it = result.iterator();
-		return !it.hasNext() ? Optional.empty() : Optional.of(parse(it.next()));
+	protected abstract E parse(Map<String, Object> row);
+
+	protected abstract boolean isPresent(K key);
+
+	protected abstract void store(E entity);
+
+	protected abstract void delete(K key);
+
+	public boolean exists(K key) {
+		return key != null && isPresent(key);
+	}
+
+	public boolean save(E entity) {
+		if (entity == null)
+			return false;
+		store(entity);
+		return true;
+	}
+
+	public boolean remove(K key) {
+		if (!exists(key))
+			return false;
+		delete(key);
+		return true;
 	}
 
 }

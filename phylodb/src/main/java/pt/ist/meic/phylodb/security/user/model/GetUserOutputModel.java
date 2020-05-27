@@ -1,4 +1,4 @@
-package pt.ist.meic.phylodb.security.authentication.user.model;
+package pt.ist.meic.phylodb.security.user.model;
 
 import java.util.Objects;
 

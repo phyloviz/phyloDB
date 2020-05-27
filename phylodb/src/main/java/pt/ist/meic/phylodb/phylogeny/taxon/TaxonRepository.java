@@ -4,24 +4,24 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Map;
 
 @Repository
-public class TaxonRepository extends EntityRepository<Taxon, String> {
+public class TaxonRepository extends VersionedRepository<Taxon, String> {
 
 	public TaxonRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	protected Result getAllEntities(int page, int limit, Object... filters) {
 		String statement = "MATCH (t:Taxon)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
 				"WHERE t.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"RETURN t.id as id, t.deprecated as deprecated, r.version as version,\n" +
-				"t.name as name, td.description as description\n" +
+				"RETURN t.id as id, t.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY size(t.id), t.id SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
 	}
@@ -34,6 +34,13 @@ public class TaxonRepository extends EntityRepository<Taxon, String> {
 				"RETURN t.id as id, t.deprecated as deprecated, r.version as version,\n" +
 				"td.description as description";
 		return query(new Query(statement, key, version));
+	}
+
+	@Override
+	protected VersionedEntity<String> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>((String) row.get("id"),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
 	}
 
 	@Override

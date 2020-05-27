@@ -7,7 +7,8 @@ import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +27,8 @@ public class DatasetService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Dataset>> getDatasets(String projectId, int page, int limit) {
-		return datasetRepository.findAll(page, limit, projectId);
+	public Optional<List<VersionedEntity<Dataset.PrimaryKey>>> getDatasets(String projectId, int page, int limit) {
+		return datasetRepository.findAllEntities(page, limit, projectId);
 	}
 
 	@Transactional(readOnly = true)
@@ -42,9 +43,9 @@ public class DatasetService {
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();
 		if (!schemaRepository.exists(schemaKey))
 			return false;
-		Optional<Dataset> dbDataset = datasetRepository.find(dataset.getPrimaryKey(), EntityRepository.CURRENT_VERSION_VALUE);
+		Optional<Dataset> dbDataset = datasetRepository.find(dataset.getPrimaryKey(), VersionedRepository.CURRENT_VERSION_VALUE);
 		if (dbDataset.isPresent()) {
-			Optional<List<Profile>> profiles = profileRepository.findAll(0, 1, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId());
+			Optional<List<VersionedEntity<Profile.PrimaryKey>>> profiles = profileRepository.findAllEntities(0, 1, dataset.getPrimaryKey().getProjectId(), dataset.getPrimaryKey().getId());
 			if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) && profiles.isPresent() && profiles.get().size() > 0)
 				return false;
 		}

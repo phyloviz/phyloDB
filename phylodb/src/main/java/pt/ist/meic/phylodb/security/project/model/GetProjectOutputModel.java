@@ -1,6 +1,6 @@
-package pt.ist.meic.phylodb.security.authorization.project.model;
+package pt.ist.meic.phylodb.security.project.model;
 
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 
 import java.util.Arrays;
 import java.util.Objects;

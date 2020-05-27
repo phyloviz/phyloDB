@@ -4,8 +4,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pt.ist.meic.phylodb.analysis.inference.model.GetInferencesOutputModel;
 import pt.ist.meic.phylodb.analysis.inference.model.GetInferenceOutputModel;
+import pt.ist.meic.phylodb.analysis.inference.model.GetInferencesOutputModel;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
@@ -18,7 +18,6 @@ import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("projects/{project}/datasets/{dataset}/inferences")
@@ -37,8 +36,7 @@ public class InferenceController extends Controller {
 			@PathVariable("dataset") String datasetId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getInferences(projectId, datasetId, page, l), GetInferencesOutputModel::new, null);
+		return getAllJson(l -> service.getInferences(projectId, datasetId, page, l), GetInferencesOutputModel::new);
 	}
 
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)

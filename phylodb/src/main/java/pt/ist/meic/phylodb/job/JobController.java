@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.job.model.GetJobsOutputModel;
-import pt.ist.meic.phylodb.job.model.JobCreatedOutputModel;
+import pt.ist.meic.phylodb.job.model.JobAcceptedOutputModel;
 import pt.ist.meic.phylodb.job.model.JobInputModel;
 import pt.ist.meic.phylodb.job.model.JobRequest;
 import pt.ist.meic.phylodb.security.authorization.Activity;
@@ -34,8 +34,7 @@ public class JobController extends Controller {
 			@PathVariable("project") String projectId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getJobs(projectId, page, l), GetJobsOutputModel::new, null);
+		return getAllJson(l -> service.getJobs(projectId, page, l), GetJobsOutputModel::new);
 	}
 
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.WRITE)
@@ -49,7 +48,7 @@ public class JobController extends Controller {
 			return new ErrorOutputModel(Problem.BAD_REQUEST).toResponseEntity();
 		Optional<Pair<String, String>> optional = service.createJob(projectId, jobRequest.get());
 		return optional.isPresent() ?
-				new JobCreatedOutputModel(optional.get().getKey(), optional.get().getValue()).toResponseEntity() :
+				new JobAcceptedOutputModel(optional.get().getKey(), optional.get().getValue()).toResponseEntity() :
 				new ErrorOutputModel(Problem.UNAUTHORIZED).toResponseEntity();
 	}
 

@@ -1,15 +1,15 @@
-package pt.ist.meic.phylodb.security.authorization.project.model;
+package pt.ist.meic.phylodb.security.project.model;
 
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
-public class Project extends Entity<String> {
+public class Project extends VersionedEntity<String> {
 
 	private final String name;
 	private final Visibility visibility;

@@ -8,18 +8,28 @@ import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Repository
 public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryKey> {
 
 	public IsolateRepository(Session session) {
 		super(session);
+	}
+
+	@Override
+	protected Result getAllEntities(int page, int limit, Object... filters) {
+		if (filters == null || filters.length != 2)
+			return null;
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
+				"WHERE pj.deprecated = false AND d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated as deprecated, r.version as version\n" +
+				"ORDER BY pj.id, d.id, size(i.id), i.id SKIP $ LIMIT $";
+		return query(new Query(statement, filters[0], filters[1], page, limit));
 	}
 
 	@Override
@@ -57,11 +67,18 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
+	protected VersionedEntity<Isolate.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new Isolate.PrimaryKey((String) row.get("projectId"), (String) row.get("datasetId"), (String) row.get("id")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
+	}
+
+	@Override
 	protected Isolate parse(Map<String, Object> row) {
 		String projectId = row.get("projectId").toString(), datasetId = row.get("datasetId").toString();
-		Entity<Profile.PrimaryKey> profile = null;
+		VersionedEntity<Profile.PrimaryKey> profile = null;
 		if (row.get("profileId") != null)
-			profile = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
+			profile = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, (String) row.get("profileId")), (long) row.get("profileVersion"), (boolean) row.get("profileDeprecated"));
 		Ancillary[] ancillaries = Arrays.stream((Map<String, Object>[]) row.get("ancillaries"))
 				.filter(a -> a.get("key") != null)
 				.map(a -> new Ancillary((String) a.get("key"), (String) a.get("value")))
@@ -98,13 +115,8 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 	}
 
 	@Override
-	protected Query init(Query query, List<Isolate> profiles) {
+	protected Query batch(Query query, List<Isolate> profiles) {
 		query.addParameter((Object) profiles.stream().map(this::getInsertParam).toArray());
-		return query;
-	}
-
-	@Override
-	protected Query batch(Query query) {
 		return query.appendQuery(getInsertStatement());
 	}
 

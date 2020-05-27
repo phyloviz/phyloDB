@@ -1,8 +1,9 @@
-package pt.ist.meic.phylodb.security.authentication.user;
+package pt.ist.meic.phylodb.security.user;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +18,8 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<User>> getUsers(int page, int limit) {
-		return userRepository.findAll(page, limit);
+	public Optional<List<VersionedEntity<User.PrimaryKey>>> getUsers(int page, int limit) {
+		return userRepository.findAllEntities(page, limit);
 	}
 
 	@Transactional(readOnly = true)

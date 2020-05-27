@@ -13,7 +13,7 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/loci")
@@ -29,8 +29,7 @@ public class LocusController extends Controller {
 			@PathVariable("taxon") String taxonId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getLoci(taxonId, page, l), GetLociOutputModel::new, null);
+		return getAllJson(l -> service.getLoci(taxonId, page, l), GetLociOutputModel::new);
 	}
 
 	@GetMapping(path = "/{locus}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -3,8 +3,8 @@ package pt.ist.meic.phylodb.security.authentication;
 import org.springframework.http.HttpHeaders;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.security.SecurityInterceptor;
-import pt.ist.meic.phylodb.security.authentication.user.UserService;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.UserService;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
 public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -30,7 +30,7 @@ public class ProfileOutputModel implements OutputModel {
 		this.deprecated = profile.isDeprecated();
 	}
 
-	public ProfileOutputModel(Entity<Profile.PrimaryKey> profile) {
+	public ProfileOutputModel(VersionedEntity<Profile.PrimaryKey> profile) {
 		this.project_id = profile.getPrimaryKey().getProjectId();
 		this.dataset_id = profile.getPrimaryKey().getDatasetId();
 		this.id = profile.getPrimaryKey().getId();
@@ -86,7 +86,7 @@ public class ProfileOutputModel implements OutputModel {
 			super(profile);
 		}
 
-		public Resumed(Entity<Profile.PrimaryKey> profile) {
+		public Resumed(VersionedEntity<Profile.PrimaryKey> profile) {
 			super(profile);
 		}
 

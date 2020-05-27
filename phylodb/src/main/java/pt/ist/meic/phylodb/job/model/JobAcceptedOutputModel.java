@@ -4,15 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 
-public class JobCreatedOutputModel implements OutputModel {
+public class JobAcceptedOutputModel implements OutputModel {
 
 	private String job_id;
 	private String analysis_id;
 
-	public JobCreatedOutputModel() {
+	public JobAcceptedOutputModel() {
 	}
 
-	public JobCreatedOutputModel(String job_id, String analysis_id) {
+	public JobAcceptedOutputModel(String job_id, String analysis_id) {
 		this.job_id = job_id;
 		this.analysis_id = analysis_id;
 	}

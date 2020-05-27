@@ -110,7 +110,7 @@ public class IsolateServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getIsolates_params")
 	public void getProfiles(int page, List<Isolate> expected) {
-		Mockito.when(isolateRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(isolateRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Isolate>> result = isolateService.getIsolates(PROJECTID, DATASETID, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

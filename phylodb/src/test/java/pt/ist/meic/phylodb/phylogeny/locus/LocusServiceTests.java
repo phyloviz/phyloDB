@@ -62,7 +62,7 @@ public class LocusServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getLoci_params")
 	public void getLoci(int page, List<Locus> expected) {
-		Mockito.when(locusRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(locusRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Locus>> result = locusService.getLoci(TAXON1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

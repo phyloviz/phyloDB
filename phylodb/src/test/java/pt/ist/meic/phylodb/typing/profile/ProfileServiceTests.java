@@ -16,7 +16,7 @@ import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -34,9 +34,9 @@ public class ProfileServiceTests extends ServiceTestsContext {
 	private static final String PROJECTID = PROJECT1.getPrimaryKey(), datasetId = DATASET1.getPrimaryKey().getId();
 	private static final Allele ALLELE21P = new Allele(TAXONID, locusId2, "1", 1, false, null, PROJECTID);
 	private static final Profile PROFILE3 = new Profile(PROJECTID, datasetId, "1", 1, false, null,
-			Arrays.asList(new Entity<>(ALLELE11.getPrimaryKey(), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
+			Arrays.asList(new VersionedEntity<>(ALLELE11.getPrimaryKey(), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
 	private static final Profile PROFILE4 = new Profile(PROJECTID, datasetId, "2", 1, false, null,
-			Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21P.getPrimaryKey(), ALLELE21P.getVersion(), ALLELE21P.isDeprecated())));
+			Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE21P.getPrimaryKey(), ALLELE21P.getVersion(), ALLELE21P.isDeprecated())));
 	private static final Profile[] STATE = new Profile[]{PROFILE3, PROFILE4};
 
 	private static Stream<Arguments> getProfiles_params() {
@@ -60,9 +60,9 @@ public class ProfileServiceTests extends ServiceTestsContext {
 
 	private static Stream<Arguments> saveProfile_params() {
 		Profile profile1 = new Profile(PROJECTID, datasetId, STATE[0].getPrimaryKey().getId(), 1, false, null,
-				Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, ALLELE11.getPrimaryKey().getId()), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new Entity<>(new Allele.PrimaryKey(null, null, ALLELE21.getPrimaryKey().getId()), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
-		Profile profile2 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(new Entity<>(new Allele.PrimaryKey(null, null, ALLELE11P.getPrimaryKey().getId()), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null));
-		Profile profile3 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Collections.singletonList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated())));
+				Arrays.asList(new VersionedEntity<>(new Allele.PrimaryKey(null, null, ALLELE11.getPrimaryKey().getId()), ALLELE11.getVersion(), ALLELE11.isDeprecated()), new VersionedEntity<>(new Allele.PrimaryKey(null, null, ALLELE21.getPrimaryKey().getId()), ALLELE21.getVersion(), ALLELE21.isDeprecated())));
+		Profile profile2 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(new VersionedEntity<>(new Allele.PrimaryKey(null, null, ALLELE11P.getPrimaryKey().getId()), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null));
+		Profile profile3 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Collections.singletonList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated())));
 		Profile profile4 = new Profile(PROJECTID, datasetId, "new", 1, false, null, Arrays.asList(null, null));
 		return Stream.of(Arguments.of(profile1, true, true, false, true),
 				Arguments.of(profile2, false, true, false, true),
@@ -130,9 +130,9 @@ public class ProfileServiceTests extends ServiceTestsContext {
 	@MethodSource("getProfiles_params")
 	public void getProfiles(int page, List<Profile> expected) {
 		Schema schema = new Schema(TAXONID, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
-		Mockito.when(profileRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(profileRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Mockito.when(schemaRepository.find(any())).thenReturn(Optional.of(schema));
-		Optional<Pair<Schema, List<Profile>>> result = profileService.getProfiles(PROJECTID, datasetId, page, LIMIT);
+		Optional<Pair<Schema, List<Profile>>> result = profileService.getProfilesEntities(PROJECTID, datasetId, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;

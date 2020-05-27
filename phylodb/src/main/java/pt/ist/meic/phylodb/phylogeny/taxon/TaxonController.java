@@ -27,8 +27,7 @@ public class TaxonController extends Controller {
 	public ResponseEntity<?> getTaxons(
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getTaxons(page, l), GetTaxonsOutputModel::new, null);
+		return getAllJson(l -> service.getTaxons(page, l), GetTaxonsOutputModel::new);
 	}
 
 	@GetMapping(path = "/{taxon}", produces = MediaType.APPLICATION_JSON_VALUE)

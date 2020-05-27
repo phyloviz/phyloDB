@@ -7,9 +7,9 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,22 +19,20 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Repository
-public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey> {
+public class SchemaRepository extends VersionedRepository<Schema, Schema.PrimaryKey> {
 
 	public SchemaRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	protected Result getAllEntities(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
-				"WHERE s.deprecated = false AND NOT EXISTS(r.to) WITH t, s, r, sd, l, h\n" +
-				"ORDER BY h.part\n" +
+				"WHERE s.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"WITH t, s, r, sd, collect(DISTINCT {taxon: t.id, id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
-				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version, " +
-				"sd.description as description, lociIds\n" +
+				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY t.id, size(s.id), s.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
@@ -52,10 +50,17 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 	}
 
 	@Override
+	protected VersionedEntity<Schema.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new Schema.PrimaryKey((String) row.get("taxonId"), (String) row.get("id")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
+	}
+
+	@Override
 	protected Schema parse(Map<String, Object> row) {
 		String taxonId = (String) row.get("taxonId");
-		List<Entity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
-				.map(m -> new Entity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")), (long) m.get("version"), (boolean) m.get("deprecated")))
+		List<VersionedEntity<Locus.PrimaryKey>> lociIds = Arrays.stream((Map<String, Object>[]) row.get("lociIds"))
+				.map(m -> new VersionedEntity<>(new Locus.PrimaryKey(taxonId, (String) m.get("id")), (long) m.get("version"), (boolean) m.get("deprecated")))
 				.collect(Collectors.toList());
 		return new Schema(taxonId,
 				(String) row.get("id"),
@@ -136,7 +141,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				"MATCH (t)-[:CONTAINS]->(l:Locus {id: param.id})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
 				"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"CREATE (sd)-[:HAS {part: param.part, version: r.version}]->(l)";
-		List<Entity<Locus.PrimaryKey>> loci = schema.getLociReferences();
+		List<VersionedEntity<Locus.PrimaryKey>> loci = schema.getLociReferences();
 		Query query = new Query(statement, schema.getPrimaryKey().getId(), schema.getType().getName(), schema.getDescription(), schema.getPrimaryKey().getTaxonId(),
 				IntStream.range(0, loci.size())
 						.mapToObj(i -> new Object() {
@@ -159,7 +164,7 @@ public class SchemaRepository extends EntityRepository<Schema, Schema.PrimaryKey
 				"MATCH (t)-[:CONTAINS]->(l:Locus {id: param.id})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
 				"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
 				"CREATE (sd)-[:HAS {part: param.part, version: r.version}]->(l)";
-		List<Entity<Locus.PrimaryKey>> loci = schema.getLociReferences();
+		List<VersionedEntity<Locus.PrimaryKey>> loci = schema.getLociReferences();
 		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId(), schema.getDescription(),
 				IntStream.range(0, loci.size())
 						.mapToObj(i -> new Object() {

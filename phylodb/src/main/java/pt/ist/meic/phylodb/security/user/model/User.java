@@ -1,13 +1,13 @@
-package pt.ist.meic.phylodb.security.authentication.user.model;
+package pt.ist.meic.phylodb.security.user.model;
 
 import pt.ist.meic.phylodb.security.authorization.Role;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
-public class User extends Entity<User.PrimaryKey> {
+public class User extends VersionedEntity<User.PrimaryKey> {
 
 	private final Role role;
 

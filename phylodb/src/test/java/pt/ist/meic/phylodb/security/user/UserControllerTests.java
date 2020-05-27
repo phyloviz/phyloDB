@@ -15,10 +15,10 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.GetUserOutputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
-import pt.ist.meic.phylodb.security.authentication.user.model.UserInputModel;
-import pt.ist.meic.phylodb.security.authentication.user.model.UserOutputModel;
+import pt.ist.meic.phylodb.security.user.model.GetUserOutputModel;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.UserInputModel;
+import pt.ist.meic.phylodb.security.user.model.UserOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Role;
 
 import java.util.*;

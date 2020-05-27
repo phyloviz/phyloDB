@@ -3,6 +3,7 @@ package pt.ist.meic.phylodb.phylogeny.taxon;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +18,8 @@ public class TaxonService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Taxon>> getTaxons(int page, int limit) {
-		return taxonRepository.findAll(page, limit);
+	public Optional<List<VersionedEntity<String>>> getTaxons(int page, int limit) {
+		return taxonRepository.findAllEntities(page, limit);
 	}
 
 	@Transactional(readOnly = true)

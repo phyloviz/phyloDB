@@ -8,9 +8,9 @@ import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -25,12 +25,12 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	private static final Profile[] STATE = new Profile[]{PROFILE1, PROFILE2};
 
 	private static Stream<Arguments> findAll_params() {
-		List<Entity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
-		List<Entity<Allele.PrimaryKey>> alleles1Changed = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
-				new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
-		List<Entity<Allele.PrimaryKey>> alleles2 = Arrays.asList(null, new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
-		List<Entity<Allele.PrimaryKey>> alleles3 = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
-				new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
+		List<VersionedEntity<Allele.PrimaryKey>> alleles1Changed = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
+				new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> alleles2 = Arrays.asList(null, new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> alleles3 = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
+				new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
 		Profile first = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 1, false, null, alleles1),
 				firstChanged = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 2, false, null, alleles1Changed),
 				second = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "4", 1, false, "aka4", alleles2),
@@ -62,10 +62,10 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> find_params() {
 		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
-				allelesChangedAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
-				allelesMissing = Arrays.asList(null, new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
-				allelesChangedMissing = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
+		List<VersionedEntity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesChangedAll = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesMissing = Arrays.asList(null, new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesChangedMissing = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		Profile first = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAll),
 				firstChanged = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, null, allelesChangedAll),
 				second = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "aka5", allelesMissing),
@@ -85,8 +85,8 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> exists_params() {
 		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
-				allelesMissing = Arrays.asList(null, new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesMissing = Arrays.asList(null, new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
 		Profile first = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAll),
 				firstDeleted = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, true, null, allelesAll),
 				second = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesMissing),
@@ -101,10 +101,10 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> save_params() {
 		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new Entity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
-				allelesAllPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
-				allelesMissingPublic = Arrays.asList(null, new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
-				allelesMissingPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
+		List<VersionedEntity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new VersionedEntity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesAllPrivate = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesMissingPublic = Arrays.asList(null, new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesMissingPrivate = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		Profile firstPublic = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAllPublic),
 				firstPublicChanged = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, null, allelesAllPrivate),
 				firstPrivate = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAllPrivate),
@@ -126,7 +126,7 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> remove_params() {
 		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3");
-		List<Entity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> allelesAll = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
 		Profile first = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, null, allelesAll),
 				firstDeleted = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, true, null, allelesAll);
 		return Stream.of(Arguments.of(key, new Profile[0], STATE, false),
@@ -135,11 +135,11 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private static Stream<Arguments> anyMissing_params() {
-		List<Entity<Profile.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(),
+		List<VersionedEntity<Profile.PrimaryKey>> references1 = new ArrayList<>(), references2 = new ArrayList<>(),
 				references3 = new ArrayList<>(), references4 = new ArrayList<>(), references5 = new ArrayList<>();
-		Entity<Profile.PrimaryKey> reference1 = new Entity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), STATE[1].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				reference2 = new Entity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), STATE[0].getPrimaryKey().getId()), EntityRepository.CURRENT_VERSION_VALUE, false),
-				notReference1 = new Entity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "not"), EntityRepository.CURRENT_VERSION_VALUE, false);
+		VersionedEntity<Profile.PrimaryKey> reference1 = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), STATE[1].getPrimaryKey().getId()), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				reference2 = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), STATE[0].getPrimaryKey().getId()), VersionedRepository.CURRENT_VERSION_VALUE, false),
+				notReference1 = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "not"), VersionedRepository.CURRENT_VERSION_VALUE, false);
 		references1.add(reference1);
 		references2.add(notReference1);
 		references3.add(reference1);
@@ -158,10 +158,10 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> saveAll_params() {
 		Profile.PrimaryKey key = new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), PROFILE1.getPrimaryKey().getId());
-		List<Entity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new Entity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
-				allelesAllPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new Entity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
-				allelesMissingPublic = Arrays.asList(null, new Entity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
-				allelesMissingPrivate = Arrays.asList(new Entity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
+		List<VersionedEntity<Allele.PrimaryKey>> allelesAllPublic = Arrays.asList(new VersionedEntity<>(ALLELE12.getPrimaryKey(), ALLELE12.getVersion(), ALLELE12.isDeprecated()), new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesAllPrivate = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated())),
+				allelesMissingPublic = Arrays.asList(null, new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated())),
+				allelesMissingPrivate = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		Profile firstPrivateExists = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "test", allelesAllPrivate),
 				firstPublicExists = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 1, false, "test", allelesAllPublic),
 				firstPrivateExistsConflict = new Profile(key.getProjectId(), key.getDatasetId(), key.getId(), 2, false, "aka", allelesAllPrivate),
@@ -211,9 +211,9 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 					"WHERE NOT EXISTS(r.to) AND %s\n" +
 					"CREATE (pd)-[:HAS {version: r.version, part: %s, total: %s}]->(a)\n" +
 					"WITH pj, d, pd, sd\n";
-			List<Entity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
+			List<VersionedEntity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();
 			for (int i = 0; i < allelesIds.size(); i++) {
-				Entity<Allele.PrimaryKey> reference = allelesIds.get(i);
+				VersionedEntity<Allele.PrimaryKey> reference = allelesIds.get(i);
 				if (reference == null || reference.getPrimaryKey().getId().matches(MISSING))
 					continue;
 				String referenceId = reference.getPrimaryKey().getId();
@@ -228,14 +228,14 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	private Profile parse(Map<String, Object> row) {
 		Map<String, Object>[] alleles = (Map<String, Object>[]) row.get("alleles");
 		int size = Math.toIntExact((long) alleles[0].get("total"));
-		List<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
+		List<VersionedEntity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 			allelesReferences.add(null);
 		for (Map<String, Object> a : alleles) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
 			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), (String) projectId);
-			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
+			VersionedEntity<Allele.PrimaryKey> reference = new VersionedEntity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
 			allelesReferences.set(position - 1, reference);
 		}
 		return new Profile(row.get("projectId").toString(),
@@ -282,7 +282,7 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Profile[] state, Profile[] expected) {
 		store(state);
-		Optional<List<Profile>> result = profileRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
+		Optional<List<Profile>> result = profileRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -345,7 +345,7 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("anyMissing_params")
-	public void anyMissing(List<Entity<Profile.PrimaryKey>> references, boolean expected) {
+	public void anyMissing(List<VersionedEntity<Profile.PrimaryKey>> references, boolean expected) {
 		store(STATE);
 		boolean result = profileRepository.anyMissing(references);
 		assertEquals(expected, result);

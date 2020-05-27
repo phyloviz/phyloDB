@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -17,6 +18,12 @@ public class TaxonOutputModel implements OutputModel {
 	}
 
 	public TaxonOutputModel(Taxon taxon) {
+		this.id = taxon.getPrimaryKey();
+		this.version = taxon.getVersion();
+		this.deprecated = taxon.isDeprecated();
+	}
+
+	public TaxonOutputModel(VersionedEntity<String> taxon) {
 		this.id = taxon.getPrimaryKey();
 		this.version = taxon.getVersion();
 		this.deprecated = taxon.isDeprecated();
@@ -55,7 +62,7 @@ public class TaxonOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Taxon taxon) {
+		public Resumed(VersionedEntity<String> taxon) {
 			super(taxon);
 		}
 

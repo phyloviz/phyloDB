@@ -13,7 +13,7 @@ import pt.ist.meic.phylodb.typing.schema.model.GetSchemasOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("/taxons/{taxon}/schemas")
@@ -30,8 +30,7 @@ public class SchemaController extends Controller {
 			@PathVariable("taxon") String taxonId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getSchemas(taxonId, page, l), GetSchemasOutputModel::new, null);
+		return getAllJson(l -> service.getSchemas(taxonId, page, l), GetSchemasOutputModel::new);
 	}
 
 	@GetMapping(path = "/{schema}", produces = MediaType.APPLICATION_JSON_VALUE)

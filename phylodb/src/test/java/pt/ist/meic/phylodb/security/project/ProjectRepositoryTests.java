@@ -6,9 +6,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
-import pt.ist.meic.phylodb.security.authentication.user.model.User;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
-import pt.ist.meic.phylodb.security.authorization.project.model.Project;
+import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.utils.db.Query;
 
 import java.util.*;
@@ -161,7 +161,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Project[] state, Project[] expected) {
 		store(state);
-		Optional<List<Project>> result = projectRepository.findAll(page, 3, USER1.getPrimaryKey());
+		Optional<List<Project>> result = projectRepository.findAllEntities(page, 3, USER1.getPrimaryKey());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

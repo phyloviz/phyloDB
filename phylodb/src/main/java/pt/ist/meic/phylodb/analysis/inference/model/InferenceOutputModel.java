@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
@@ -21,6 +22,13 @@ public class InferenceOutputModel implements OutputModel {
 	}
 
 	public InferenceOutputModel(Inference analysis) {
+		this.project_id = analysis.getPrimaryKey().getProjectId();
+		this.dataset_id = analysis.getPrimaryKey().getDatasetId();
+		this.id = analysis.getPrimaryKey().getId();
+		this.deprecated = analysis.isDeprecated();
+	}
+
+	public InferenceOutputModel(Entity<Inference.PrimaryKey> analysis) {
 		this.project_id = analysis.getPrimaryKey().getProjectId();
 		this.dataset_id = analysis.getPrimaryKey().getDatasetId();
 		this.id = analysis.getPrimaryKey().getId();
@@ -65,7 +73,7 @@ public class InferenceOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Inference inference) {
+		public Resumed(Entity<Inference.PrimaryKey> inference) {
 			super(inference);
 		}
 

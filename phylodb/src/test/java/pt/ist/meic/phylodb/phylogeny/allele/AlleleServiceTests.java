@@ -105,7 +105,7 @@ public class AlleleServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getAlleles_params")
 	public void getAlleles(int page, List<Allele> expected) {
-		Mockito.when(alleleRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(alleleRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Allele>> result = alleleService.getAlleles(TAXONID, LOCUSID, null, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

@@ -136,7 +136,7 @@ public class TaxonRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAll_params")
 	public void findAll(int page, Taxon[] state, Taxon[] expected) {
 		store(state);
-		Optional<List<Taxon>> result = taxonRepository.findAll(page, LIMIT);
+		Optional<List<Taxon>> result = taxonRepository.findAllEntities(page, LIMIT);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

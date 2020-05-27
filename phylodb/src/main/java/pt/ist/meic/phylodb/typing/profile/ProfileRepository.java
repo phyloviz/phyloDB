@@ -7,7 +7,7 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -21,12 +21,23 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
+	protected Result getAllEntities(int page, int limit, Object... filters) {
+		if (filters == null || filters.length == 0)
+			return null;
+		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
+				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated\n" +
+				"ORDER BY pj.id, d.id, size(p.id), p.id SKIP $ LIMIT $";
+		return query(new Query(statement, filters[0], filters[1], page, limit));
+	}
+
+	@Override
 	protected Result getAll(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
-				"MATCH (pd)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"MATCH (pd)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
 				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated,\n" +
 				"pd.aka as aka, collect(DISTINCT {project: pj2.id, taxon: t.id, locus: l.id, id: a.id, version: h.version, deprecated: a.deprecated, part:h.part, total: h.total}) as alleles\n" +
@@ -47,17 +58,24 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
+	protected VersionedEntity<Profile.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new Profile.PrimaryKey((String) row.get("projectId"), (String) row.get("datasetId"), (String) row.get("id")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
+	}
+
+	@Override
 	protected Profile parse(Map<String, Object> row) {
 		Map<String, Object>[] alleles = (Map<String, Object>[]) row.get("alleles");
 		int size = Math.toIntExact((long) alleles[0].get("total"));
-		List<Entity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
+		List<VersionedEntity<Allele.PrimaryKey>> allelesReferences = new ArrayList<>(size);
 		for (int i = 0; i < size; i++)
 			allelesReferences.add(null);
 		for (Map<String, Object> a : alleles) {
 			int position = Math.toIntExact((long) a.get("part"));
 			Object projectId = a.get("project");
 			Allele.PrimaryKey key = new Allele.PrimaryKey((String) a.get("taxon"), (String) a.get("locus"), (String) a.get("id"), (String) projectId);
-			Entity<Allele.PrimaryKey> reference = new Entity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
+			VersionedEntity<Allele.PrimaryKey> reference = new VersionedEntity<>(key, (long) a.get("version"), (boolean) a.get("deprecated"));
 			allelesReferences.set(position - 1, reference);
 		}
 		return new Profile((String) row.get("projectId"),
@@ -91,19 +109,13 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	}
 
 	@Override
-	protected Query init(Query query, List<Profile> profiles) {
+	protected Query batch(Query query, List<Profile> profiles) {
 		query.addParameter((Object) profiles.stream().map(this::getInsertParam).toArray());
-		return query;
-	}
-
-	@Override
-	protected Query batch(Query query) {
 		return query.appendQuery(getInsertStatement());
 	}
 
-
-	public boolean anyMissing(List<Entity<Profile.PrimaryKey>> references) {
-		Optional<Entity<Profile.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
+	public boolean anyMissing(List<VersionedEntity<Profile.PrimaryKey>> references) {
+		Optional<VersionedEntity<Profile.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
 		if (!optional.isPresent())
 			return true;
 		String project = optional.get().getPrimaryKey().getProjectId();
@@ -152,7 +164,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 
 	private Object getInsertParam(Profile profile) {
 		Profile.PrimaryKey key = profile.getPrimaryKey();
-		List<Entity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
+		List<VersionedEntity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
 		boolean priv = references.stream().anyMatch(a -> a != null && a.getPrimaryKey().getProjectId() != null);
 		return new Object(){
 			public final String projectId = key.getProjectId();

@@ -1,21 +1,20 @@
 package pt.ist.meic.phylodb.typing.isolate.model;
 
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
-public class Isolate extends Entity<Isolate.PrimaryKey> {
+public class Isolate extends VersionedEntity<Isolate.PrimaryKey> {
 
 	private final String description;
 	private final Ancillary[] ancillaries;
-	private final Entity<Profile.PrimaryKey> profile;
+	private final VersionedEntity<Profile.PrimaryKey> profile;
 
-	public Isolate(String projectId, String datasetId, String id, long version, boolean deprecated, String description, Ancillary[] ancillaries, Entity<Profile.PrimaryKey> profile) {
+	public Isolate(String projectId, String datasetId, String id, long version, boolean deprecated, String description, Ancillary[] ancillaries, VersionedEntity<Profile.PrimaryKey> profile) {
 		super(new PrimaryKey(projectId, datasetId, id), version, deprecated);
 		this.description = description;
 		this.profile = profile;
@@ -24,7 +23,7 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 
 	public Isolate(String projectId, String datasetId, String id, String description, Ancillary[] ancillaries, String profileId) {
 		this(projectId, datasetId, id, CURRENT_VERSION_VALUE, false, description, ancillaries,
-				profileId == null ? null : new Entity<>(new Profile.PrimaryKey(projectId, datasetId, profileId), CURRENT_VERSION_VALUE, false));
+				profileId == null ? null : new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, profileId), CURRENT_VERSION_VALUE, false));
 	}
 
 	public String getDatasetId() {
@@ -35,7 +34,7 @@ public class Isolate extends Entity<Isolate.PrimaryKey> {
 		return description;
 	}
 
-	public Entity<Profile.PrimaryKey> getProfile() {
+	public VersionedEntity<Profile.PrimaryKey> getProfile() {
 		return profile;
 	}
 

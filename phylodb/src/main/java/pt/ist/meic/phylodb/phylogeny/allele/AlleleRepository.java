@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.utils.db.BatchRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -16,6 +16,26 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 
 	public AlleleRepository(Session session) {
 		super(session);
+	}
+
+	@Override
+	protected Result getAllEntities(int page, int limit, Object... filters) {
+		if (filters == null || filters.length != 3)
+			return null;
+		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
+				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false AND NOT EXISTS(r.to)";
+		Object[] params = new Object[]{filters[0], filters[1], page, limit};
+		if (filters[2] != null) {
+			params = new Object[]{filters[0], filters[1], filters[2], page, limit};
+			statement += "\nMATCH (a)<-[:CONTAINS]-(p:Project {id: $})\n" +
+					"WHERE p.deprecated = false\n" +
+					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, p.id as project\n";
+		} else {
+			statement += " AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
+					"\nRETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version\n";
+		}
+		statement += "ORDER BY t.id, l.id, size(a.id), a.id SKIP $ LIMIT $";
+		return query(new Query(statement, params));
 	}
 
 	@Override
@@ -51,6 +71,13 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 					"RETURN t.id as taxonId, l.id as locusId, a.id as id, a.deprecated as deprecated, r.version as version, ad.sequence as sequence\n";
 		}
 		return query(new Query(statement, key.getTaxonId(), key.getLocusId(), key.getId(), version, key.getProjectId()));
+	}
+
+	@Override
+	protected VersionedEntity<Allele.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new Allele.PrimaryKey((String) row.get("taxonId"), (String) row.get("locusId"), (String) row.get("id"), (String) row.get("project")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
 	}
 
 	@Override
@@ -91,18 +118,13 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 	}
 
 	@Override
-	protected Query init(Query query, List<Allele> profiles) {
-		query.addParameter((Object) profiles.stream().map(this::getInsertParam).toArray());
-		return query;
-	}
-
-	@Override
-	protected Query batch(Query query) {
+	protected Query batch(Query query, List<Allele> alleles) {
+		query.addParameter((Object) alleles.stream().map(this::getInsertParam).toArray());
 		return query.appendQuery(getInsertStatement());
 	}
 
-	public boolean anyMissing(List<Entity<Allele.PrimaryKey>> references) {
-		Optional<Entity<Allele.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
+	public boolean anyMissing(List<VersionedEntity<Allele.PrimaryKey>> references) {
+		Optional<VersionedEntity<Allele.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
 		if (!optional.isPresent())
 			return true;
 		String taxon = optional.get().getPrimaryKey().getTaxonId();

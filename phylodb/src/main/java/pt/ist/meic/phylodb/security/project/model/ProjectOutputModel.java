@@ -1,9 +1,10 @@
-package pt.ist.meic.phylodb.security.authorization.project.model;
+package pt.ist.meic.phylodb.security.project.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
@@ -17,6 +18,12 @@ public class ProjectOutputModel implements OutputModel {
 	}
 
 	public ProjectOutputModel(Project project) {
+		this.id = project.getPrimaryKey();
+		this.version = project.getVersion();
+		this.deprecated = project.isDeprecated();
+	}
+
+	public ProjectOutputModel(VersionedEntity<String> project) {
 		this.id = project.getPrimaryKey();
 		this.version = project.getVersion();
 		this.deprecated = project.isDeprecated();
@@ -55,7 +62,7 @@ public class ProjectOutputModel implements OutputModel {
 		public Resumed() {
 		}
 
-		public Resumed(Project project) {
+		public Resumed(VersionedEntity<String> project) {
 			super(project);
 		}
 

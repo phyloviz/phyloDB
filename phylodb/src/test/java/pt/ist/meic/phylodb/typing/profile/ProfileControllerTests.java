@@ -185,7 +185,7 @@ public class ProfileControllerTests extends ControllerTestsContext {
 	public void getProfilesList(MockHttpServletRequestBuilder req, List<Profile> profiles, HttpStatus expectedStatus, List<ProfileOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Schema schema = new Schema("taxon", "schema", Method.MLVA, null, new String[]{"1", "2"});
 		Pair<Schema, List<Profile>> pair = profiles == null ? null : new Pair<>(schema, profiles);
-		Mockito.when(profileService.getProfiles(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
+		Mockito.when(profileService.getProfilesEntities(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -206,7 +206,7 @@ public class ProfileControllerTests extends ControllerTestsContext {
 	@MethodSource("getProfilesString_params")
 	public void getProfilesString(MockHttpServletRequestBuilder req, Schema schema, List<Profile> profiles, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Pair<Schema, List<Profile>> pair = profiles == null ? null : new Pair<>(schema, profiles);
-		Mockito.when(profileService.getProfiles(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
+		Mockito.when(profileService.getProfilesEntities(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.TEXT_PLAIN);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())

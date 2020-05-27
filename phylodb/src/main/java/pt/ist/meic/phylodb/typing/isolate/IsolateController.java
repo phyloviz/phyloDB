@@ -17,9 +17,8 @@ import pt.ist.meic.phylodb.typing.isolate.model.IsolateInputModel;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 import java.io.IOException;
-import java.util.UUID;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 
 @RestController
 @RequestMapping("projects/{project}/datasets/{dataset}/isolates")
@@ -36,12 +35,9 @@ public class IsolateController extends Controller {
 	public ResponseEntity<?> getIsolates(
 			@PathVariable("project") String projectId,
 			@PathVariable("dataset") String datasetId,
-			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestHeader(value = "Accept", defaultValue = MediaType.APPLICATION_JSON_VALUE) String type
+			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		return getAll(type, l -> service.getIsolates(projectId, datasetId, page, l),
-				GetIsolatesOutputModel::new,
-				(i) -> new FileOutputModel(new IsolatesFormatter().format(i)));
+		return getAllJson(l -> service.getIsolatesEntities(projectId, datasetId, page, l), GetIsolatesOutputModel::new);
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.READ)
@@ -63,7 +59,17 @@ public class IsolateController extends Controller {
 			@PathVariable("isolate") String isolateId,
 			@RequestBody IsolateInputModel input
 	) {
-		return put(() -> input.toDomainEntity(projectId.toString(), datasetId.toString(), isolateId), service::saveIsolate);
+		return put(() -> input.toDomainEntity(projectId, datasetId, isolateId), service::saveIsolate);
+	}
+
+	@Authorized(role = Role.USER, operation = Operation.READ)
+	@GetMapping(path = "/files", produces = {MediaType.TEXT_PLAIN_VALUE})
+	public ResponseEntity<?> getIsolatesFile(
+			@PathVariable("project") String projectId,
+			@PathVariable("dataset") String datasetId,
+			@RequestParam(value = "page", defaultValue = "0") int page
+	) {
+		return getAllFile(l -> service.getIsolates(projectId, datasetId, page, l), i -> new FileOutputModel(new IsolatesFormatter().format(i)));
 	}
 
 	@Authorized(role = Role.USER, operation = Operation.WRITE)

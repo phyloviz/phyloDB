@@ -13,8 +13,6 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("projects/{project}/datasets/{dataset}/inferences/{inference}/visualizations")
 public class VisualizationController extends Controller {
@@ -33,8 +31,7 @@ public class VisualizationController extends Controller {
 			@PathVariable("inference") String inferenceId,
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		String type = MediaType.APPLICATION_JSON_VALUE;
-		return getAll(type, l -> service.getVisualizations(projectId, datasetId, inferenceId, page, l), GetVisualizationsOutputModel::new, null);
+		return getAllJson(l -> service.getVisualizations(projectId, datasetId, inferenceId, page, l), GetVisualizationsOutputModel::new);
 	}
 
 	@Authorized(activity = Activity.ALGORITHMS, role = Role.USER, operation = Operation.READ)

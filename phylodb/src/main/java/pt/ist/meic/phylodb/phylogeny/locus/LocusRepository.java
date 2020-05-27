@@ -4,9 +4,9 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,20 +14,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
+public class LocusRepository extends VersionedRepository<Locus, Locus.PrimaryKey> {
 
 	public LocusRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	protected Result getAllEntities(int page, int limit, Object... filters) {
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false AND NOT EXISTS(r.to)\n" +
-				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
-				"l.name as name, ld.description as description\n" +
+				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY t.id, size(l.id), l.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
@@ -40,6 +39,13 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
 				"l.name as name, ld.description as description";
 		return query(new Query(statement, key.getTaxonId(), key.getId(), version));
+	}
+
+	@Override
+	protected VersionedEntity<Locus.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new Locus.PrimaryKey((String) row.get("taxonId"), (String) row.get("id")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
 	}
 
 	@Override
@@ -77,7 +83,7 @@ public class LocusRepository extends EntityRepository<Locus, Locus.PrimaryKey> {
 		execute(new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
-	public boolean anyMissing(List<Entity<Locus.PrimaryKey>> references) {
+	public boolean anyMissing(List<VersionedEntity<Locus.PrimaryKey>> references) {
 		String parameterized = references.stream().map((i) -> "$").collect(Collectors.joining(","));
 		String statement = String.format("MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)\n" +
 				"WHERE t.deprecated = false AND l.deprecated = false AND l.id IN [%s]\n" +

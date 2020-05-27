@@ -5,29 +5,26 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.EntityRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Map;
 
 @Repository
-public class DatasetRepository extends EntityRepository<Dataset, Dataset.PrimaryKey> {
+public class DatasetRepository extends VersionedRepository<Dataset, Dataset.PrimaryKey> {
 
 	public DatasetRepository(Session session) {
 		super(session);
 	}
 
 	@Override
-	protected Result getAll(int page, int limit, Object... filters) {
+	protected Result getAllEntities(int page, int limit, Object... filters) {
 		if (filters == null || filters.length != 1)
 			return null;
-		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-				"WHERE p.deprecated = false AND d.deprecated = false AND NOT EXISTS(r1.to) AND r2.version = h.version\n" +
-				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
-				"WITH p, d, r1, dd, h, s, t, collect(l) as loci\n" +
-				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r1.version as version, " +
-				"dd.description as description, t.id as taxonId, s.id as schemaId, h.version as schemaVersion, s.deprecated as schemaDeprecated\n" +
+		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
+				"WHERE p.deprecated = false AND d.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY p.id, size(d.id), d.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
 	}
@@ -45,8 +42,15 @@ public class DatasetRepository extends EntityRepository<Dataset, Dataset.Primary
 	}
 
 	@Override
+	protected VersionedEntity<Dataset.PrimaryKey> parseVersionedEntity(Map<String, Object> row) {
+		return new VersionedEntity<>(new Dataset.PrimaryKey((String) row.get("projectId"), (String) row.get("datasetId")),
+				(long) row.get("version"),
+				(boolean) row.get("deprecated"));
+	}
+
+	@Override
 	protected Dataset parse(Map<String, Object> row) {
-		Entity<Schema.PrimaryKey> schema = new Entity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
+		VersionedEntity<Schema.PrimaryKey> schema = new VersionedEntity<>(new Schema.PrimaryKey((String) row.get("taxonId"),
 				(String) row.get("schemaId")),
 				(long) row.get("schemaVersion"),
 				(boolean) row.get("schemaDeprecated"));

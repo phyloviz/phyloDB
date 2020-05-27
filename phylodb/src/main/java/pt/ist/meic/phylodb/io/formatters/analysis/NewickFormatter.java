@@ -2,13 +2,13 @@ package pt.ist.meic.phylodb.io.formatters.analysis;
 
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static pt.ist.meic.phylodb.utils.db.EntityRepository.CURRENT_VERSION_VALUE;
+import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
 public class NewickFormatter extends TreeFormatter {
 
@@ -48,7 +48,7 @@ public class NewickFormatter extends TreeFormatter {
 					for (Edge child :children) {
 						if(parentId.equals(child.getTo().getPrimaryKey().getId()))
 							return false;
-						Entity<Profile.PrimaryKey> from = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, parentId), CURRENT_VERSION_VALUE, false);
+						VersionedEntity<Profile.PrimaryKey> from = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, parentId), CURRENT_VERSION_VALUE, false);
 						add.accept(new Edge(from, child.getTo(), child.getWeight()));
 					}
 					break;
@@ -63,13 +63,13 @@ public class NewickFormatter extends TreeFormatter {
 	@Override
 	public String format(List<Edge> entities, Object... params) {
 		StringBuilder data = new StringBuilder();
-		List<Entity<Profile.PrimaryKey>> roots = entities.stream()
+		List<VersionedEntity<Profile.PrimaryKey>> roots = entities.stream()
 				.map(Edge::getFrom)
 				.filter(p -> entities.stream().noneMatch(e -> e.getTo().equals(p)))
 				.distinct()
 				.collect(Collectors.toList());
 		List<Edge> edges = new ArrayList<>(entities);
-		for (Entity<Profile.PrimaryKey> root : roots) {
+		for (VersionedEntity<Profile.PrimaryKey> root : roots) {
 			format(edges, root, data);
 			data.append(root.getPrimaryKey().getId()).append(';');
 		}
@@ -84,14 +84,14 @@ public class NewickFormatter extends TreeFormatter {
 			if (values.length != 2 || Arrays.stream(values).anyMatch(s -> s.matches(String.format("[\\s%s]*", missing)) || s.isEmpty()) ||
 					!values[1].matches("[\\d]*"))
 				return null;
-			Entity<Profile.PrimaryKey> to = new Entity<>(new Profile.PrimaryKey(projectId, datasetId, values[0]), CURRENT_VERSION_VALUE, false);
+			VersionedEntity<Profile.PrimaryKey> to = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, values[0]), CURRENT_VERSION_VALUE, false);
 			levels.peek().add(new Edge(null, to, Integer.parseInt(values[1])));
 			return values[0];
 		}
 		return values[0];
 	}
 
-	private void format(List<Edge> entities, Entity<Profile.PrimaryKey> root, StringBuilder data) {
+	private void format(List<Edge> entities, VersionedEntity<Profile.PrimaryKey> root, StringBuilder data) {
 		List<Edge> edges = entities.stream()
 				.filter(e -> e.getFrom().equals(root) || e.getTo().equals(root))
 				.collect(Collectors.toList());

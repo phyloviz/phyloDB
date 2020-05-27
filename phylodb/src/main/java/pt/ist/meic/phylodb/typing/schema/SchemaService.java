@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +21,8 @@ public class SchemaService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<List<Schema>> getSchemas(String taxonId, int page, int limit) {
-		return schemaRepository.findAll(page, limit, taxonId);
+	public Optional<List<VersionedEntity<Schema.PrimaryKey>>> getSchemas(String taxonId, int page, int limit) {
+		return schemaRepository.findAllEntities(page, limit, taxonId);
 	}
 
 	@Transactional(readOnly = true)

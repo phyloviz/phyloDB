@@ -10,7 +10,7 @@ import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +46,7 @@ public class DatasetServiceTests extends ServiceTestsContext {
 	}
 
 	private static Stream<Arguments> saveDataset_params() {
-		Dataset withDifferentSchema = new Dataset(PROJECT1.getPrimaryKey(), STATE[0].getPrimaryKey().getId(), 1, false, "name1", new Entity<>(new Schema.PrimaryKey("t", "x"), 1, false));
+		Dataset withDifferentSchema = new Dataset(PROJECT1.getPrimaryKey(), STATE[0].getPrimaryKey().getId(), 1, false, "name1", new VersionedEntity<>(new Schema.PrimaryKey("t", "x"), 1, false));
 		List<Profile> profiles = Collections.singletonList(new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "id", 1, false, "aka", null));
 		return Stream.of(Arguments.of(STATE[0], true, null, null, true),
 				Arguments.of(STATE[1], false, null, null, false),
@@ -70,7 +70,7 @@ public class DatasetServiceTests extends ServiceTestsContext {
 	@ParameterizedTest
 	@MethodSource("getDatasets_params")
 	public void getDatasets(int page, List<Dataset> expected) {
-		Mockito.when(datasetRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(datasetRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Dataset>> result = datasetService.getDatasets(PROJECT1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
@@ -98,7 +98,7 @@ public class DatasetServiceTests extends ServiceTestsContext {
 	public void saveDataset(Dataset dataset, boolean exists, Dataset dbDataset, List<Profile> profiles, boolean expected) {
 		Mockito.when(schemaRepository.exists(any())).thenReturn(exists);
 		Mockito.when(datasetRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(dbDataset));
-		Mockito.when(profileRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(profiles));
+		Mockito.when(profileRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(profiles));
 		Mockito.when(datasetRepository.save(any())).thenReturn(expected);
 		boolean result = datasetService.saveDataset(dataset);
 		assertEquals(expected, result);
