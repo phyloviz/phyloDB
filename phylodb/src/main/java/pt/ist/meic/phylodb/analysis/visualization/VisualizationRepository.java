@@ -30,9 +30,9 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {analysis: $}]->(c:Coordinate)\n" +
 				"WHERE h.deprecated = false\n" +
-				"WITH pj, ds, h.analysis as analysis, p, h, c, collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, analysis as analysisId, h.id as id, h.deprecated as deprecated\n" +
-				"ORDER BY pj.id, ds.id, analysis, size(h.id), h.id SKIP $ LIMIT $";
+				"WITH pj, ds, h.analysis as analysisId, h.id as id, h.deprecated as deprecated, collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, analysisId as analysisId, id as id, deprecated as deprecated\n" +
+				"ORDER BY pj.id, ds.id, analysisId, size(id), id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], filters[2], page, limit));
 	}
 

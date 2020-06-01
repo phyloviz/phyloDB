@@ -37,9 +37,8 @@ public class DatasetControllerTests extends ControllerTestsContext {
 	private static Stream<Arguments> getDatasets_params() {
 		String uri = "/projects/%s/datasets";
 		String projectId = UUID.randomUUID().toString(), datasetId = UUID.randomUUID().toString();
-		VersionedEntity<Schema.PrimaryKey> schemaReference = new VersionedEntity<>(new Schema.PrimaryKey("t", "x"), 1, false);
-		Dataset dataset = new Dataset(projectId, datasetId, 1, false, "name1", schemaReference);
-		List<Dataset> datasets = new ArrayList<Dataset>() {{
+		VersionedEntity<Dataset.PrimaryKey> dataset = new VersionedEntity<>(new Dataset.PrimaryKey(projectId, datasetId), 1, false);
+		List<VersionedEntity<Dataset.PrimaryKey>> datasets = new ArrayList<VersionedEntity<Dataset.PrimaryKey>>() {{
 			add(dataset);
 		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, projectId)).param("page", "0"),
@@ -108,7 +107,7 @@ public class DatasetControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getDatasets_params")
-	public void getDatasets(MockHttpServletRequestBuilder req, List<Dataset> datasets, HttpStatus expectedStatus, List<DatasetOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getDatasets(MockHttpServletRequestBuilder req, List<VersionedEntity<Dataset.PrimaryKey>> datasets, HttpStatus expectedStatus, List<DatasetOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(datasetService.getDatasets(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(datasets));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());

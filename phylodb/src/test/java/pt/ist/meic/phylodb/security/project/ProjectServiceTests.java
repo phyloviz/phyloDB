@@ -10,6 +10,7 @@ import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -24,12 +25,14 @@ public class ProjectServiceTests extends ServiceTestsContext {
 			new Project("3f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "private1", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()})};
 
 	private static Stream<Arguments> getProjects_params() {
-		List<Project> expected1 = new ArrayList<Project>() {{
-			add(STATE[0]);
+		VersionedEntity<String> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<String>> expected1 = new ArrayList<VersionedEntity<String>>() {{
+			add(state0);
 		}};
-		List<Project> expected2 = new ArrayList<Project>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<VersionedEntity<String>> expected2 = new ArrayList<VersionedEntity<String>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -60,18 +63,18 @@ public class ProjectServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getProjects_params")
-	public void getProjects(int page, List<Project> expected) {
+	public void getProjects(int page, List<VersionedEntity<String>> expected) {
 		Mockito.when(projectRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Project>> result = projectService.getProjects(USER1.getPrimaryKey(), page, LIMIT);
+		Optional<List<VersionedEntity<String>>> result = projectService.getProjects(USER1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<Project> users = result.get();
-		assertEquals(expected.size(), users.size());
-		assertEquals(expected, users);
+		List<VersionedEntity<String>> projects = result.get();
+		assertEquals(expected.size(), projects.size());
+		assertEquals(expected, projects);
 	}
 
 	@ParameterizedTest

@@ -19,6 +19,7 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ public class TaxonControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getTaxons_params() {
 		String uri = "/taxons";
-		List<Taxon> taxons = new ArrayList<Taxon>() {{
-			add(new Taxon("id", null));
+		List<VersionedEntity<String>> taxons = new ArrayList<VersionedEntity<String>>() {{
+			add(new VersionedEntity<>("id", 1, false));
 		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
@@ -90,7 +91,7 @@ public class TaxonControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getTaxons_params")
-	public void getTaxons(MockHttpServletRequestBuilder req, List<Taxon> taxons, HttpStatus expectedStatus, List<TaxonOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getTaxons(MockHttpServletRequestBuilder req, List<VersionedEntity<String>> taxons, HttpStatus expectedStatus, List<TaxonOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(taxonService.getTaxons(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxons));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());

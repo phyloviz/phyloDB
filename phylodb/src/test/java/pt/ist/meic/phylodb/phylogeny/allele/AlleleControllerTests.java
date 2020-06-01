@@ -26,6 +26,7 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.GetAlleleOutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,15 +43,15 @@ public class AlleleControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getAllelesList_params() {
 		String uri = "/taxons/%s/loci/%s/alleles";
-		List<Allele> alleles1 = new ArrayList<Allele>() {{
-			add(new Allele(TAXONID, LOCUSID, "id", null, null));
+		List<VersionedEntity<Allele.PrimaryKey>> alleles1 = new ArrayList<VersionedEntity<Allele.PrimaryKey>>() {{
+			add(new VersionedEntity<>(new Allele.PrimaryKey(TAXONID, LOCUSID, "id", null), 1, false));
 		}};
 		List<Allele> alleles2 = new ArrayList<Allele>() {{
 			add(new Allele(TAXONID, LOCUSID, "id", null, null));
 			add(new Allele(TAXONID, LOCUSID, "id2", null, null));
 		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, TAXONID, LOCUSID)).param("page", "0"),
-				req2 = get(String.format(uri, TAXONID, LOCUSID)).param("page", "0").param("project", PROJECTID.toString()),
+				req2 = get(String.format(uri, TAXONID, LOCUSID)).param("page", "0").param("project", PROJECTID),
 				req3 = get(uri), req4 = get(String.format(uri, TAXONID, LOCUSID)).param("page", "-10");
 		List<AlleleOutputModel> result1 = alleles1.stream()
 				.map(AlleleOutputModel::new)
@@ -68,8 +69,8 @@ public class AlleleControllerTests extends ControllerTestsContext {
 				Arguments.of(req1, alleles1, MediaType.IMAGE_PNG, HttpStatus.NOT_ACCEPTABLE, result1, new ErrorOutputModel(Problem.NOT_ACCEPTABLE.getMessage())));
 	}
 
-	private static Stream<Arguments> getAllelesString_params() {
-		String uri = "/taxons/%s/loci/%s/alleles";
+	private static Stream<Arguments> getAllelesFile_params() {
+		String uri = "/taxons/%s/loci/%s/alleles/files";
 		List<Allele> alleles1 = new ArrayList<Allele>() {{
 			add(new Allele(TAXONID, LOCUSID, "id", null, null));
 		}};
@@ -93,9 +94,9 @@ public class AlleleControllerTests extends ControllerTestsContext {
 		Allele.PrimaryKey key1 = allele1.getPrimaryKey();
 		Allele.PrimaryKey key2 = allele2.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, TAXONID, LOCUSID, key1.getId())).param("version", "1"),
-				req2 = get(String.format(uri, TAXONID, LOCUSID, key2.getId())).param("version", "1").param("project", PROJECTID.toString()),
+				req2 = get(String.format(uri, TAXONID, LOCUSID, key2.getId())).param("version", "1").param("project", PROJECTID),
 				req3 = get(String.format(uri, TAXONID, LOCUSID, key1.getId())),
-				req4 = get(String.format(uri, TAXONID, LOCUSID, key2.getId())).param("project", PROJECTID.toString());
+				req4 = get(String.format(uri, TAXONID, LOCUSID, key2.getId())).param("project", PROJECTID);
 		return Stream.of(Arguments.of(req1, allele1, HttpStatus.OK, new GetAlleleOutputModel(allele1)),
 				Arguments.of(req2, allele2, HttpStatus.OK, new GetAlleleOutputModel(allele2)),
 				Arguments.of(req1, null, HttpStatus.NOT_FOUND, new ErrorOutputModel(Problem.NOT_FOUND.getMessage())),
@@ -111,7 +112,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 		Allele allele = new Allele(TAXONID, LOCUSID, "id", "description", null);
 		Allele.PrimaryKey key = allele.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, TAXONID, LOCUSID, key.getId())),
-				req2 = put(String.format(uri, TAXONID, LOCUSID, key.getId())).param("project", PROJECTID.toString());
+				req2 = put(String.format(uri, TAXONID, LOCUSID, key.getId())).param("project", PROJECTID);
 		AlleleInputModel input1 = new AlleleInputModel(key.getId(), "description"),
 				input2 = new AlleleInputModel("different", "description");
 		return Stream.of(Arguments.of(req1, input1, true, HttpStatus.NO_CONTENT, new NoContentOutputModel()),
@@ -141,7 +142,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 			r.setMethod(HttpMethod.PUT.name());
 			return r;
 		});
-		req2.param("project", PROJECTID.toString());
+		req2.param("project", PROJECTID);
 		MockHttpServletRequestBuilder req4 = put(String.format(uri, TAXONID, LOCUSID));
 		Integer[] invalidLines = {1, 2, 3};
 		String[] invalidIds = {"4, 5"};
@@ -158,7 +159,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 		String uri = "/taxons/%s/loci/%s/alleles/files";
 		MockMultipartFile file = new MockMultipartFile("file", "", "text/plain", "bytes".getBytes());
 		MockHttpServletRequestBuilder req1 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file),
-				req2 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file).param("project", PROJECTID.toString()),
+				req2 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file).param("project", PROJECTID),
 				req3 = multipart(String.format(uri, TAXONID, LOCUSID)),
 				req4 = post(String.format(uri, TAXONID, LOCUSID));
 		Integer[] invalidLines = {1, 2, 3};
@@ -190,8 +191,8 @@ public class AlleleControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getAllelesList_params")
-	public void getAllelesList(MockHttpServletRequestBuilder req, List<Allele> alleles, MediaType mediatype, HttpStatus expectedStatus, List<AlleleOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(alleleService.getAlleles(anyString(), anyString(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(alleles));
+	public void getAllelesList(MockHttpServletRequestBuilder req, List<VersionedEntity<Allele.PrimaryKey>> alleles, MediaType mediatype, HttpStatus expectedStatus, List<AlleleOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+		Mockito.when(alleleService.getAllelesEntities(anyString(), anyString(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(alleles));
 		MockHttpServletResponse result = http.executeRequest(req, mediatype);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -209,7 +210,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getAllelesString_params")
+	@MethodSource("getAllelesFile_params")
 	public void getAllelesString(MockHttpServletRequestBuilder req, List<Allele> alleles, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(alleleService.getAlleles(anyString(), anyString(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(alleles));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.TEXT_PLAIN);
@@ -219,7 +220,6 @@ public class AlleleControllerTests extends ControllerTestsContext {
 		} else
 			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
-
 	@ParameterizedTest
 	@MethodSource("getAllele_params")
 	public void getAllele(MockHttpServletRequestBuilder req, Allele allele, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {

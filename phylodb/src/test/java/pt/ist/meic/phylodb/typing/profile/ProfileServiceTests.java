@@ -39,6 +39,22 @@ public class ProfileServiceTests extends ServiceTestsContext {
 			Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), new VersionedEntity<>(ALLELE21P.getPrimaryKey(), ALLELE21P.getVersion(), ALLELE21P.isDeprecated())));
 	private static final Profile[] STATE = new Profile[]{PROFILE3, PROFILE4};
 
+	private static Stream<Arguments> getProfilesEntities_params() {
+		VersionedEntity<Profile.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<Profile.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<Profile.PrimaryKey>>() {{
+			add(state0);
+		}};
+		List<VersionedEntity<Profile.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<Profile.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
+		}};
+		return Stream.of(Arguments.of(0, Collections.emptyList()),
+				Arguments.of(0, expected1),
+				Arguments.of(0, expected2),
+				Arguments.of(-1, null));
+	}
+
 	private static Stream<Arguments> getProfiles_params() {
 		List<Profile> expected1 = new ArrayList<Profile>() {{
 			add(STATE[0]);
@@ -127,12 +143,29 @@ public class ProfileServiceTests extends ServiceTestsContext {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getProfiles_params")
-	public void getProfiles(int page, List<Profile> expected) {
+	@MethodSource("getProfilesEntities_params")
+	public void getProfilesEntities(int page, List<VersionedEntity<Profile.PrimaryKey>> expected) {
 		Schema schema = new Schema(TAXONID, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
 		Mockito.when(profileRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Mockito.when(schemaRepository.find(any())).thenReturn(Optional.of(schema));
-		Optional<Pair<Schema, List<Profile>>> result = profileService.getProfilesEntities(PROJECTID, datasetId, page, LIMIT);
+		Optional<List<VersionedEntity<Profile.PrimaryKey>>> result = profileService.getProfilesEntities(PROJECTID, datasetId, page, LIMIT);
+		if (expected == null && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertNotNull(expected);
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Profile.PrimaryKey>> profiles = result.get();
+		assertEquals(expected, profiles);
+	}
+
+	@ParameterizedTest
+	@MethodSource("getProfiles_params")
+	public void getProfiles(int page, List<Profile> expected) {
+		Schema schema = new Schema(TAXONID, "schema", Method.MLVA, null, new String[]{locusId1, locusId2});
+		Mockito.when(profileRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(schemaRepository.find(any())).thenReturn(Optional.of(schema));
+		Optional<Pair<Schema, List<Profile>>> result = profileService.getProfiles(PROJECTID, datasetId, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;

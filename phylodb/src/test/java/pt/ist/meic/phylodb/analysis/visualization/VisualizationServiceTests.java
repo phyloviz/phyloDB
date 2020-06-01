@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +26,14 @@ public class VisualizationServiceTests extends ServiceTestsContext {
 	private static final Visualization[] STATE = new Visualization[]{VISUALIZATION1, VISUALIZATION2};
 
 	private static Stream<Arguments> getInferences_params() {
-		List<Visualization> expected1 = new ArrayList<Visualization>() {{
-			add(STATE[0]);
+		Entity<Visualization.PrimaryKey> state0 = new Entity<>(STATE[0].getPrimaryKey(), STATE[0].isDeprecated()),
+				state1 = new Entity<>(STATE[1].getPrimaryKey(), STATE[1].isDeprecated());
+		List<Entity<Visualization.PrimaryKey>> expected1 = new ArrayList<Entity<Visualization.PrimaryKey>>() {{
+			add(state0);
 		}};
-		List<Visualization> expected2 = new ArrayList<Visualization>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<Entity<Visualization.PrimaryKey>> expected2 = new ArrayList<Entity<Visualization.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -55,18 +58,18 @@ public class VisualizationServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getInferences_params")
-	public void getVisualizations(int page, List<Visualization> expected) {
+	public void getVisualizations(int page, List<Entity<Visualization.PrimaryKey>> expected) {
 		Mockito.when(visualizationRepository.findAllEntities(anyInt(), anyInt(), any(), any(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Visualization>> result = visualizationService.getVisualizations(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), page, LIMIT);
+		Optional<List<Entity<Visualization.PrimaryKey>>> result = visualizationService.getVisualizations(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<Visualization> schemas = result.get();
-		assertEquals(expected.size(), schemas.size());
-		assertEquals(expected, schemas);
+		List<Entity<Visualization.PrimaryKey>> visualizations = result.get();
+		assertEquals(expected.size(), visualizations.size());
+		assertEquals(expected, visualizations);
 	}
 
 	@ParameterizedTest

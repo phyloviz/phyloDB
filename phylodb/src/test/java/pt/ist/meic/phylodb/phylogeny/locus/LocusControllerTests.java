@@ -19,6 +19,7 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.GetLocusOutputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,8 +35,8 @@ public class LocusControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getLoci_params() {
 		String uri = "/taxons/%s/loci";
-		List<Locus> loci = new ArrayList<Locus>() {{
-			add(new Locus(TAXONID, "id", null));
+		List<VersionedEntity<Locus.PrimaryKey>> loci = new ArrayList<VersionedEntity<Locus.PrimaryKey>>() {{
+			add(new VersionedEntity<>(new Locus.PrimaryKey(TAXONID, "id"), 1, false));
 		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, TAXONID)).param("page", "0"),
 				req2 = get(uri), req3 = get(String.format(uri, TAXONID)).param("page", "-10");
@@ -92,7 +93,7 @@ public class LocusControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getLoci_params")
-	public void getLoci(MockHttpServletRequestBuilder req, List<Locus> loci, HttpStatus expectedStatus, List<LocusOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getLoci(MockHttpServletRequestBuilder req, List<VersionedEntity<Locus.PrimaryKey>> loci, HttpStatus expectedStatus, List<LocusOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(locusService.getLoci(anyString(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(loci));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());

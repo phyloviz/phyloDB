@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,12 +25,14 @@ public class LocusServiceTests extends ServiceTestsContext {
 	private static final Locus[] STATE = new Locus[]{LOCUS1, LOCUS2};
 
 	private static Stream<Arguments> getLoci_params() {
-		List<Locus> expected1 = new ArrayList<Locus>() {{
-			add(STATE[0]);
+		VersionedEntity<Locus.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+			state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<Locus.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<Locus.PrimaryKey>>() {{
+			add(state0);
 		}};
-		List<Locus> expected2 = new ArrayList<Locus>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<VersionedEntity<Locus.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<Locus.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -61,18 +64,18 @@ public class LocusServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getLoci_params")
-	public void getLoci(int page, List<Locus> expected) {
+	public void getLoci(int page, List<VersionedEntity<Locus.PrimaryKey>> expected) {
 		Mockito.when(locusRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Locus>> result = locusService.getLoci(TAXON1.getPrimaryKey(), page, LIMIT);
+		Optional<List<VersionedEntity<Locus.PrimaryKey>>> result = locusService.getLoci(TAXON1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<Locus> users = result.get();
-		assertEquals(expected.size(), users.size());
-		assertEquals(expected, users);
+		List<VersionedEntity<Locus.PrimaryKey>> loci = result.get();
+		assertEquals(expected.size(), loci.size());
+		assertEquals(expected, loci);
 	}
 
 	@ParameterizedTest

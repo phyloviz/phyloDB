@@ -30,8 +30,9 @@ public class InferenceRepository extends UnversionedRepository<Inference, Infere
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES]->(p2:Profile)\n" +
 				"WHERE d.deprecated = false\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, d.id as id, d.deprecated as deprecated\n" +
-				"ORDER BY pj.id, ds.id, size(d.id), d.id SKIP $ LIMIT $";
+				"WITH pj, ds, d.id as id, d.deprecated as deprecated, collect(d) as ignored\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, id as id, deprecated as deprecated\n" +
+				"ORDER BY pj.id, ds.id, size(id), id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], page, limit));
 	}
 

@@ -27,12 +27,14 @@ public class DatasetServiceTests extends ServiceTestsContext {
 	private static final Dataset[] STATE = new Dataset[]{DATASET1, DATASET2};
 
 	private static Stream<Arguments> getDatasets_params() {
-		List<Dataset> expected1 = new ArrayList<Dataset>() {{
-			add(STATE[0]);
+		VersionedEntity<Dataset.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<Dataset.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<Dataset.PrimaryKey>>() {{
+			add(state0);
 		}};
-		List<Dataset> expected2 = new ArrayList<Dataset>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<VersionedEntity<Dataset.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<Dataset.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -47,7 +49,7 @@ public class DatasetServiceTests extends ServiceTestsContext {
 
 	private static Stream<Arguments> saveDataset_params() {
 		Dataset withDifferentSchema = new Dataset(PROJECT1.getPrimaryKey(), STATE[0].getPrimaryKey().getId(), 1, false, "name1", new VersionedEntity<>(new Schema.PrimaryKey("t", "x"), 1, false));
-		List<Profile> profiles = Collections.singletonList(new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "id", 1, false, "aka", null));
+		List<VersionedEntity<Profile.PrimaryKey>> profiles = Collections.singletonList(new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "id"), 1, false));
 		return Stream.of(Arguments.of(STATE[0], true, null, null, true),
 				Arguments.of(STATE[1], false, null, null, false),
 				Arguments.of(STATE[0], true, withDifferentSchema, Collections.emptyList(), true),
@@ -69,18 +71,18 @@ public class DatasetServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getDatasets_params")
-	public void getDatasets(int page, List<Dataset> expected) {
+	public void getDatasets(int page, List<VersionedEntity<Dataset.PrimaryKey>> expected) {
 		Mockito.when(datasetRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Dataset>> result = datasetService.getDatasets(PROJECT1.getPrimaryKey(), page, LIMIT);
+		Optional<List<VersionedEntity<Dataset.PrimaryKey>>> result = datasetService.getDatasets(PROJECT1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<Dataset> schemas = result.get();
-		assertEquals(expected.size(), schemas.size());
-		assertEquals(expected, schemas);
+		List<VersionedEntity<Dataset.PrimaryKey>> datasets = result.get();
+		assertEquals(expected.size(), datasets.size());
+		assertEquals(expected, datasets);
 	}
 
 	@ParameterizedTest
@@ -95,7 +97,7 @@ public class DatasetServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("saveDataset_params")
-	public void saveDataset(Dataset dataset, boolean exists, Dataset dbDataset, List<Profile> profiles, boolean expected) {
+	public void saveDataset(Dataset dataset, boolean exists, Dataset dbDataset, List<VersionedEntity<Profile.PrimaryKey>> profiles, boolean expected) {
 		Mockito.when(schemaRepository.exists(any())).thenReturn(exists);
 		Mockito.when(datasetRepository.find(any(), anyLong())).thenReturn(Optional.ofNullable(dbDataset));
 		Mockito.when(profileRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(profiles));

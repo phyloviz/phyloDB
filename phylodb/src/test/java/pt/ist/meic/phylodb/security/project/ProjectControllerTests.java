@@ -22,6 +22,7 @@ import pt.ist.meic.phylodb.security.project.model.GetProjectOutputModel;
 import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.security.project.model.ProjectInputModel;
 import pt.ist.meic.phylodb.security.project.model.ProjectOutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,9 +37,8 @@ public class ProjectControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProjects_params() {
 		String uri = "/projects";
-		Project project = new Project(UUID.randomUUID().toString(), "x", Visibility.PRIVATE, "x", new User.PrimaryKey[0]);
-		List<Project> projects = new ArrayList<Project>() {{
-			add(project);
+		List<VersionedEntity<String>> projects = new ArrayList<VersionedEntity<String>>() {{
+			add(new VersionedEntity<>(UUID.randomUUID().toString(), 1, false));
 		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
@@ -105,7 +105,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getProjects_params")
-	public void getProjects(MockHttpServletRequestBuilder req, List<Project> projects, HttpStatus expectedStatus, List<ProjectOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getProjects(MockHttpServletRequestBuilder req, List<VersionedEntity<String>> projects, HttpStatus expectedStatus, List<ProjectOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(projectService.getProjects(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
@@ -115,7 +115,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
-					assertEquals(expectedResult.get(i).getId().toString(), p.get("id"));
+					assertEquals(expectedResult.get(i).getId(), p.get("id"));
 					assertEquals(expectedResult.get(i).getVersion(), Long.parseLong(p.get("version").toString()));
 				}
 			}

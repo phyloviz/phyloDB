@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,12 +25,14 @@ public class UserServiceTests extends ServiceTestsContext {
 	private static final User[] STATE = new User[]{USER1, USER2};
 
 	private static Stream<Arguments> getUsers_params() {
-		List<User> expected1 = new ArrayList<User>() {{
-			add(STATE[0]);
+		VersionedEntity<User.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<User.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<User.PrimaryKey>>() {{
+			add(state0);
 		}};
-		List<User> expected2 = new ArrayList<User>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<VersionedEntity<User.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<User.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -66,16 +69,16 @@ public class UserServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getUsers_params")
-	public void getUsers(int page, List<User> expected) {
+	public void getUsers(int page, List<VersionedEntity<User.PrimaryKey>> expected) {
 		Mockito.when(userRepository.findAllEntities(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<User>> result = userService.getUsers(page, LIMIT);
+		Optional<List<VersionedEntity<User.PrimaryKey>>> result = userService.getUsers(page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<User> users = result.get();
+		List<VersionedEntity<User.PrimaryKey>> users = result.get();
 		assertEquals(expected.size(), users.size());
 		assertEquals(expected, users);
 	}

@@ -7,8 +7,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
-import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
@@ -22,6 +22,88 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	private static final int LIMIT = 2;
 	private static final String PROJECTID = PROJECT1.getPrimaryKey();
 	private static final Allele[] STATE = new Allele[]{ALLELE11, ALLELE12, ALLELE11P, ALLELE12P};
+
+	private static Stream<Arguments> findAllEntitiesNoProject_params() {
+		String id1 = "3test", id3 = "5test";
+		String taxonKey = TAXON1.getPrimaryKey();
+		String locusKey = LOCUS1.getPrimaryKey().getId();
+		Allele firstE = new Allele(taxonKey, locusKey, id1, 1, false, "description", null),
+				firstChangedE = new Allele(taxonKey, locusKey, id1, 2, false, "description2", null),
+				secondE = new Allele(taxonKey, locusKey, "4test", 1, false, null, null),
+				thirdE = new Allele(taxonKey, locusKey, id3, 1, false, "description3", null),
+				thirdChangedE = new Allele(taxonKey, locusKey, id3, 2, false, null, null),
+				fourthE = new Allele(taxonKey, locusKey, "6test", 1, false, null, null);
+		VersionedEntity<Allele.PrimaryKey> first = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id1), 1, false),
+				firstChanged = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id1), 2, false),
+				second = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, "4test"), 1, false),
+				third = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id3), 1, false),
+				thirdChanged = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id3), 2, false),
+				fourth = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, "6test"), 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Allele[0], Collections.emptyList()),
+				Arguments.of(0, new Allele[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Allele[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Allele[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Allele[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Allele[0], Collections.emptyList()),
+				Arguments.of(1, new Allele[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Allele[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Allele[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Allele[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Allele[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Allele[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Allele[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Allele[0], Collections.emptyList()),
+				Arguments.of(2, new Allele[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Allele[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Allele[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Allele[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Allele[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE},Arrays.asList(third, fourth)),
+				Arguments.of(2, new Allele[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Allele[0], Collections.emptyList()));
+	}
+
+	private static Stream<Arguments> findAllEntitiesProject_params() {
+		String id1 = "3test", id3 = "5test";
+		String taxonKey = TAXON1.getPrimaryKey();
+		String locusKey = LOCUS1.getPrimaryKey().getId();
+		Allele firstE = new Allele(taxonKey, locusKey, id1, 1, false, "description", PROJECTID),
+				firstChangedE = new Allele(taxonKey, locusKey, id1, 2, false, "description2", PROJECTID),
+				secondE = new Allele(taxonKey, locusKey, "4test", 1, false, null, PROJECTID),
+				thirdE = new Allele(taxonKey, locusKey, id3, 1, false, "description3", PROJECTID),
+				thirdChangedE = new Allele(taxonKey, locusKey, id3, 2, false, null, PROJECTID),
+				fourthE = new Allele(taxonKey, locusKey, "6test", 1, false, null, PROJECTID);
+		VersionedEntity<Allele.PrimaryKey> first = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id1, PROJECTID), 1, false),
+				firstChanged = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id1, PROJECTID), 2, false),
+				second = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, "4test", PROJECTID), 1, false),
+				third = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id3, PROJECTID), 1, false),
+				thirdChanged = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, id3, PROJECTID), 2, false),
+				fourth = new VersionedEntity<>(new Allele.PrimaryKey(taxonKey, locusKey, "6test", PROJECTID), 1, false),
+				state2 = new VersionedEntity<>(STATE[2].getPrimaryKey(), STATE[2].getVersion(), STATE[2].isDeprecated()),
+				state3 = new VersionedEntity<>(STATE[3].getPrimaryKey(), STATE[3].getVersion(), STATE[3].isDeprecated());
+		return Stream.of(Arguments.of(0, new Allele[0], Collections.emptyList()),
+				Arguments.of(0, new Allele[]{STATE[2]}, Collections.singletonList(state2)),
+				Arguments.of(0, new Allele[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Allele[]{STATE[2], STATE[3], firstE}, Arrays.asList(state2, state3)),
+				Arguments.of(0, new Allele[]{STATE[2], STATE[3], firstE, firstChangedE}, Arrays.asList(state2, state3)),
+				Arguments.of(1, new Allele[0], Collections.emptyList()),
+				Arguments.of(1, new Allele[]{STATE[2]}, Collections.emptyList()),
+				Arguments.of(1, new Allele[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Allele[]{STATE[2], STATE[3], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Allele[]{STATE[2], STATE[3], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Allele[]{STATE[2], STATE[3], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Allele[]{STATE[2], STATE[3], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Allele[]{STATE[2], STATE[3], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Allele[0], Collections.emptyList()),
+				Arguments.of(2, new Allele[]{STATE[2]}, Collections.emptyList()),
+				Arguments.of(2, new Allele[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Allele[]{STATE[2], STATE[3], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Allele[]{STATE[2], STATE[3], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Allele[]{STATE[2], STATE[3], firstE, secondE, thirdE, fourthE},Arrays.asList(third, fourth)),
+				Arguments.of(2, new Allele[]{STATE[2], STATE[3], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Allele[0], Collections.emptyList()));
+	}
 
 	private static Stream<Arguments> findAllNoProject_params() {
 		String id1 = "3test", id3 = "5test";
@@ -265,10 +347,48 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	}
 
 	@ParameterizedTest
+	@MethodSource("findAllEntitiesNoProject_params")
+	public void findAllEntitiesNoProject(int page, Allele[] state, List<VersionedEntity<Allele.PrimaryKey>> expected) {
+		store(state);
+		Optional<List<VersionedEntity<Allele.PrimaryKey>>> result = alleleRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), null);
+		if (expected.size() == 0 && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Allele.PrimaryKey>> alleles = result.get();
+		assertEquals(expected.size(), alleles.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), alleles.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), alleles.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), alleles.get(i).isDeprecated());
+		}
+	}
+
+	@ParameterizedTest
+	@MethodSource("findAllEntitiesProject_params")
+	public void findAllEntitiesProject(int page, Allele[] state, List<VersionedEntity<Allele.PrimaryKey>> expected) {
+		store(state);
+		Optional<List<VersionedEntity<Allele.PrimaryKey>>> result = alleleRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), PROJECTID);
+		if (expected.size() == 0 && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Allele.PrimaryKey>> alleles = result.get();
+		assertEquals(expected.size(), alleles.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), alleles.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), alleles.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), alleles.get(i).isDeprecated());
+		}
+	}
+
+	@ParameterizedTest
 	@MethodSource("findAllNoProject_params")
 	public void findAllNoProject(int page, Allele[] state, Allele[] expected) {
 		store(state);
-		Optional<List<Allele>> result = alleleRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), null);
+		Optional<List<Allele>> result = alleleRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), null);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
@@ -283,7 +403,7 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 	@MethodSource("findAllProject_params")
 	public void findAllProject(int page, Allele[] state, Allele[] expected) {
 		store(state);
-		Optional<List<Allele>> result = alleleRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), PROJECTID);
+		Optional<List<Allele>> result = alleleRepository.findAll(page, LIMIT, TAXON1.getPrimaryKey(), LOCUS1.getPrimaryKey().getId(), PROJECTID);
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

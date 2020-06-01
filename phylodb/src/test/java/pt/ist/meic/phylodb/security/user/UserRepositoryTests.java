@@ -8,10 +8,9 @@ import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -24,31 +23,41 @@ public class UserRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> findAll_params() {
 		String email1 = "3test", provider1 = "3test", email3 = "5test", provider3 = "5provider";
-		User first = new User(email1, provider1, 1, false, Role.USER), firstChanged = new User(email1, provider1, 2, false, Role.ADMIN),
-				second = new User("4test", "4provider", 1, false, Role.USER),
-				third = new User(email3, provider3, 1, false, Role.USER), thirdChanged = new User(email3, provider3, 2, false, Role.ADMIN),
-				fourth = new User("6test", "6provider", 1, false, Role.USER);
-		return Stream.of(Arguments.of(0, new User[0], new User[0]),
-				Arguments.of(0, new User[]{STATE[0]}, new User[]{STATE[0]}),
-				Arguments.of(0, new User[]{first, firstChanged}, new User[]{firstChanged}),
-				Arguments.of(0, new User[]{STATE[0], STATE[1], first}, STATE),
-				Arguments.of(0, new User[]{STATE[0], STATE[1], first, firstChanged}, STATE),
-				Arguments.of(1, new User[0], new User[0]),
-				Arguments.of(1, new User[]{STATE[0]}, new User[0]),
-				Arguments.of(1, new User[]{first, firstChanged}, new User[0]),
-				Arguments.of(1, new User[]{STATE[0], STATE[1], first}, new User[]{first}),
-				Arguments.of(1, new User[]{STATE[0], STATE[1], first, firstChanged}, new User[]{firstChanged}),
-				Arguments.of(1, new User[]{STATE[0], STATE[1], first, second}, new User[]{first, second}),
-				Arguments.of(1, new User[]{STATE[0], STATE[1], first, firstChanged, second}, new User[]{firstChanged, second}),
-				Arguments.of(1, new User[]{STATE[0], STATE[1], first, firstChanged}, new User[]{firstChanged}),
-				Arguments.of(2, new User[0], new User[0]),
-				Arguments.of(2, new User[]{STATE[0]}, new User[0]),
-				Arguments.of(2, new User[]{first, firstChanged}, new User[0]),
-				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third}, new User[]{third}),
-				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new User[]{thirdChanged}),
-				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third, fourth}, new User[]{third, fourth}),
-				Arguments.of(2, new User[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new User[]{thirdChanged, fourth}),
-				Arguments.of(-1, new User[0], new User[0]));
+		User firstE = new User(email1, provider1, 1, false, Role.USER),
+				firstChangedE = new User(email1, provider1, 2, false, Role.ADMIN),
+				secondE = new User("4test", "4provider", 1, false, Role.USER),
+				thirdE = new User(email3, provider3, 1, false, Role.USER),
+				thirdChangedE = new User(email3, provider3, 2, false, Role.ADMIN),
+				fourthE = new User("6test", "6provider", 1, false, Role.USER);
+		VersionedEntity<User.PrimaryKey> first = new VersionedEntity<>(new User.PrimaryKey(email1, provider1), 1, false),
+				firstChanged = new VersionedEntity<>(new User.PrimaryKey(email1, provider1), 2, false),
+				second = new VersionedEntity<>(new User.PrimaryKey("4test", "4provider"), 1, false),
+				third = new VersionedEntity<>(new User.PrimaryKey(email3, provider3), 1, false),
+				thirdChanged = new VersionedEntity<>(new User.PrimaryKey(email3, provider3), 2, false),
+				fourth = new VersionedEntity<>(new User.PrimaryKey("6test", "6provider"), 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new User[0], Collections.emptyList()),
+				Arguments.of(0, new User[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new User[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new User[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new User[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new User[0], Collections.emptyList()),
+				Arguments.of(1, new User[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new User[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new User[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new User[0], Collections.emptyList()),
+				Arguments.of(2, new User[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new User[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new User[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new User[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -132,17 +141,21 @@ public class UserRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, User[] state, User[] expected) {
+	public void findAll(int page, User[] state, List<VersionedEntity<User.PrimaryKey>> expected) {
 		store(state);
-		Optional<List<User>> result = userRepository.findAllEntities(page, LIMIT);
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<VersionedEntity<User.PrimaryKey>>> result = userRepository.findAllEntities(page, LIMIT);
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<User> users = result.get();
-		assertEquals(expected.length, users.size());
-		assertArrayEquals(expected, users.toArray());
+		List<VersionedEntity<User.PrimaryKey>> users = result.get();
+		assertEquals(expected.size(), users.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), users.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), users.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), users.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest

@@ -19,6 +19,7 @@ import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,9 +35,9 @@ public class InferenceControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getInferences_params() {
 		String uri = "/projects/%s/datasets/%s/inferences";
-		Inference inference1 = new Inference(PROJECTID, DATASETID, UUID.randomUUID().toString(), InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
-		Inference inference2 = new Inference(PROJECTID, DATASETID, UUID.randomUUID().toString(), InferenceAlgorithm.GOEBURST, Arrays.asList(EDGES1, EDGES2));
-		List<Inference> inferences = new ArrayList<Inference>() {{
+		Entity<Inference.PrimaryKey> inference1 = new Entity<>(new Inference.PrimaryKey(PROJECTID, DATASETID, UUID.randomUUID().toString()), false),
+				inference2 = new Entity<>(new Inference.PrimaryKey(PROJECTID, DATASETID, UUID.randomUUID().toString()), false);
+		List<Entity<Inference.PrimaryKey>> inferences = new ArrayList<Entity<Inference.PrimaryKey>>() {{
 			add(inference1);
 			add(inference2);
 		}};
@@ -104,7 +105,7 @@ public class InferenceControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getInferences_params")
-	public void getInferences(MockHttpServletRequestBuilder req, List<Inference> inferences, HttpStatus expectedStatus, List<InferenceOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getInferences(MockHttpServletRequestBuilder req, List<Entity<Inference.PrimaryKey>> inferences, HttpStatus expectedStatus, List<InferenceOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(inferenceService.getInferences(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(inferences));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
@@ -114,7 +115,7 @@ public class InferenceControllerTests extends ControllerTestsContext {
 			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
-					assertEquals(expectedResult.get(i).getId().toString(), p.get("id"));
+					assertEquals(expectedResult.get(i).getId(), p.get("id"));
 				}
 			}
 		} else

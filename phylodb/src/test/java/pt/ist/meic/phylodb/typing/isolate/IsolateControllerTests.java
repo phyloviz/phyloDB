@@ -24,6 +24,7 @@ import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
 import pt.ist.meic.phylodb.typing.isolate.model.*;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,11 +42,9 @@ public class IsolateControllerTests extends ControllerTestsContext {
 	private static Stream<Arguments> getIsolatesList_params() {
 		String uri = "/projects/%s/datasets/%s/isolates";
 		Profile profile = new Profile(PROJECTID, DATASETID, "1", 1, false, null, null);
-		Isolate isolate1 = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
-		Isolate isolate2 = new Isolate(PROJECTID, DATASETID, "2", "test", new Ancillary[]{ANCILLARY1}, profile.getPrimaryKey().getId());
-		List<Isolate> isolates = new ArrayList<Isolate>() {{
-			add(isolate1);
-			add(isolate2);
+		List<VersionedEntity<Isolate.PrimaryKey>> isolates = new ArrayList<VersionedEntity<Isolate.PrimaryKey>>() {{
+			add(new VersionedEntity<>(new Isolate.PrimaryKey(PROJECTID, DATASETID, "1"), 1, false));
+			add(new VersionedEntity<>(new Isolate.PrimaryKey(PROJECTID, DATASETID, "2"), 1, false));
 		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, PROJECTID, DATASETID)).param("page", "0"),
 				req2 = get(String.format(uri, PROJECTID, DATASETID)), req3 = get(String.format(uri, PROJECTID, DATASETID)).param("page", "-10");
@@ -59,8 +58,8 @@ public class IsolateControllerTests extends ControllerTestsContext {
 				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, null, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
-	private static Stream<Arguments> getIsolatesString_params() {
-		String uri = "/projects/%s/datasets/%s/isolates";
+	private static Stream<Arguments> getIsolatesFile_params() {
+		String uri = "/projects/%s/datasets/%s/isolates/files";
 		Profile profile = new Profile(PROJECTID, DATASETID, "1", "aka", new String[]{"1", "2", "3"});
 		Isolate isolate1 = new Isolate(PROJECTID, DATASETID, "1", "description", new Ancillary[]{ANCILLARY1, ANCILLARY2}, null);
 		Isolate isolate2 = new Isolate(PROJECTID, DATASETID, "2", "test", new Ancillary[]{ANCILLARY1}, profile.getPrimaryKey().getId());
@@ -161,8 +160,8 @@ public class IsolateControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getIsolatesList_params")
-	public void getIsolatesList(MockHttpServletRequestBuilder req, List<Isolate> isolates, HttpStatus expectedStatus, List<IsolateOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(isolateService.getIsolates(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
+	public void getIsolatesList(MockHttpServletRequestBuilder req, List<VersionedEntity<Isolate.PrimaryKey>> isolates, HttpStatus expectedStatus, List<IsolateOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+		Mockito.when(isolateService.getIsolatesEntities(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -180,8 +179,8 @@ public class IsolateControllerTests extends ControllerTestsContext {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getIsolatesString_params")
-	public void getProfilesString(MockHttpServletRequestBuilder req, List<Isolate> isolates, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
+	@MethodSource("getIsolatesFile_params")
+	public void getProfilesFile(MockHttpServletRequestBuilder req, List<Isolate> isolates, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(isolateService.getIsolates(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(isolates));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.TEXT_PLAIN);
 		assertEquals(expectedStatus.value(), result.getStatus());
@@ -190,7 +189,6 @@ public class IsolateControllerTests extends ControllerTestsContext {
 		else
 			assertEquals(expectedError, http.parseResult(ErrorOutputModel.class, result));
 	}
-
 	@ParameterizedTest
 	@MethodSource("getIsolate_params")
 	public void getIsolate(MockHttpServletRequestBuilder req, Isolate isolate, HttpStatus expectedStatus, OutputModel expectedResult) throws Exception {

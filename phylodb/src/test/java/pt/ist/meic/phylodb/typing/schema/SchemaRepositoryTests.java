@@ -32,33 +32,41 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 				new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()));
 		List<VersionedEntity<Locus.PrimaryKey>> loci2 = Arrays.asList(new VersionedEntity<>(LOCUS2.getPrimaryKey(), LOCUS2.getVersion(), LOCUS2.isDeprecated()),
 				new VersionedEntity<>(LOCUS1.getPrimaryKey(), LOCUS1.getVersion(), LOCUS1.isDeprecated()));
-		Schema first = new Schema(taxonKey, id1, 1, false, Method.MLST, "description", loci1),
-				firstChanged = new Schema(taxonKey, id1, 2, false, Method.MLST, "description2", loci1),
-				second = new Schema(taxonKey, "4test", 1, false, Method.MLST, null, loci2),
-				third = new Schema(taxonKey, id3, 1, false, Method.MLST, "description3", loci2),
-				thirdChanged = new Schema(taxonKey, id3, 2, false, Method.MLST, null, loci1),
-				fourth = new Schema(taxonKey, "6test", 1, false, Method.MLST, null, loci2);
-		return Stream.of(Arguments.of(0, new Schema[0], new Schema[0]),
-				Arguments.of(0, new Schema[]{STATE[0]}, new Schema[]{STATE[0]}),
-				Arguments.of(0, new Schema[]{first, firstChanged}, new Schema[]{firstChanged}),
-				Arguments.of(0, new Schema[]{STATE[0], STATE[1], first}, STATE),
-				Arguments.of(0, new Schema[]{STATE[0], STATE[1], first, firstChanged}, STATE),
-				Arguments.of(1, new Schema[0], new Schema[0]),
-				Arguments.of(1, new Schema[]{STATE[0]}, new Schema[0]),
-				Arguments.of(1, new Schema[]{first, firstChanged}, new Schema[0]),
-				Arguments.of(1, new Schema[]{STATE[0], STATE[1], first}, new Schema[]{first}),
-				Arguments.of(1, new Schema[]{STATE[0], STATE[1], first, firstChanged}, new Schema[]{firstChanged}),
-				Arguments.of(1, new Schema[]{STATE[0], STATE[1], first, second}, new Schema[]{first, second}),
-				Arguments.of(1, new Schema[]{STATE[0], STATE[1], first, firstChanged, second}, new Schema[]{firstChanged, second}),
-				Arguments.of(1, new Schema[]{STATE[0], STATE[1], first, firstChanged}, new Schema[]{firstChanged}),
-				Arguments.of(2, new Schema[0], new Schema[0]),
-				Arguments.of(2, new Schema[]{STATE[0]}, new Schema[0]),
-				Arguments.of(2, new Schema[]{first, firstChanged}, new Schema[0]),
-				Arguments.of(2, new Schema[]{STATE[0], STATE[1], first, second, third}, new Schema[]{third}),
-				Arguments.of(2, new Schema[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Schema[]{thirdChanged}),
-				Arguments.of(2, new Schema[]{STATE[0], STATE[1], first, second, third, fourth}, new Schema[]{third, fourth}),
-				Arguments.of(2, new Schema[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Schema[]{thirdChanged, fourth}),
-				Arguments.of(-1, new Schema[0], new Schema[0]));
+		Schema firstE = new Schema(taxonKey, id1, 1, false, Method.MLST, "description", loci1),
+				firstChangedE = new Schema(taxonKey, id1, 2, false, Method.MLST, "description2", loci1),
+				secondE = new Schema(taxonKey, "4test", 1, false, Method.MLST, null, loci2),
+				thirdE = new Schema(taxonKey, id3, 1, false, Method.MLST, "description3", loci2),
+				thirdChangedE = new Schema(taxonKey, id3, 2, false, Method.MLST, null, loci1),
+				fourthE = new Schema(taxonKey, "6test", 1, false, Method.MLST, null, loci2);
+		VersionedEntity<Schema.PrimaryKey> first = new VersionedEntity<>(new Schema.PrimaryKey(taxonKey, id1), 1, false),
+				firstChanged = new VersionedEntity<>(new Schema.PrimaryKey(taxonKey, id1), 2, false),
+				second = new VersionedEntity<>(new Schema.PrimaryKey(taxonKey, "4test"), 1, false),
+				third = new VersionedEntity<>(new Schema.PrimaryKey(taxonKey, id3), 1, false),
+				thirdChanged = new VersionedEntity<>(new Schema.PrimaryKey(taxonKey, id3), 2, false),
+				fourth = new VersionedEntity<>(new Schema.PrimaryKey(taxonKey, "6test"), 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Schema[0], Collections.emptyList()),
+				Arguments.of(0, new Schema[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Schema[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Schema[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Schema[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Schema[0], Collections.emptyList()),
+				Arguments.of(1, new Schema[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Schema[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Schema[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Schema[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Schema[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Schema[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Schema[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Schema[0], Collections.emptyList()),
+				Arguments.of(2, new Schema[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Schema[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Schema[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Schema[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Schema[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new Schema[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Schema[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -263,17 +271,21 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, Schema[] state, Schema[] expected) {
+	public void findAll(int page, Schema[] state, List<VersionedEntity<Schema.PrimaryKey>> expected) {
 		store(state);
-		Optional<List<Schema>> result = schemaRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey());
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<VersionedEntity<Schema.PrimaryKey>>> result = schemaRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey());
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<Schema> schemas = result.get();
-		assertEquals(expected.length, schemas.size());
-		assertArrayEquals(expected, schemas.toArray());
+		List<VersionedEntity<Schema.PrimaryKey>> schemas = result.get();
+		assertEquals(expected.size(), schemas.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), schemas.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), schemas.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), schemas.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest

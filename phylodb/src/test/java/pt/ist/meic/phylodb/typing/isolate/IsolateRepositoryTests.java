@@ -23,6 +23,44 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 	private static final int LIMIT = 2;
 	protected static final Isolate[] STATE = new Isolate[]{ISOLATE1, ISOLATE2};
 
+	private static Stream<Arguments> findAllEntities_params() {
+		Isolate firstE = isolate("3", 1, false, null, new Ancillary[] {ANCILLARY1}, PROFILE1),
+				firstChangedE = isolate("3", 2, false, null, new Ancillary[] {ANCILLARY2}, PROFILE1),
+				secondE = isolate("4", 1, false, null, new Ancillary[] {ANCILLARY1, ANCILLARY2}, null),
+				thirdE = isolate("5", 1, false, null, new Ancillary[0], null),
+				thirdChangedE = isolate("5", 2, false, null, new Ancillary[] {ANCILLARY1, ANCILLARY2, new Ancillary("key3", "value3")}, PROFILE2),
+				fourthE = isolate("6", 1, false, null, new Ancillary[0], PROFILE1);
+		VersionedEntity<Isolate.PrimaryKey> first = new VersionedEntity<>(firstE.getPrimaryKey(), firstE.getVersion(), firstE.isDeprecated()),
+				firstChanged = new VersionedEntity<>(firstChangedE.getPrimaryKey(), firstChangedE.getVersion(), firstChangedE.isDeprecated()),
+				second = new VersionedEntity<>(secondE.getPrimaryKey(), secondE.getVersion(), secondE.isDeprecated()),
+				third = new VersionedEntity<>(thirdE.getPrimaryKey(), thirdE.getVersion(), thirdE.isDeprecated()),
+				thirdChanged = new VersionedEntity<>(thirdChangedE.getPrimaryKey(), thirdChangedE.getVersion(), thirdChangedE.isDeprecated()),
+				fourth = new VersionedEntity<>(fourthE.getPrimaryKey(), fourthE.getVersion(), fourthE.isDeprecated()),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Isolate[0], Collections.emptyList()),
+				Arguments.of(0, new Isolate[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Isolate[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Isolate[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Isolate[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Isolate[0], Collections.emptyList()),
+				Arguments.of(1, new Isolate[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Isolate[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Isolate[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Isolate[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Isolate[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Isolate[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Isolate[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Isolate[0], Collections.emptyList()),
+				Arguments.of(2, new Isolate[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Isolate[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Isolate[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Isolate[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Isolate[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new Isolate[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Isolate[0], Collections.emptyList()));
+	}
+
 	private static Stream<Arguments> findAll_params() {
 		Isolate first = isolate("3", 1, false, null, new Ancillary[] {ANCILLARY1}, PROFILE1),
 				firstChanged = isolate("3", 2, false, null, new Ancillary[] {ANCILLARY2}, PROFILE1),
@@ -272,10 +310,29 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 	}
 
 	@ParameterizedTest
+	@MethodSource("findAllEntities_params")
+	public void findAllEntities(int page, Isolate[] state, List<VersionedEntity<Isolate.PrimaryKey>> expected) {
+		store(state);
+		Optional<List<VersionedEntity<Isolate.PrimaryKey>>> result = isolateRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
+		if (expected.size() == 0 && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Isolate.PrimaryKey>> isolates = result.get();
+		assertEquals(expected.size(), isolates.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), isolates.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), isolates.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), isolates.get(i).isDeprecated());
+		}
+	}
+
+	@ParameterizedTest
 	@MethodSource("findAll_params")
 	public void findAll(int page, Isolate[] state, Isolate[] expected) {
 		store(state);
-		Optional<List<Isolate>> result = isolateRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
+		Optional<List<Isolate>> result = isolateRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

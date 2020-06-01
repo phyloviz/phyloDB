@@ -13,6 +13,7 @@ import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.formatters.IsolatesFormatterTests;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,6 +28,22 @@ public class IsolateServiceTests extends ServiceTestsContext {
 	private static final int LIMIT = 2;
 	private static final String PROJECTID = PROJECT1.getPrimaryKey(), DATASETID = DATASET1.getPrimaryKey().getId();
 	private static final Isolate[] STATE = new Isolate[]{ISOLATE1, ISOLATE2};
+
+	private static Stream<Arguments> getIsolatesEntities_params() {
+		VersionedEntity<Isolate.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<Isolate.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<Isolate.PrimaryKey>>() {{
+			add(state0);
+		}};
+		List<VersionedEntity<Isolate.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<Isolate.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
+		}};
+		return Stream.of(Arguments.of(0, Collections.emptyList()),
+				Arguments.of(0, expected1),
+				Arguments.of(0, expected2),
+				Arguments.of(-1, null));
+	}
 
 	private static Stream<Arguments> getIsolates_params() {
 		List<Isolate> expected1 = new ArrayList<Isolate>() {{
@@ -108,9 +125,25 @@ public class IsolateServiceTests extends ServiceTestsContext {
 	}
 
 	@ParameterizedTest
+	@MethodSource("getIsolatesEntities_params")
+	public void getIsolatesEntities(int page, List<VersionedEntity<Isolate.PrimaryKey>> expected) {
+		Mockito.when(isolateRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Optional<List<VersionedEntity<Isolate.PrimaryKey>>> result = isolateService.getIsolatesEntities(PROJECTID, DATASETID, page, LIMIT);
+		if (expected == null && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertNotNull(expected);
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Isolate.PrimaryKey>> isolates = result.get();
+		assertEquals(expected.size(), isolates.size());
+		assertEquals(expected, isolates);
+	}
+
+	@ParameterizedTest
 	@MethodSource("getIsolates_params")
 	public void getProfiles(int page, List<Isolate> expected) {
-		Mockito.when(isolateRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(isolateRepository.findAll(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Isolate>> result = isolateService.getIsolates(PROJECTID, DATASETID, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

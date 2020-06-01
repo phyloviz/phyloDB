@@ -11,10 +11,7 @@ import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -28,33 +25,41 @@ public class LocusRepositoryTests extends RepositoryTestsContext {
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
 		String taxonKey = TAXON1.getPrimaryKey();
-		Locus first = new Locus(taxonKey, id1, 1, false, "description"),
-				firstChanged = new Locus(taxonKey, id1, 2, false, "description2"),
-				second = new Locus(taxonKey, "4test", 1, false, null),
-				third = new Locus(taxonKey, id3, 1, false, "description3"),
-				thirdChanged = new Locus(taxonKey, id3, 2, false, null),
-				fourth = new Locus(taxonKey, "6test", 1, false, null);
-		return Stream.of(Arguments.of(0, new Locus[0], new Locus[0]),
-				Arguments.of(0, new Locus[]{STATE[0]}, new Locus[]{STATE[0]}),
-				Arguments.of(0, new Locus[]{first, firstChanged}, new Locus[]{firstChanged}),
-				Arguments.of(0, new Locus[]{STATE[0], STATE[1], first}, STATE),
-				Arguments.of(0, new Locus[]{STATE[0], STATE[1], first, firstChanged}, STATE),
-				Arguments.of(1, new Locus[0], new Locus[0]),
-				Arguments.of(1, new Locus[]{STATE[0]}, new Locus[0]),
-				Arguments.of(1, new Locus[]{first, firstChanged}, new Locus[0]),
-				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first}, new Locus[]{first}),
-				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, firstChanged}, new Locus[]{firstChanged}),
-				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, second}, new Locus[]{first, second}),
-				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, firstChanged, second}, new Locus[]{firstChanged, second}),
-				Arguments.of(1, new Locus[]{STATE[0], STATE[1], first, firstChanged}, new Locus[]{firstChanged}),
-				Arguments.of(2, new Locus[0], new Locus[0]),
-				Arguments.of(2, new Locus[]{STATE[0]}, new Locus[0]),
-				Arguments.of(2, new Locus[]{first, firstChanged}, new Locus[0]),
-				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third}, new Locus[]{third}),
-				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Locus[]{thirdChanged}),
-				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third, fourth}, new Locus[]{third, fourth}),
-				Arguments.of(2, new Locus[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Locus[]{thirdChanged, fourth}),
-				Arguments.of(-1, new Locus[0], new Locus[0]));
+		Locus firstE = new Locus(taxonKey, id1, 1, false, "description"),
+				firstChangedE = new Locus(taxonKey, id1, 2, false, "description2"),
+				secondE = new Locus(taxonKey, "4test", 1, false, null),
+				thirdE = new Locus(taxonKey, id3, 1, false, "description3"),
+				thirdChangedE = new Locus(taxonKey, id3, 2, false, null),
+				fourthE = new Locus(taxonKey, "6test", 1, false, null);
+		VersionedEntity<Locus.PrimaryKey> first = new VersionedEntity<>(new Locus.PrimaryKey(taxonKey, id1), 1, false),
+				firstChanged = new VersionedEntity<>(new Locus.PrimaryKey(taxonKey, id1), 2, false),
+				second = new VersionedEntity<>(new Locus.PrimaryKey(taxonKey, "4test"), 1, false),
+				third = new VersionedEntity<>(new Locus.PrimaryKey(taxonKey, id3), 1, false),
+				thirdChanged = new VersionedEntity<>(new Locus.PrimaryKey(taxonKey, id3), 2, false),
+				fourth = new VersionedEntity<>(new Locus.PrimaryKey(taxonKey, "6test"), 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Locus[0], Collections.emptyList()),
+				Arguments.of(0, new Locus[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Locus[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Locus[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Locus[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Locus[0], Collections.emptyList()),
+				Arguments.of(1, new Locus[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Locus[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Locus[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Locus[0], Collections.emptyList()),
+				Arguments.of(2, new Locus[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Locus[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new Locus[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Locus[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -163,17 +168,21 @@ public class LocusRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, Locus[] state, Locus[] expected) {
+	public void findAll(int page, Locus[] state, List<VersionedEntity<Locus.PrimaryKey>> expected) {
 		store(state);
-		Optional<List<Locus>> result = locusRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey());
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<VersionedEntity<Locus.PrimaryKey>>> result = locusRepository.findAllEntities(page, LIMIT, TAXON1.getPrimaryKey());
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<Locus> users = result.get();
-		assertEquals(expected.length, users.size());
-		assertArrayEquals(expected, users.toArray());
+		List<VersionedEntity<Locus.PrimaryKey>> loci = result.get();
+		assertEquals(expected.size(), loci.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), loci.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), loci.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), loci.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest

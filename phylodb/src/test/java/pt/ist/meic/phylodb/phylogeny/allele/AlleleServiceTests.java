@@ -13,6 +13,7 @@ import pt.ist.meic.phylodb.formatters.FastaFormatterTests;
 import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,6 +28,22 @@ public class AlleleServiceTests extends ServiceTestsContext {
 	private static final int LIMIT = 2;
 	private static final String TAXONID = TAXON1.getPrimaryKey(), LOCUSID = LOCUS1.getPrimaryKey().getId();
 	private static final Allele[] STATE = new Allele[]{ALLELE11, ALLELE12P};
+
+	private static Stream<Arguments> getAllelesEntities_params() {
+		VersionedEntity<Allele.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<Allele.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<Allele.PrimaryKey>>() {{
+			add(state0);
+		}};
+		List<VersionedEntity<Allele.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<Allele.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
+		}};
+		return Stream.of(Arguments.of(0, Collections.emptyList()),
+				Arguments.of(0, expected1),
+				Arguments.of(0, expected2),
+				Arguments.of(-1, null));
+	}
 
 	private static Stream<Arguments> getAlleles_params() {
 		List<Allele> expected1 = new ArrayList<Allele>() {{
@@ -103,9 +120,25 @@ public class AlleleServiceTests extends ServiceTestsContext {
 	}
 
 	@ParameterizedTest
+	@MethodSource("getAllelesEntities_params")
+	public void getAllelesEntities(int page, List<VersionedEntity<Allele.PrimaryKey>> expected) {
+		Mockito.when(alleleRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
+		Optional<List<VersionedEntity<Allele.PrimaryKey>>> result = alleleService.getAllelesEntities(TAXONID, LOCUSID, null, page, LIMIT);
+		if (expected == null && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertNotNull(expected);
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Allele.PrimaryKey>> users = result.get();
+		assertEquals(expected.size(), users.size());
+		assertEquals(expected, users);
+	}
+
+	@ParameterizedTest
 	@MethodSource("getAlleles_params")
 	public void getAlleles(int page, List<Allele> expected) {
-		Mockito.when(alleleRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
+		Mockito.when(alleleRepository.findAll(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
 		Optional<List<Allele>> result = alleleService.getAlleles(TAXONID, LOCUSID, null, page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);

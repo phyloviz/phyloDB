@@ -20,6 +20,7 @@ import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.user.model.UserInputModel;
 import pt.ist.meic.phylodb.security.user.model.UserOutputModel;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,8 +34,8 @@ public class UserControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getUsers_params() {
 		String uri = "/users";
-		List<User> users = new ArrayList<User>() {{
-			add(new User("id", "provider", Role.USER));
+		List<VersionedEntity<User.PrimaryKey>> users = new ArrayList<VersionedEntity<User.PrimaryKey>>() {{
+			add(new VersionedEntity<>(new User.PrimaryKey("id", "provider"), 1, false));
 		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
@@ -97,7 +98,7 @@ public class UserControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getUsers_params")
-	public void getUsers(MockHttpServletRequestBuilder req, List<User> users, HttpStatus expectedStatus, List<UserOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getUsers(MockHttpServletRequestBuilder req, List<VersionedEntity<User.PrimaryKey>> users, HttpStatus expectedStatus, List<UserOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(userService.getUsers(anyInt(), anyInt())).thenReturn(Optional.ofNullable(users));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());

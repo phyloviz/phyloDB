@@ -21,6 +21,7 @@ import pt.ist.meic.phylodb.typing.schema.model.GetSchemaOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaOutputModel;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,9 +37,9 @@ public class SchemaControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getSchemas_params() {
 		String uri = "/taxons/%s/schemas";
-		List<Schema> loci = new ArrayList<Schema>() {{
-			add(SCHEMA1);
-			add(SCHEMA2);
+		List<VersionedEntity<Schema.PrimaryKey>> loci = new ArrayList<VersionedEntity<Schema.PrimaryKey>>() {{
+			add(new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()));
+			add(new VersionedEntity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated()));
 		}};
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, TAXONID)).param("page", "0"),
 				req2 = get(uri), req3 = get(String.format(uri, TAXONID)).param("page", "-10");
@@ -93,7 +94,7 @@ public class SchemaControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getSchemas_params")
-	public void getSchemas(MockHttpServletRequestBuilder req, List<Schema> schemas, HttpStatus expectedStatus, List<SchemaOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getSchemas(MockHttpServletRequestBuilder req, List<VersionedEntity<Schema.PrimaryKey>> schemas, HttpStatus expectedStatus, List<SchemaOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(schemaService.getSchemas(anyString(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(schemas));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());

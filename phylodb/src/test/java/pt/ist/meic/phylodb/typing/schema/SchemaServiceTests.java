@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import pt.ist.meic.phylodb.ServiceTestsContext;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +26,14 @@ public class SchemaServiceTests extends ServiceTestsContext {
 	private static final Schema[] STATE = new Schema[]{SCHEMA1, SCHEMA2};
 
 	private static Stream<Arguments> getSchemas_params() {
-		List<Schema> expected1 = new ArrayList<Schema>() {{
-			add(STATE[0]);
+		VersionedEntity<Schema.PrimaryKey> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		List<VersionedEntity<Schema.PrimaryKey>> expected1 = new ArrayList<VersionedEntity<Schema.PrimaryKey>>() {{
+			add(state0);
 		}};
-		List<Schema> expected2 = new ArrayList<Schema>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<VersionedEntity<Schema.PrimaryKey>> expected2 = new ArrayList<VersionedEntity<Schema.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -63,16 +66,16 @@ public class SchemaServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getSchemas_params")
-	public void getSchema(int page, List<Schema> expected) {
+	public void getSchema(int page, List<VersionedEntity<Schema.PrimaryKey>> expected) {
 		Mockito.when(schemaRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Schema>> result = schemaService.getSchemas(TAXON1.getPrimaryKey(), page, LIMIT);
+		Optional<List<VersionedEntity<Schema.PrimaryKey>>> result = schemaService.getSchemas(TAXON1.getPrimaryKey(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<Schema> schemas = result.get();
+		List<VersionedEntity<Schema.PrimaryKey>> schemas = result.get();
 		assertEquals(expected.size(), schemas.size());
 		assertEquals(expected, schemas);
 	}

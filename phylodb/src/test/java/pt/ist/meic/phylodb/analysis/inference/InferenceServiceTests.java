@@ -12,6 +12,7 @@ import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.formatters.FormatterTests;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,12 +28,14 @@ public class InferenceServiceTests extends ServiceTestsContext {
 	private static final Inference[] STATE = new Inference[]{INFERENCE1, INFERENCE2};
 
 	private static Stream<Arguments> getInferences_params() {
-		List<Inference> expected1 = new ArrayList<Inference>() {{
-			add(STATE[0]);
+		Entity<Inference.PrimaryKey> state0 = new Entity<>(STATE[0].getPrimaryKey(), STATE[0].isDeprecated()),
+				state1 = new Entity<>(STATE[1].getPrimaryKey(), STATE[1].isDeprecated());
+		List<Entity<Inference.PrimaryKey>> expected1 = new ArrayList<Entity<Inference.PrimaryKey>>() {{
+			add(state0);
 		}};
-		List<Inference> expected2 = new ArrayList<Inference>() {{
-			add(STATE[0]);
-			add(STATE[1]);
+		List<Entity<Inference.PrimaryKey>> expected2 = new ArrayList<Entity<Inference.PrimaryKey>>() {{
+			add(state0);
+			add(state1);
 		}};
 		return Stream.of(Arguments.of(0, Collections.emptyList()),
 				Arguments.of(0, expected1),
@@ -70,18 +73,18 @@ public class InferenceServiceTests extends ServiceTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getInferences_params")
-	public void getInferences(int page, List<Inference> expected) {
+	public void getInferences(int page, List<Entity<Inference.PrimaryKey>> expected) {
 		Mockito.when(inferenceRepository.findAllEntities(anyInt(), anyInt(), any(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<Inference>> result = inferenceService.getInferences(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), page, LIMIT);
+		Optional<List<Entity<Inference.PrimaryKey>>> result = inferenceService.getInferences(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<Inference> schemas = result.get();
-		assertEquals(expected.size(), schemas.size());
-		assertEquals(expected, schemas);
+		List<Entity<Inference.PrimaryKey>> inferences = result.get();
+		assertEquals(expected.size(), inferences.size());
+		assertEquals(expected, inferences);
 	}
 
 	@ParameterizedTest

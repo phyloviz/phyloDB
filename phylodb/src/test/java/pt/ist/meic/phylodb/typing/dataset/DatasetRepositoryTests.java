@@ -11,9 +11,7 @@ import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -28,33 +26,41 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7", key2 = "6f809af7-2c99-43f7-b674-4843c77384c7";
 		VersionedEntity<Schema.PrimaryKey> s1 = new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()),
 				s2 = new VersionedEntity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated());
-		Dataset first = new Dataset(PROJECT1.getPrimaryKey(), key1, 1, false, "name", s1),
-				firstChanged = new Dataset(PROJECT1.getPrimaryKey(), key1, 2, false, "name2", s2),
-				second = new Dataset(PROJECT1.getPrimaryKey(), "5f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name3", s2),
-				third = new Dataset(PROJECT1.getPrimaryKey(), key2, 1, false, "name5", s2),
-				thirdChanged = new Dataset(PROJECT1.getPrimaryKey(), key2, 2, false, "name4", s1),
-				fourth = new Dataset(PROJECT1.getPrimaryKey(), "7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", s1);
-		return Stream.of(Arguments.of(0, new Dataset[0], new Dataset[0]),
-				Arguments.of(0, new Dataset[]{STATE[0]}, new Dataset[]{STATE[0]}),
-				Arguments.of(0, new Dataset[]{first, firstChanged}, new Dataset[]{firstChanged}),
-				Arguments.of(0, new Dataset[]{STATE[0], STATE[1], first}, STATE),
-				Arguments.of(0, new Dataset[]{STATE[0], STATE[1], first, firstChanged}, STATE),
-				Arguments.of(1, new Dataset[0], new Dataset[0]),
-				Arguments.of(1, new Dataset[]{STATE[0]}, new Dataset[0]),
-				Arguments.of(1, new Dataset[]{first, firstChanged}, new Dataset[0]),
-				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first}, new Dataset[]{first}),
-				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, firstChanged}, new Dataset[]{firstChanged}),
-				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, second}, new Dataset[]{first, second}),
-				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, firstChanged, second}, new Dataset[]{firstChanged, second}),
-				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], first, firstChanged}, new Dataset[]{firstChanged}),
-				Arguments.of(2, new Dataset[0], new Dataset[0]),
-				Arguments.of(2, new Dataset[]{STATE[0]}, new Dataset[0]),
-				Arguments.of(2, new Dataset[]{first, firstChanged}, new Dataset[0]),
-				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third}, new Dataset[]{third}),
-				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Dataset[]{thirdChanged}),
-				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third, fourth}, new Dataset[]{third, fourth}),
-				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Dataset[]{thirdChanged, fourth}),
-				Arguments.of(-1, new Dataset[0], new Dataset[0]));
+		Dataset firstE = new Dataset(PROJECT1.getPrimaryKey(), key1, 1, false, "name", s1),
+				firstChangedE = new Dataset(PROJECT1.getPrimaryKey(), key1, 2, false, "name2", s2),
+				secondE = new Dataset(PROJECT1.getPrimaryKey(), "5f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name3", s2),
+				thirdE = new Dataset(PROJECT1.getPrimaryKey(), key2, 1, false, "name5", s2),
+				thirdChangedE = new Dataset(PROJECT1.getPrimaryKey(), key2, 2, false, "name4", s1),
+				fourthE = new Dataset(PROJECT1.getPrimaryKey(), "7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", s1);
+		VersionedEntity<Dataset.PrimaryKey> first = new VersionedEntity<>(new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), key1), 1, false),
+				firstChanged = new VersionedEntity<>(new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), key1), 2, false),
+				second = new VersionedEntity<>(new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "5f809af7-2c99-43f7-b674-4843c77384c7"), 1, false),
+				third = new VersionedEntity<>(new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), key2), 1, false),
+				thirdChanged = new VersionedEntity<>(new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), key2), 2, false),
+				fourth = new VersionedEntity<>(new Dataset.PrimaryKey(PROJECT1.getPrimaryKey(), "7f809af7-2c99-43f7-b674-4843c77384c7"), 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Dataset[0], Collections.emptyList()),
+				Arguments.of(0, new Dataset[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Dataset[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Dataset[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Dataset[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Dataset[0], Collections.emptyList()),
+				Arguments.of(1, new Dataset[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Dataset[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Dataset[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Dataset[0], Collections.emptyList()),
+				Arguments.of(2, new Dataset[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Dataset[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new Dataset[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Dataset[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -170,17 +176,21 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, Dataset[] state, Dataset[] expected) {
+	public void findAll(int page, Dataset[] state, List<VersionedEntity<Dataset.PrimaryKey>> expected) {
 		store(state);
-		Optional<List<Dataset>> result = datasetRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey());
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<VersionedEntity<Dataset.PrimaryKey>>> result = datasetRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey());
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<Dataset> projects = result.get();
-		assertEquals(expected.length, projects.size());
-		assertArrayEquals(expected, projects.toArray());
+		List<VersionedEntity<Dataset.PrimaryKey>> datasets = result.get();
+		assertEquals(expected.size(), datasets.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), datasets.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), datasets.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), datasets.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest

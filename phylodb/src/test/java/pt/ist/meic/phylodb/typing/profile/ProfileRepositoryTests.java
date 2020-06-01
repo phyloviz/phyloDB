@@ -24,6 +24,51 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	private static final String MISSING = "-";
 	private static final Profile[] STATE = new Profile[]{PROFILE1, PROFILE2};
 
+	private static Stream<Arguments> findAllEntities_params() {
+		List<VersionedEntity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
+		List<VersionedEntity<Allele.PrimaryKey>> alleles1Changed = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
+				new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> alleles2 = Arrays.asList(null, new VersionedEntity<>(ALLELE21.getPrimaryKey(), ALLELE21.getVersion(), ALLELE21.isDeprecated()));
+		List<VersionedEntity<Allele.PrimaryKey>> alleles3 = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
+				new VersionedEntity<>(ALLELE22.getPrimaryKey(), ALLELE22.getVersion(), ALLELE22.isDeprecated()));
+		Profile firstE = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 1, false, null, alleles1),
+				firstChangedE = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3", 2, false, null, alleles1Changed),
+				secondE = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "4", 1, false, "aka4", alleles2),
+				thirdE = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "5", 1, false, "aka5", alleles3),
+				thirdChangedE = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "5", 2, false, "aka4changed", alleles3),
+				fourthE = new Profile(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "6", 1, false, "aka6", alleles1);
+		VersionedEntity<Profile.PrimaryKey> first = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3"), 1, false),
+				firstChanged = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "3"), 2, false),
+				second = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "4"), 1, false),
+				third = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "5"), 1, false),
+				thirdChanged = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "5"), 2, false),
+				fourth = new VersionedEntity<>(new Profile.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), "6"), 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+
+		return Stream.of(Arguments.of(0, new Profile[0], Collections.emptyList()),
+				Arguments.of(0, new Profile[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Profile[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Profile[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Profile[]{STATE[0], STATE[1], firstE, firstChangedE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Profile[0], Collections.emptyList()),
+				Arguments.of(1, new Profile[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Profile[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Profile[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Profile[0], Collections.emptyList()),
+				Arguments.of(2, new Profile[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Profile[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new Profile[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Profile[0], Collections.emptyList()));
+	}
+
 	private static Stream<Arguments> findAll_params() {
 		List<VersionedEntity<Allele.PrimaryKey>> alleles1 = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()), null);
 		List<VersionedEntity<Allele.PrimaryKey>> alleles1Changed = Arrays.asList(new VersionedEntity<>(ALLELE11P.getPrimaryKey(), ALLELE11P.getVersion(), ALLELE11P.isDeprecated()),
@@ -279,10 +324,29 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 	}
 
 	@ParameterizedTest
+	@MethodSource("findAllEntities_params")
+	public void findAllEntities(int page, Profile[] state, List<VersionedEntity<Profile.PrimaryKey>> expected) {
+		store(state);
+		Optional<List<VersionedEntity<Profile.PrimaryKey>>> result = profileRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
+		if (expected.size() == 0 && !result.isPresent()) {
+			assertTrue(true);
+			return;
+		}
+		assertTrue(result.isPresent());
+		List<VersionedEntity<Profile.PrimaryKey>> profiles = result.get();
+		assertEquals(expected.size(), profiles.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), profiles.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), profiles.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), profiles.get(i).isDeprecated());
+		}
+	}
+
+	@ParameterizedTest
 	@MethodSource("findAll_params")
 	public void findAll(int page, Profile[] state, Profile[] expected) {
 		store(state);
-		Optional<List<Profile>> result = profileRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
+		Optional<List<Profile>> result = profileRepository.findAll(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId());
 		if (expected.length == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;

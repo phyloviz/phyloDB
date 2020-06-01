@@ -16,6 +16,7 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,9 +35,9 @@ public class VisualizationControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getVisualizations_params() {
 		String uri = "/projects/%s/datasets/%s/inferences/%s/visualizations";
-		Visualization visualization1 = new Visualization(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID().toString(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12));
-		Visualization visualization2 = new Visualization(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID().toString(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE21, COORDINATE22));
-		List<Visualization> visualizations = new ArrayList<Visualization>() {{
+		Entity<Visualization.PrimaryKey> visualization1 = new Entity<>(new Visualization.PrimaryKey(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID().toString()), false),
+				visualization2 = new Entity<>(new Visualization.PrimaryKey(PROJECTID, DATASETID, INFERENCEID, UUID.randomUUID().toString()), false);
+		List<Entity<Visualization.PrimaryKey>> visualizations = new ArrayList<Entity<Visualization.PrimaryKey>>() {{
 			add(visualization1);
 			add(visualization2);
 		}};
@@ -82,7 +83,7 @@ public class VisualizationControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getVisualizations_params")
-	public void getInferences(MockHttpServletRequestBuilder req, List<Visualization> visualizations, HttpStatus expectedStatus, List<VisualizationOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+	public void getInferences(MockHttpServletRequestBuilder req, List<Entity<Visualization.PrimaryKey>> visualizations, HttpStatus expectedStatus, List<VisualizationOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Mockito.when(visualizationService.getVisualizations(any(), any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(visualizations));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
@@ -92,7 +93,7 @@ public class VisualizationControllerTests extends ControllerTestsContext {
 			if (expectedResult.size() > 0) {
 				for (int i = 0; i < expectedResult.size(); i++) {
 					Map<String, Object> p = parsed.get(i);
-					assertEquals(expectedResult.get(i).getId().toString(), p.get("id"));
+					assertEquals(expectedResult.get(i).getId(), p.get("id"));
 				}
 			}
 		} else

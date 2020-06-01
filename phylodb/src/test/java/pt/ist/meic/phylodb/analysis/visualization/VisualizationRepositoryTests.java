@@ -11,6 +11,7 @@ import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
 import pt.ist.meic.phylodb.analysis.visualization.model.VisualizationAlgorithm;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -27,22 +28,28 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 		String key1 = "6f809af7-2c99-43f7-b674-4843c77384c7", key2 = "7f809af7-2c99-43f7-b674-4843c77384c7";
 		Coordinate coordinate1 = new Coordinate(PROFILE1.getPrimaryKey(), 44, 44);
 		Coordinate coordinate2 = new Coordinate(PROFILE2.getPrimaryKey(), 55, 55);
-		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
-				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
-				third = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  key2, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
-				fourth = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  "8f809af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
-		return Stream.of(Arguments.of(0, new Visualization[0], new Visualization[0]),
-				Arguments.of(0, new Visualization[]{STATE[0]}, new Visualization[]{STATE[0]}),
-				Arguments.of(0, new Visualization[]{STATE[0], STATE[1], first}, STATE),
-				Arguments.of(1, new Visualization[0], new Visualization[0]),
-				Arguments.of(1, new Visualization[]{STATE[0]}, new Visualization[0]),
-				Arguments.of(1, new Visualization[]{STATE[0], STATE[1], first}, new Visualization[]{first}),
-				Arguments.of(1, new Visualization[]{STATE[0], STATE[1], first, second}, new Visualization[]{first, second}),
-				Arguments.of(2, new Visualization[0], new Visualization[0]),
-				Arguments.of(2, new Visualization[]{STATE[0]}, new Visualization[0]),
-				Arguments.of(2, new Visualization[]{STATE[0], STATE[1], first, second, third}, new Visualization[]{third}),
-				Arguments.of(2, new Visualization[]{STATE[0], STATE[1], first, second, third, fourth}, new Visualization[]{third, fourth}),
-				Arguments.of(-1, new Visualization[0], new Visualization[0]));
+		Visualization firstE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
+				secondE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
+				thirdE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  key2, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
+				fourthE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  "8f809af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
+		Entity<Visualization.PrimaryKey> first = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1), false),
+				second = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7"), false),
+				third = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key2), false),
+				fourth = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "8f809af7-2c99-43f7-b674-4843c77384c7"), false),
+				state0 = new Entity<>(STATE[0].getPrimaryKey(), STATE[0].isDeprecated()),
+				state1 = new Entity<>(STATE[1].getPrimaryKey(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Visualization[0], Collections.emptyList()),
+				Arguments.of(0, new Visualization[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Visualization[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(1, new Visualization[0], Collections.emptyList()),
+				Arguments.of(1, new Visualization[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Visualization[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Visualization[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(2, new Visualization[0], Collections.emptyList()),
+				Arguments.of(2, new Visualization[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Visualization[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Visualization[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(-1, new Visualization[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -150,17 +157,20 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, Visualization[] state, Visualization[] expected) {
+	public void findAll(int page, Visualization[] state, List<Entity<Visualization.PrimaryKey>> expected) {
 		store(state);
-		Optional<List<Visualization>> result = visualizationRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId());
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<Entity<Visualization.PrimaryKey>>> result = visualizationRepository.findAllEntities(page, LIMIT, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId());
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<Visualization> projects = result.get();
-		assertEquals(expected.length, projects.size());
-		assertArrayEquals(expected, projects.toArray());
+		List<Entity<Visualization.PrimaryKey>> visualizations = result.get();
+		assertEquals(expected.size(), visualizations.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), visualizations.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).isDeprecated(), visualizations.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest

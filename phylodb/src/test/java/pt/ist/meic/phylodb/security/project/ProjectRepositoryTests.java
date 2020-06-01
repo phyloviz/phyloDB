@@ -10,6 +10,7 @@ import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -24,34 +25,44 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> findAll_params() {
 		String key1 = "4f809af7-2c99-43f7-b674-4843c77384c7", key2 = "5f809af7-2c99-43f7-b674-4843c77384c7", key3 = "8f809af7-2c99-43f7-b674-4843c77384c7";
-		Project first = new Project(key1, 1, false, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				firstChanged = new Project(key1, 2, false, "name2", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				second = new Project(key2, 1, false, "name3", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				secondChanged = new Project(key2, 2, false, "name4", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				third = new Project("6f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name5", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fourth = new Project("7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fifth = new Project(key3, 1, false, "name7", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
-				fifthChanged = new Project(key3, 2, false, "name77", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
-				sixth = new Project("9f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name8", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
-		return Stream.of(Arguments.of(0, new Project[0], new Project[0]),
-				Arguments.of(0, new Project[]{STATE[0]}, new Project[]{STATE[0]}),
-				Arguments.of(0, new Project[]{first, firstChanged}, new Project[]{firstChanged}),
-				Arguments.of(0, new Project[]{STATE[0], STATE[1], STATE[2], first}, new Project[]{STATE[0], STATE[2], first}),
-				Arguments.of(0, new Project[]{STATE[0], STATE[1], STATE[2], first, firstChanged}, new Project[]{STATE[0], STATE[2], firstChanged}),
-				Arguments.of(1, new Project[0], new Project[0]),
-				Arguments.of(1, new Project[]{STATE[0]}, new Project[0]),
-				Arguments.of(1, new Project[]{first, firstChanged}, new Project[0]),
-				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], first, second}, new Project[]{second}),
-				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], first, firstChanged, second, third}, new Project[]{second, third}),
-				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], first, firstChanged, second, secondChanged, third}, new Project[]{secondChanged, third}),
-				Arguments.of(2, new Project[0], new Project[0]),
-				Arguments.of(2, new Project[]{STATE[0]}, new Project[0]),
-				Arguments.of(2, new Project[]{first, firstChanged}, new Project[0]),
-				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth}, new Project[]{fifth}),
-				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth, fifthChanged}, new Project[]{fifthChanged}),
-				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth, sixth}, new Project[]{fifth, sixth}),
-				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], first, second, third, fourth, fifth, fifthChanged, sixth}, new Project[]{fifthChanged, sixth}),
-				Arguments.of(-1, new Project[0], new Project[0]));
+		Project firstE = new Project(key1, 1, false, "name", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				firstChangedE = new Project(key1, 2, false, "name2", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				secondE = new Project(key2, 1, false, "name3", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				secondChangedE = new Project(key2, 2, false, "name4", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				thirdE = new Project("6f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name5", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fourthE = new Project("7f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name6", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fifthE = new Project(key3, 1, false, "name7", Visibility.PUBLIC, null, new User.PrimaryKey[]{USER2.getPrimaryKey()}),
+				fifthChangedE = new Project(key3, 2, false, "name77", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()}),
+				sixthE = new Project("9f809af7-2c99-43f7-b674-4843c77384c7", 1, false, "name8", Visibility.PRIVATE, null, new User.PrimaryKey[]{USER1.getPrimaryKey()});
+		VersionedEntity<String> first = new VersionedEntity<>(key1, 1, false),
+				firstChanged =  new VersionedEntity<>(key1, 2, false),
+				second = new VersionedEntity<>(key2, 1, false),
+				secondChanged = new VersionedEntity<>(key2, 2, false),
+				third = new VersionedEntity<>("6f809af7-2c99-43f7-b674-4843c77384c7", 1, false),
+				fifth = new VersionedEntity<>(key3, 1, false),
+				fifthChanged = new VersionedEntity<>(key3, 2, false),
+				sixth = new VersionedEntity<>("9f809af7-2c99-43f7-b674-4843c77384c7", 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state2 = new VersionedEntity<>(STATE[2].getPrimaryKey(), STATE[2].getVersion(), STATE[2].isDeprecated());
+		return Stream.of(Arguments.of(0, new Project[0], Collections.emptyList()),
+				Arguments.of(0, new Project[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Project[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Project[]{STATE[0], STATE[1], STATE[2], firstE}, Arrays.asList(state0, state2, first)),
+				Arguments.of(0, new Project[]{STATE[0], STATE[1], STATE[2], firstE, firstChangedE}, Arrays.asList(state0, state2, firstChanged)),
+				Arguments.of(1, new Project[0], Collections.emptyList()),
+				Arguments.of(1, new Project[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Project[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], firstE, secondE}, Collections.singletonList(second)),
+				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], firstE, firstChangedE, secondE, thirdE}, Arrays.asList(second, third)),
+				Arguments.of(1, new Project[]{STATE[0], STATE[1], STATE[2], firstE, firstChangedE, secondE, secondChangedE, thirdE}, Arrays.asList(secondChanged, third)),
+				Arguments.of(2, new Project[0], Collections.emptyList()),
+				Arguments.of(2, new Project[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Project[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], firstE, secondE, thirdE, fourthE, fifthE}, Collections.singletonList(fifth)),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], firstE, secondE, thirdE, fourthE, fifthE, fifthChangedE}, Collections.singletonList(fifthChanged)),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], firstE, secondE, thirdE, fourthE, fifthE, sixthE}, Arrays.asList(fifth, sixth)),
+				Arguments.of(2, new Project[]{STATE[0], STATE[1], STATE[2], firstE, secondE, thirdE, fourthE, fifthE, fifthChangedE, sixthE}, Arrays.asList(fifthChanged, sixth)),
+				Arguments.of(-1, new Project[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -159,17 +170,21 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, Project[] state, Project[] expected) {
+	public void findAll(int page, Project[] state, List<VersionedEntity<String>> expected) {
 		store(state);
-		Optional<List<Project>> result = projectRepository.findAllEntities(page, 3, USER1.getPrimaryKey());
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<VersionedEntity<String>>> result = projectRepository.findAllEntities(page, 3, USER1.getPrimaryKey());
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<Project> projects = result.get();
-		assertEquals(expected.length, projects.size());
-		assertArrayEquals(expected, projects.toArray());
+		List<VersionedEntity<String>> projects = result.get();
+		assertEquals(expected.size(), projects.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), projects.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), projects.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), projects.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest

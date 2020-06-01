@@ -29,6 +29,7 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.profile.model.ProfileInputModel;
 import pt.ist.meic.phylodb.typing.profile.model.ProfileOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,9 +46,9 @@ public class ProfileControllerTests extends ControllerTestsContext {
 
 	private static Stream<Arguments> getProfilesList_params() {
 		String uri = "/projects/%s/datasets/%s/profiles";
-		Profile profile1 = new Profile(PROJECTID, DATASETID, "1", "aka", new String[]{"1", "2", "3"});
-		Profile profile2 = new Profile(PROJECTID, DATASETID, "2", "aka", new String[]{null, "2", null});
-		List<Profile> profiles = new ArrayList<Profile>() {{
+		VersionedEntity<Profile.PrimaryKey> profile1 = new VersionedEntity<>(new Profile.PrimaryKey(PROJECTID, DATASETID, "1"), 1, false),
+				profile2 = new VersionedEntity<>(new Profile.PrimaryKey(PROJECTID, DATASETID, "2"), 1, false);
+		List<VersionedEntity<Profile.PrimaryKey>> profiles = new ArrayList<VersionedEntity<Profile.PrimaryKey>>() {{
 			add(profile1);
 			add(profile2);
 		}};
@@ -63,8 +64,8 @@ public class ProfileControllerTests extends ControllerTestsContext {
 				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, null, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
-	private static Stream<Arguments> getProfilesString_params() {
-		String uri = "/projects/%s/datasets/%s/profiles";
+	private static Stream<Arguments> getProfilesFile_params() {
+		String uri = "/projects/%s/datasets/%s/profiles/files";
 		Schema schema1 = new Schema("taxon", "id", Method.MLST, "description", new String[]{"a", "b", "c"});
 		Schema schema2 = new Schema("taxon", "id", Method.SNP, "description", new String[]{"a", "b", "c"});
 		Profile profile1 = new Profile(PROJECTID, DATASETID, "1", "aka", new String[]{"1", "2", "3"});
@@ -182,10 +183,8 @@ public class ProfileControllerTests extends ControllerTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("getProfilesList_params")
-	public void getProfilesList(MockHttpServletRequestBuilder req, List<Profile> profiles, HttpStatus expectedStatus, List<ProfileOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Schema schema = new Schema("taxon", "schema", Method.MLVA, null, new String[]{"1", "2"});
-		Pair<Schema, List<Profile>> pair = profiles == null ? null : new Pair<>(schema, profiles);
-		Mockito.when(profileService.getProfilesEntities(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
+	public void getProfilesList(MockHttpServletRequestBuilder req, List<VersionedEntity<Profile.PrimaryKey>> profiles, HttpStatus expectedStatus, List<ProfileOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+		Mockito.when(profileService.getProfilesEntities(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(profiles));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
@@ -203,10 +202,10 @@ public class ProfileControllerTests extends ControllerTestsContext {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getProfilesString_params")
-	public void getProfilesString(MockHttpServletRequestBuilder req, Schema schema, List<Profile> profiles, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
+	@MethodSource("getProfilesFile_params")
+	public void getProfilesFile(MockHttpServletRequestBuilder req, Schema schema, List<Profile> profiles, HttpStatus expectedStatus, FileOutputModel expectedResult, ErrorOutputModel expectedError) throws Exception {
 		Pair<Schema, List<Profile>> pair = profiles == null ? null : new Pair<>(schema, profiles);
-		Mockito.when(profileService.getProfilesEntities(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
+		Mockito.when(profileService.getProfiles(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(pair));
 		MockHttpServletResponse result = http.executeRequest(req, MediaType.TEXT_PLAIN);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful())

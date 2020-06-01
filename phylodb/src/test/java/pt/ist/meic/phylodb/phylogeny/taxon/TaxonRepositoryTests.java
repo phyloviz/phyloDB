@@ -7,10 +7,9 @@ import org.neo4j.ogm.model.Result;
 import pt.ist.meic.phylodb.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -23,33 +22,41 @@ public class TaxonRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> findAll_params() {
 		String id1 = "3test", id3 = "5test";
-		Taxon first = new Taxon(id1, 1, false, "description"),
-				firstChanged = new Taxon(id1, 2, false, "description2"),
-				second = new Taxon("4test", 1, false, null),
-				third = new Taxon(id3, 1, false, "description3"),
-				thirdChanged = new Taxon(id3, 2, false, null),
-				fourth = new Taxon("6test", 1, false, null);
-		return Stream.of(Arguments.of(0, new Taxon[0], new Taxon[0]),
-				Arguments.of(0, new Taxon[]{STATE[0]}, new Taxon[]{STATE[0]}),
-				Arguments.of(0, new Taxon[]{first, firstChanged}, new Taxon[]{firstChanged}),
-				Arguments.of(0, new Taxon[]{STATE[0], STATE[1], first}, STATE),
-				Arguments.of(0, new Taxon[]{STATE[0], STATE[1], first, firstChanged}, STATE),
-				Arguments.of(1, new Taxon[0], new Taxon[0]),
-				Arguments.of(1, new Taxon[]{STATE[0]}, new Taxon[0]),
-				Arguments.of(1, new Taxon[]{first, firstChanged}, new Taxon[0]),
-				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first}, new Taxon[]{first}),
-				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, firstChanged}, new Taxon[]{firstChanged}),
-				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, second}, new Taxon[]{first, second}),
-				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, firstChanged, second}, new Taxon[]{firstChanged, second}),
-				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], first, firstChanged}, new Taxon[]{firstChanged}),
-				Arguments.of(2, new Taxon[0], new Taxon[0]),
-				Arguments.of(2, new Taxon[]{STATE[0]}, new Taxon[0]),
-				Arguments.of(2, new Taxon[]{first, firstChanged}, new Taxon[0]),
-				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third}, new Taxon[]{third}),
-				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third, thirdChanged}, new Taxon[]{thirdChanged}),
-				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third, fourth}, new Taxon[]{third, fourth}),
-				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], first, second, third, thirdChanged, fourth}, new Taxon[]{thirdChanged, fourth}),
-				Arguments.of(-1, new Taxon[0], new Taxon[0]));
+		Taxon firstE = new Taxon(id1, 1, false, "teste"),
+				firstChangedE = new Taxon(id1, 2, false, "teste1"),
+				secondE = new Taxon("4test", 1, false, "teste"),
+				thirdE = new Taxon(id3, 1, false, "teste2"),
+				thirdChangedE = new Taxon(id3, 2, false, "teste"),
+				fourthE = new Taxon("6test", 1, false, "teste3");
+		VersionedEntity<String> first = new VersionedEntity<>(id1, 1, false),
+				firstChanged = new VersionedEntity<>(id1, 2, false),
+				second = new VersionedEntity<>("4test", 1, false),
+				third = new VersionedEntity<>(id3, 1, false),
+				thirdChanged = new VersionedEntity<>(id3, 2, false),
+				fourth = new VersionedEntity<>("6test", 1, false),
+				state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
+				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
+		return Stream.of(Arguments.of(0, new Taxon[0], Collections.emptyList()),
+				Arguments.of(0, new Taxon[]{STATE[0]}, Collections.singletonList(state0)),
+				Arguments.of(0, new Taxon[]{firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(0, new Taxon[]{STATE[0], STATE[1], firstE}, Arrays.asList(state0, state1)),
+				Arguments.of(0, new Taxon[]{STATE[0], STATE[1], firstE, firstChangedE},  Arrays.asList(state0, state1)),
+				Arguments.of(1, new Taxon[0], Collections.emptyList()),
+				Arguments.of(1, new Taxon[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(1, new Taxon[]{firstE, firstChangedE},Collections.emptyList()),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], firstE}, Collections.singletonList(first)),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], firstE, secondE}, Arrays.asList(first, second)),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], firstE, firstChangedE, secondE}, Arrays.asList(firstChanged, second)),
+				Arguments.of(1, new Taxon[]{STATE[0], STATE[1], firstE, firstChangedE}, Collections.singletonList(firstChanged)),
+				Arguments.of(2, new Taxon[0], Collections.emptyList()),
+				Arguments.of(2, new Taxon[]{STATE[0]}, Collections.emptyList()),
+				Arguments.of(2, new Taxon[]{firstE, firstChangedE}, Collections.emptyList()),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], firstE, secondE, thirdE}, Collections.singletonList(third)),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE}, Collections.singletonList(thirdChanged)),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], firstE, secondE, thirdE, fourthE}, Arrays.asList(third, fourth)),
+				Arguments.of(2, new Taxon[]{STATE[0], STATE[1], firstE, secondE, thirdE, thirdChangedE, fourthE}, Arrays.asList(thirdChanged, fourth)),
+				Arguments.of(-1, new Taxon[0], Collections.emptyList()));
 	}
 
 	private static Stream<Arguments> find_params() {
@@ -134,17 +141,21 @@ public class TaxonRepositoryTests extends RepositoryTestsContext {
 
 	@ParameterizedTest
 	@MethodSource("findAll_params")
-	public void findAll(int page, Taxon[] state, Taxon[] expected) {
+	public void findAll(int page, Taxon[] state, List<VersionedEntity<String>> expected) {
 		store(state);
-		Optional<List<Taxon>> result = taxonRepository.findAllEntities(page, LIMIT);
-		if (expected.length == 0 && !result.isPresent()) {
+		Optional<List<VersionedEntity<String>>> result = taxonRepository.findAllEntities(page, LIMIT);
+		if (expected.size() == 0 && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<Taxon> users = result.get();
-		assertEquals(expected.length, users.size());
-		assertArrayEquals(expected, users.toArray());
+		List<VersionedEntity<String>> taxons = result.get();
+		assertEquals(expected.size(), taxons.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getPrimaryKey(), taxons.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), taxons.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), taxons.get(i).isDeprecated());
+		}
 	}
 
 	@ParameterizedTest
