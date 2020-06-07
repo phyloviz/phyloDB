@@ -9,7 +9,7 @@ import java.util.stream.StreamSupport;
 
 public abstract class Repository<T, R> {
 
-	public GraphDatabaseService database;
+	protected GraphDatabaseService database;
 
 	public Repository(GraphDatabaseService database) {
 		this.database = database;

@@ -67,19 +67,19 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 			properties.put(Distance.DEPRECATED, false);
 			createRelationship(from, to, Relation.DISTANCES, properties);
 		}
-
 	}
 
 	private List<Edge> direct(List<Edge> edges) {
 		List<Edge> directed = new ArrayList<>();
-		Integer[] roots = edges.stream()
-				.map(Edge::from)
-				.filter(i -> edges.stream().noneMatch(edge -> edge.to() == i))
-				.distinct()
-				.toArray(Integer[]::new);
 		List<Edge> toDirect = new ArrayList<>(edges);
-		for (Integer root : roots)
+		while(!toDirect.isEmpty()) {
+			Integer root = toDirect.stream()
+					.map(Edge::from)
+					.filter(i -> edges.stream().noneMatch(edge -> edge.to() == i))
+					.findFirst()
+					.orElseThrow(RuntimeException::new);
 			directed.addAll(directEdges(toDirect, root));
+		}
 		return directed;
 	}
 
@@ -95,5 +95,4 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 		}
 		return directed;
 	}
-
 }
