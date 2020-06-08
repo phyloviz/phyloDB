@@ -2,8 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/Repository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/Repository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/Radial.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/Radial.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/VisualizationAlgorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/VisualizationAlgorithm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Coordinate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Tree.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Vertex.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Vertex.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/GoeBURSTTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/implementation/GoeBURSTTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/inference/GoeBURSTTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/repository/InferenceRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/inference/InferenceRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/repository/RepositoryTests.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

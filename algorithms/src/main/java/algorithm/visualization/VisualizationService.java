@@ -1,11 +1,8 @@
 package algorithm.visualization;
 
 import algorithm.Service;
-import algorithm.inference.implementation.GoeBURST;
-import algorithm.inference.model.Inference;
-import algorithm.inference.model.Matrix;
 import algorithm.visualization.implementation.Radial;
-import algorithm.visualization.model.Tree;
+import algorithm.visualization.model.Vertex;
 import algorithm.visualization.model.Visualization;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -22,7 +19,7 @@ public class VisualizationService extends Service {
 		Radial algorithm = new Radial();
 		try (Transaction tx = database.beginTx()) {
 			//long startTime = System.nanoTime();
-			Tree tree = repository.read(project, dataset, inference);
+			Vertex tree = repository.read(project, dataset, inference);
 			//logTime(startTime, "Read");
 			algorithm.init(project, dataset, inference, id);
 			//startTime = System.currentTimeMillis();

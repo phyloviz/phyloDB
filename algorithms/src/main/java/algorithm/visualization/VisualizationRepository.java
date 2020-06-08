@@ -2,7 +2,6 @@ package algorithm.visualization;
 
 import algorithm.repository.Repository;
 import algorithm.repository.type.*;
-import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Vertex;
 import algorithm.visualization.model.Visualization;
 import org.neo4j.graphdb.*;
@@ -12,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class VisualizationRepository extends Repository<Visualization, Tree> {
+public class VisualizationRepository extends Repository<Visualization, Vertex> {
 
 	public VisualizationRepository(GraphDatabaseService database) {
 		super(database);
 	}
 
 	@Override
-	public Tree read(String... params) {
+	public Vertex read(String... params) {
 		String projectId = params[0], datasetId = params[1], inferenceId = params[2];
 		Node project = node(Project.LABEL, projectId);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
@@ -30,11 +29,11 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 		Node[] roots = distances.stream()
 				.map(Relationship::getStartNode)
 				.filter(r -> distances.stream().noneMatch(r2 -> r2.getEndNode().equals(r)))
+				.distinct()
 				.toArray(Node[]::new);
-		Vertex[] treeRoots = new Vertex[roots.length];
-		for (int i = 0; i < roots.length; i++)
-			treeRoots[i] = tree(roots[i], 0);
-		return new Tree(treeRoots);
+		if(roots.length > 1)
+			throw new RuntimeException();
+		return tree(roots[0], 0);
 	}
 
 	@Override
@@ -59,9 +58,9 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 		}
 	}
 
-	private Vertex tree(Node current, int distance) {
+	private Vertex tree(Node current, long distance) {
 		Vertex[] children = relationships(current, Relation.DISTANCES, Direction.OUTGOING)
-				.map(r -> tree(r.getEndNode(), (Integer) r.getProperty(Distance.ID)))
+				.map(r -> tree(r.getEndNode(), (long) r.getProperty(Distance.DISTANCE)))
 				.toArray(Vertex[]::new);
 		return new Vertex((String) current.getProperty(Profile.ID), distance, children);
 	}

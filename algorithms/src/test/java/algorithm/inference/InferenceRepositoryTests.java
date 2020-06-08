@@ -1,4 +1,4 @@
-package algorithm.repository;
+package algorithm.inference;
 
 import algorithm.inference.InferenceProcedures;
 import algorithm.inference.InferenceRepository;
@@ -6,6 +6,7 @@ import algorithm.inference.implementation.GoeBURST;
 import algorithm.inference.model.Edge;
 import algorithm.inference.model.Inference;
 import algorithm.inference.model.Matrix;
+import algorithm.repository.RepositoryTests;
 import algorithm.repository.type.Distance;
 import algorithm.repository.type.Profile;
 import algorithm.repository.type.Relation;

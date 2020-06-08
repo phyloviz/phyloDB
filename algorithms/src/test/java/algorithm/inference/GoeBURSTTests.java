@@ -1,4 +1,4 @@
-package algorithm.implementation;
+package algorithm.inference;
 
 import algorithm.inference.implementation.GoeBURST;
 import algorithm.inference.model.Edge;
