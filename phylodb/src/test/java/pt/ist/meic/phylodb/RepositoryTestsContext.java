@@ -62,6 +62,7 @@ public abstract class RepositoryTestsContext extends TestContext {
 	}
 
 	protected void execute(Query query) {
+		System.out.println("\nQuery: " + query.getExpression() + "\nParameters: " + query.getParameters().toString());
 		session.query(query.getExpression(), query.getParameters());
 		session.clear();
 	}

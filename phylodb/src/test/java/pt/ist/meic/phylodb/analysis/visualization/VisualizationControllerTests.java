@@ -60,7 +60,7 @@ public class VisualizationControllerTests extends ControllerTestsContext {
 			add(COORDINATE12);
 		}};
 		Visualization.PrimaryKey key1 = VISUALIZATION1.getPrimaryKey();
-		Visualization visualization = new Visualization(PROJECTID, DATASETID, INFERENCEID, key1.getId(), false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, coordinates);
+		Visualization visualization = new Visualization(PROJECTID, DATASETID, INFERENCEID, key1.getId(), false, VisualizationAlgorithm.RADIAL, coordinates);
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, PROJECTID, DATASETID, INFERENCEID, key1.getId()));
 		return Stream.of(Arguments.of(req1, visualization, HttpStatus.OK, new GetVisualizationOutputModel(visualization)),
 				Arguments.of(req1, null, HttpStatus.NOT_FOUND, new ErrorOutputModel(Problem.NOT_FOUND.getMessage())));

@@ -1,12 +1,13 @@
 package pt.ist.meic.phylodb.job.model;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Job {
 
 	private PrimaryKey id;
 	private String algorithm;
-	private String[] params;
+	private Object[] params;
 	private String analysisId;
 	private boolean completed;
 	private boolean cancelled;
@@ -17,7 +18,7 @@ public class Job {
 		this.cancelled = cancelled;
 	}
 
-	public Job(String projectId, String jobId, String algorithm, String analysisId, String[] params) {
+	public Job(String projectId, String jobId, String algorithm, String analysisId, Object[] params) {
 		this.id = new PrimaryKey(projectId, jobId);
 		this.algorithm = algorithm;
 		this.analysisId = analysisId;
@@ -32,7 +33,7 @@ public class Job {
 		return algorithm;
 	}
 
-	public String[] getParams() {
+	public Object[] getParams() {
 		return params;
 	}
 
@@ -48,6 +49,16 @@ public class Job {
 		return cancelled;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Job job = (Job) o;
+		return Objects.equals(id, job.id) &&
+				Objects.equals(algorithm, job.algorithm) &&
+				Arrays.equals(params, job.params) &&
+				Objects.equals(analysisId, job.analysisId);
+	}
 
 	public static class PrimaryKey {
 

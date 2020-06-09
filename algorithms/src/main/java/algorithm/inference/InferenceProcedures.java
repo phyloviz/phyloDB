@@ -15,7 +15,7 @@ public class InferenceProcedures {
 	public Log log;
 
 	@Procedure(value = "algorithms.inference.goeburst", mode = Mode.WRITE)
-	public void goeBURST(@Name("project") String project, @Name("dataset") String dataset, @Name("inference") String analysis, @Name("lvs") long lvs) {
+	public void goeBURST(@Name("project") String project, @Name("dataset") String dataset, @Name("lvs") long lvs, @Name("inference") String analysis) {
 		InferenceService service = new InferenceService(database, log);
 		service.goeBURST(project, dataset, analysis, lvs);
 	}

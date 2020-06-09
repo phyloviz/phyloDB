@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.job;
 
-import org.apache.logging.log4j.util.Strings;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
@@ -14,8 +13,8 @@ import java.util.stream.StreamSupport;
 @Repository
 public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 
-	private static final String FULLY_QUALIFIED = "algorithms.%s";
-	private static final int UUID_LENGTH = UUID.randomUUID().toString().length();
+	public static final String FULLY_QUALIFIED = "algorithms.%s";
+	public static final int UUID_LENGTH = UUID.randomUUID().toString().length();
 
 	protected JobRepository(Session session) {
 		super(session);
@@ -71,14 +70,18 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 		String statement = "CALL apoc.periodic.list() YIELD name, done, cancelled\n" +
 				"WHERE name = $\n" +
 				"RETURN COALESCE(name is not null, false)";
-		return query(Boolean.class, new Query(statement, name(key.getProjectId(), key.getId())));
+		Boolean result = query(Boolean.class, new Query(statement, name(key.getProjectId(), key.getId())));
+		return result == null ? false : result;
 	}
 
 	private void store(Job job) {
 		Job.PrimaryKey key = job.getPrimaryKey();
 		String jobName = name(key.getProjectId(), key.getId());
-		String params = Strings.join(Arrays.asList(job.getParams()), ',') + "," + job.getAnalysisId();
-		String statement = "CALL apoc.periodic.submit(\"$\", \"CALL $.($)\")";
+		String params = Arrays.stream(job.getParams())
+				.map(s -> s.getClass().equals(String.class) ? "'" + s + "'" : String.valueOf(s))
+				.collect(Collectors.joining(","));
+		params = "'" + key.getProjectId() + "'," + params + ",'" + job.getAnalysisId() + "'";
+		String statement = "CALL apoc.periodic.submit($, 'CALL ' + $ + '(' + $ + ')') YIELD name, delay, rate, done, cancelled RETURN 0";
 		execute(new Query(statement, jobName, String.format(FULLY_QUALIFIED, job.getAlgorithm()), params));
 	}
 

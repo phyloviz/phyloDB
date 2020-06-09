@@ -6,9 +6,9 @@ public class JobRequest {
 
 	private final Analysis type;
 	private final String algorithm;
-	private final String[] parameters;
+	private final Object[] parameters;
 
-	public JobRequest(Analysis type, String algorithm, String[] parameters) {
+	public JobRequest(Analysis type, String algorithm, Object[] parameters) {
 		this.type = type;
 		this.algorithm = algorithm;
 		this.parameters = parameters;
@@ -22,7 +22,7 @@ public class JobRequest {
 		return algorithm;
 	}
 
-	public String[] getParameters() {
+	public Object[] getParameters() {
 		return parameters;
 	}
 

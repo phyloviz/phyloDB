@@ -2,12 +2,14 @@ package pt.ist.meic.phylodb;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import pt.ist.meic.phylodb.analysis.Analysis;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
 import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.analysis.visualization.model.Coordinate;
 import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
 import pt.ist.meic.phylodb.analysis.visualization.model.VisualizationAlgorithm;
+import pt.ist.meic.phylodb.job.model.Job;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
@@ -24,6 +26,7 @@ import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -71,8 +74,10 @@ public abstract class TestContext {
 	protected static final Coordinate COORDINATE21 = new Coordinate(PROFILE1.getPrimaryKey(), 21, 21);
 	protected static final Coordinate COORDINATE22 = new Coordinate(PROFILE2.getPrimaryKey(), 22, 22);
 	protected static final Coordinate COORDINATE23 = new Coordinate(PROFILE3.getPrimaryKey(), 23, 23);
-	protected static final Visualization VISUALIZATION1 = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "2023b71c-704f-425e-8dcf-b26fc84300e7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
-	protected static final Visualization VISUALIZATION2 = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "3023b71c-704f-425e-8dcf-b26fc84300e7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
+	protected static final Visualization VISUALIZATION1 = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "2023b71c-704f-425e-8dcf-b26fc84300e7", false, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
+	protected static final Visualization VISUALIZATION2 = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "3023b71c-704f-425e-8dcf-b26fc84300e7", false, VisualizationAlgorithm.RADIAL,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
+	protected static final Job JOB1 = new Job(PROJECT1.getPrimaryKey(), "j1", Analysis.INFERENCE.getName() + "." + InferenceAlgorithm.GOEBURST.getName(), UUID.randomUUID().toString(), new Object[]{DATASET1.getPrimaryKey().getId(), 3});
+	protected static final Job JOB2 = new Job(PROJECT1.getPrimaryKey(), "j2", Analysis.VISUALIZATION.getName() + "." + VisualizationAlgorithm.RADIAL.getName(), UUID.randomUUID().toString(), new Object[]{DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId()});
 
 	protected static Isolate isolate(String id, long version, boolean deprecated, String description, Ancillary[] ancillary, Profile profile) {
 		VersionedEntity<Profile.PrimaryKey> reference = null;

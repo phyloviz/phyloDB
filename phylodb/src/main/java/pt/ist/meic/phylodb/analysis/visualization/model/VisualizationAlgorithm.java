@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public enum VisualizationAlgorithm {
 
-	FORCE_DIRECTED_LAYOUT;
+	RADIAL;
 
 	public static boolean exists(String name) {
 		return Arrays.stream(VisualizationAlgorithm.values())

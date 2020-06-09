@@ -28,10 +28,10 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 		String key1 = "6f809af7-2c99-43f7-b674-4843c77384c7", key2 = "7f809af7-2c99-43f7-b674-4843c77384c7";
 		Coordinate coordinate1 = new Coordinate(PROFILE1.getPrimaryKey(), 44, 44);
 		Coordinate coordinate2 = new Coordinate(PROFILE2.getPrimaryKey(), 55, 55);
-		Visualization firstE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
-				secondE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
-				thirdE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  key2, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(coordinate1, coordinate2)),
-				fourthE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  "8f809af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
+		Visualization firstE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1, false, VisualizationAlgorithm.RADIAL, Arrays.asList(coordinate1, coordinate2)),
+				secondE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
+				thirdE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  key2, false, VisualizationAlgorithm.RADIAL, Arrays.asList(coordinate1, coordinate2)),
+				fourthE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  "8f809af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.RADIAL,  Arrays.asList(COORDINATE21, COORDINATE22, COORDINATE23));
 		Entity<Visualization.PrimaryKey> first = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1), false),
 				second = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7"), false),
 				third = new Entity<>(new Visualization.PrimaryKey(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key2), false),
@@ -54,7 +54,7 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> find_params() {
 		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
-		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
+		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
 		return Stream.of(Arguments.of(first.getPrimaryKey(), new Visualization[0], null),
 				Arguments.of(first.getPrimaryKey(), new Visualization[]{first}, first),
 				Arguments.of(null, new Visualization[0], null));
@@ -62,8 +62,8 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> exists_params() {
 		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
-		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
-				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, true, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
+		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
+				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, true, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
 		return Stream.of(Arguments.of(first.getPrimaryKey(), new Visualization[0], false),
 				Arguments.of(first.getPrimaryKey(), new Visualization[]{first}, true),
 				Arguments.of(second.getPrimaryKey(), new Visualization[]{second}, false),
@@ -72,8 +72,8 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> remove_params() {
 		String key = "6f809af7-2c99-43f7-b674-4843c77384c7";
-		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
-				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, true, VisualizationAlgorithm.FORCE_DIRECTED_LAYOUT, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
+		Visualization first = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, false, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
+				second = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key, true, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13));
 		return Stream.of(Arguments.of(first.getPrimaryKey(), new Visualization[0], new Visualization[]{STATE[0], STATE[1]}, false),
 				Arguments.of(second.getPrimaryKey(), new Visualization[]{first}, new Visualization[]{STATE[0], STATE[1], second}, true),
 				Arguments.of(null, new Visualization[0], new Visualization[]{STATE[0], STATE[1]}, false));

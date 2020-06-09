@@ -11,21 +11,44 @@ import java.util.Optional;
 
 public class JobInputModel implements InputModel<JobRequest> {
 
-	public static final int INFERENCE_PARAMETERS_COUNT = 1, VISUALIZATION_PARAMETERS_COUNT = 2;
+	public static final int INFERENCE_PARAMETERS_COUNT = 2, VISUALIZATION_PARAMETERS_COUNT = 2;
 
 	private String analysis;
 	private String algorithm;
-	private String[] parameters;
+	private Object[] parameters;
+
+	public JobInputModel() {
+	}
+
+	public JobInputModel(String analysis, String algorithm, Object[] parameters) {
+		this.analysis = analysis;
+		this.algorithm = algorithm;
+		this.parameters = parameters;
+	}
+
+	public String getAnalysis() {
+		return analysis;
+	}
+
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	public Object[] getParameters() {
+		return parameters;
+	}
 
 	@Override
 	public Optional<JobRequest> toDomainEntity(String... params) {
+		if(!Analysis.exists(analysis))
+			return Optional.empty();
 		JobRequest request;
-		return Analysis.exists(analysis) && (request = parseJobRequest(Analysis.valueOf(analysis), algorithm, parameters)) != null ?
+		return (request = parseJobRequest(Analysis.valueOf(analysis.toUpperCase()), algorithm, parameters)) != null ?
 				Optional.of(request) :
 				Optional.empty();
 	}
 
-	private JobRequest parseJobRequest(Analysis analysis, String algorithm, String[] parameters) {
+	private JobRequest parseJobRequest(Analysis analysis, String algorithm, Object[] parameters) {
 		if(analysis == Analysis.INFERENCE)
 			return parseInferenceJobRequest(algorithm, parameters);
 		else if(analysis == Analysis.VISUALIZATION)
@@ -33,14 +56,14 @@ public class JobInputModel implements InputModel<JobRequest> {
 		return null;
 	}
 
-	private JobRequest parseInferenceJobRequest(String algorithm, String[] parameters) {
-		if(!InferenceAlgorithm.exists(algorithm) || parameters.length != INFERENCE_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
+	private JobRequest parseInferenceJobRequest(String algorithm, Object[] parameters) {
+		if(!InferenceAlgorithm.exists(algorithm) || parameters == null || parameters.length != INFERENCE_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
 			return null;
 		return new JobRequest(Analysis.INFERENCE, algorithm, parameters);
 	}
 
-	private JobRequest parseVisualizationJobRequest(String algorithm, String[] parameters) {
-		if(!VisualizationAlgorithm.exists(algorithm) || parameters.length != VISUALIZATION_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
+	private JobRequest parseVisualizationJobRequest(String algorithm, Object[] parameters) {
+		if(!VisualizationAlgorithm.exists(algorithm) || parameters == null || parameters.length != VISUALIZATION_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
 			return null;
 		return new JobRequest(Analysis.VISUALIZATION, algorithm, parameters);
 	}
