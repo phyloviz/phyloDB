@@ -9,9 +9,9 @@ public class Edge {
 
 	private final VersionedEntity<Profile.PrimaryKey> from;
 	private final VersionedEntity<Profile.PrimaryKey> to;
-	private final int weight;
+	private final long weight;
 
-	public Edge(VersionedEntity<Profile.PrimaryKey> from, VersionedEntity<Profile.PrimaryKey> to, int weight) {
+	public Edge(VersionedEntity<Profile.PrimaryKey> from, VersionedEntity<Profile.PrimaryKey> to, long weight) {
 		this.from = from;
 		this.to = to;
 		this.weight = weight;
@@ -25,7 +25,7 @@ public class Edge {
 		return to;
 	}
 
-	public int getWeight() {
+	public long getWeight() {
 		return weight;
 	}
 

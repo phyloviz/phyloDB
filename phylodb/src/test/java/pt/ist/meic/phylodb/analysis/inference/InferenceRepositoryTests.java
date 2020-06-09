@@ -112,7 +112,7 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 							.map(e -> new Object() {
 								public final String from = e.getFrom().getPrimaryKey().getId();
 								public final String to = e.getTo().getPrimaryKey().getId();
-								public final int distance = e.getWeight();
+								public final long distance = e.getWeight();
 							})
 			);
 			execute(query);

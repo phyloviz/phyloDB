@@ -7,13 +7,13 @@ import java.util.Objects;
 public class Coordinate {
 
 	private Profile.PrimaryKey profile;
-	private int x;
-	private int y;
+	private double x;
+	private double y;
 
 	public Coordinate() {
 	}
 
-	public Coordinate(Profile.PrimaryKey profileId, int x, int y) {
+	public Coordinate(Profile.PrimaryKey profileId, double x, double y) {
 		this.profile = profileId;
 		this.x = x;
 		this.y = y;
@@ -23,11 +23,11 @@ public class Coordinate {
 		return profile;
 	}
 
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 

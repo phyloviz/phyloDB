@@ -76,7 +76,7 @@ public class VisualizationServiceTests extends ServiceTestsContext {
 	@MethodSource("getInference_params")
 	public void getVisualization(Visualization.PrimaryKey key, Visualization expected) {
 		Mockito.when(visualizationRepository.find(any())).thenReturn(Optional.ofNullable(expected));
-		Optional<Visualization> result = visualizationService.getVisualization(key.getProjectId(), key.getDatasetId(),key.getAnalysisId(), key.getId());
+		Optional<Visualization> result = visualizationService.getVisualization(key.getProjectId(), key.getDatasetId(),key.getInferenceId(), key.getId());
 		assertTrue((expected == null && !result.isPresent()) || (expected != null && result.isPresent()));
 		if (expected != null)
 			assertEquals(expected, result.get());
@@ -86,7 +86,7 @@ public class VisualizationServiceTests extends ServiceTestsContext {
 	@MethodSource("deleteInference_params")
 	public void deleteVisualization(Visualization.PrimaryKey key, boolean expected) {
 		Mockito.when(visualizationRepository.remove(any())).thenReturn(expected);
-		boolean result = visualizationService.deleteVisualization(key.getProjectId(), key.getDatasetId(), key.getAnalysisId(), key.getId());
+		boolean result = visualizationService.deleteVisualization(key.getProjectId(), key.getDatasetId(), key.getInferenceId(), key.getId());
 		assertEquals(expected, result);
 	}
 

@@ -85,7 +85,7 @@ public class NewickFormatter extends TreeFormatter {
 					!values[1].matches("[\\d]*"))
 				return null;
 			VersionedEntity<Profile.PrimaryKey> to = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, values[0]), CURRENT_VERSION_VALUE, false);
-			levels.peek().add(new Edge(null, to, Integer.parseInt(values[1])));
+			levels.peek().add(new Edge(null, to, Long.parseLong(values[1])));
 			return values[0];
 		}
 		return values[0];

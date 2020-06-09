@@ -83,17 +83,17 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 		for (Visualization visualization : visualizations) {
 			String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})\n" +
 					"WHERE d.deprecated = false\n" +
-					"WITH pj, d, $ as analysis, $ as id, $ as algorithm, $ as deprecated\n" +
+					"WITH pj, d, $ as inferenceId, $ as id, $ as algorithm, $ as deprecated\n" +
 					"UNWIND $ as coordinate\n" +
 					"MATCH (d)-[:CONTAINS]->(p:Profile {id: coordinate.profile})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
 					"WHERE NOT EXISTS(r.to)\n" +
-					"CREATE (p)-[:HAS {analysis: analysis, id: id, algorithm: algorithm, deprecated: deprecated}]->(:Coordinate {x: coordinate.x, y: coordinate.y})";
+					"CREATE (p)-[:HAS {inferenceId: inferenceId, id: id, algorithm: algorithm, deprecated: deprecated}]->(:Coordinate {x: coordinate.x, y: coordinate.y})";
 			Visualization.PrimaryKey key = visualization.getPrimaryKey();
-			Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getAnalysisId(), key.getId(), visualization.getAlgorithm().getName(), visualization.isDeprecated(),
+			Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getInferenceId(), key.getId(), visualization.getAlgorithm().getName(), visualization.isDeprecated(),
 					visualization.getCoordinates().stream()
 							.map(c -> new Object() {
-								public final int x = c.getX();
-								public final int y = c.getY();
+								public final double x = c.getX();
+								public final double y = c.getY();
 								public final String profile = c.getProfile().getId();
 							})
 			);
@@ -107,11 +107,11 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 		String datasetId = row.get("datasetId").toString();
 		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
-			list.add(new Coordinate(profile, Math.toIntExact((long) coordinates.get("x")), Math.toIntExact((long) coordinates.get("y"))));
+			list.add(new Coordinate(profile, (double) coordinates.get("x"), (double) coordinates.get("y")));
 		}
 		return new Visualization(projectId,
 				datasetId,
-				row.get("analysisId").toString(),
+				row.get("inferenceId").toString(),
 				row.get("id").toString(),
 				(boolean) row.get("deprecated"),
 				VisualizationAlgorithm.valueOf(row.get("algorithm").toString().toUpperCase()),
@@ -121,12 +121,12 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	private Visualization[] findAll() {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
-				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {analysis: $}]->(c:Coordinate)\n" +
-				"WITH pj, ds, h.analysis as analysis, p, h, c\n" +
-				"ORDER BY pj.id, ds.id, analysis, size(h.id), h.id, p.id, c.x, c.y\n" +
-				"RETURN pj.id as projectId, ds.id as datasetId, analysis as analysisId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +
+				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: $}]->(c:Coordinate)\n" +
+				"WITH pj, ds, h.inferenceId as inferenceId, p, h, c\n" +
+				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id, p.id, c.x, c.y\n" +
+				"RETURN pj.id as projectId, ds.id as datasetId, inferenceId as inferenceId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +
 				"collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates\n" +
-				"ORDER BY pj.id, ds.id, analysis, size(h.id), h.id";
+				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id";
 		Result result = query(new Query(statement, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId()));
 		if (result == null) return new Visualization[0];
 		return StreamSupport.stream(result.spliterator(), false)

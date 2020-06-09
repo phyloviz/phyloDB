@@ -40,8 +40,8 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 	public static class CoordinateOutputModel {
 
 		private String profile_id;
-		private int x;
-		private int y;
+		private double x;
+		private double y;
 
 		public CoordinateOutputModel() {
 		}
@@ -56,11 +56,11 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 			return profile_id;
 		}
 
-		public int getX() {
+		public double getX() {
 			return x;
 		}
 
-		public int getY() {
+		public double getY() {
 			return y;
 		}
 

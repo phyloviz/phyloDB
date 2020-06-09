@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class VisualizationRepository extends Repository<Visualization, Vertex> {
 
@@ -33,7 +34,7 @@ public class VisualizationRepository extends Repository<Visualization, Vertex> {
 				.toArray(Node[]::new);
 		if(roots.length > 1)
 			throw new RuntimeException();
-		return tree(roots[0], 0);
+		return tree(roots[0], 0, inferenceId);
 	}
 
 	@Override
@@ -58,10 +59,14 @@ public class VisualizationRepository extends Repository<Visualization, Vertex> {
 		}
 	}
 
-	private Vertex tree(Node current, long distance) {
-		Vertex[] children = relationships(current, Relation.DISTANCES, Direction.OUTGOING)
-				.map(r -> tree(r.getEndNode(), (long) r.getProperty(Distance.DISTANCE)))
+	private Vertex tree(Node current, long distance, String inferenceId) {
+		Vertex[] children = distances(current, Relation.DISTANCES, Direction.OUTGOING, inferenceId)
+				.map(r -> tree(r.getEndNode(), (long) r.getProperty(Distance.DISTANCE), inferenceId))
 				.toArray(Vertex[]::new);
 		return new Vertex((String) current.getProperty(Profile.ID), distance, children);
+	}
+
+	private Stream<Relationship> distances(Node node, Relation relationship, Direction direction, String id) {
+		return relationships(node, relationship, direction).filter(r -> r.getProperty(Distance.ID).equals(id));
 	}
 }

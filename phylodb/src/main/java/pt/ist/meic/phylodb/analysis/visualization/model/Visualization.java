@@ -38,13 +38,13 @@ public class Visualization extends Entity<Visualization.PrimaryKey> {
 
 		private final String projectId;
 		private final String datasetId;
-		private final String analysisId;
+		private final String inferenceId;
 		private final String id;
 
-		public PrimaryKey(String projectId, String datasetId, String analysisId, String id) {
+		public PrimaryKey(String projectId, String datasetId, String inferenceId, String id) {
 			this.projectId = projectId;
 			this.datasetId = datasetId;
-			this.analysisId = analysisId;
+			this.inferenceId = inferenceId;
 			this.id = id;
 		}
 
@@ -56,8 +56,8 @@ public class Visualization extends Entity<Visualization.PrimaryKey> {
 			return datasetId;
 		}
 
-		public String getAnalysisId() {
-			return analysisId;
+		public String getInferenceId() {
+			return inferenceId;
 		}
 
 		public String getId() {
@@ -71,7 +71,7 @@ public class Visualization extends Entity<Visualization.PrimaryKey> {
 			PrimaryKey that = (PrimaryKey) o;
 			return Objects.equals(projectId, that.projectId) &&
 					Objects.equals(datasetId, that.datasetId) &&
-					Objects.equals(analysisId, that.analysisId) &&
+					Objects.equals(inferenceId, that.inferenceId) &&
 					Objects.equals(id, that.id);
 		}
 

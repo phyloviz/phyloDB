@@ -62,7 +62,7 @@ public class InferenceRepository extends UnversionedRepository<Inference, Infere
 		for (Map<String, Object> edge: (Map<String, Object>[]) row.get("edges")) {
 			VersionedEntity<Profile.PrimaryKey> from = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("from")), (long) edge.get("fromVersion"), (boolean) edge.get("fromDeprecated"));
 			VersionedEntity<Profile.PrimaryKey> to = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("to")), (long) edge.get("toVersion"), (boolean) edge.get("toDeprecated"));
-			list.add(new Edge(from, to, Math.toIntExact((long) edge.get("distance"))));
+			list.add(new Edge(from, to, (long) edge.get("distance")));
 		}
 		return new Inference(projectId,
 				datasetId,
@@ -98,7 +98,7 @@ public class InferenceRepository extends UnversionedRepository<Inference, Infere
 						.map(e -> new Object() {
 							public final String from = e.getFrom().getPrimaryKey().getId();
 							public final String to = e.getTo().getPrimaryKey().getId();
-							public final int distance = e.getWeight();
+							public final long distance = e.getWeight();
 						})
 		);
 		execute(query);

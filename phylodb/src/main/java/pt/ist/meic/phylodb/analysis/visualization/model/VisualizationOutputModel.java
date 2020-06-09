@@ -26,7 +26,7 @@ public class VisualizationOutputModel implements OutputModel {
 	public VisualizationOutputModel(Visualization visualization) {
 		this.project_id = visualization.getPrimaryKey().getProjectId();
 		this.dataset_id = visualization.getPrimaryKey().getDatasetId();
-		this.analysis_id = visualization.getPrimaryKey().getAnalysisId();
+		this.analysis_id = visualization.getPrimaryKey().getInferenceId();
 		this.id = visualization.getPrimaryKey().getId();
 		this.deprecated = visualization.isDeprecated();
 	}
@@ -34,7 +34,7 @@ public class VisualizationOutputModel implements OutputModel {
 	public VisualizationOutputModel(Entity<Visualization.PrimaryKey> visualization) {
 		this.project_id = visualization.getPrimaryKey().getProjectId();
 		this.dataset_id = visualization.getPrimaryKey().getDatasetId();
-		this.analysis_id = visualization.getPrimaryKey().getAnalysisId();
+		this.analysis_id = visualization.getPrimaryKey().getInferenceId();
 		this.id = visualization.getPrimaryKey().getId();
 		this.deprecated = visualization.isDeprecated();
 	}
