@@ -14,7 +14,6 @@ public class NewickFormatter extends TreeFormatter {
 
 	private String projectId;
 	private String datasetId;
-	protected String missing;
 
 	@Override
 	protected boolean init(Iterator<String> it, Object... params) {
@@ -26,11 +25,12 @@ public class NewickFormatter extends TreeFormatter {
 	@Override
 	protected boolean parse(String line, boolean last, Consumer<Edge> add) {
 		StringBuilder newick = new StringBuilder(line.trim());
+		List<Edge> aux = new ArrayList<>();
 		Stack<List<Edge>> levels = new Stack<>();
 		while (newick.length() > 0) {
 			switch (newick.charAt(0)) {
 				case ';':
-					if (!levels.isEmpty())
+					if (!levels.isEmpty() || aux.isEmpty())
 						return false;
 					newick.delete(0, 1);
 					break;
@@ -42,18 +42,20 @@ public class NewickFormatter extends TreeFormatter {
 				case ')':
 					newick.delete(0, 1);
 					List<Edge> children = new ArrayList<>(levels.pop());
-					String parentId = parseNode(newick, levels);
+					String parentId = parseNode(newick, levels, aux);
 					if(parentId == null)
 						return false;
 					for (Edge child :children) {
 						if(parentId.equals(child.getTo().getPrimaryKey().getId()))
 							return false;
 						VersionedEntity<Profile.PrimaryKey> from = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, parentId), CURRENT_VERSION_VALUE, false);
-						add.accept(new Edge(from, child.getTo(), child.getWeight()));
+						Edge edge = new Edge(from, child.getTo(), child.getWeight());
+						add.accept(edge);
+						aux.add(edge);
 					}
 					break;
 				default:
-					if(parseNode(newick, levels) == null)
+					if(parseNode(newick, levels, aux) == null)
 						return false;
 			}
 		}
@@ -76,17 +78,22 @@ public class NewickFormatter extends TreeFormatter {
 		return data.toString();
 	}
 
-	private String parseNode(StringBuilder newick, Stack<List<Edge>> levels) {
+	private String parseNode(StringBuilder newick, Stack<List<Edge>> levels, List<Edge> aux) {
+		if(!newick.toString().matches(".*[),;].*"))
+			return null;
 		String info = newick.toString().split("[),;]", 2)[0];
 		newick.delete(0, info.length());
-		String[] values = info.split(":", 2);
-		if (newick.length() > 0 && newick.charAt(0) != ';') {
-			if (values.length != 2 || Arrays.stream(values).anyMatch(s -> s.matches(String.format("[\\s%s]*", missing)) || s.isEmpty()) ||
-					!values[1].matches("[\\d]*"))
+		String[] values = info.split(":", -1);
+		if(values.length > 1) {
+			if(newick.indexOf(";") == 0 || values.length > 2 || !values[1].matches("[\\d]*") || values[0].isEmpty())
 				return null;
 			VersionedEntity<Profile.PrimaryKey> to = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, values[0]), CURRENT_VERSION_VALUE, false);
-			levels.peek().add(new Edge(null, to, Long.parseLong(values[1])));
+			Edge edge = new Edge(null, to, Long.parseLong(values[1]));
+			levels.peek().add(edge);
+			aux.add(edge);
 			return values[0];
+		} else if(newick.indexOf(";") != 0) {
+			return null;
 		}
 		return values[0];
 	}

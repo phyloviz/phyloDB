@@ -31,9 +31,12 @@ public abstract class Formatter<T> {
 			if (!init(it, params))
 				return new Pair<>(entities, errors);
 			while (it.hasNext()) {
+				List<T> parsed = new ArrayList<>();
 				count++;
-				if (!parse(it.next(), !it.hasNext(), entities::add))
+				if (!parse(it.next(), !it.hasNext(), parsed::add))
 					errors.add(count);
+				else
+					entities.addAll(parsed);
 			}
 			return new Pair<>(entities, errors);
 		}

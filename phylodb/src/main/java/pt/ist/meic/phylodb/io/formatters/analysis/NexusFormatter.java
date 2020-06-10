@@ -19,7 +19,7 @@ public class NexusFormatter extends NewickFormatter {
 			return true;
 		} else if(trees) {
 			if(!line.contains("("))
-				return true;
+				return false;
 			String current = line.substring(line.indexOf('('));
 			return super.parse(current, last, add);
 		} else {
@@ -29,6 +29,8 @@ public class NexusFormatter extends NewickFormatter {
 
 	@Override
 	public String format(List<Edge> entities, Object... params) {
+		if(entities.isEmpty())
+			return "";
 		String format = super.format(entities);
 		return String.format("BEGIN TREES;\n\tTree result = %s\nEND;", format);
 	}

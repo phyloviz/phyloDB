@@ -1,0 +1,3 @@
+BEGIN TREES;
+	Tree result = (1:1)2;
+END;

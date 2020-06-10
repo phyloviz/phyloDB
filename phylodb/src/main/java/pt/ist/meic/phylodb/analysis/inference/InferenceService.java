@@ -1,12 +1,11 @@
 package pt.ist.meic.phylodb.analysis.inference;
 
 import javafx.util.Pair;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
+import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
@@ -25,9 +24,6 @@ import java.util.stream.Stream;
 
 @Service
 public class InferenceService {
-
-	@Value("${application.missing}")
-	private String missing;
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;
@@ -55,7 +51,7 @@ public class InferenceService {
 		if(!InferenceAlgorithm.exists(algorithm) || (formatter = TreeFormatter.get(format)) == null ||
 				!datasetRepository.exists(new Dataset.PrimaryKey(projectId, datasetId)))
 			return Optional.empty();
-		Pair<List<Edge>, List<Integer>> parsed = formatter.parse(file, projectId, datasetId, missing);
+		Pair<List<Edge>, List<Integer>> parsed = formatter.parse(file, projectId, datasetId);
 		if(parsed.getValue().size() > 0)
 			return Optional.empty();
 		List<Edge> edges = parsed.getKey();

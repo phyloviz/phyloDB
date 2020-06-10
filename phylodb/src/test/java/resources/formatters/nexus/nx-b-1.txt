@@ -1,0 +1,3 @@
+BEGIN TREES;
+	Tree resusslt = 1:1,2:23;
+END;
