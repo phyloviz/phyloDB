@@ -40,6 +40,7 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 	public static class CoordinateOutputModel {
 
 		private String profile_id;
+		private long component;
 		private double x;
 		private double y;
 
@@ -48,12 +49,17 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 
 		public CoordinateOutputModel(Coordinate coordinate) {
 			this.profile_id = coordinate.getProfile().getId();
+			this.component = coordinate.getComponent();
 			this.x = coordinate.getX();
 			this.y = coordinate.getY();
 		}
 
 		public String getProfile_id() {
 			return profile_id;
+		}
+
+		public long getComponent() {
+			return component;
 		}
 
 		public double getX() {
@@ -69,8 +75,9 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
 			CoordinateOutputModel that = (CoordinateOutputModel) o;
-			return x == that.x &&
-					y == that.y &&
+			return component == that.component &&
+					Double.compare(that.x, x) == 0 &&
+					Double.compare(that.y, y) == 0 &&
 					Objects.equals(profile_id, that.profile_id);
 		}
 

@@ -5,17 +5,23 @@ import java.util.Objects;
 public class Coordinate {
 
 	private final String profileId;
+	private final int component;
 	private final double x;
 	private final double y;
 
-	public Coordinate(String profileId, double x, double y) {
+	public Coordinate(String profileId, int component, double x, double y) {
 		this.profileId = profileId;
+		this.component = component;
 		this.x = x;
 		this.y = y;
 	}
 
 	public String getProfileId() {
 		return profileId;
+	}
+
+	public int getComponent() {
+		return component;
 	}
 
 	public double getX() {
@@ -31,7 +37,8 @@ public class Coordinate {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Coordinate that = (Coordinate) o;
-		return Double.compare(that.x, x) == 0 &&
+		return component == that.component &&
+				Double.compare(that.x, x) == 0 &&
 				Double.compare(that.y, y) == 0 &&
 				Objects.equals(profileId, that.profileId);
 	}

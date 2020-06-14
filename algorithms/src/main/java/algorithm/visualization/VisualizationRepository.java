@@ -2,6 +2,7 @@ package algorithm.visualization;
 
 import algorithm.repository.Repository;
 import algorithm.repository.type.*;
+import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Vertex;
 import algorithm.visualization.model.Visualization;
 import org.neo4j.graphdb.*;
@@ -12,14 +13,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class VisualizationRepository extends Repository<Visualization, Vertex> {
+public class VisualizationRepository extends Repository<Visualization, Tree> {
 
 	public VisualizationRepository(GraphDatabaseService database) {
 		super(database);
 	}
 
 	@Override
-	public Vertex read(String... params) {
+	public Tree read(String... params) {
 		String projectId = params[0], datasetId = params[1], inferenceId = params[2];
 		Node project = node(Project.LABEL, projectId);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
@@ -27,14 +28,13 @@ public class VisualizationRepository extends Repository<Visualization, Vertex> {
 				.flatMap(n -> relationships(n, Relation.DISTANCES, Direction.OUTGOING)
 					.filter(r -> r.getProperty(Distance.ID).equals(inferenceId)))
 				.collect(Collectors.toList());
-		Node[] roots = distances.stream()
+		Vertex[] roots = distances.stream()
 				.map(Relationship::getStartNode)
 				.filter(r -> distances.stream().noneMatch(r2 -> r2.getEndNode().equals(r)))
 				.distinct()
-				.toArray(Node[]::new);
-		if(roots.length > 1)
-			throw new RuntimeException();
-		return tree(roots[0], 0, inferenceId);
+				.map(n ->  tree(n, 0, inferenceId))
+				.toArray(Vertex[]::new);
+		return new Tree(roots);
 	}
 
 	@Override
@@ -53,6 +53,7 @@ public class VisualizationRepository extends Repository<Visualization, Vertex> {
 			Map<String, Object> properties = new HashMap<>();
 			properties.put(Has.INFERENCE_ID, inferenceId);
 			properties.put(Has.ID, id);
+			properties.put(Has.COMPONENT, coordinate.getComponent());
 			properties.put(Has.ALGORITHM, algorithm);
 			properties.put(Has.DEPRECATED, false);
 			createRelationship(profile, c, Relation.HAS, properties);

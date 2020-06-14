@@ -26,8 +26,8 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 
 	private static Stream<Arguments> findAll_params() {
 		String key1 = "6f809af7-2c99-43f7-b674-4843c77384c7", key2 = "7f809af7-2c99-43f7-b674-4843c77384c7";
-		Coordinate coordinate1 = new Coordinate(PROFILE1.getPrimaryKey(), 44, 44);
-		Coordinate coordinate2 = new Coordinate(PROFILE2.getPrimaryKey(), 55, 55);
+		Coordinate coordinate1 = new Coordinate(PROFILE1.getPrimaryKey(), 1, 44, 44);
+		Coordinate coordinate2 = new Coordinate(PROFILE2.getPrimaryKey(), 1, 55, 55);
 		Visualization firstE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), key1, false, VisualizationAlgorithm.RADIAL, Arrays.asList(coordinate1, coordinate2)),
 				secondE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(), "6f909af7-2c99-43f7-b674-4843c77384c7", false, VisualizationAlgorithm.RADIAL, Arrays.asList(COORDINATE11, COORDINATE12, COORDINATE13)),
 				thirdE = new Visualization(PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId(),  key2, false, VisualizationAlgorithm.RADIAL, Arrays.asList(coordinate1, coordinate2)),
@@ -87,13 +87,14 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 					"UNWIND $ as coordinate\n" +
 					"MATCH (d)-[:CONTAINS]->(p:Profile {id: coordinate.profile})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
 					"WHERE NOT EXISTS(r.to)\n" +
-					"CREATE (p)-[:HAS {inferenceId: inferenceId, id: id, algorithm: algorithm, deprecated: deprecated}]->(:Coordinate {x: coordinate.x, y: coordinate.y})";
+					"CREATE (p)-[:HAS {inferenceId: inferenceId, id: id, component: coordinate.component, algorithm: algorithm, deprecated: deprecated}]->(:Coordinate {x: coordinate.x, y: coordinate.y})";
 			Visualization.PrimaryKey key = visualization.getPrimaryKey();
 			Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getInferenceId(), key.getId(), visualization.getAlgorithm().getName(), visualization.isDeprecated(),
 					visualization.getCoordinates().stream()
 							.map(c -> new Object() {
 								public final double x = c.getX();
 								public final double y = c.getY();
+								public final long component = c.getComponent();
 								public final String profile = c.getProfile().getId();
 							})
 			);
@@ -107,7 +108,7 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 		String datasetId = row.get("datasetId").toString();
 		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
-			list.add(new Coordinate(profile, (double) coordinates.get("x"), (double) coordinates.get("y")));
+			list.add(new Coordinate(profile, (long) coordinates.get("component"), (double) coordinates.get("x"), (double) coordinates.get("y")));
 		}
 		return new Visualization(projectId,
 				datasetId,
@@ -123,9 +124,9 @@ public class VisualizationRepositoryTests extends RepositoryTestsContext {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: $}]->(c:Coordinate)\n" +
 				"WITH pj, ds, h.inferenceId as inferenceId, p, h, c\n" +
-				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id, p.id, c.x, c.y\n" +
+				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id, h.component, p.id, c.x, c.y\n" +
 				"RETURN pj.id as projectId, ds.id as datasetId, inferenceId as inferenceId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +
-				"collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates\n" +
+				"collect(DISTINCT {profileId: p.id, component: h.component, x: c.x, y: c.y}) as coordinates\n" +
 				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id";
 		Result result = query(new Query(statement, PROJECT1.getPrimaryKey(), DATASET1.getPrimaryKey().getId(), INFERENCE1.getPrimaryKey().getId()));
 		if (result == null) return new Visualization[0];

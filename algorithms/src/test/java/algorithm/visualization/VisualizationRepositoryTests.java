@@ -7,6 +7,7 @@ import algorithm.repository.type.Profile;
 import algorithm.repository.type.Relation;
 import algorithm.visualization.implementation.Radial;
 import algorithm.visualization.model.Coordinate;
+import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Vertex;
 import algorithm.visualization.model.Visualization;
 import org.junit.Before;
@@ -60,10 +61,10 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 	public void read_inference1Edge() throws IOException {
 		try (Transaction tx = database.beginTx()) {
 			arrange("visualization", "ctx-1e.cypher");
-			Vertex result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
+			Tree result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
 			Vertex child = vertex(PROFILE2_ID, 2);
 			Vertex expected = vertex(PROFILE1_ID, 0, child);
-			assertEquals(expected, result);
+			assertEquals(new Tree(new Vertex[]{expected}), result);
 			tx.failure();
 		}
 	}
@@ -72,11 +73,11 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 	public void read_inferenceNEdge1Root() throws IOException {
 		try (Transaction tx = database.beginTx()) {
 			arrange("visualization", "ctx-ne-1r.cypher");
-			Vertex result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
+			Tree result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
 			Vertex grandChild = vertex(PROFILE3_ID, 3);
 			Vertex child = vertex(PROFILE2_ID, 2, grandChild);
 			Vertex expected = vertex(PROFILE1_ID, 0, child);
-			assertEquals(expected, result);
+			assertEquals(new Tree(new Vertex[]{expected}), result);
 			tx.failure();
 		}
 	}
@@ -85,12 +86,12 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 	public void read_inferenceNEdge1Tree() throws IOException {
 		try (Transaction tx = database.beginTx()) {
 			arrange("visualization", "ctx-ne-1t.cypher");
-			Vertex result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
+			Tree result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
 			Vertex grandChild = vertex(PROFILE3_ID, 3);
 			Vertex child1 = vertex(PROFILE2_ID, 2, grandChild);
 			Vertex child2 = vertex(PROFILE4_ID, 1);
 			Vertex expected = vertex(PROFILE1_ID, 0, child1, child2);
-			assertEquals(expected, result);
+			assertEquals(new Tree(new Vertex[]{expected}), result);
 			tx.failure();
 		}
 	}
@@ -99,14 +100,14 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 	public void read_inferenceNEdgeNTree() throws IOException {
 		try (Transaction tx = database.beginTx()) {
 			arrange("visualization", "ctx-ne-nt.cypher");
-			Vertex result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
+			Tree result = repository.read(PROJECT_ID, DATASET_ID, INFERENCE_ID);
 			Vertex grandChild11 = vertex(PROFILE3_ID, 3);
 			Vertex child1 = vertex(PROFILE2_ID, 2, grandChild11);
 			Vertex grandChild21 = vertex(PROFILE5_ID, 1);
 			Vertex grandChild22 = vertex(PROFILE6_ID, 1);
 			Vertex child2 = vertex(PROFILE4_ID, 1, grandChild21, grandChild22);
 			Vertex expected = vertex(PROFILE1_ID, 0, child1, child2);
-			assertEquals(expected, result);
+			assertEquals(new Tree(new Vertex[]{expected}), result);
 			tx.failure();
 		}
 	}
@@ -117,8 +118,8 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 			arrange("visualization", "ctx-ne-nt.cypher");
 			long relationshipsCount = getRelationshipsCount();
 			long nodesCount = getNodesCount();
-			Coordinate c1 = new Coordinate(PROFILE1_ID, 1, 2);
-			Coordinate c2 = new Coordinate(PROFILE2_ID, 3, 2.5);
+			Coordinate c1 = new Coordinate(PROFILE1_ID, 1, 1, 2);
+			Coordinate c2 = new Coordinate(PROFILE2_ID, 1, 3, 2.5);
 			Visualization visualization = visualization(c1, c2);
 			repository.write(visualization);
 			assertEquals(relationshipsCount + 2, getRelationshipsCount());
@@ -134,10 +135,10 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 			arrange("visualization", "ctx-ne-nt.cypher");
 			long relationshipsCount = getRelationshipsCount();
 			long nodesCount = getNodesCount();
-			Coordinate c1 = new Coordinate(PROFILE1_ID, 1, 2);
-			Coordinate c2 = new Coordinate(PROFILE2_ID, 3, 2.5);
-			Coordinate c3 = new Coordinate(PROFILE3_ID, 1.1, 10.13);
-			Coordinate c4 = new Coordinate(PROFILE4_ID, 0, 0);
+			Coordinate c1 = new Coordinate(PROFILE1_ID, 1, 1, 2);
+			Coordinate c2 = new Coordinate(PROFILE2_ID, 1, 3, 2.5);
+			Coordinate c3 = new Coordinate(PROFILE3_ID, 1, 1.1, 10.13);
+			Coordinate c4 = new Coordinate(PROFILE4_ID, 1, 0, 0);
 			Visualization visualization = visualization(c1, c2, c3, c4);
 			repository.write(visualization);
 			assertEquals(relationshipsCount + 4, getRelationshipsCount());
@@ -159,6 +160,7 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 			assertEquals(r.getEndNode().getProperty(algorithm.repository.type.Coordinate.Y), c.getY());
 			assertEquals(r.getProperty(Has.INFERENCE_ID), visualization.getInferenceId());
 			assertEquals(r.getProperty(Has.ID), visualization.getId());
+			assertEquals(r.getProperty(Has.COMPONENT), c.getComponent());
 			assertEquals(r.getProperty(Has.ALGORITHM), visualization.getAlgorithm());
 			assertEquals(r.getProperty(Has.DEPRECATED), false);
 		}

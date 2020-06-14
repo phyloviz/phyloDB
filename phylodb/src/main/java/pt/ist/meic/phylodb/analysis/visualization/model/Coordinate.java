@@ -7,20 +7,26 @@ import java.util.Objects;
 public class Coordinate {
 
 	private Profile.PrimaryKey profile;
+	private long component;
 	private double x;
 	private double y;
 
 	public Coordinate() {
 	}
 
-	public Coordinate(Profile.PrimaryKey profileId, double x, double y) {
+	public Coordinate(Profile.PrimaryKey profileId, long component, double x, double y) {
 		this.profile = profileId;
+		this.component = component;
 		this.x = x;
 		this.y = y;
 	}
 
 	public Profile.PrimaryKey getProfile() {
 		return profile;
+	}
+
+	public long getComponent() {
+		return component;
 	}
 
 	public double getX() {
@@ -36,8 +42,9 @@ public class Coordinate {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Coordinate that = (Coordinate) o;
-		return x == that.x &&
-				y == that.y &&
+		return component == that.component &&
+				Double.compare(that.x, x) == 0 &&
+				Double.compare(that.y, y) == 0 &&
 				Objects.equals(profile, that.profile);
 	}
 

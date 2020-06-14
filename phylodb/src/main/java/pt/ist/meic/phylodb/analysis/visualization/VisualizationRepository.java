@@ -30,7 +30,7 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: $}]->(c:Coordinate)\n" +
 				"WHERE h.deprecated = false\n" +
-				"WITH pj, ds, h.inferenceId as inferenceId, h.id as id, h.deprecated as deprecated, collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates\n" +
+				"WITH pj, ds, h.inferenceId as inferenceId, h.id as id, h.deprecated as deprecated, collect(DISTINCT {profileId: p.id, component: c.component, x: c.x, y: c.y}) as coordinates\n" +
 				"RETURN pj.id as projectId, ds.id as datasetId, inferenceId as inferenceId, id as id, deprecated as deprecated\n" +
 				"ORDER BY pj.id, ds.id, inferenceId, size(id), id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], filters[2], page, limit));
@@ -42,9 +42,9 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: $, id: $}]->(c:Coordinate)\n" +
 				"WHERE h.deprecated = false\n" +
 				"WITH pj, ds, h.inferenceId as inferenceId, p, h, c\n" +
-				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id, p.id, c.x, c.y\n" +
+				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id, h.component, p.id, c.x, c.y\n" +
 				"RETURN pj.id as projectId, ds.id as datasetId, inferenceId as inferenceId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +
-				"collect(DISTINCT {profileId: p.id, x: c.x, y: c.y}) as coordinates";
+				"collect(DISTINCT {profileId: p.id, component: h.component, x: c.x, y: c.y}) as coordinates";
 		return query(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getInferenceId(), key.getId()));
 	}
 
@@ -61,7 +61,7 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 		String datasetId = row.get("datasetId").toString();
 		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
-			list.add(new Coordinate(profile, (double) coordinates.get("x"), (double) coordinates.get("y")));
+			list.add(new Coordinate(profile, (long) coordinates.get("component"), (double) coordinates.get("x"), (double) coordinates.get("y")));
 		}
 		return new Visualization(projectId,
 				datasetId,
