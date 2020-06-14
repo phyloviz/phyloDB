@@ -156,8 +156,8 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
 				"WITH ds, d.id as analysis, collect(d) as ignored\n" +
-				"OPTIONAL MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis})\n" +
-				"WHERE c.deprecate = false\n" +
+				"OPTIONAL MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS]->(c:Coordinate {analysisId: analysis})\n" +
+				"WHERE h.deprecated = false\n" +
 				"RETURN COUNT(c) <> 0";
 		return query(Boolean.class, new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}

@@ -98,7 +98,13 @@ public class ProjectRepository extends VersionedRepository<Project, String> {
 				"MATCH (p)-[:CONTAINS]->(a:Allele) SET a.deprecated = true WITH p\n" +
 				"MATCH (p)-[:CONTAINS]->(d:Dataset) SET d.deprecated = true WITH d\n" +
 				"MATCH (p)-[:CONTAINS]->(pf:Profile) SET pf.deprecated = true WITH d\n" +
-				"MATCH (p)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true";
+				"MATCH (p)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true WITH d\n" +
+				"MATCH (d)-[:CONTAINS]->(p1:Profile)-[di:DISTANCES]->(p2:Profile)\n" +
+				"SET di.deprecated = true\n" +
+				"WITH d, di.id as analysis, collect(di) as ignored\n" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: analysis}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"SET h.deprecated = true";
 		execute(new Query(statement, key));
 	}
 

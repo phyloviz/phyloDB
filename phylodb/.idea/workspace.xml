@@ -2,20 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Has.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Has.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/Radial.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/Radial.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/VisualizationAlgorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/VisualizationAlgorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/model/Coordinate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/RadialTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/RadialTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/VisualizationRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/VisualizationRepositoryTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/model/Coordinate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/model/Coordinate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/model/GetVisualizationOutputModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/model/GetVisualizationOutputModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/TestContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/TestContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/InferenceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/InferenceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/project/ProjectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/project/ProjectRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/dataset/DatasetRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/analysis/inference/InferenceRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/analysis/inference/InferenceRepositoryTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +106,7 @@
       <recent name="C:\Users\Bruno\Desktop\Projeto\PhyloDB\phylodb\src\test\java\resources\formatters\ml" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.VisualizationControllerTests.getVisualization">
+  <component name="RunManager" selected="JUnit.pt.ist.meic.phylodb in phylodb.test">
     <configuration name="NexusFormatterTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
       <extension name="coverage">
@@ -199,9 +191,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.pt.ist.meic.phylodb in phylodb.test" />
         <item itemvalue="JUnit.VisualizationControllerTests.getVisualization" />
         <item itemvalue="JUnit.pt.ist.meic.phylodb.analysis.visualization in phylodb.test" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb in phylodb.test" />
         <item itemvalue="JUnit.NexusFormatterTests" />
         <item itemvalue="JUnit.NexusFormatterTests.format_fileWithEdges" />
       </list>
@@ -308,60 +300,60 @@
     </state>
     <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591019829313" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1589914901033" />
-    <state width="1877" height="330" key="GridCell.Tab.0.bottom" timestamp="1592143490636">
+    <state width="1877" height="330" key="GridCell.Tab.0.bottom" timestamp="1592145230586">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="330" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592143490636" />
+    <state width="1877" height="330" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230586" />
     <state width="1493" height="264" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935618" />
     <state width="1493" height="217" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1591809390313" />
-    <state width="1877" height="330" key="GridCell.Tab.0.center" timestamp="1592143490636">
+    <state width="1877" height="330" key="GridCell.Tab.0.center" timestamp="1592145230586">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="330" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592143490636" />
+    <state width="1877" height="330" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230586" />
     <state width="1493" height="264" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935618" />
     <state width="1493" height="217" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1591809390313" />
-    <state width="1877" height="330" key="GridCell.Tab.0.left" timestamp="1592143490636">
+    <state width="1877" height="330" key="GridCell.Tab.0.left" timestamp="1592145230585">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="330" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592143490636" />
+    <state width="1877" height="330" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230585" />
     <state width="1493" height="264" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935618" />
     <state width="1493" height="217" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1591809390313" />
-    <state width="1877" height="330" key="GridCell.Tab.0.right" timestamp="1592143490636">
+    <state width="1877" height="330" key="GridCell.Tab.0.right" timestamp="1592145230586">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="281" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587405197234" />
-    <state width="1877" height="330" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592143490636" />
+    <state width="1877" height="330" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230586" />
     <state width="1493" height="264" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935618" />
     <state width="1493" height="217" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1591809390313" />
-    <state width="1493" height="248" key="GridCell.Tab.1.bottom" timestamp="1591809016781">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="330" key="GridCell.Tab.1.bottom" timestamp="1592145230454">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
-    <state width="1877" height="280" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591281551658" />
+    <state width="1877" height="330" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230454" />
     <state width="1493" height="264" key="GridCell.Tab.1.bottom/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935619" />
     <state width="1493" height="248" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1591809016781" />
-    <state width="1493" height="248" key="GridCell.Tab.1.center" timestamp="1591809016781">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="330" key="GridCell.Tab.1.center" timestamp="1592145230454">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
-    <state width="1877" height="280" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591281551658" />
+    <state width="1877" height="330" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230454" />
     <state width="1493" height="264" key="GridCell.Tab.1.center/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935619" />
     <state width="1493" height="248" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1591809016781" />
-    <state width="1493" height="248" key="GridCell.Tab.1.left" timestamp="1591809016781">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="330" key="GridCell.Tab.1.left" timestamp="1592145230454">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844232" />
-    <state width="1877" height="280" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591281551658" />
+    <state width="1877" height="330" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230454" />
     <state width="1493" height="264" key="GridCell.Tab.1.left/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935619" />
     <state width="1493" height="248" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1591809016781" />
-    <state width="1493" height="248" key="GridCell.Tab.1.right" timestamp="1591809016781">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="330" key="GridCell.Tab.1.right" timestamp="1592145230454">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="305" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040/1920.0.1280.680@-1920.0.1920.1040" timestamp="1587404844233" />
-    <state width="1877" height="280" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591281551658" />
+    <state width="1877" height="330" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592145230454" />
     <state width="1493" height="264" key="GridCell.Tab.1.right/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1591303935619" />
     <state width="1493" height="248" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1591809016781" />
     <state x="620" y="360" key="ReplaceDuplicatesPrompt" timestamp="1588720714296">

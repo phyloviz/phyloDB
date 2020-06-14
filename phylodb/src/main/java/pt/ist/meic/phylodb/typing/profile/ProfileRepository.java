@@ -104,7 +104,14 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	@Override
 	protected void delete(Profile.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
-				"SET p.deprecated = true";
+				"SET p.deprecated = true WITH d, p\n" +
+				"MATCH (d)-[:CONTAINS]->(p1:Profile)-[di:DISTANCES]->(p2:Profile)\n" +
+				"WHERE p1.id = p.id OR p2.id = p.id\n" +
+				"SET di.deprecated = true\n" +
+				"WITH d, di.id as analysis, collect(di) as ignored\n" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: analysis}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"SET h.deprecated = true";
 		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 

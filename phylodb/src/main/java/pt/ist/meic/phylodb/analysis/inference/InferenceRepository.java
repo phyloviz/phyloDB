@@ -110,9 +110,9 @@ public class InferenceRepository extends UnversionedRepository<Inference, Infere
 				"MATCH (ds)-[:CONTAINS]->(p1:Profile)-[d:DISTANCES {id: $}]->(p2:Profile)\n" +
 				"SET d.deprecated = true\n" +
 				"WITH ds, d.id as analysis, collect(d) as ignored\n" +
-				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[:HAS]->(c:Coordinate {analysisId: analysis})\n" +
-				"WHERE c.deprecate = false\n" +
-				"SET c.deprecated = true";
+				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: analysis}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"SET h.deprecated = true";
 		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 

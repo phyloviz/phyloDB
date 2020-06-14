@@ -90,7 +90,13 @@ public class DatasetRepository extends VersionedRepository<Dataset, Dataset.Prim
 	protected void delete(Dataset.PrimaryKey id) {
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) SET d.deprecated = true WITH d\n" +
 				"MATCH (d)-[:CONTAINS]->(p:Profile) SET p.deprecated = true WITH d\n" +
-				"MATCH (d)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true";
+				"MATCH (d)-[:CONTAINS]->(i:Isolate) SET i.deprecated = true WITH d\n" +
+				"MATCH (d)-[:CONTAINS]->(p1:Profile)-[di:DISTANCES]->(p2:Profile)\n" +
+				"SET di.deprecated = true\n" +
+				"WITH d, di.id as analysis, collect(di) as ignored\n" +
+				"MATCH (d)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: analysis}]->(c:Coordinate)\n" +
+				"WHERE h.deprecated = false\n" +
+				"SET h.deprecated = true";
 		execute(new Query(statement, id.getProjectId(), id.getId()));
 	}
 
