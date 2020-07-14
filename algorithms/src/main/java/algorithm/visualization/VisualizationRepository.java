@@ -62,7 +62,7 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 
 	private Vertex tree(Node current, long distance, String inferenceId) {
 		Vertex[] children = distances(current, Relation.DISTANCES, Direction.OUTGOING, inferenceId)
-				.map(r -> tree(r.getEndNode(), (long) r.getProperty(Distance.DISTANCE), inferenceId))
+				.map(r -> tree(r.getEndNode(), Long.parseLong(String.valueOf(r.getProperty(Distance.DISTANCE))), inferenceId))
 				.toArray(Vertex[]::new);
 		return new Vertex((String) current.getProperty(Profile.ID), distance, children);
 	}
