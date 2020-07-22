@@ -4,6 +4,13 @@ import pt.ist.meic.phylodb.io.input.InputModel;
 
 import java.util.Optional;
 
+/**
+ * A ProfileInputModel is the input model for a profile
+ * <p>
+ * A ProfileInputModel is constituted by the {@link #id} field to identify the profile,
+ * by the {@link #aka}, that is alternative id for the profile,
+ * and by the {@link #alleles} which are the references for the alleles that define this profile.
+ */
 public class ProfileInputModel implements InputModel<Profile> {
 
 	private String id;

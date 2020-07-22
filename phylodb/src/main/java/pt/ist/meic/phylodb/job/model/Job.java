@@ -3,9 +3,17 @@ package pt.ist.meic.phylodb.job.model;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A job is used to represent a request to queue an algorithm execution
+ * <p>
+ * A job is constituted by the {@link #id}, to identify to the job, by the {@link #algorithm} that is the respective algorithm,
+ * the {@link #params}, that can be the dataset id in case of being an inference job, or the dataset id and inference id, in case of
+ * being a visualization job. It is also composed of {@link #analysisId}, that is the id generated for the result of the job, and the
+ * {@link #completed}, and {@link #cancelled} which are the status of the job.
+ */
 public class Job {
 
-	private PrimaryKey id;
+	private final PrimaryKey id;
 	private String algorithm;
 	private Object[] params;
 	private String analysisId;
@@ -60,6 +68,11 @@ public class Job {
 				Objects.equals(analysisId, job.analysisId);
 	}
 
+	/**
+	 * A Job.PrimaryKey is the identification of a job
+	 * <p>
+	 * A Visualization.PrimaryKey is constituted by the {@link #projectId}, and {@link #id} fields which identify the job.
+	 */
 	public static class PrimaryKey {
 
 		private final String projectId;

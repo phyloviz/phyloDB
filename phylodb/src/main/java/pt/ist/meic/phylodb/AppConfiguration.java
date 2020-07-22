@@ -6,6 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
 import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 
+/**
+ * Configuration of the application
+ */
 @Configuration
 public class AppConfiguration implements WebMvcConfigurer {
 

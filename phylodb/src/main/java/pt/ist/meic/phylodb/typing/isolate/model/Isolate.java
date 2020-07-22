@@ -8,6 +8,14 @@ import java.util.Objects;
 
 import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
+/**
+ * An Isolate is an organism isolated from the microbial population, and is defined by a description, a set of {@link Ancillary ancillary details}
+ * and can be associated to a {@link Profile profile}
+ * <p>
+ * An Isolate is constituted by the {@link #id} field to identify the isolate, the {@link #deprecated} field which indicates if the isolate is deprecated, and
+ * the {@link #version} field that is the version of the isolate. It is also constituted by the {@link #description}, that is a description of this isolate,
+ * by the {@link #ancillaries} which are a set of details associated to the isolate, and by the {@link #profile} which is the profile that this isolate is associated with.
+ */
 public class Isolate extends VersionedEntity<Isolate.PrimaryKey> {
 
 	private final String description;
@@ -54,6 +62,11 @@ public class Isolate extends VersionedEntity<Isolate.PrimaryKey> {
 				Objects.equals(profile, isolate.profile);
 	}
 
+	/**
+	 * An Isolate.PrimaryKey is the identification of an isolate
+	 * <p>
+	 * An Isolate.PrimaryKey is constituted by the {@link #projectId}, {@link #datasetId}, {@link #id}, {@link #projectId}, fields which identify the isolate.
+	 */
 	public static class PrimaryKey {
 
 		private final String projectId;

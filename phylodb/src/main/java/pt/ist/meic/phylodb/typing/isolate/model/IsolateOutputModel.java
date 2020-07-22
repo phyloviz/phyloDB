@@ -9,6 +9,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * An IsolateOutputModel is an output model for an isolate
+ * <p>
+ * An IsolateOutputModel contains the {@link #project_id}, {@link #dataset_id}, {@link #id} fields which identify the isolate,
+ * and also contains the {@link #version}, and {@link #deprecated} fields which are the version of the allele, and the existence status respectively.
+ */
 public class IsolateOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -75,6 +81,12 @@ public class IsolateOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
+	/**
+	 * An IsolateOutputModel.Resumed is the resumed information of an isolate output model
+	 * <p>
+	 * An IsolateOutputModel.Resumed is constituted by the {@link #id} field which is the id of the isolate,
+	 * and by the {@link #version} field which is the version of the isolate.
+	 */
 	@JsonIgnoreProperties({"project_id", "dataset_id", "deprecated"})
 	public static class Resumed extends IsolateOutputModel {
 

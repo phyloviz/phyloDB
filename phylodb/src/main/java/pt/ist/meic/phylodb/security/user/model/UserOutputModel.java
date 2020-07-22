@@ -8,6 +8,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * A UserOutputModel is an output model for a user
+ * <p>
+ * A UserOutputModel contains the {@link #email} and {@link #provider} fields which identify the user, and the {@link #version}, and {@link #deprecated}
+ * fields which are the version of the user, and the existence status respectively.
+ */
 public class UserOutputModel implements OutputModel {
 
 	protected String email;
@@ -64,6 +70,12 @@ public class UserOutputModel implements OutputModel {
 				Objects.equals(provider, that.provider);
 	}
 
+	/**
+	 * A UserOutputModel.Resumed is the resumed information of a user output model
+	 * <p>
+	 * A UserOutputModel.Resumed is constituted by the {@link #email} and {@link #provider} fields which identify the user,
+	 * and the {@link #version} which is the version of the user.
+	 */
 	@JsonIgnoreProperties({"deprecated"})
 	public static class Resumed extends UserOutputModel {
 

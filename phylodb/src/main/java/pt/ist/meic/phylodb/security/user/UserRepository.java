@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Class that contains the implementation of the {@link VersionedRepository} for users
+ */
 @Repository
 public class UserRepository extends VersionedRepository<User, User.PrimaryKey> {
 
@@ -80,6 +83,12 @@ public class UserRepository extends VersionedRepository<User, User.PrimaryKey> {
 		execute(new Query(statement, key.getId(), key.getProvider()));
 	}
 
+	/**
+	 * Verifies if any of the users represented by the primary keys received in the params doesn't exist
+	 *
+	 * @param keys users {@link User.PrimaryKey primary keys}
+	 * @return {@code true} if any of the users represented by the keys doesn't exist
+	 */
 	public boolean anyMissing(User.PrimaryKey[] keys) {
 		String parameterized = Arrays.stream(keys).map((i) -> "{id: $, provider: $}").collect(Collectors.joining(","));
 		String statement = String.format("MATCH (u:User)\n" +

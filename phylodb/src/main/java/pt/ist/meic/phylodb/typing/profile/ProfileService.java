@@ -9,6 +9,7 @@ import pt.ist.meic.phylodb.io.formatters.dataset.profile.ProfilesFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleRepository;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.typing.dataset.DatasetRepository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
@@ -18,9 +19,17 @@ import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
+/**
+ * Class that contains operations to manage profiles
+ * <p>
+ * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
+ */
 @Service
 public class ProfileService {
 
@@ -39,22 +48,56 @@ public class ProfileService {
 		this.schemaRepository = schemaRepository;
 	}
 
+	/**
+	 * Operation to retrieve the resumed information of the requested profiles
+	 *
+	 * @param projectId identifier of the {@link Project project}
+	 * @param datasetId identifier of the {@link Dataset dataset}
+	 * @param page      number of the page to retrieve
+	 * @param limit     number of profiles to retrieve by page
+	 * @return an {@link Optional} with a {@link List} of {@link VersionedEntity<Profile.PrimaryKey>}, which is the resumed information of each profile
+	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Profile.PrimaryKey>>> getProfilesEntities(String projectId, String datasetId, int page, int limit) {
 		return profileRepository.findAllEntities(page, limit, projectId, datasetId);
 	}
 
+	/**
+	 * Operation to retrieve the information of the requested profiles
+	 *
+	 * @param projectId identifier of the {@link Project project}
+	 * @param datasetId identifier of the {@link Dataset dataset}
+	 * @param page      number of the page to retrieve
+	 * @param limit     number of profiles to retrieve by page
+	 * @return an {@link Optional} with a {@link List<Profile>} which is the information of each profile
+	 */
 	@Transactional(readOnly = true)
 	public Optional<Pair<Schema, List<Profile>>> getProfiles(String projectId, String datasetId, int page, int limit) {
 		return profileRepository.findAll(page, limit, projectId, datasetId)
 				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
 	}
 
+	/**
+	 * Operation to retrieve the requested profile
+	 *
+	 * @param projectId identifier of the {@link Project project}
+	 * @param datasetId identifier of the {@link Dataset dataset}
+	 * @param profileId identifier of the {@link Profile profile}
+	 * @param version   version of the profile
+	 * @return an {@link Optional} of {@link Profile}, which is the requested profile
+	 */
 	@Transactional(readOnly = true)
 	public Optional<Profile> getProfile(String projectId, String datasetId, String profileId, long version) {
 		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
 	}
 
+	/**
+	 * Operation to save a profile
+	 *
+	 * @param profile    profile to be saved
+	 * @param authorized boolean which indicates if the alleles used are private or public
+	 * @return {@code true} if the profile was saved
+	 */
 	@Transactional
 	public boolean saveProfile(Profile profile, boolean authorized) {
 		if (profile == null)
@@ -72,16 +115,44 @@ public class ProfileService {
 		return verifyAlleles(profile.getAllelesReferences()) && profileRepository.save(profile);
 	}
 
+	/**
+	 * Operation to deprecate a profile
+	 *
+	 * @param projectId identifier of the {@link Project project}
+	 * @param datasetId identifier of the {@link Dataset dataset}
+	 * @param profileId identifier of the {@link Profile profile}
+	 * @return {@code true} if the profile was deprecated
+	 */
 	@Transactional
 	public boolean deleteProfile(String projectId, String datasetId, String profileId) {
 		return profileRepository.remove(new Profile.PrimaryKey(projectId, datasetId, profileId));
 	}
 
+	/**
+	 * Operation to save several profiles if they don't exist
+	 *
+	 * @param projectId  identifier of the {@link Project project}
+	 * @param datasetId  identifier of the {@link Dataset dataset}
+	 * @param authorized boolean which indicates if the alleles used are private or public
+	 * @param file       file with the profiles
+	 * @return an {@link Optional} of {@link Pair} where the key is the list of line numbers that couldn't be parsed, and the value is list of profiles ids parsed that are not valid
+	 * @throws IOException if there is an error parsing the file
+	 */
 	@Transactional
 	public Optional<Pair<Integer[], String[]>> saveProfilesOnConflictSkip(String projectId, String datasetId, boolean authorized, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, authorized, false, file);
 	}
 
+	/**
+	 * Operation to save several profiles
+	 *
+	 * @param projectId  identifier of the {@link Project project}
+	 * @param datasetId  identifier of the {@link Dataset dataset}
+	 * @param authorized boolean which indicates if the alleles used are private or public
+	 * @param file       file with the profiles
+	 * @return an {@link Optional} of {@link Pair} where the key is the list of line numbers that couldn't be parsed, and the value is list of profiles ids parsed that are not valid
+	 * @throws IOException if there is an error parsing the file
+	 */
 	@Transactional
 	public Optional<Pair<Integer[], String[]>> saveProfilesOnConflictUpdate(String projectId, String datasetId, boolean authorized, MultipartFile file) throws IOException {
 		return saveAll(projectId, datasetId, authorized, true, file);
@@ -98,7 +169,7 @@ public class ProfileService {
 		List<String> invalids = new ArrayList<>();
 		List<Profile> profiles = parsed.getKey(), toSave = new ArrayList<>();
 		for (Profile profile : profiles) {
-			if(canSave.test(profile) && verifyAlleles(profile.getAllelesReferences())) {
+			if (canSave.test(profile) && verifyAlleles(profile.getAllelesReferences())) {
 				toSave.add(profile);
 				continue;
 			}

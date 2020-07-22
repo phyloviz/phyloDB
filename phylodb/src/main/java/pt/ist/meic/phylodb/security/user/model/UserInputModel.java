@@ -5,6 +5,12 @@ import pt.ist.meic.phylodb.security.authorization.Role;
 
 import java.util.Optional;
 
+/**
+ * A UserInputModel is the input model for a user
+ * <p>
+ * A UserInputModel is constituted by the {@link #id} and {@link #provider} fields to identify the user,
+ * and the {@link #role}, which is the role of the user.
+ */
 public class UserInputModel implements InputModel<User> {
 
 	private String id;

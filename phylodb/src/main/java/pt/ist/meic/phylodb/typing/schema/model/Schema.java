@@ -11,6 +11,13 @@ import java.util.stream.Collectors;
 
 import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
+/**
+ * A schema is a domain entity to represent a typing methodology schema, it is composed of several {@link Locus loci}
+ * <p>
+ * A schema is constituted by the {@link #id} field to identify the schema, the {@link #deprecated} field which indicates if the schema is deprecated, and
+ * the {@link #version} field that is the version of the schema. It is also constituted by the {@link #type}, which the method of this schema,
+ * by the {@link #description}, that is a description of this taxon, and by the {@link #lociIds}, which are the set of loci that compose this schema.
+ */
 public class Schema extends VersionedEntity<Schema.PrimaryKey> {
 
 	private final Method type;
@@ -60,6 +67,11 @@ public class Schema extends VersionedEntity<Schema.PrimaryKey> {
 				Objects.equals(lociIds, schema.lociIds);
 	}
 
+	/**
+	 * A Schema.PrimaryKey is the identification of a schema
+	 * <p>
+	 * A Schema.PrimaryKey is constituted by the {@link #taxonId}, and {@link #id} fields which identify the schema.
+	 */
 	public static class PrimaryKey {
 
 		private final String taxonId;

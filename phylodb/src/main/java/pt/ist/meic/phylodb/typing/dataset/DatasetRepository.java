@@ -11,6 +11,9 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Map;
 
+/**
+ * Class that contains the implementation of the {@link VersionedRepository} for datasets
+ */
 @Repository
 public class DatasetRepository extends VersionedRepository<Dataset, Dataset.PrimaryKey> {
 

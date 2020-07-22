@@ -2,6 +2,12 @@ package pt.ist.meic.phylodb.security.user.model;
 
 import java.util.Objects;
 
+/**
+ * A GetUserOutputModel is the output model representation of a {@link User}
+ * <p>
+ * A GetUserOutputModel is constituted by the {@link #email} and {@link #provider} fields to identify the project, the {@link #deprecated}, and {@link #version} fields which
+ * indicates if the user is deprecated, and what version it has. It also contains the {@link #role}, that is the user role.
+ */
 public class GetUserOutputModel extends UserOutputModel {
 
 	private String role;

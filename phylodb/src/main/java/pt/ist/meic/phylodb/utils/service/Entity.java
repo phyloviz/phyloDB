@@ -2,6 +2,11 @@ package pt.ist.meic.phylodb.utils.service;
 
 import java.util.Objects;
 
+/**
+ * An Entity is an domain object that can be identified an {@link K id}, and that can be signaled as deprecated
+ *
+ * @param <K> entity id
+ */
 public class Entity<K> {
 
 	protected K id;

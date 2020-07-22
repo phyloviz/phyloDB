@@ -9,6 +9,12 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.Objects;
 
+/**
+ * Base class of an inference output model, which extends {@link OutputModel}
+ * <p>
+ * An InferenceOutputModel contains the base information of an inference, and is constituted by the {@link #project_id}, {@link #dataset_id}, and {@link #id}
+ * fields to identify the inference. It also contains the {@link #deprecated} field which indicates if the inference is deprecated.
+ */
 public class InferenceOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -52,11 +58,6 @@ public class InferenceOutputModel implements OutputModel {
 	}
 
 	@Override
-	public ResponseEntity<InferenceOutputModel> toResponseEntity() {
-		return ResponseEntity.status(HttpStatus.OK).body(this);
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -67,6 +68,16 @@ public class InferenceOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
+	@Override
+	public ResponseEntity<InferenceOutputModel> toResponseEntity() {
+		return ResponseEntity.status(HttpStatus.OK).body(this);
+	}
+
+	/**
+	 * An InferenceOutputModel.Resumed is the resumed information of an inference output model
+	 * <p>
+	 * An InferenceOutputModel.Resumed is constituted by the {@link #id} field which is the id of the inference.
+	 */
 	@JsonIgnoreProperties({"project_id", "dataset_id", "deprecated"})
 	public static class Resumed extends InferenceOutputModel {
 

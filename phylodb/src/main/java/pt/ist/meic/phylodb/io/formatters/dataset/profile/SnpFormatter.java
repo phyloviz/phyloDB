@@ -5,6 +5,9 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * SnpFormatter is the implementation of the formatter to parse and format profiles in snp
+ */
 public class SnpFormatter extends ProfilesFormatter {
 
 	public SnpFormatter() {

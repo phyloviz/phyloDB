@@ -5,6 +5,11 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * An edge is used to represent distances between 2 profiles, and exist within an {@link Inference inference}
+ * <p>
+ * An edge is constituted by the {@link #from} and {@link #to} profiles references, and the {@link #weight} between them.
+ */
 public class Edge {
 
 	private final VersionedEntity<Profile.PrimaryKey> from;

@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * An inference is the result of an inference study executed on a dataset. It contains a list of {@link Edge edges} that represent the result of the inference
+ * <p>
+ * An inference is constituted by the {@link #projectId}, {@link #datasetId}, and {@link #id} fields to identify the inference,
+ * the {@link #profileIds} that contains the real profile ids, the {@link #algorithm} field that is the algorithm used to produce the inference, and by the {@link #edges} field which are the edges that compose this inference.
+ * An inference results of an inference algorithm execution.
+ */
 public class Inference {
 
 	private final String projectId;

@@ -2,6 +2,11 @@ package pt.ist.meic.phylodb.typing.isolate.model;
 
 import java.util.Objects;
 
+/**
+ * An ancillary is the additional details that can be associated to an {@link Isolate isolate}
+ * <p>
+ * An ancillary is defined an {@link #key} which is the name of the detail, and the {@link #value} that is the actual value for the detail.
+ */
 public class Ancillary {
 
 	private String key;

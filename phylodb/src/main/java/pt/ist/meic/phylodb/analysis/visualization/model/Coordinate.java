@@ -4,6 +4,13 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 
 import java.util.Objects;
 
+/**
+ * A coordinate is used to represent the position of a profile within a {@link Visualization visualization}
+ * <p>
+ * A coordinate is constituted by the {@link #profile}, to identify to which profile the coordinate belongs to,
+ * by the {@link #component} to specify the component of the visualization it belongs to, and by the {@link #x} and {@link #y}
+ * that are the axis positions.
+ */
 public class Coordinate {
 
 	private Profile.PrimaryKey profile;

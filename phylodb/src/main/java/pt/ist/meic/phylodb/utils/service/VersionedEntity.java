@@ -2,6 +2,11 @@ package pt.ist.meic.phylodb.utils.service;
 
 import java.util.Objects;
 
+/**
+ * An VersionedEntity is an {@link Entity} that is versioned
+ *
+ * @param <K> entity id
+ */
 public class VersionedEntity<K> extends Entity<K> {
 
 	protected long version;

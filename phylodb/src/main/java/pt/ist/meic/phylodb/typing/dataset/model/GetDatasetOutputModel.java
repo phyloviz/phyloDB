@@ -6,6 +6,14 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * A GetDatasetOutputModel is the output model representation of a {@link Dataset}
+ * <p>
+ * A GetDatasetOutputModel is constituted by the {@link #project_id}, and {@link #id} fields which identify the dataset,
+ * the {@link #deprecated}, and {@link #version} fields which indicates if the dataset is deprecated, and what version it has.
+ * It also contains the the {@link #description}, that is the dataset description and the {@link #schema}, which is
+ * {@link SchemaOutputModel schema} it follows.
+ */
 public class GetDatasetOutputModel extends DatasetOutputModel {
 
 	private String description;

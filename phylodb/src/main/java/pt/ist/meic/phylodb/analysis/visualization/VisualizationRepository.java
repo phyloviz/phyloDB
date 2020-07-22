@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class that contains the implementation of the {@link UnversionedRepository} for visualizations
+ */
 @Repository
 public class VisualizationRepository extends UnversionedRepository<Visualization, Visualization.PrimaryKey> {
 
@@ -59,7 +62,7 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 		List<Coordinate> list = new ArrayList<>();
 		String projectId = row.get("projectId").toString();
 		String datasetId = row.get("datasetId").toString();
-		for (Map<String, Object> coordinates: (Map<String, Object>[]) row.get("coordinates")) {
+		for (Map<String, Object> coordinates : (Map<String, Object>[]) row.get("coordinates")) {
 			Profile.PrimaryKey profile = new Profile.PrimaryKey(projectId, datasetId, (String) coordinates.get("profileId"));
 			list.add(new Coordinate(profile, (long) coordinates.get("component"), (double) coordinates.get("x"), (double) coordinates.get("y")));
 		}

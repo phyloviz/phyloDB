@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * MlFormatter is the implementation of the formatter to parse and format profiles in mslt or mlva
+ */
 public class MlFormatter extends ProfilesFormatter {
 
 	@Override

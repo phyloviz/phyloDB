@@ -9,6 +9,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * A ProfileOutputModel is an output model for a profile
+ * <p>
+ * A ProfileOutputModel contains the {@link #project_id}, {@link #dataset_id}, {@link #id} fields which identify the profile,
+ * and also contains the {@link #version}, and {@link #deprecated} fields which are the version of the profile, and the existence status respectively.
+ */
 public class ProfileOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -75,7 +81,12 @@ public class ProfileOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
-
+	/**
+	 * A ProfileOutputModel.Resumed is the resumed information of a profile output model
+	 * <p>
+	 * A ProfileOutputModel.Resumed is constituted by the {@link #id} field which is the id of the profile,
+	 * and by the {@link #version} field which is the version of the profile.
+	 */
 	@JsonIgnoreProperties({"project_id", "dataset_id", "deprecated"})
 	public static class Resumed extends ProfileOutputModel {
 

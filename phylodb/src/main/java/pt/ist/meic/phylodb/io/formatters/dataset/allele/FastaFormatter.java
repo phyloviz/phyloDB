@@ -7,6 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * FastaFormatter is the implementation of the formatter to parse and format alleles in fasta
+ */
 public class FastaFormatter extends Formatter<Allele> {
 
 	private String taxon;
@@ -31,7 +34,7 @@ public class FastaFormatter extends Formatter<Allele> {
 			if (id != null && sequence.length() > 0)
 				add.accept(new Allele(taxon, locus, id, sequence.toString(), project));
 			int idIndex = line.lastIndexOf("_");
-			if(idIndex == -1 || idIndex == line.length() - 1)
+			if (idIndex == -1 || idIndex == line.length() - 1)
 				return false;
 			id = line.substring(idIndex + 1);
 			sequence = new StringBuilder();

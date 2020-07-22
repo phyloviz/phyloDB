@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Class that contains the implementation of the {@link Repository} for visualizations
+ */
 public class VisualizationRepository extends Repository<Visualization, Tree> {
 
 	public VisualizationRepository(GraphDatabaseService database) {
@@ -26,13 +29,13 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
 		List<Relationship> distances = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL)
 				.flatMap(n -> relationships(n, Relation.DISTANCES, Direction.OUTGOING)
-					.filter(r -> r.getProperty(Distance.ID).equals(inferenceId)))
+						.filter(r -> r.getProperty(Distance.ID).equals(inferenceId)))
 				.collect(Collectors.toList());
 		Vertex[] roots = distances.stream()
 				.map(Relationship::getStartNode)
 				.filter(r -> distances.stream().noneMatch(r2 -> r2.getEndNode().equals(r)))
 				.distinct()
-				.map(n ->  tree(n, 0, inferenceId))
+				.map(n -> tree(n, 0, inferenceId))
 				.toArray(Vertex[]::new);
 		return new Tree(roots);
 	}
@@ -70,4 +73,5 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 	private Stream<Relationship> distances(Node node, Relation relationship, Direction direction, String id) {
 		return relationships(node, relationship, direction).filter(r -> r.getProperty(Distance.ID).equals(id));
 	}
+
 }

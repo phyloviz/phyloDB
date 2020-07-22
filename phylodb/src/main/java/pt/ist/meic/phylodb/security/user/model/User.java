@@ -7,6 +7,12 @@ import java.util.Objects;
 
 import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
+/**
+ * A User is a domain entity that represent the several users of the platform
+ * <p>
+ * A User is constituted by the {@link #id} field to identify the user, the {@link #deprecated} field which indicates if the user is deprecated, and
+ * the {@link #version} field that is the version of the user. It is also constituted by the {@link #role}, that is the {@link Role role} of the user,
+ */
 public class User extends VersionedEntity<User.PrimaryKey> {
 
 	private final Role role;
@@ -33,6 +39,11 @@ public class User extends VersionedEntity<User.PrimaryKey> {
 				Objects.equals(role, user.role);
 	}
 
+	/**
+	 * A User.PrimaryKey is the identification of a user
+	 * <p>
+	 * A User.PrimaryKey is constituted by the {@link #id}, {@link #provider} fields which identify the user.
+	 */
 	public static class PrimaryKey {
 
 		private String id;

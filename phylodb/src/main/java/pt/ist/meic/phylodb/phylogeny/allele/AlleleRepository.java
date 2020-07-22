@@ -11,6 +11,9 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 import java.util.*;
 import java.util.stream.StreamSupport;
 
+/**
+ * Class that contains the implementation of the {@link BatchRepository} for alleles
+ */
 @Repository
 public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey> {
 
@@ -123,6 +126,12 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		return query.appendQuery(getInsertStatement());
 	}
 
+	/**
+	 * Verifies if any of the alleles represented by the primary keys received in the params doesn't exist
+	 *
+	 * @param references alleles {@link VersionedEntity<Allele.PrimaryKey> primary keys}
+	 * @return {@code true} if any of alleles represented by the keys don't exist
+	 */
 	public boolean anyMissing(List<VersionedEntity<Allele.PrimaryKey>> references) {
 		Optional<VersionedEntity<Allele.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
 		if (!optional.isPresent())
@@ -148,7 +157,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 				.toArray())
 		);
 		Iterator<Map<String, Object>> it = result.iterator();
-		if(!it.hasNext())
+		if (!it.hasNext())
 			return true;
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false)
 				.anyMatch(r -> r.get("present") == null);

@@ -4,6 +4,9 @@ import pt.ist.meic.phylodb.security.authentication.TokenInfo;
 
 import java.util.Arrays;
 
+/**
+ * GoogleToken is the class that represent the token information retrieved by the google identity provider
+ */
 public class GoogleToken extends TokenInfo {
 
 	private static final String SCOPE = "https://www.googleapis.com/auth/userinfo.email";

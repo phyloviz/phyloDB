@@ -8,6 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A GetProfileOutputModel is the output model representation of an {@link Profile}
+ * <p>
+ * A GetProfileOutputModel is constituted by the {@link #project_id}, {@link #dataset_id}, {@link #id} fields to identify the profile,
+ * the {@link #deprecated}, and {@link #version} fields which indicates if the profile is deprecated, and what version it has. It is also constituted
+ * by the {@link #aka}, that is alternative id for the profile, and by the {@link #alleles} which are the references for the alleles that define this profile.
+ */
 public class GetProfileOutputModel extends ProfileOutputModel {
 
 	private String aka;

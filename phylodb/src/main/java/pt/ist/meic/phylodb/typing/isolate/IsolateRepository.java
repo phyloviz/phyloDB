@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class that contains the implementation of the {@link BatchRepository} for isolates
+ */
 @Repository
 public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryKey> {
 

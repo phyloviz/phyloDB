@@ -1,5 +1,11 @@
 package pt.ist.meic.phylodb.job.model;
 
+/**
+ * A JobOutputModel is an output model for a job
+ * <p>
+ * A JobOutputModel contains the {@link #id} field which identify the job, and the {@link #completed}, and {@link #cancelled}
+ * fields which are the status of the job.
+ */
 public class JobOutputModel {
 
 	private String id;

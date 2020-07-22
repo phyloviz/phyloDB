@@ -9,6 +9,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * A DatasetOutputModel is an output model for a dataset
+ * <p>
+ * A DatasetOutputModel contains the {@link #project_id}, and {@link #id} fields which identify the dataset, and the {@link #version}, and {@link #deprecated}
+ * fields which are the version of the dataset, and the existence status respectively.
+ */
 public class DatasetOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -66,7 +72,12 @@ public class DatasetOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
-
+	/**
+	 * A DatasetOutputModel.Resumed is the resumed information of a dataset output model
+	 * <p>
+	 * A DatasetOutputModel.Resumed is constituted by the {@link #id} field which is the id of the dataset,
+	 * and by the {@link #version} field which is the version of the dataset.
+	 */
 	@JsonIgnoreProperties({"project_id", "deprecated"})
 	public static class Resumed extends DatasetOutputModel {
 

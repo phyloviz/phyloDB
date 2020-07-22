@@ -17,13 +17,24 @@ import java.util.Optional;
 
 import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
+/**
+ * AuthorizationInterceptor is the implementation of {@link SecurityInterceptor} that validates if the user performing the
+ * request has access to the respective project.
+ * <p>
+ * A user is authorized when:
+ * - Its an admin
+ * - The project and belongs to the user
+ * - The project is public and doesn't belong to the user, but the activity is management and its a read operation
+ * - The project is public and doesn't belong to the user, but the activity is algorithms
+ * - The resource doesn't belong to a project
+ */
 @Component
 @Order(2)
 public class AuthorizationInterceptor extends SecurityInterceptor {
 
 	public static final String PROJECT = "project";
 
-	private ProjectService projectService;
+	private final ProjectService projectService;
 
 	public AuthorizationInterceptor(ProjectService projectService) {
 		this.projectService = projectService;
@@ -40,13 +51,13 @@ public class AuthorizationInterceptor extends SecurityInterceptor {
 		Map<String, Object> pathVariables = (Map<String, Object>) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		Object projectId = pathVariables.getOrDefault(PROJECT, req.getParameter(PROJECT));
 		if (projectId != null) {
-			if(annotation.role() == Role.USER) {
+			if (annotation.role() == Role.USER) {
 				Optional<Project> optional = projectService.getProject(projectId.toString(), CURRENT_VERSION_VALUE);
 				if (optional.isPresent()) {
 					Project project = optional.get();
 					boolean included = Arrays.stream(project.getUsers())
 							.anyMatch(u -> u.getId().equals(userId) && u.getProvider().equals(provider));
-					if(annotation.activity() == Activity.MANAGEMENT && ((operation == Operation.WRITE && included) ||
+					if (annotation.activity() == Activity.MANAGEMENT && ((operation == Operation.WRITE && included) ||
 							(operation == Operation.READ && (included || project.getVisibility() == Visibility.PUBLIC))))
 						return true;
 					else if (annotation.activity() == Activity.ALGORITHMS && (included || project.getVisibility() == Visibility.PUBLIC))

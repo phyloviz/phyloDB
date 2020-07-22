@@ -4,8 +4,8 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Class that contains the implementation of the {@link VersionedRepository} for loci
+ */
 @Repository
 public class LocusRepository extends VersionedRepository<Locus, Locus.PrimaryKey> {
 
@@ -83,6 +86,12 @@ public class LocusRepository extends VersionedRepository<Locus, Locus.PrimaryKey
 		execute(new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
+	/**
+	 * Verifies if any of the loci represented by the primary keys received in the params doesn't exist
+	 *
+	 * @param references loci {@link VersionedEntity<Locus.PrimaryKey> primary keys}
+	 * @return {@code true} if any of loci represented by the keys don't exist
+	 */
 	public boolean anyMissing(List<VersionedEntity<Locus.PrimaryKey>> references) {
 		String parameterized = references.stream().map((i) -> "$").collect(Collectors.joining(","));
 		String statement = String.format("MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)\n" +

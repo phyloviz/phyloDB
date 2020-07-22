@@ -5,6 +5,13 @@ import pt.ist.meic.phylodb.io.input.InputModel;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * An IsolateInputModel is the input model for an isolate
+ * <p>
+ * An IsolateInputModel is constituted by the {@link #id} field to identify the isolate,
+ * by the {@link #description}, that is a description of this isolate, by the {@link #ancillaries}
+ * which are a set of details associated to the isolate, and by the {@link #profileId} which is the profile that this isolate is associated with.
+ */
 public class IsolateInputModel implements InputModel<Isolate> {
 
 	private String id;

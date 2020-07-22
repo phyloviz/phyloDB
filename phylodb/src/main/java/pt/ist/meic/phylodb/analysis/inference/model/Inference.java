@@ -5,7 +5,13 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * An inference is the result of an inference study executed on a dataset. It contains a list of {@link Edge edges} that represent the result of the inference
+ * <p>
+ * An inference is constituted by the {@link #id} field to identify the inference, the {@link #deprecated} field which indicates if the inference is deprecated,
+ * the {@link #algorithm} field that is the algorithm used to produce the inference, and by the {@link #edges} field which are the edges that compose this inference.
+ * An inference results of an inference algorithm execution.
+ */
 public class Inference extends Entity<Inference.PrimaryKey> {
 
 	private final InferenceAlgorithm algorithm;
@@ -39,6 +45,11 @@ public class Inference extends Entity<Inference.PrimaryKey> {
 				Objects.equals(edges, inference.edges);
 	}
 
+	/**
+	 * An Inference.PrimaryKey is the identification of an inference
+	 * <p>
+	 * An Inference.PrimaryKey is constituted by the {@link #projectId}, {@link #datasetId}, and {@link #id} fields which identify the inference.
+	 */
 	public static class PrimaryKey {
 
 		private final String projectId;
@@ -72,6 +83,7 @@ public class Inference extends Entity<Inference.PrimaryKey> {
 					Objects.equals(datasetId, that.datasetId) &&
 					Objects.equals(id, that.id);
 		}
+
 	}
 
 }

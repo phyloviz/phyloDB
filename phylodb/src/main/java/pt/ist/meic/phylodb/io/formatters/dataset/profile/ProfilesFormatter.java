@@ -7,8 +7,14 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
+/**
+ * Base class for profile formatters
+ */
 public abstract class ProfilesFormatter extends Formatter<Profile> {
 
 	protected String projectId;
@@ -17,6 +23,12 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 	protected String missing;
 	protected boolean authorized;
 
+	/**
+	 * Retrieves the requested ProfilesFormatter
+	 *
+	 * @param format a String that identifies the formatter
+	 * @return the ProfilesFormatter represented by the parameter format
+	 */
 	public static ProfilesFormatter get(String format) {
 		return new HashMap<String, ProfilesFormatter>() {{
 			put(Method.MLST.getName(), new MlFormatter());
@@ -25,6 +37,12 @@ public abstract class ProfilesFormatter extends Formatter<Profile> {
 		}}.get(format);
 	}
 
+	/**
+	 * Retrieves the alleles formatted to be used in the {@link #format(List, Object...)} operation
+	 *
+	 * @param alleles list of alleles
+	 * @return a {@link List<String>} with each allele formatted
+	 */
 	protected static List<String> formatAlleles(List<VersionedEntity<Allele.PrimaryKey>> alleles) {
 		List<String> output = new ArrayList<>();
 		for (VersionedEntity<Allele.PrimaryKey> allele : alleles) {

@@ -1,9 +1,16 @@
 package pt.ist.meic.phylodb.phylogeny.allele.model;
 
+import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * An Allele is defined by an sequence assembled in the an alignment process, and occupies a given position of a {@link Locus}
+ * <p>
+ * An Allele is constituted by the {@link #id} field to identify the allele, the {@link #deprecated} field which indicates if the allele is deprecated, and
+ * the {@link #version} field that is the version of the allele. It is also constituted by the {@link #sequence}, that is sequence that this allele represents.
+ */
 public class Allele extends VersionedEntity<Allele.PrimaryKey> {
 
 	private final String sequence;
@@ -38,6 +45,11 @@ public class Allele extends VersionedEntity<Allele.PrimaryKey> {
 		return super.equals(allele) && Objects.equals(sequence, allele.sequence);
 	}
 
+	/**
+	 * An Allele.PrimaryKey is the identification of an allele
+	 * <p>
+	 * An Allele.PrimaryKey is constituted by the {@link #taxonId}, {@link #locusId}, {@link #id}, {@link #projectId}, fields which identify the allele.
+	 */
 	public static class PrimaryKey {
 
 		private final String taxonId;

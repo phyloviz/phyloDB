@@ -5,11 +5,17 @@ import pt.ist.meic.phylodb.io.formatters.Formatter;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * IsolatesFormatter is the implementation of the formatter to parse and format isolates
+ */
 public class IsolatesFormatter extends Formatter<Isolate> {
 
 	private List<String> headers;

@@ -1,5 +1,8 @@
 package algorithm.inference.model;
 
+/**
+ * A matrix represents the differences between the profiles of an dataset
+ */
 public class Matrix {
 
 	private final String[] ids;

@@ -1,12 +1,19 @@
 package pt.ist.meic.phylodb.security.project.model;
 
 import pt.ist.meic.phylodb.io.input.InputModel;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
+import pt.ist.meic.phylodb.security.user.model.User;
 
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * A ProjectInputModel is the input model for a project
+ * <p>
+ * A ProjectInputModel is constituted by the {@link #id} field to identify the project, the {@link #name},
+ * that is the project name, the {@link #visibility} which is the project visibility, either private or public,
+ * the {@link #description}, that is the project description and the {@link #users}, which are the users that have access to the project.
+ */
 public class ProjectInputModel implements InputModel<Project> {
 
 	private String id;
@@ -48,7 +55,7 @@ public class ProjectInputModel implements InputModel<Project> {
 
 	@Override
 	public Optional<Project> toDomainEntity(String... params) {
-		String id = params.length == 0 ? UUID.randomUUID().toString() :params[0];
+		String id = params.length == 0 ? UUID.randomUUID().toString() : params[0];
 		return (params.length != 0 && !params[0].equals(this.id)) || name == null || users == null ||
 				visibility == null || !Visibility.exists(visibility) ?
 				Optional.empty() :

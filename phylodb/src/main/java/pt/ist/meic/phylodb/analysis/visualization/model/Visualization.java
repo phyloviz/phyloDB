@@ -5,6 +5,13 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A Visualization is the result of an visualization algorithm executed on a inference study. It contains a list of {@link Coordinate coordinates} that represent the result of the visualization algorithm
+ * <p>
+ * A Visualization is constituted by the {@link #id} field to identify the visualization, the {@link #deprecated} field which indicates if the visualization is deprecated,
+ * the {@link #algorithm} field that is the algorithm used to produce the visualization, and by the {@link #coordinates} field which are the coordinates that compose this visualization.
+ * An Visualization results of a visualization algorithm execution.
+ */
 public class Visualization extends Entity<Visualization.PrimaryKey> {
 
 	private final VisualizationAlgorithm algorithm;
@@ -34,6 +41,11 @@ public class Visualization extends Entity<Visualization.PrimaryKey> {
 				Objects.equals(coordinates, that.coordinates);
 	}
 
+	/**
+	 * A Visualization.PrimaryKey is the identification of an visualization
+	 * <p>
+	 * A Visualization.PrimaryKey is constituted by the {@link #projectId}, {@link #datasetId}, {@link #inferenceId}, and {@link #id} fields which identify the visualization.
+	 */
 	public static class PrimaryKey {
 
 		private final String projectId;
@@ -76,4 +88,5 @@ public class Visualization extends Entity<Visualization.PrimaryKey> {
 		}
 
 	}
+
 }

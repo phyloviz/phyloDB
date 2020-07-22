@@ -2,6 +2,11 @@ package pt.ist.meic.phylodb.error;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * A Problem is used to represent an error that happened when handling a request
+ * <p>
+ * A problem is constituted by the {@link #name()} and {@link #status}.
+ */
 public enum Problem {
 
 	SERVER(HttpStatus.INTERNAL_SERVER_ERROR),

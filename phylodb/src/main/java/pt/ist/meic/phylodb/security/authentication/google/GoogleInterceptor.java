@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * GoogleInterceptor is the implementation of {@link AuthenticationInterceptor} that uses the google identity provider
+ * to perform instropect the access tokens
+ */
 @Component
 @Order(1)
 public class GoogleInterceptor extends AuthenticationInterceptor {

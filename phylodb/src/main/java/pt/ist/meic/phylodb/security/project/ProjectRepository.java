@@ -3,16 +3,19 @@ package pt.ist.meic.phylodb.security.project;
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.model.Project;
-import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Class that contains the implementation of the {@link VersionedRepository} for projects
+ */
 @Repository
 public class ProjectRepository extends VersionedRepository<Project, String> {
 

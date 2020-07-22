@@ -1,11 +1,13 @@
 package algorithm.inference;
 
-import algorithm.repository.type.*;
-import algorithm.repository.Repository;
 import algorithm.inference.model.Edge;
 import algorithm.inference.model.Inference;
 import algorithm.inference.model.Matrix;
-import org.neo4j.graphdb.*;
+import algorithm.repository.Repository;
+import algorithm.repository.type.*;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +16,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Class that contains the implementation of the {@link Repository} for inferences
+ */
 public class InferenceRepository extends Repository<Inference, Matrix> {
 
 	public InferenceRepository(GraphDatabaseService database) {
@@ -40,8 +45,8 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 				.peek(i -> ids[i] = (String) profiles.get(i).getProperty(Profile.ID))
 				.peek(i -> isolates[i] = Math.toIntExact(relationships(profiles.get(i), Relation.HAS, Direction.INCOMING).count()))
 				.forEach(i -> relationships(detail(profiles.get(i)), Relation.HAS, Direction.OUTGOING)
-						.map(r -> new Object[] {Math.toIntExact((long)  r.getProperty(Allele.PART)), r.getEndNode().getProperty(Allele.ID)})
-						.forEach(p -> alleles[i][((int)p[0]) - 1] = (String) p[1]));
+						.map(r -> new Object[]{Math.toIntExact((long) r.getProperty(Allele.PART)), r.getEndNode().getProperty(Allele.ID)})
+						.forEach(p -> alleles[i][((int) p[0]) - 1] = (String) p[1]));
 		return new Matrix(ids, isolates, alleles);
 	}
 
@@ -72,7 +77,7 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 	private List<Edge> direct(List<Edge> edges) {
 		List<Edge> directed = new ArrayList<>();
 		List<Edge> toDirect = new ArrayList<>(edges);
-		while(!toDirect.isEmpty()) {
+		while (!toDirect.isEmpty()) {
 			Integer root = toDirect.stream()
 					.map(Edge::from)
 					.filter(i -> edges.stream().noneMatch(edge -> edge.to() == i))
@@ -95,4 +100,5 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 		}
 		return directed;
 	}
+
 }

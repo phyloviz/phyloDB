@@ -8,19 +8,25 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A GetProfilesOutputModel is the output model representation of a set of {@link Profile profiles}
+ * <p>
+ * A GetProfilesOutputModel is constituted by the {@link #profiles} field that contains the resumed information of each profile.
+ * Each resumed information is represented by an {@link ProfileOutputModel.Resumed} object.
+ */
 public class GetProfilesOutputModel implements OutputModel {
 
-	private final List<ProfileOutputModel.Resumed> entities;
+	private final List<ProfileOutputModel.Resumed> profiles;
 
 	public GetProfilesOutputModel(List<VersionedEntity<Profile.PrimaryKey>> entities) {
-		this.entities = entities.stream()
+		this.profiles = entities.stream()
 				.map(ProfileOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public ResponseEntity<List<ProfileOutputModel.Resumed>> toResponseEntity() {
-		return ResponseEntity.status(HttpStatus.OK).body(entities);
+		return ResponseEntity.status(HttpStatus.OK).body(profiles);
 	}
 
 }

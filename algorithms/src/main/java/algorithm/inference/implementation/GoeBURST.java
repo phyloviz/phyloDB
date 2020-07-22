@@ -8,10 +8,13 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 
+/**
+ * GoeBURST is an InferenceAlgorithm which implements the goeBURST algorithm
+ */
 public class GoeBURST extends InferenceAlgorithm {
 
-	private int lvs;
 	public static final String NAME = "goeburst";
+	private int lvs;
 
 	@Override
 	public void init(Object... params) {

@@ -7,6 +7,12 @@ import pt.ist.meic.phylodb.io.output.OutputModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A GetJobsOutputModel is the output model representation of a set of {@link Job jobs}
+ * <p>
+ * A GetJobsOutputModel is constituted by the {@link #jobs} field that contains the information of each job.
+ * Each information is represented by an {@link JobOutputModel} object.
+ */
 public class GetJobsOutputModel implements OutputModel {
 
 	private final List<JobOutputModel> jobs;
@@ -21,4 +27,5 @@ public class GetJobsOutputModel implements OutputModel {
 	public ResponseEntity<List<JobOutputModel>> toResponseEntity() {
 		return ResponseEntity.status(HttpStatus.OK).body(jobs);
 	}
+
 }

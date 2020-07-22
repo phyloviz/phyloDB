@@ -14,6 +14,13 @@ import java.util.stream.IntStream;
 
 import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_VALUE;
 
+/**
+ * A profile is a set of alleles identified at some loci, and is defined by an aka and a set of {@link Allele alleles}
+ * <p>
+ * A profile is constituted by the {@link #id} field to identify the profile, the {@link #deprecated} field which indicates if the profile is deprecated, and
+ * the {@link #version} field that is the version of the profile. It is also constituted by the {@link #aka}, that is alternative id for the profile,
+ * and by the {@link #allelesIds} which are the references for the alleles that define this profile.
+ */
 public class Profile extends VersionedEntity<Profile.PrimaryKey> {
 
 	private final String aka;
@@ -43,6 +50,14 @@ public class Profile extends VersionedEntity<Profile.PrimaryKey> {
 		return allelesIds;
 	}
 
+	/**
+	 * Updates the alleles references to include the taxon, and locus ids.
+	 *
+	 * @param schema     {@link Schema schema} that this profile follows
+	 * @param missing    missing characters
+	 * @param authorized boolean which indicates if the alleles used are private or public
+	 * @return the profile with the updated alleles
+	 */
 	public Profile updateReferences(Schema schema, String missing, boolean authorized) {
 		String taxon = schema.getPrimaryKey().getTaxonId();
 		List<VersionedEntity<Locus.PrimaryKey>> loci = schema.getLociReferences();
@@ -73,6 +88,11 @@ public class Profile extends VersionedEntity<Profile.PrimaryKey> {
 				Objects.equals(allelesIds, profile.allelesIds);
 	}
 
+	/**
+	 * A Profile.PrimaryKey is the identification of a profile
+	 * <p>
+	 * A Profile.PrimaryKey is constituted by the {@link #projectId}, {@link #datasetId}, {@link #id} fields which identify the profile.
+	 */
 	public static class PrimaryKey {
 
 		private final String projectId;

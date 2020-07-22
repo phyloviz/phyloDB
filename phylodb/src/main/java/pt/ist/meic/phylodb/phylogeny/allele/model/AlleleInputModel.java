@@ -4,6 +4,12 @@ import pt.ist.meic.phylodb.io.input.InputModel;
 
 import java.util.Optional;
 
+/**
+ * An AlleleInputModel is the input model for an allele
+ * <p>
+ * An AlleleInputModel is constituted by the {@link #id} field to identify the allele
+ * and the {@link #sequence} which is the sequence represented by this allele.
+ */
 public class AlleleInputModel implements InputModel<Allele> {
 
 	private String id;

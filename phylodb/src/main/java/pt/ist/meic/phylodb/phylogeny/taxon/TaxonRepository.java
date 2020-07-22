@@ -10,6 +10,9 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Map;
 
+/**
+ * Class that contains the implementation of the {@link VersionedRepository} for taxons
+ */
 @Repository
 public class TaxonRepository extends VersionedRepository<Taxon, String> {
 

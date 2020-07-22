@@ -10,6 +10,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * Class that contains the implementation of the {@link pt.ist.meic.phylodb.utils.db.Repository} for jobs
+ */
 @Repository
 public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 
@@ -20,6 +23,14 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 		super(session);
 	}
 
+	/**
+	 * Retrieves a page of {@link Job} as a result
+	 *
+	 * @param page    number of the page to retrieve
+	 * @param limit   number of {@link Job} to retrieve by page
+	 * @param filters used to filter the query results
+	 * @return page of {@link Job}
+	 */
 	public Optional<List<Job>> findAll(int page, int limit, Object... filters) {
 		if (page < 0 || limit < 0) return Optional.empty();
 		Result result = getAll(page * limit, limit, filters);
@@ -29,10 +40,21 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 				.collect(Collectors.toList()));
 	}
 
+	/**
+	 * Verifies if an job identified by the {@link Job.PrimaryKey key} exists
+	 *
+	 * @param key job id
+	 * @return {@code true} if it exists
+	 */
 	public boolean exists(Job.PrimaryKey key) {
 		return key != null && isPresent(key);
 	}
 
+	/**
+	 * Saves the {@link Job job}
+	 *
+	 * @param entity {@link Job} to be saved
+	 */
 	public boolean save(Job entity) {
 		if (entity == null)
 			return false;
@@ -40,6 +62,11 @@ public class JobRepository extends pt.ist.meic.phylodb.utils.db.Repository {
 		return true;
 	}
 
+	/**
+	 * Removes the {@link Job job} identified by the {@link Job.PrimaryKey key}
+	 *
+	 * @param key job id
+	 */
 	public boolean remove(Job.PrimaryKey key) {
 		if (!exists(key))
 			return false;

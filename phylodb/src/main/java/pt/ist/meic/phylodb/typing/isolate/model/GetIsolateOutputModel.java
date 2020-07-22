@@ -7,6 +7,14 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A GetIsolateOutputModel is the output model representation of an {@link Isolate}
+ * <p>
+ * A GetIsolateOutputModel is constituted by the  {@link #project_id}, {@link #dataset_id}, {@link #id} fields to identify the isolate,
+ * the {@link #deprecated}, and {@link #version} fields which indicates if the isolate is deprecated, and what version it has. It is also constituted
+ * by the {@link #description}, that is a description of this isolate, by the {@link #ancillaries} which are a set of details associated to the isolate,
+ * and by the {@link #profile} which is the profile that this isolate is associated with.
+ */
 public class GetIsolateOutputModel extends IsolateOutputModel {
 
 	private String description;
@@ -21,7 +29,7 @@ public class GetIsolateOutputModel extends IsolateOutputModel {
 		this.description = isolate.getDescription();
 		this.ancillaries = isolate.getAncillaries();
 		VersionedEntity<Profile.PrimaryKey> profile = isolate.getProfile();
-		if(isolate.getProfile() != null)
+		if (isolate.getProfile() != null)
 			this.profile = new ProfileOutputModel.Resumed(profile);
 	}
 

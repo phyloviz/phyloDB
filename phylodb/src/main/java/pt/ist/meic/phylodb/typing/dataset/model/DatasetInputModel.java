@@ -5,6 +5,13 @@ import pt.ist.meic.phylodb.io.input.InputModel;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * A DatasetInputModel is the input model for a dataset
+ * <p>
+ * A DatasetInputModel is constituted by the {@link #id} field to identify the dataset,
+ * the {@link #description} that is the dataset and the {@link #taxonId}, and {@link #schemaId}
+ * fields which identifies the schema the dataset follows.
+ */
 public class DatasetInputModel implements InputModel<Dataset> {
 
 	private String id;

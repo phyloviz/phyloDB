@@ -9,6 +9,13 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * A JobInputModel is the input model for a job
+ * <p>
+ * A JobInputModel is constituted by the {@link #analysis}, and {@link #algorithm} that identify the respective algorithm,
+ * and by the {@link #parameters}, that can be the dataset id in case of being an inference job, or the dataset id and inference id, in case of
+ * being a visualization job.
+ */
 public class JobInputModel implements InputModel<JobRequest> {
 
 	public static final int INFERENCE_PARAMETERS_COUNT = 2, VISUALIZATION_PARAMETERS_COUNT = 2;
@@ -40,7 +47,7 @@ public class JobInputModel implements InputModel<JobRequest> {
 
 	@Override
 	public Optional<JobRequest> toDomainEntity(String... params) {
-		if(!Analysis.exists(analysis))
+		if (!Analysis.exists(analysis))
 			return Optional.empty();
 		JobRequest request;
 		return (request = parseJobRequest(Analysis.valueOf(analysis.toUpperCase()), algorithm, parameters)) != null ?
@@ -49,21 +56,21 @@ public class JobInputModel implements InputModel<JobRequest> {
 	}
 
 	private JobRequest parseJobRequest(Analysis analysis, String algorithm, Object[] parameters) {
-		if(analysis == Analysis.INFERENCE)
+		if (analysis == Analysis.INFERENCE)
 			return parseInferenceJobRequest(algorithm, parameters);
-		else if(analysis == Analysis.VISUALIZATION)
+		else if (analysis == Analysis.VISUALIZATION)
 			return parseVisualizationJobRequest(algorithm, parameters);
 		return null;
 	}
 
 	private JobRequest parseInferenceJobRequest(String algorithm, Object[] parameters) {
-		if(!InferenceAlgorithm.exists(algorithm) || parameters == null || parameters.length != INFERENCE_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
+		if (!InferenceAlgorithm.exists(algorithm) || parameters == null || parameters.length != INFERENCE_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
 			return null;
 		return new JobRequest(Analysis.INFERENCE, algorithm, parameters);
 	}
 
 	private JobRequest parseVisualizationJobRequest(String algorithm, Object[] parameters) {
-		if(!VisualizationAlgorithm.exists(algorithm) || parameters == null || parameters.length != VISUALIZATION_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
+		if (!VisualizationAlgorithm.exists(algorithm) || parameters == null || parameters.length != VISUALIZATION_PARAMETERS_COUNT || Arrays.stream(parameters).anyMatch(Objects::isNull))
 			return null;
 		return new JobRequest(Analysis.VISUALIZATION, algorithm, parameters);
 	}

@@ -5,13 +5,19 @@ import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Vertex;
 import algorithm.visualization.model.Visualization;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
+/**
+ * Radial is an VisualizationAlgorithm which implements the radial algorithm
+ */
 public class Radial extends VisualizationAlgorithm {
 
+	public static final String NAME = "radial";
 	private static final int DEFAULT_DISTANCE_MULTIPLIER = 100;
 	private static final int DEFAULT_ZERO_DISTANCE = 10;
-	public static final String NAME = "radial";
 
 	private static int leafs(Vertex node) {
 		return node.getChildren().length == 0 ? 1 : Arrays.stream(node.getChildren()).reduce(0, (a, c) -> a + leafs(c), Integer::sum);
@@ -57,6 +63,9 @@ public class Radial extends VisualizationAlgorithm {
 				.toArray(Coordinate[]::new));
 	}
 
+	/**
+	 * Helper class used to calculate coordinates during radial algorithm
+	 */
 	public static class RadialCoordinate extends Coordinate {
 
 		private final double rightBorder;
@@ -71,7 +80,5 @@ public class Radial extends VisualizationAlgorithm {
 		}
 
 	}
-
-
 
 }

@@ -13,6 +13,9 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Class that contains the implementation of the {@link BatchRepository} for profiles
+ */
 @Repository
 public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryKey> {
 
@@ -121,6 +124,12 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		return query.appendQuery(getInsertStatement());
 	}
 
+	/**
+	 * Verifies if any of the profiles represented by the primary keys received in the params doesn't exist
+	 *
+	 * @param references profiles {@link VersionedEntity<Profile.PrimaryKey> primary keys}
+	 * @return {@code true} if any of profile represented by the keys don't exist
+	 */
 	public boolean anyMissing(List<VersionedEntity<Profile.PrimaryKey>> references) {
 		Optional<VersionedEntity<Profile.PrimaryKey>> optional = references.stream().filter(Objects::nonNull).findFirst();
 		if (!optional.isPresent())
@@ -137,7 +146,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 				.toArray();
 		Result result = query(new Query(statement, project, dataset, ids));
 		Iterator<Map<String, Object>> it = result.iterator();
-		if(!it.hasNext())
+		if (!it.hasNext())
 			return true;
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false)
 				.anyMatch(r -> r.get("present") == null);
@@ -173,14 +182,14 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		Profile.PrimaryKey key = profile.getPrimaryKey();
 		List<VersionedEntity<Allele.PrimaryKey>> references = profile.getAllelesReferences();
 		boolean priv = references.stream().anyMatch(a -> a != null && a.getPrimaryKey().getProjectId() != null);
-		return new Object(){
+		return new Object() {
 			public final String projectId = key.getProjectId();
 			public final String datasetId = key.getDatasetId();
 			public final String id = key.getId();
 			public final String aka = profile.getAka();
 			public final boolean project = priv;
 			public final Object[] alleles = IntStream.range(0, references.size())
-					.mapToObj(i -> references.get(i) != null ? new Object(){
+					.mapToObj(i -> references.get(i) != null ? new Object() {
 						public final String id = references.get(i).getPrimaryKey().getId();
 						public final int part = i + 1;
 						public final int total = references.size();

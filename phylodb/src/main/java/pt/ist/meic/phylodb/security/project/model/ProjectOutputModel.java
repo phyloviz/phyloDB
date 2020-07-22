@@ -8,6 +8,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * A ProjectOutputModel is an output model for a project
+ * <p>
+ * A ProjectOutputModel contains the {@link #id} field which identify the project, and the {@link #version}, and {@link #deprecated}
+ * fields which are the version of the project, and the existence status respectively.
+ */
 public class ProjectOutputModel implements OutputModel {
 
 	protected String id;
@@ -56,6 +62,12 @@ public class ProjectOutputModel implements OutputModel {
 				deprecated == that.deprecated;
 	}
 
+	/**
+	 * A ProjectOutputModel.Resumed is the resumed information of a project output model
+	 * <p>
+	 * A ProjectOutputModel.Resumed is constituted by the {@link #id} field which is the id of the project,
+	 * and by the {@link #version} field which is the version of the project.
+	 */
 	@JsonIgnoreProperties({"deprecated"})
 	public static class Resumed extends ProjectOutputModel {
 

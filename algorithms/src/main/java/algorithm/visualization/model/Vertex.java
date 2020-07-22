@@ -3,6 +3,9 @@ package algorithm.visualization.model;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A vertex behaves as a node, which has an {@link #id}, and can have {@link #children} associated with a {@link #distance}
+ */
 public class Vertex {
 
 	private final String id;

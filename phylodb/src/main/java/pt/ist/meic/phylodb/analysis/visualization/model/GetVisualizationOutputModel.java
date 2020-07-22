@@ -3,6 +3,13 @@ package pt.ist.meic.phylodb.analysis.visualization.model;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A GetVisualizationOutputModel is the output model representation of a {@link Visualization}
+ * <p>
+ * A GetVisualizationOutputModel is constituted by the {@link #project_id}, {@link #dataset_id}, {@link #inference_id}, and {@link #id} fields to identify the visualization.
+ * It also contains the {@link #deprecated} field which indicates if the visualization is deprecated, and the {@link #algorithm} and {@link #coordinates}
+ * which are the algorithm that was used to produce this visualization and the resultant coordinates, respectively.
+ */
 public class GetVisualizationOutputModel extends VisualizationOutputModel {
 
 	private String algorithm;
@@ -37,6 +44,12 @@ public class GetVisualizationOutputModel extends VisualizationOutputModel {
 				Arrays.equals(coordinates, that.coordinates);
 	}
 
+	/**
+	 * A CoordinateOutputModel is the output model representation of a {@link Coordinate}
+	 * <p>
+	 * A CoordinateOutputModel is constituted by the {@link #profile_id}, {@link #component} to specify the component of the visualization it belongs to,
+	 * and by the {@link #x} and {@link #y} that are the axis positions.
+	 */
 	public static class CoordinateOutputModel {
 
 		private String profile_id;

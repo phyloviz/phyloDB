@@ -2,6 +2,9 @@ package pt.ist.meic.phylodb.job.model;
 
 import pt.ist.meic.phylodb.analysis.Analysis;
 
+/**
+ * A JobRequest allows the jobs input model to be parsed into a domain object
+ */
 public class JobRequest {
 
 	private final Analysis type;

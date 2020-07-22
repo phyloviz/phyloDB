@@ -9,6 +9,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * A SchemaOutputModel is an output model for a schema
+ * <p>
+ * A SchemaOutputModel contains the {@link #taxon_id}, and {@link #id} fields which identify the schema,
+ * and also contains the {@link #version}, and {@link #deprecated} fields which are the version of the schema, and the existence status respectively.
+ */
 public class SchemaOutputModel implements OutputModel {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -66,6 +72,12 @@ public class SchemaOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
+	/**
+	 * A SchemaOutputModel.Resumed is the resumed information of a schema output model
+	 * <p>
+	 * A SchemaOutputModel.Resumed is constituted by the {@link #id} field which is the id of the schema,
+	 * and by the {@link #version} field which is the version of the schema.
+	 */
 	@JsonIgnoreProperties({"taxon_id", "deprecated"})
 	public static class Resumed extends SchemaOutputModel {
 

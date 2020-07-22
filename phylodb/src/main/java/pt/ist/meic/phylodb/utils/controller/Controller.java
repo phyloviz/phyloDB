@@ -15,6 +15,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * Base class of a controller that contains auxiliar methods
+ */
 public abstract class Controller {
 
 	@Value("${application.limits.pagination.json}")

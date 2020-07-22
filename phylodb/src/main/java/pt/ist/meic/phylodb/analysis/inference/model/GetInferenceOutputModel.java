@@ -4,6 +4,13 @@ import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 
 import java.util.Objects;
 
+/**
+ * A GetInferenceOutputModel is the output model representation of an {@link Inference}
+ * <p>
+ * A GetInferenceOutputModel is constituted by the {@link #project_id}, {@link #dataset_id}, and {@link #id} fields to identify the inference.
+ * It also contains the {@link #deprecated} field which indicates if the inference is deprecated, and the {@link #algorithm} and {@link #tree}
+ * which are the algorithm that was used to produce this inference and the resultant tree, respectively.
+ */
 public class GetInferenceOutputModel extends InferenceOutputModel {
 
 	private String algorithm;

@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class that contains the implementation of the {@link UnversionedRepository} for inferences
+ */
 @Repository
 public class InferenceRepository extends UnversionedRepository<Inference, Inference.PrimaryKey> {
 
@@ -59,7 +62,7 @@ public class InferenceRepository extends UnversionedRepository<Inference, Infere
 		List<Edge> list = new ArrayList<>();
 		String projectId = row.get("projectId").toString();
 		String datasetId = row.get("datasetId").toString();
-		for (Map<String, Object> edge: (Map<String, Object>[]) row.get("edges")) {
+		for (Map<String, Object> edge : (Map<String, Object>[]) row.get("edges")) {
 			VersionedEntity<Profile.PrimaryKey> from = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("from")), (long) edge.get("fromVersion"), (boolean) edge.get("fromDeprecated"));
 			VersionedEntity<Profile.PrimaryKey> to = new VersionedEntity<>(new Profile.PrimaryKey(projectId, datasetId, (String) edge.get("to")), (long) edge.get("toVersion"), (boolean) edge.get("toDeprecated"));
 			list.add(new Edge(from, to, (long) edge.get("distance")));

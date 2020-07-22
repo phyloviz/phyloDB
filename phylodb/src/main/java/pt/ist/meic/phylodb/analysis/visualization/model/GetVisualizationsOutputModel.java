@@ -8,6 +8,12 @@ import pt.ist.meic.phylodb.utils.service.Entity;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A GetVisualizationsOutputModel is the output model representation of a set of {@link Visualization visualizations}
+ * <p>
+ * A GetVisualizationsOutputModel is constituted by the {@link #visualizations} field that contains the resumed information of each visualization.
+ * Each resumed information is represented by an {@link VisualizationOutputModel.Resumed} object.
+ */
 public class GetVisualizationsOutputModel implements OutputModel {
 
 	private final List<VisualizationOutputModel.Resumed> visualizations;

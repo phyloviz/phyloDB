@@ -5,6 +5,14 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A GetSchemaOutputModel is the output model representation of an {@link Schema}
+ * <p>
+ * A GetSchemaOutputModel is constituted by the {@link #taxon_id}, and {@link #id} fields to identify the schema,
+ * the {@link #deprecated}, and {@link #version} fields which indicates if the schema is deprecated, and what version it has. It is also constituted
+ * by the {@link #type}, which the method of this schema, by the {@link #description}, that is a description of this taxon,
+ * and by the {@link #loci}, which are the set of loci that compose this schema.
+ */
 public class GetSchemaOutputModel extends SchemaOutputModel {
 
 	private String type;

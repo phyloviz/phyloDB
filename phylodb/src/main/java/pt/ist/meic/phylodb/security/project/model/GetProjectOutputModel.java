@@ -5,6 +5,14 @@ import pt.ist.meic.phylodb.security.user.model.User;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A GetProjectOutputModel is the output model representation of a {@link Project}
+ * <p>
+ * A GetProjectOutputModel is constituted by the {@link #id} field to identify the project, the {@link #deprecated}, and {@link #version} fields which
+ * indicates if the project is deprecated, and what version it has. It also contains the {@link #name}, that is the project name, the {@link #visibility}
+ * which is the project visibility, either private or public, the {@link #description}, that is the project description and
+ * the {@link #users}, which are the users that have access to the project.
+ */
 public class GetProjectOutputModel extends ProjectOutputModel {
 
 	private String name;
@@ -52,6 +60,11 @@ public class GetProjectOutputModel extends ProjectOutputModel {
 				Arrays.equals(users, that.users);
 	}
 
+	/**
+	 * A UserKeyOutputModel is the output model representation of a {@link User.PrimaryKey}
+	 * <p>
+	 * A UserKeyOutputModel is constituted by the {@link #email}, {@link #provider} to specify which user it represents.
+	 */
 	private static class UserKeyOutputModel {
 
 		private String email;

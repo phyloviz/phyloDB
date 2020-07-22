@@ -9,6 +9,12 @@ import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Objects;
 
+/**
+ * An AlleleOutputModel is an output model for an allele
+ * <p>
+ * An AlleleOutputModel contains the {@link #taxon_id}, {@link #locus_id}, {@link #id}, {@link #project_id} fields which identify the allele,
+ * and also contains the {@link #version}, and {@link #deprecated} fields which are the version of the allele, and the existence status respectively.
+ */
 public class AlleleOutputModel implements OutputModel {
 
 	protected String taxon_id;
@@ -81,6 +87,12 @@ public class AlleleOutputModel implements OutputModel {
 				Objects.equals(id, that.id);
 	}
 
+	/**
+	 * An AlleleOutputModel.Resumed is the resumed information of an allele output model
+	 * <p>
+	 * An AlleleOutputModel.Resumed is constituted by the {@link #id} field which is the id of the allele,
+	 * and by the {@link #version} field which is the version of the allele.
+	 */
 	@JsonIgnoreProperties({"taxon_id", "locus_id", "deprecated"})
 	public static class Resumed extends AlleleOutputModel {
 

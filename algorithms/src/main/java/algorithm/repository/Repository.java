@@ -7,6 +7,12 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Class which contains the operations to iterate with the database
+ *
+ * @param <T> domain object to be written
+ * @param <R> domain object to be read
+ */
 public abstract class Repository<T, R> {
 
 	protected GraphDatabaseService database;
@@ -15,8 +21,20 @@ public abstract class Repository<T, R> {
 		this.database = database;
 	}
 
+	/**
+	 * Reads the domain object from the database
+	 *
+	 * @param params identifiers
+	 * @return domain object
+	 * @throws Exception if couldn't retrieve the domain object
+	 */
 	public abstract R read(String... params) throws Exception;
 
+	/**
+	 * Stores the domain object in the database
+	 *
+	 * @param param domain object
+	 */
 	public abstract void write(T param);
 
 	protected void createRelationship(Node from, Node to, Relation type, Map<String, Object> params) {

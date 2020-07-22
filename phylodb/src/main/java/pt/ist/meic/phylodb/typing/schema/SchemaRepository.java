@@ -4,11 +4,12 @@ import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
-import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.Arrays;
@@ -18,6 +19,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Class that contains the implementation of the {@link VersionedRepository} for schemas
+ */
 @Repository
 public class SchemaRepository extends VersionedRepository<Schema, Schema.PrimaryKey> {
 
@@ -95,6 +99,14 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 		execute(new Query(statement, key.getTaxonId(), key.getId()));
 	}
 
+	/**
+	 * Retrieves the schema that has the specified loci
+	 *
+	 * @param taxonId identifier of the {@link Taxon taxon}
+	 * @param type    schema {@link Method methodology}
+	 * @param lociIds identifier of the  {@link Locus loci} composing the schema
+	 * @return the schema of the specified by the loci
+	 */
 	public Optional<Schema> find(String taxonId, Method type, String[] lociIds) {
 		if (taxonId == null || lociIds == null || lociIds.length == 0)
 			return Optional.empty();
@@ -117,6 +129,12 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 		return Optional.of(parse(result.iterator().next()));
 	}
 
+	/**
+	 * Retrieves the schema of the specified {@link Dataset dataset}
+	 *
+	 * @param key dataset {@link Dataset.PrimaryKey primary key}
+	 * @return the schema of the specified dataset
+	 */
 	public Optional<Schema> find(Dataset.PrimaryKey key) {
 		if (key == null)
 			return Optional.empty();

@@ -6,6 +6,12 @@ import pt.ist.meic.phylodb.io.output.OutputModel;
 
 import java.util.Objects;
 
+/**
+ * A JobAcceptedOutputModel is the output model for the creation of a job
+ * <p>
+ * A JobAcceptedOutputModel contains the {@link #job_id}, and {@link #analysis_id} which are the generated ids, and will
+ * be parsed to a response with a {@link HttpStatus#ACCEPTED} status
+ */
 public class JobAcceptedOutputModel implements OutputModel {
 
 	private String job_id;

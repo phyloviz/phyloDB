@@ -2,9 +2,13 @@ package algorithm.visualization.model;
 
 import java.util.Arrays;
 
+/**
+ * A tree is the result of an {@link algorithm.inference.implementation.InferenceAlgorithm}. It contains a set of {@link Vertex} which are the
+ * roots of the tree
+ */
 public class Tree {
 
-	private Vertex[] roots;
+	private final Vertex[] roots;
 
 	public Tree(Vertex[] roots) {
 		this.roots = roots;
