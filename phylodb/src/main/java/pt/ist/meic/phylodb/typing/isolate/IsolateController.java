@@ -52,7 +52,7 @@ public class IsolateController extends Controller {
 	 * @return a {@link ResponseEntity<GetIsolatesOutputModel>} representing the specified isolates page or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
 	 */
 	@Authorized(role = Role.USER, operation = Operation.READ)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
+	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getIsolates(
 			@PathVariable("project") String projectId,
 			@PathVariable("dataset") String datasetId,
@@ -119,7 +119,7 @@ public class IsolateController extends Controller {
 	 * @return a {@link ResponseEntity<FileOutputModel>} representing the specified isolates page in a formatted string or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
 	 */
 	@Authorized(role = Role.USER, operation = Operation.READ)
-	@GetMapping(path = "/files", produces = {MediaType.TEXT_PLAIN_VALUE})
+	@GetMapping(path = "/files", produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<?> getIsolatesFile(
 			@PathVariable("project") String projectId,
 			@PathVariable("dataset") String datasetId,

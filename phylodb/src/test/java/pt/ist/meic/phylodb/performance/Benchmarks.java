@@ -1,10 +1,16 @@
 package pt.ist.meic.phylodb.performance;
 
 import org.neo4j.ogm.session.Session;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.profile.GCProfiler;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import pt.ist.meic.phylodb.PhylodbApplication;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleService;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusService;
@@ -28,6 +34,7 @@ import pt.ist.meic.phylodb.utils.DbUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static pt.ist.meic.phylodb.utils.DbUtils.clearContext;
 import static pt.ist.meic.phylodb.utils.DbUtils.clearProfiles;
@@ -47,7 +54,8 @@ public class Benchmarks {
 
 	protected static final String PROJECT_ID = "project", DATASET_ID = "dataset", INFERENCE_ID = "inference", VISUALIZATION_ID = "visualization";
 
-	protected static void initContext(ConfigurableApplicationContext context) {
+	protected static void main(Class<?> _class, String[] args) throws RunnerException {
+		ConfigurableApplicationContext context = SpringApplication.run(PhylodbApplication.class, args);
 		session = context.getBean(Session.class);
 		taxonService = context.getBean(TaxonService.class);
 		locusService = context.getBean(LocusService.class);
@@ -65,7 +73,7 @@ public class Benchmarks {
 			String locusId = "locus" + i;
 			loci.add(locusId);
 			locusService.saveLocus(new Locus(taxonId, locusId, null));
-			for (int j = 1; j <= 500; j++) {
+			for (int j = 1; j <= 1000; j++) {
 				String sequence = ("sequence" + i) + j;
 				alleleService.saveAllele(new Allele(taxonId, locusId, String.valueOf(j), sequence, null));
 			}
@@ -76,101 +84,56 @@ public class Benchmarks {
 		userService.createUser(new User(userId, provider, Role.ADMIN));
 		projectService.saveProject(new Project(PROJECT_ID, "name", Visibility.PUBLIC, null, new User.PrimaryKey[0]), new User.PrimaryKey(userId, provider));
 		datasetService.saveDataset(new Dataset(PROJECT_ID, DATASET_ID, null, taxonId, schemaId));
+		new Runner(options(_class)).run();
 	}
 
-	protected static void initProfiles(String filename) throws IOException {
+	private static Options options(Class<?> _class){
+		return new OptionsBuilder()
+				.include("\\." + _class.getSimpleName() + "\\.")
+				.timeout(TimeValue.NONE)
+				.warmupIterations(5)
+				.measurementIterations(10)
+				.forks(0)
+				.shouldDoGC(true)
+				.shouldFailOnError(true)
+				.jvmArgs("-server")
+				.mode(Mode.AverageTime)
+				.timeUnit(TimeUnit.MILLISECONDS)
+				.addProfiler(GCProfiler.class)
+				.build();
+	}
+
+	private static void initProfiles(String filename) throws IOException {
 		profileService.saveProfilesOnConflictUpdate(PROJECT_ID, DATASET_ID, false, createFile("performance", filename));
 	}
 
 	@State(value = Scope.Benchmark)
-	public static class With500Profiles {
+	public static class WithProfiles {
+
+		@Param(value = {"500", "1000", "2000", "5000", "10000", "15000"})
+		public int profiles;
 
 		@Setup
 		public void setup() throws IOException {
 			clearProfiles(session);
-			initProfiles("profiles_500.txt");
+			initProfiles("profiles_" + profiles + ".txt");
 		}
 
 	}
 
 	@State(value = Scope.Benchmark)
-	public static class With500ProfilesAndInference {
+	public static class WithProfilesAndInference {
+
+		@Param(value = {"500", "1000", "2000", "5000", "10000", "15000"})
+		public int profiles;
 
 		@Setup
 		public void setup() throws IOException {
 			clearProfiles(session);
-			initProfiles("profiles_500.txt");
+			initProfiles("profiles_" + profiles + ".txt");
 			DbUtils.goeBURST(session, PROJECT_ID, DATASET_ID, INFERENCE_ID);
 		}
 
 	}
 
-	@State(value = Scope.Benchmark)
-	public static class With1000Profiles {
-
-		@Setup
-		public void setup() throws IOException {
-			clearProfiles(session);
-			initProfiles("profiles_1000.txt");
-		}
-
-	}
-
-	@State(value = Scope.Benchmark)
-	public static class With1000ProfilesAndInference {
-
-		@Setup
-		public void setup() throws IOException {
-			clearProfiles(session);
-			initProfiles("profiles_1000.txt");
-			DbUtils.goeBURST(session, PROJECT_ID, DATASET_ID, INFERENCE_ID);
-		}
-
-	}
-
-	@State(value = Scope.Benchmark)
-	public static class With2000Profiles {
-
-		@Setup
-		public void setup() throws IOException {
-			clearProfiles(session);
-			initProfiles("profiles_2000.txt");
-		}
-
-	}
-
-	@State(value = Scope.Benchmark)
-	public static class With2000ProfilesAndInference {
-
-		@Setup
-		public void setup() throws IOException {
-			clearProfiles(session);
-			initProfiles("profiles_2000.txt");
-			DbUtils.goeBURST(session, PROJECT_ID, DATASET_ID, INFERENCE_ID);
-		}
-
-	}
-
-	@State(value = Scope.Benchmark)
-	public static class With5000Profiles {
-
-		@Setup
-		public void setup() throws IOException {
-			clearProfiles(session);
-			initProfiles("profiles_5000.txt");
-		}
-
-	}
-
-	@State(value = Scope.Benchmark)
-	public static class With5000ProfilesAndInference {
-
-		@Setup
-		public void setup() throws IOException {
-			clearProfiles(session);
-			initProfiles("profiles_5000.txt");
-			DbUtils.goeBURST(session, PROJECT_ID, DATASET_ID, INFERENCE_ID);
-		}
-
-	}
 }

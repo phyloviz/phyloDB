@@ -58,7 +58,7 @@ public class AlleleController extends Controller {
 	 * @return a {@link ResponseEntity<GetAllelesOutputModel>} representing the specified alleles page or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
 	 */
 	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
-	@GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getAlleles(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
@@ -131,7 +131,7 @@ public class AlleleController extends Controller {
 	 * @return a {@link ResponseEntity<FileOutputModel>} representing the specified alleles page in a formatted string or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
 	 */
 	@Authorized(role = Role.USER, operation = Operation.READ, required = false)
-	@GetMapping(path = "/files", produces = {MediaType.TEXT_PLAIN_VALUE})
+	@GetMapping(path = "/files", produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<?> getAllelesFile(
 			@PathVariable("taxon") String taxonId,
 			@PathVariable("locus") String locusId,
