@@ -8,12 +8,12 @@ import java.util.Optional;
 /**
  * A UserInputModel is the input model for a user
  * <p>
- * A UserInputModel is constituted by the {@link #id} and {@link #provider} fields to identify the user,
+ * A UserInputModel is constituted by the {@link #email} and {@link #provider} fields to identify the user,
  * and the {@link #role}, which is the role of the user.
  */
 public class UserInputModel implements InputModel<User> {
 
-	private String id;
+	private String email;
 	private String provider;
 	private String role;
 
@@ -21,13 +21,13 @@ public class UserInputModel implements InputModel<User> {
 	}
 
 	public UserInputModel(String email, String provider, String role) {
-		this.id = email;
+		this.email = email;
 		this.provider = provider;
 		this.role = role;
 	}
 
-	public String getId() {
-		return id;
+	public String getEmail() {
+		return email;
 	}
 
 	public String getProvider() {
@@ -40,8 +40,8 @@ public class UserInputModel implements InputModel<User> {
 
 	@Override
 	public Optional<User> toDomainEntity(String... params) {
-		return !params[0].equals(id) || !params[1].equals(provider) || !Role.exists(role) ? Optional.empty() :
-				Optional.of(new User(id, provider, Role.valueOf(role.toUpperCase())));
+		return !params[0].equals(email) || !params[1].equals(provider) || !Role.exists(role) ? Optional.empty() :
+				Optional.of(new User(email, provider, Role.valueOf(role.toUpperCase())));
 	}
 
 }

@@ -10,13 +10,13 @@ import java.util.Optional;
  * <p>
  * An IsolateInputModel is constituted by the {@link #id} field to identify the isolate,
  * by the {@link #description}, that is a description of this isolate, by the {@link #ancillaries}
- * which are a set of details associated to the isolate, and by the {@link #profileId} which is the profile that this isolate is associated with.
+ * which are a set of details associated to the isolate, and by the {@link #profile_id} which is the profile that this isolate is associated with.
  */
 public class IsolateInputModel implements InputModel<Isolate> {
 
 	private String id;
 	private String description;
-	private String profileId;
+	private String profile_id;
 	private Ancillary[] ancillaries;
 
 	public IsolateInputModel() {
@@ -26,7 +26,7 @@ public class IsolateInputModel implements InputModel<Isolate> {
 		this.id = id;
 		this.description = description;
 		this.ancillaries = ancillaries;
-		this.profileId = profileId;
+		this.profile_id = profileId;
 	}
 
 	public String getId() {
@@ -41,8 +41,8 @@ public class IsolateInputModel implements InputModel<Isolate> {
 		return ancillaries;
 	}
 
-	public String getProfileId() {
-		return profileId;
+	public String getProfile_id() {
+		return profile_id;
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class IsolateInputModel implements InputModel<Isolate> {
 				.filter(a -> a.getKey() != null && a.getValue() != null)
 				.distinct()
 				.toArray(Ancillary[]::new);
-		return Optional.of(new Isolate(params[0], params[1], id, description, ancillaries, profileId));
+		return Optional.of(new Isolate(params[0], params[1], id, description, ancillaries, profile_id));
 	}
 
 }

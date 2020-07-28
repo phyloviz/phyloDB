@@ -39,7 +39,7 @@ public class UserController extends Controller {
 	 * be authenticated.
 	 *
 	 * @param page number of the page to retrieve
-	 * @returna {@link ResponseEntity<GetUsersOutputModel>} representing the specified users page or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
+	 * @return a {@link ResponseEntity<GetUsersOutputModel>} representing the specified users page or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
 	 */
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getUsers(@RequestParam(value = "page", defaultValue = "0") int page) {

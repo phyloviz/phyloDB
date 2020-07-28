@@ -87,7 +87,7 @@ public class VisualizationOutputModel implements OutputModel {
 	 * <p>
 	 * A VisualizationOutputModel.Resumed is constituted by the {@link #id} field which is the id of the inference.
 	 */
-	@JsonIgnoreProperties({"project_id", "dataset_id", "analysis_id", "deprecated"})
+	@JsonIgnoreProperties({"project_id", "dataset_id", "inference_id", "deprecated"})
 	public static class Resumed extends VisualizationOutputModel {
 
 		public Resumed() {
