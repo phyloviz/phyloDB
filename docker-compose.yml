@@ -7,7 +7,6 @@ services:
           - 7474:7474
           - 7687:7687
         volumes:
-          - ${DB_PATH}/conf:/conf
           - ${DB_PATH}/data:/data
           - ${DB_PATH}/logs:/logs
           - ${DB_PATH}/plugins:/plugins
