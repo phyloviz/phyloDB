@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.job;
 
-import javafx.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +14,7 @@ import pt.ist.meic.phylodb.security.authorization.Operation;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.utils.controller.Controller;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.util.Optional;
 

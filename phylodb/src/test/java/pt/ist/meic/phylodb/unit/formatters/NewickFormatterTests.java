@@ -1,6 +1,6 @@
 package pt.ist.meic.phylodb.unit.formatters;
 
-import javafx.util.Pair;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

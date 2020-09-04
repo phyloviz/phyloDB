@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.utils.controller;
 
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
@@ -9,6 +8,7 @@ import pt.ist.meic.phylodb.io.output.BatchOutputModel;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.io.IOException;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package pt.ist.meic.phylodb.io.formatters;
 
-import javafx.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;

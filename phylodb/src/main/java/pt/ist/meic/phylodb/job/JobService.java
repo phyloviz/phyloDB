@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.job;
 
-import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.analysis.Analysis;
@@ -10,6 +9,7 @@ import pt.ist.meic.phylodb.job.model.Job;
 import pt.ist.meic.phylodb.job.model.JobRequest;
 import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.util.Collections;
 import java.util.List;

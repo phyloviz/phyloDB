@@ -1,6 +1,6 @@
 package pt.ist.meic.phylodb.unit.typing.isolate;
 
-import javafx.util.Pair;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

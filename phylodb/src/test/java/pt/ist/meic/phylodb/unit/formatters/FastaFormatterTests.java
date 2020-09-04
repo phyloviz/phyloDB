@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.formatters;
 
-import javafx.util.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.io.IOException;
 import java.util.Arrays;
