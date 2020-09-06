@@ -10,7 +10,6 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.db.UnversionedRepository;
 import pt.ist.meic.phylodb.utils.service.Entity;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +86,7 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 
 	@Override
 	protected void store(Visualization entity) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not Implemented");
 	}
 
 	@Override

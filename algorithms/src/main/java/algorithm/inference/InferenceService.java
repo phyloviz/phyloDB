@@ -31,11 +31,11 @@ public class InferenceService extends Service {
 		InferenceRepository repository = new InferenceRepository(database);
 		GoeBURST algorithm = new GoeBURST();
 		try (Transaction tx = database.beginTx()) {
-			Matrix matrix = repository.read(project, dataset);
+			Matrix matrix = repository.read(tx, project, dataset);
 			algorithm.init(project, dataset, analysis, lvs);
 			Inference inference = algorithm.compute(matrix);
-			repository.write(inference);
-			tx.success();
+			repository.write(tx, inference);
+			tx.commit();
 		}
 	}
 

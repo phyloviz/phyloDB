@@ -7,6 +7,7 @@ import java.util.Collections;
 public class DbUtils {
 
 	public static void clearContext(Session session) {
+		clearProfiles(session);
 		session.query("call apoc.periodic.iterate('MATCH (n) return n', 'DETACH DELETE n', {batchSize:1000})", Collections.emptyMap());
 		session.clear();
 	}

@@ -23,9 +23,9 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 	}
 
 	@Override
-	public Tree read(String... params) {
+	public Tree read(Transaction tx, String... params) {
 		String projectId = params[0], datasetId = params[1], inferenceId = params[2];
-		Node project = node(Project.LABEL, projectId);
+		Node project = node(Project.LABEL, projectId, tx);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
 		List<Relationship> distances = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL)
 				.flatMap(n -> relationships(n, Relation.DISTANCES, Direction.OUTGOING)
@@ -41,16 +41,16 @@ public class VisualizationRepository extends Repository<Visualization, Tree> {
 	}
 
 	@Override
-	public void write(Visualization visualization) {
+	public void write(Transaction tx, Visualization visualization) {
 		String inferenceId = visualization.getInferenceId();
 		String id = visualization.getId();
 		String algorithm = visualization.getAlgorithm();
 		algorithm.visualization.model.Coordinate[] coordinates = visualization.getCoordinates();
-		Node project = node(Project.LABEL, visualization.getProjectId());
+		Node project = node(Project.LABEL, visualization.getProjectId(), tx);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, visualization.getDatasetId());
 		for (algorithm.visualization.model.Coordinate coordinate : coordinates) {
 			Node profile = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL, coordinate.getProfileId());
-			Node c = database.createNode(Label.label(Coordinate.LABEL));
+			Node c = tx.createNode(Label.label(Coordinate.LABEL));
 			c.setProperty(Coordinate.X, coordinate.getX());
 			c.setProperty(Coordinate.Y, coordinate.getY());
 			Map<String, Object> properties = new HashMap<>();

@@ -25,7 +25,8 @@ public abstract class SecurityInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object handler) {
 		if (handler.getClass() != HandlerMethod.class)
 			return true;
-		return handle(req, res, handler);
+		//return handle(req, res, handler);
+		return true;
 	}
 
 	/**

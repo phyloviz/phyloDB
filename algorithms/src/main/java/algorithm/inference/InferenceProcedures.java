@@ -7,9 +7,6 @@ import org.neo4j.procedure.Mode;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
 
-/**
- * InferenceProcedures contains the inference algorithms procedures
- */
 public class InferenceProcedures {
 
 	@Context

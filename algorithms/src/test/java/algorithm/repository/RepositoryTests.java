@@ -1,6 +1,7 @@
 package algorithm.repository;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,8 +12,8 @@ public class RepositoryTests {
 
 	protected GraphDatabaseService database;
 
-	protected void arrange(String path, String filename) throws IOException {
-		database.execute(readFile(path, filename));
+	protected void arrange(Transaction tx, String path, String filename) throws IOException {
+		tx.execute(readFile(path, filename));
 	}
 
 	protected static String readFile(String path, String filename) throws IOException {
@@ -20,11 +21,11 @@ public class RepositoryTests {
 		return Files.lines(Paths.get(path + "/" + filename)).collect(Collectors.joining("\n"));
 	}
 
-	protected long getRelationshipsCount() {
-		return database.getAllRelationships().stream().count();
+	protected long getRelationshipsCount(Transaction tx) {
+		return tx.getAllRelationships().stream().count();
 	}
 
-	protected long getNodesCount() {
-		return database.getAllNodes().stream().count();
+	protected long getNodesCount(Transaction tx) {
+		return tx.getAllNodes().stream().count();
 	}
 }

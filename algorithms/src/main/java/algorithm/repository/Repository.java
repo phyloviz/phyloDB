@@ -28,22 +28,22 @@ public abstract class Repository<T, R> {
 	 * @return domain object
 	 * @throws Exception if couldn't retrieve the domain object
 	 */
-	public abstract R read(String... params) throws Exception;
+	public abstract R read(Transaction tx, String... params) throws Exception;
 
 	/**
 	 * Stores the domain object in the database
 	 *
 	 * @param param domain object
 	 */
-	public abstract void write(T param);
+	public abstract void write(Transaction tx, T param);
 
 	protected void createRelationship(Node from, Node to, Relation type, Map<String, Object> params) {
 		Relationship relationship = from.createRelationshipTo(to, RelationshipType.withName(type.name()));
 		params.forEach(relationship::setProperty);
 	}
 
-	protected Node node(String label, String id) {
-		return database.findNode(Label.label(label), "id", id);
+	protected Node node(String label, String id, Transaction tx) {
+		return tx.findNode(Label.label(label), "id", id);
 	}
 
 	protected Node related(Node node, Relation relationship, Direction direction, String label, String id) {
@@ -61,7 +61,7 @@ public abstract class Repository<T, R> {
 	}
 
 	protected Stream<Relationship> relationships(Node node, Relation relationship, Direction direction) {
-		Iterable<Relationship> relationships = node.getRelationships(RelationshipType.withName(relationship.name()), direction);
+		Iterable<Relationship> relationships = node.getRelationships(direction, RelationshipType.withName(relationship.name()));
 		return StreamSupport.stream(relationships.spliterator(), false);
 	}
 

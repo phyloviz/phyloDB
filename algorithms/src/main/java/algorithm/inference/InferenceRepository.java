@@ -8,6 +8,7 @@ import algorithm.repository.type.*;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +27,9 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 	}
 
 	@Override
-	public Matrix read(String... params) {
+	public Matrix read(Transaction tx, String... params) {
 		String projectId = params[0], datasetId = params[1];
-		Node project = node(Project.LABEL, projectId);
+		Node project = node(Project.LABEL, projectId, tx);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
 		List<Node> profiles = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL)
 				.collect(Collectors.toList());
@@ -51,12 +52,12 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 	}
 
 	@Override
-	public void write(Inference inference) {
+	public void write(Transaction tx, Inference inference) {
 		String inferenceId = inference.getId();
 		String algorithm = inference.getAlgorithm();
 		List<Edge> edges = direct(inference.getEdges());
 		String[] ids = inference.getProfileIds();
-		Node project = node(Project.LABEL, inference.getProjectId());
+		Node project = node(Project.LABEL, inference.getProjectId(), tx);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, inference.getDatasetId());
 		for (Edge edge : edges) {
 			Node from = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL, ids[edge.from()]);

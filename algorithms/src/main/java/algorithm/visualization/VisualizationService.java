@@ -31,11 +31,11 @@ public class VisualizationService extends Service {
 		VisualizationRepository repository = new VisualizationRepository(database);
 		Radial algorithm = new Radial();
 		try (Transaction tx = database.beginTx()) {
-			Tree tree = repository.read(project, dataset, inference);
+			Tree tree = repository.read(tx, project, dataset, inference);
 			algorithm.init(project, dataset, inference, id);
 			Visualization visualization = algorithm.compute(tree);
-			repository.write(visualization);
-			tx.success();
+			repository.write(tx, visualization);
+			tx.commit();
 		}
 	}
 
