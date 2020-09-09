@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class ProjectService {
+public class ProjectService extends pt.ist.meic.phylodb.utils.service.Service  {
 
 	private ProjectRepository projectRepository;
 	private UserRepository userRepository;

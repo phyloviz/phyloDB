@@ -27,7 +27,7 @@ import java.util.function.Predicate;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class IsolateService {
+public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 
 	@Value("${application.missing}")
 	private String missing;

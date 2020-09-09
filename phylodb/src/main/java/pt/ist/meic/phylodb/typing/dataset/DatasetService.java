@@ -20,7 +20,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class DatasetService {
+public class DatasetService extends pt.ist.meic.phylodb.utils.service.Service  {
 
 	private DatasetRepository datasetRepository;
 	private SchemaRepository schemaRepository;

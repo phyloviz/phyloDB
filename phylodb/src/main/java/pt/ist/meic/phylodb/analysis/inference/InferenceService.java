@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class InferenceService {
+public class InferenceService extends pt.ist.meic.phylodb.utils.service.Service  {
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;

@@ -24,7 +24,7 @@ import java.util.function.Predicate;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class AlleleService {
+public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 
 	private LocusRepository locusRepository;
 	private AlleleRepository alleleRepository;
