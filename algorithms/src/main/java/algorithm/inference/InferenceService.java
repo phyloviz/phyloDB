@@ -1,6 +1,6 @@
 package algorithm.inference;
 
-import algorithm.Service;
+import algorithm.utils.Service;
 import algorithm.inference.implementation.GoeBURST;
 import algorithm.inference.model.Inference;
 import algorithm.inference.model.Matrix;
@@ -30,12 +30,16 @@ public class InferenceService extends Service {
 	public void goeBURST(String project, String dataset, String analysis, long lvs) {
 		InferenceRepository repository = new InferenceRepository(database);
 		GoeBURST algorithm = new GoeBURST();
-		try (Transaction tx = database.beginTx()) {
-			Matrix matrix = repository.read(tx, project, dataset);
-			algorithm.init(project, dataset, analysis, lvs);
-			Inference inference = algorithm.compute(matrix);
-			repository.write(tx, inference);
-			tx.commit();
+		algorithm.init(project, dataset, analysis, lvs);
+		Matrix matrix;
+		try (Transaction tx1 = database.beginTx()) {
+			matrix = repository.read(tx1, project, dataset);
+			tx1.commit();
+		}
+		Inference inference = algorithm.compute(matrix);
+		try (Transaction tx2 = database.beginTx()) {
+			repository.write(tx2, inference);
+			tx2.commit();
 		}
 	}
 

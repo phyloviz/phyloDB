@@ -1,6 +1,6 @@
-package algorithm.repository;
+package algorithm.utils;
 
-import algorithm.repository.type.Relation;
+import algorithm.utils.type.Relation;
 import org.neo4j.graphdb.*;
 
 import java.util.Map;

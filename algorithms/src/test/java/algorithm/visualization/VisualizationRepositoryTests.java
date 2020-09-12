@@ -2,9 +2,9 @@ package algorithm.visualization;
 
 import algorithm.inference.InferenceProcedures;
 import algorithm.repository.RepositoryTests;
-import algorithm.repository.type.Has;
-import algorithm.repository.type.Profile;
-import algorithm.repository.type.Relation;
+import algorithm.utils.type.Has;
+import algorithm.utils.type.Profile;
+import algorithm.utils.type.Relation;
 import algorithm.visualization.implementation.Radial;
 import algorithm.visualization.model.Coordinate;
 import algorithm.visualization.model.Tree;
@@ -161,8 +161,8 @@ public class VisualizationRepositoryTests extends RepositoryTests {
 					.findFirst();
 			assertTrue(coordinate.isPresent());
 			Coordinate c = coordinate.get();
-			assertEquals(r.getEndNode().getProperty(algorithm.repository.type.Coordinate.X), c.getX());
-			assertEquals(r.getEndNode().getProperty(algorithm.repository.type.Coordinate.Y), c.getY());
+			assertEquals(r.getEndNode().getProperty(algorithm.utils.type.Coordinate.X), c.getX());
+			assertEquals(r.getEndNode().getProperty(algorithm.utils.type.Coordinate.Y), c.getY());
 			assertEquals(r.getProperty(Has.INFERENCE_ID), visualization.getInferenceId());
 			assertEquals(r.getProperty(Has.ID), visualization.getId());
 			assertEquals(r.getProperty(Has.COMPONENT), c.getComponent());

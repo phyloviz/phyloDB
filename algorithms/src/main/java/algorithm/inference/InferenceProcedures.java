@@ -1,18 +1,10 @@
 package algorithm.inference;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.logging.Log;
-import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Mode;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.Procedure;
 
-public class InferenceProcedures {
-
-	@Context
-	public GraphDatabaseService database;
-	@Context
-	public Log log;
+public class InferenceProcedures extends algorithm.utils.Procedure {
 
 	/**
 	 * Executes the goeBURST algorithm, for a given dataset within a project with the parameter lvs. The result is stored using the inference id

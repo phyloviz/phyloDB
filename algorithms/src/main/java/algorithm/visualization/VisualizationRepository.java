@@ -1,7 +1,7 @@
 package algorithm.visualization;
 
-import algorithm.repository.Repository;
-import algorithm.repository.type.*;
+import algorithm.utils.Repository;
+import algorithm.utils.type.*;
 import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Vertex;
 import algorithm.visualization.model.Visualization;

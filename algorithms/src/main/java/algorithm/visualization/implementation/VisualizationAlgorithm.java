@@ -1,6 +1,6 @@
 package algorithm.visualization.implementation;
 
-import algorithm.Algorithm;
+import algorithm.utils.Algorithm;
 import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Visualization;
 

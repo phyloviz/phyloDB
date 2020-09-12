@@ -1,4 +1,4 @@
-package algorithm.repository.type;
+package algorithm.utils.type;
 
 public enum Relation {
 	CONTAINS, CONTAINS_DETAILS, HAS, DISTANCES

@@ -1,6 +1,6 @@
 package algorithm.visualization;
 
-import algorithm.Service;
+import algorithm.utils.Service;
 import algorithm.visualization.implementation.Radial;
 import algorithm.visualization.model.Tree;
 import algorithm.visualization.model.Visualization;
@@ -30,12 +30,16 @@ public class VisualizationService extends Service {
 	public void radial(String project, String dataset, String inference, String id) {
 		VisualizationRepository repository = new VisualizationRepository(database);
 		Radial algorithm = new Radial();
-		try (Transaction tx = database.beginTx()) {
-			Tree tree = repository.read(tx, project, dataset, inference);
-			algorithm.init(project, dataset, inference, id);
-			Visualization visualization = algorithm.compute(tree);
-			repository.write(tx, visualization);
-			tx.commit();
+		algorithm.init(project, dataset, inference, id);
+		Tree tree;
+		try (Transaction tx1 = database.beginTx()) {
+			tree = repository.read(tx1, project, dataset, inference);
+			tx1.commit();
+		}
+		Visualization visualization = algorithm.compute(tree);
+		try (Transaction tx2 = database.beginTx()) {
+			repository.write(tx2, visualization);
+			tx2.commit();
 		}
 	}
 

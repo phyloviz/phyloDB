@@ -1,6 +1,6 @@
 package algorithm.inference.implementation;
 
-import algorithm.Algorithm;
+import algorithm.utils.Algorithm;
 import algorithm.inference.model.Inference;
 import algorithm.inference.model.Matrix;
 
