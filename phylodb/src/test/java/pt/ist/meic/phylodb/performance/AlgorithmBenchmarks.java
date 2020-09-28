@@ -1,12 +1,14 @@
 package pt.ist.meic.phylodb.performance;
 
+import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import pt.ist.meic.phylodb.utils.DbUtils;
 
 public class AlgorithmBenchmarks extends Benchmarks {
 
-	public static void main(String[] args) throws Exception {
-		main(AlgorithmBenchmarks.class, args);
+	@Test
+	public void launchBenchMark() throws Exception {
+		main(AlgorithmBenchmarks.class);
 	}
 
 	@Benchmark

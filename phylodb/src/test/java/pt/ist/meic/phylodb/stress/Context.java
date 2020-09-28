@@ -22,6 +22,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.profile.ProfileService;
 import pt.ist.meic.phylodb.typing.schema.SchemaService;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.utils.DbUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,6 +65,10 @@ public class Context {
 		projectService.saveProject(new Project(projectId, "name", Visibility.PUBLIC, null, new User.PrimaryKey[0]), new User.PrimaryKey(userId, provider));
 		datasetService.saveDataset(new Dataset(projectId, datasetId, null, taxonId, schemaId));
 		profileService.saveProfilesOnConflictUpdate(projectId, datasetId, false, createFile("stress", "profiles_500.txt"));
+		String inferenceId = "inference";
+		String visualizationId = "visualization";
+		DbUtils.goeBURST(session, projectId, datasetId, inferenceId);
+		DbUtils.radial(session, projectId, datasetId, inferenceId, visualizationId);
 		System.out.println("...Context data initialized...");
 		System.exit(0);
 	}

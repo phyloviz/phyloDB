@@ -11,6 +11,8 @@ import org.openjdk.jmh.runner.options.TimeValue;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import pt.ist.meic.phylodb.PhylodbApplication;
+import pt.ist.meic.phylodb.analysis.inference.InferenceService;
+import pt.ist.meic.phylodb.analysis.visualization.VisualizationService;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleService;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusService;
@@ -51,11 +53,13 @@ public class Benchmarks {
 	protected static ProjectService projectService;
 	protected static DatasetService datasetService;
 	protected static ProfileService profileService;
+	protected static InferenceService inferenceService;
+	protected static VisualizationService visualizationService;
 
 	protected static final String PROJECT_ID = "project", DATASET_ID = "dataset", INFERENCE_ID = "inference", VISUALIZATION_ID = "visualization";
 
-	protected static void main(Class<?> _class, String[] args) throws RunnerException {
-		ConfigurableApplicationContext context = SpringApplication.run(PhylodbApplication.class, args);
+	protected static void main(Class<?> _class) throws RunnerException {
+		ConfigurableApplicationContext context = SpringApplication.run(PhylodbApplication.class);
 		session = context.getBean(Session.class);
 		taxonService = context.getBean(TaxonService.class);
 		locusService = context.getBean(LocusService.class);
@@ -65,6 +69,8 @@ public class Benchmarks {
 		projectService = context.getBean(ProjectService.class);
 		datasetService = context.getBean(DatasetService.class);
 		profileService = context.getBean(ProfileService.class);
+		inferenceService = context.getBean(InferenceService.class);
+		visualizationService = context.getBean(VisualizationService.class);
 		clearContext(session);
 		String taxonId = "taxon";
 		taxonService.saveTaxon(new Taxon(taxonId, null));
@@ -132,6 +138,22 @@ public class Benchmarks {
 			clearProfiles(session);
 			initProfiles("profiles_" + profiles + ".txt");
 			DbUtils.goeBURST(session, PROJECT_ID, DATASET_ID, INFERENCE_ID);
+		}
+
+	}
+
+	@State(value = Scope.Benchmark)
+	public static class WithProfilesInferenceAndVisualization {
+
+		@Param(value = {"500", "1000", "2000", "5000", "10000", "15000"})
+		public int profiles;
+
+		@Setup
+		public void setup() throws IOException {
+			clearProfiles(session);
+			initProfiles("profiles_" + profiles + ".txt");
+			DbUtils.goeBURST(session, PROJECT_ID, DATASET_ID, INFERENCE_ID);
+			DbUtils.radial(session, PROJECT_ID, DATASET_ID, INFERENCE_ID, VISUALIZATION_ID);
 		}
 
 	}

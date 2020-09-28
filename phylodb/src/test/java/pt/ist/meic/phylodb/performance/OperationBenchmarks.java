@@ -1,5 +1,6 @@
 package pt.ist.meic.phylodb.performance;
 
+import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 
@@ -10,10 +11,10 @@ import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION_V
 
 public class OperationBenchmarks extends Benchmarks {
 
-	private static final String PROJECT_ID = "project", DATASET_ID = "dataset";
 
-	public static void main(String[] args) throws Exception {
-		main(OperationBenchmarks.class, args);
+	@Test
+	public void launchBenchmark() throws Exception {
+		main(OperationBenchmarks.class);
 	}
 
 	@Benchmark
@@ -41,4 +42,13 @@ public class OperationBenchmarks extends Benchmarks {
 		profileService.saveProfilesOnConflictUpdate(PROJECT_ID, DATASET_ID, false, createFile("performance", "profiles_" + state.profiles + ".txt"));
 	}
 
+	@Benchmark
+	public void getInference(WithProfilesAndInference ignored) {
+		inferenceService.getInference(PROJECT_ID, DATASET_ID, INFERENCE_ID);
+	}
+
+	@Benchmark
+	public void getVisualization(WithProfilesInferenceAndVisualization ignored) {
+		visualizationService.getVisualization(PROJECT_ID, DATASET_ID, INFERENCE_ID, VISUALIZATION_ID);
+	}
 }

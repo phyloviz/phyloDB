@@ -5,30 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/utils/Algorithm.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/utils/Service.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/Algorithm.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/Service.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceProcedures.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceProcedures.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/implementation/InferenceAlgorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/implementation/InferenceAlgorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/Repository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Allele.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Coordinate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Dataset.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Distance.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Has.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Profile.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Project.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/repository/type/Relation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationProcedures.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationProcedures.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/VisualizationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/VisualizationAlgorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/visualization/implementation/VisualizationAlgorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/inference/InferenceRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/inference/InferenceRepositoryTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/VisualizationRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/VisualizationRepositoryTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/AlgorithmBenchmarks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/AlgorithmBenchmarks.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/Benchmarks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/Benchmarks.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/OperationBenchmarks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/OperationBenchmarks.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/stress/Context.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/stress/Context.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,26 +111,13 @@
       <recent name="pt.ist.meic.phylodb.phylogeny.locus.model" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.phylodb [clean]">
-    <configuration name="AlgorithmBenchmarks" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.performance.AlgorithmBenchmarks" />
+  <component name="RunManager" selected="Application.PhylodbApplication">
+    <configuration name="Context" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.stress.Context" />
       <module name="phylodb.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.performance.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="OperationBenchmarks" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.performance.OperationBenchmarks" />
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.performance.*" />
+          <option name="PATTERN" value="pt.ist.meic.phylodb.stress.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -189,6 +157,22 @@
       <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="OperationBenchmarks.launchBenchmark" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.performance.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.performance" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.performance.OperationBenchmarks" />
+      <option name="METHOD_NAME" value="launchBenchmark" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="pt.ist.meic.phylodb.unit in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
       <extension name="coverage">
@@ -204,19 +188,19 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.PhylodbApplication" />
-      <item itemvalue="Application.OperationBenchmarks" />
-      <item itemvalue="Application.AlgorithmBenchmarks" />
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
       <item itemvalue="Gradle.phylodb [clean]" />
+      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
+      <item itemvalue="JUnit.OperationBenchmarks.launchBenchmark" />
+      <item itemvalue="Application.Context" />
+      <item itemvalue="Application.PhylodbApplication" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.PhylodbApplication" />
+        <item itemvalue="Application.Context" />
+        <item itemvalue="JUnit.OperationBenchmarks.launchBenchmark" />
         <item itemvalue="Gradle.phylodb [clean]" />
         <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
-        <item itemvalue="Application.AlgorithmBenchmarks" />
-        <item itemvalue="Application.OperationBenchmarks" />
-        <item itemvalue="Application.PhylodbApplication" />
       </list>
     </recent_temporary>
   </component>
@@ -246,14 +230,9 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="74" y="73" width="1389" height="679" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1591809192707">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="74" y="73" width="1389" height="679" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1536.824@0.0.1536.824" timestamp="1591809192707" />
     <state x="574" y="67" width="388" height="437" key="#com.intellij.ide.util.MemberChooser" timestamp="1598827287589">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="-1202" y="144" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1592143197839" />
     <state x="574" y="67" width="388" height="437" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1598827287589" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1595941043462">
       <screen x="0" y="0" width="1536" height="824" />
@@ -273,37 +252,33 @@
     </state>
     <state x="-1340" y="140" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1594812937566" />
     <state x="464" y="111" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1594732569978" />
-    <state width="405" height="466" key="DebuggerActiveHint" timestamp="1591018162210">
-      <screen x="-1920" y="0" width="1920" height="1040" />
-    </state>
-    <state width="405" height="466" key="DebuggerActiveHint/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1591018162210" />
     <state x="-1234" y="212" key="FileChooserDialogImpl" timestamp="1594812936439">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
     <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1594812936439" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1594732559441" />
-    <state width="1493" height="240" key="GridCell.Tab.0.bottom" timestamp="1599653756437">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="319" key="GridCell.Tab.0.bottom" timestamp="1601225678363">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="321" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1599399108474" />
+    <state width="1877" height="319" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678363" />
     <state width="1493" height="241" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1599653756437" />
-    <state width="1493" height="240" key="GridCell.Tab.0.center" timestamp="1599653756437">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="319" key="GridCell.Tab.0.center" timestamp="1601225678363">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="321" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1599399108474" />
+    <state width="1877" height="319" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678363" />
     <state width="1493" height="241" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1599653756437" />
-    <state width="1493" height="240" key="GridCell.Tab.0.left" timestamp="1599653756436">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="319" key="GridCell.Tab.0.left" timestamp="1601225678362">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="321" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1599399108474" />
+    <state width="1877" height="319" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678362" />
     <state width="1493" height="241" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1599653756436" />
-    <state width="1493" height="240" key="GridCell.Tab.0.right" timestamp="1599653756437">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="1877" height="319" key="GridCell.Tab.0.right" timestamp="1601225678363">
+      <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="321" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1599399108474" />
+    <state width="1877" height="319" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678363" />
     <state width="1493" height="241" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1599653756437" />
     <state width="1493" height="246" key="GridCell.Tab.1.bottom" timestamp="1599235676326">
