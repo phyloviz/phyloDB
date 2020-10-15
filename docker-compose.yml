@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
     db:
+        user: ${USER}
         image: neo4j:latest
         ports:
           - 7474:7474
