@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/RadialTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/visualization/RadialTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/AlgorithmBenchmarks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/AlgorithmBenchmarks.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/Benchmarks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/Benchmarks.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/OperationBenchmarks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/performance/OperationBenchmarks.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/stress/Context.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/stress/Context.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,7 +108,7 @@
       <recent name="pt.ist.meic.phylodb.phylogeny.locus.model" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.PhylodbApplication">
+  <component name="RunManager" selected="JUnit.pt.ist.meic.phylodb.unit in phylodb.test">
     <configuration name="Context" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.stress.Context" />
       <module name="phylodb.test" />
@@ -175,32 +172,40 @@
     </configuration>
     <configuration name="pt.ist.meic.phylodb.unit in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
+      <useClassPathOnly />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="pt.ist.meic.phylodb.unit.*" />
+          <option name="ENABLED" value="false" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="package" />
+      <option name="PARAMETERS" value="" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.Context" />
+      <item itemvalue="Application.PhylodbApplication" />
       <item itemvalue="Gradle.phylodb [clean]" />
       <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
       <item itemvalue="JUnit.OperationBenchmarks.launchBenchmark" />
-      <item itemvalue="Application.Context" />
-      <item itemvalue="Application.PhylodbApplication" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
         <item itemvalue="Application.PhylodbApplication" />
         <item itemvalue="Application.Context" />
         <item itemvalue="JUnit.OperationBenchmarks.launchBenchmark" />
         <item itemvalue="Gradle.phylodb [clean]" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
       </list>
     </recent_temporary>
   </component>
@@ -230,10 +235,22 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="-1506" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601908045610">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1506" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908045610" />
     <state x="574" y="67" width="388" height="437" key="#com.intellij.ide.util.MemberChooser" timestamp="1598827287589">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="574" y="67" width="388" height="437" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1598827287589" />
+    <state x="-1230" y="296" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1601908039751">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1230" y="296" key="#com.intellij.ide.util.PackageChooserDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908039751" />
+    <state x="-1231" y="310" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1601908026602">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1231" y="310" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908026602" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1595941043462">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -247,6 +264,10 @@
     </state>
     <state x="-1509" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1595428319080" />
     <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1595889881475" />
+    <state x="-1357" y="190" key="#pt.ist.meic.phylodb.unit_in_phylodb.test" timestamp="1601907851852">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1357" y="190" key="#pt.ist.meic.phylodb.unit_in_phylodb.test/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601907851852" />
     <state x="-1340" y="140" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1594812937566">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
@@ -257,28 +278,28 @@
     </state>
     <state x="-1234" y="212" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1594812936439" />
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1594732559441" />
-    <state width="1877" height="319" key="GridCell.Tab.0.bottom" timestamp="1601225678363">
+    <state width="1877" height="319" key="GridCell.Tab.0.bottom" timestamp="1601908047925">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678363" />
+    <state width="1877" height="319" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047925" />
     <state width="1493" height="241" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1599653756437" />
-    <state width="1877" height="319" key="GridCell.Tab.0.center" timestamp="1601225678363">
+    <state width="1877" height="319" key="GridCell.Tab.0.center" timestamp="1601908047925">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678363" />
+    <state width="1877" height="319" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047925" />
     <state width="1493" height="241" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1599653756437" />
-    <state width="1877" height="319" key="GridCell.Tab.0.left" timestamp="1601225678362">
+    <state width="1877" height="319" key="GridCell.Tab.0.left" timestamp="1601908047924">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678362" />
+    <state width="1877" height="319" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047924" />
     <state width="1493" height="241" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1599653756436" />
-    <state width="1877" height="319" key="GridCell.Tab.0.right" timestamp="1601225678363">
+    <state width="1877" height="319" key="GridCell.Tab.0.right" timestamp="1601908047925">
       <screen x="-1920" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601225678363" />
+    <state width="1877" height="319" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047925" />
     <state width="1493" height="241" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1599310101972" />
     <state width="1493" height="240" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1599653756437" />
     <state width="1493" height="246" key="GridCell.Tab.1.bottom" timestamp="1599235676326">
@@ -367,7 +388,13 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/phylodb$PhylodbApplication.ic" NAME="PhylodbApplication Coverage Results" MODIFIED="1601907437073" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>pt.ist.meic.phylodb.*</FILTER>
+    </SUITE>
     <SUITE FILE_PATH="coverage/phylodb$pt_ist_meic_phylodb_in_phylodb_test.ic" NAME="pt.ist.meic.phylodb in phylodb.test Coverage Results" MODIFIED="1588779690994" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>pt.ist.meic.phylodb.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/phylodb$pt_ist_meic_phylodb_unit_in_phylodb_test.ic" NAME="pt.ist.meic.phylodb.unit in phylodb.test Coverage Results" MODIFIED="1601908047890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
       <FILTER>pt.ist.meic.phylodb.*</FILTER>
     </SUITE>
   </component>

@@ -56,8 +56,8 @@ public class RadialTests {
 	public void compute_nEdgesNTree() {
 		Coordinate[] coordinates = new Coordinate[]{
 			new Coordinate(PROFILE1_ID,  1, 0, 0), new Coordinate(PROFILE2_ID, 1, 105.00000000000003, 181.8653347947321),
-			new Coordinate(PROFILE3_ID,  1, 260.00000000000006, 450.33320996790803), new Coordinate(PROFILE4_ID, 1, -255.00000000000023, -441.6729559300636),
-			new Coordinate(PROFILE5_ID, 1, -365.0000000000002, -441.6729559300636), new Coordinate(PROFILE6_ID, 1, -200.00000000000028, -536.9357503463519)
+			new Coordinate(PROFILE3_ID,  1, 260.00000000000006, 450.33320996790803), new Coordinate(PROFILE4_ID, 1, -255.00000000000023, -441.67295593006355),
+			new Coordinate(PROFILE5_ID, 1, -365.0000000000002, -441.67295593006355), new Coordinate(PROFILE6_ID, 1, -200.00000000000028, -536.9357503463518)
 		};
 		Vertex grandChild11 = vertex(PROFILE3_ID, 3);
 		Vertex child1 = vertex(PROFILE2_ID, 2, grandChild11);
