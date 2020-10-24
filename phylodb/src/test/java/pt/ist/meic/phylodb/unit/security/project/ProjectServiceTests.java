@@ -65,7 +65,7 @@ public class ProjectServiceTests extends ServiceTestsContext {
 	@MethodSource("getProjects_params")
 	public void getProjects(int page, List<VersionedEntity<String>> expected) {
 		Mockito.when(projectRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<VersionedEntity<String>>> result = projectService.getProjects(USER1.getPrimaryKey(), page, LIMIT);
+		Optional<List<VersionedEntity<String>>> result = projectService.getProjects(USER1.getPrimaryKey().getId(), USER1.getPrimaryKey().getProvider(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;

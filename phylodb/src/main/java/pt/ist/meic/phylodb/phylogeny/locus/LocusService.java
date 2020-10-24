@@ -6,6 +6,7 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonRepository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class LocusService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class LocusService extends VersionedEntityService<Locus, Locus.PrimaryKey> {
 
 	private TaxonRepository taxonRepository;
 	private LocusRepository locusRepository;
@@ -36,7 +37,7 @@ public class LocusService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Locus.PrimaryKey>>> getLoci(String taxonId, int page, int limit) {
-		return locusRepository.findAllEntities(page, limit, taxonId);
+		return getAllEntities(page, limit, taxonId);
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class LocusService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Locus> getLocus(String taxonId, String locusId, Long version) {
-		return locusRepository.find(new Locus.PrimaryKey(taxonId, locusId), version);
+		return get(new Locus.PrimaryKey(taxonId, locusId), version);
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class LocusService extends pt.ist.meic.phylodb.utils.service.Service  {
 	public boolean saveLocus(Locus locus) {
 		if (locus == null)
 			return false;
-		return taxonRepository.exists(locus.getTaxonId()) && locusRepository.save(locus);
+		return taxonRepository.exists(locus.getTaxonId()) && save(locus);
 	}
 
 	/**
@@ -74,7 +75,27 @@ public class LocusService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteLocus(String taxonId, String locusId) {
-		return locusRepository.remove(new Locus.PrimaryKey(taxonId, locusId));
+		return remove(new Locus.PrimaryKey(taxonId, locusId));
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<Locus.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return locusRepository.findAllEntities(page, limit, params[0]);
+	}
+
+	@Override
+	protected Optional<Locus> get(Locus.PrimaryKey key, long version) {
+		return locusRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Locus entity) {
+		return locusRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Locus.PrimaryKey key) {
+		return locusRepository.remove(key);
 	}
 
 }

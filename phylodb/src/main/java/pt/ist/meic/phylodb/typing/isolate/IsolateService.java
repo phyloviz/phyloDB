@@ -11,6 +11,7 @@ import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
+import pt.ist.meic.phylodb.utils.service.BatchService;
 import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -27,7 +28,7 @@ import java.util.function.Predicate;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class IsolateService extends BatchService<Isolate, Isolate.PrimaryKey> {
 
 	@Value("${application.missing}")
 	private String missing;
@@ -53,7 +54,7 @@ public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Isolate.PrimaryKey>>> getIsolatesEntities(String projectId, String datasetId, int page, int limit) {
-		return isolateRepository.findAllEntities(page, limit, projectId, datasetId);
+		return getAllEntities(page, limit, projectId, datasetId);
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<Isolate>> getIsolates(String projectId, String datasetId, int page, int limit) {
-		return isolateRepository.findAll(page, limit, projectId, datasetId);
+		return getAll(page, limit, projectId, datasetId);
 	}
 
 	/**
@@ -81,7 +82,7 @@ public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Isolate> getIsolate(String projectId, String datasetId, String isolateId, Long version) {
-		return isolateRepository.find(new Isolate.PrimaryKey(projectId, datasetId, isolateId), version);
+		return get(new Isolate.PrimaryKey(projectId, datasetId, isolateId), version);
 	}
 
 	/**
@@ -102,7 +103,7 @@ public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 				.filter(a -> !a.getValue().matches(String.format("[\\s%s]*", missing)))
 				.toArray(Ancillary[]::new);
 		Isolate save = new Isolate(key.getProjectId(), key.getDatasetId(), key.getId(), isolate.getVersion(), isolate.isDeprecated(), isolate.getDescription(), ancillaries, isolate.getProfile());
-		return isolateRepository.save(save);
+		return save(save);
 	}
 
 	/**
@@ -115,7 +116,7 @@ public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteIsolate(String projectId, String datasetId, String isolateId) {
-		return isolateRepository.remove(new Isolate.PrimaryKey(projectId, datasetId, isolateId));
+		return remove(new Isolate.PrimaryKey(projectId, datasetId, isolateId));
 	}
 
 	/**
@@ -162,9 +163,39 @@ public class IsolateService extends pt.ist.meic.phylodb.utils.service.Service  {
 			}
 			invalids.add(isolate.getPrimaryKey().getId());
 		}
-		return isolateRepository.saveAll(toSave) ?
+		return saveAll(toSave) ?
 				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
 				Optional.empty();
+	}
+
+	@Override
+	protected Optional<List<Isolate>> getAll(int page, int limit, Object... params) {
+		return isolateRepository.findAll(page, limit, params[0], params[1]);
+	}
+
+	@Override
+	protected boolean saveAll(List<Isolate> entities) {
+		return isolateRepository.saveAll(entities);
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<Isolate.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return isolateRepository.findAllEntities(page, limit, params[0], params[1]);
+	}
+
+	@Override
+	protected Optional<Isolate> get(Isolate.PrimaryKey key, long version) {
+		return isolateRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Isolate entity) {
+		return isolateRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Isolate.PrimaryKey key) {
+		return isolateRepository.remove(key);
 	}
 
 }

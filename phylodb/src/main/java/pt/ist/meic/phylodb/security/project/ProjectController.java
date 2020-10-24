@@ -55,7 +55,7 @@ public class ProjectController extends Controller {
 	) {
 		String userId = (String) req.getAttribute(SecurityInterceptor.ID);
 		String provider = (String) req.getAttribute(SecurityInterceptor.PROVIDER);
-		return getAllJson(l -> service.getProjects(new User.PrimaryKey(userId, provider), page, l), GetProjectsOutputModel::new);
+		return getAllJson(l -> service.getProjects(userId, provider, page, l), GetProjectsOutputModel::new);
 	}
 
 	/**

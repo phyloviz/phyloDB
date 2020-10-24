@@ -9,6 +9,7 @@ import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.utils.service.BatchService;
 import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -24,7 +25,7 @@ import java.util.function.Predicate;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class AlleleService extends BatchService<Allele, Allele.PrimaryKey> {
 
 	private LocusRepository locusRepository;
 	private AlleleRepository alleleRepository;
@@ -46,7 +47,7 @@ public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Allele.PrimaryKey>>> getAllelesEntities(String taxonId, String locusId, String project, int page, int limit) {
-		return alleleRepository.findAllEntities(page, limit, taxonId, locusId, project);
+		return getAllEntities(page, limit, taxonId, locusId, project);
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<Allele>> getAlleles(String taxonId, String locusId, String project, int page, int limit) {
-		return alleleRepository.findAll(page, limit, taxonId, locusId, project);
+		return getAll(page, limit, taxonId, locusId, project);
 	}
 
 	/**
@@ -76,7 +77,7 @@ public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Allele> getAllele(String taxonId, String locusId, String alleleId, String project, long version) {
-		return alleleRepository.find(new Allele.PrimaryKey(taxonId, locusId, alleleId, project), version);
+		return get(new Allele.PrimaryKey(taxonId, locusId, alleleId, project), version);
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 	public boolean saveAllele(Allele allele) {
 		if (allele == null) return false;
 		return locusRepository.exists(new Locus.PrimaryKey(allele.getTaxonId(), allele.getLocusId())) &&
-				alleleRepository.save(allele);
+				save(allele);
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteAllele(String taxonId, String locusId, String alleleId, String project) {
-		return alleleRepository.remove(new Allele.PrimaryKey(taxonId, locusId, alleleId, project));
+		return remove(new Allele.PrimaryKey(taxonId, locusId, alleleId, project));
 	}
 
 	/**
@@ -150,9 +151,39 @@ public class AlleleService extends pt.ist.meic.phylodb.utils.service.Service  {
 			}
 			invalids.add(allele.getPrimaryKey().getId());
 		}
-		return alleleRepository.saveAll(toSave) ?
+		return saveAll(toSave) ?
 				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
 				Optional.empty();
+	}
+
+	@Override
+	protected Optional<List<Allele>> getAll(int page, int limit, Object... params) {
+		return alleleRepository.findAll(page, limit, params[0], params[1], params[2]);
+	}
+
+	@Override
+	protected boolean saveAll(List<Allele> entities) {
+		return alleleRepository.saveAll(entities);
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<Allele.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return alleleRepository.findAllEntities(page, limit, params[0], params[1], params[2]);
+	}
+
+	@Override
+	protected Optional<Allele> get(Allele.PrimaryKey key, long version) {
+		return alleleRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Allele entity) {
+		return alleleRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Allele.PrimaryKey key) {
+		return alleleRepository.remove(key);
 	}
 
 }

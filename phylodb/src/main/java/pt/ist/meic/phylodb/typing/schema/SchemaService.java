@@ -6,6 +6,7 @@ import pt.ist.meic.phylodb.phylogeny.locus.LocusRepository;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class SchemaService extends pt.ist.meic.phylodb.utils.service.Service {
+public class SchemaService extends VersionedEntityService<Schema, Schema.PrimaryKey> {
 
 	private LocusRepository locusRepository;
 	private SchemaRepository schemaRepository;
@@ -36,7 +37,7 @@ public class SchemaService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Schema.PrimaryKey>>> getSchemas(String taxonId, int page, int limit) {
-		return schemaRepository.findAllEntities(page, limit, taxonId);
+		return getAllEntities(page, limit, taxonId);
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class SchemaService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Schema> getSchema(String taxonId, String schemaId, long version) {
-		return schemaRepository.find(new Schema.PrimaryKey(taxonId, schemaId), version);
+		return get(new Schema.PrimaryKey(taxonId, schemaId), version);
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class SchemaService extends pt.ist.meic.phylodb.utils.service.Service {
 		if (locusRepository.anyMissing(schema.getLociReferences()) ||
 				(dbSchema.isPresent() && !dbSchema.get().getPrimaryKey().equals(schema.getPrimaryKey())))
 			return false;
-		return schemaRepository.save(schema);
+		return save(schema);
 	}
 
 	/**
@@ -79,7 +80,27 @@ public class SchemaService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional
 	public boolean deleteSchema(String taxonId, String schemaId) {
-		return schemaRepository.remove(new Schema.PrimaryKey(taxonId, schemaId));
+		return remove(new Schema.PrimaryKey(taxonId, schemaId));
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<Schema.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return schemaRepository.findAllEntities(page, limit, params[0]);
+	}
+
+	@Override
+	protected Optional<Schema> get(Schema.PrimaryKey key, long version) {
+		return schemaRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Schema entity) {
+		return schemaRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Schema.PrimaryKey key) {
+		return schemaRepository.remove(key);
 	}
 
 }

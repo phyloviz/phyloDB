@@ -106,7 +106,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 	@ParameterizedTest
 	@MethodSource("getProjects_params")
 	public void getProjects(MockHttpServletRequestBuilder req, List<VersionedEntity<String>> projects, HttpStatus expectedStatus, List<ProjectOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(projectService.getProjects(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
+		Mockito.when(projectService.getProjects(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
 		MockHttpServletResponse result = executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {

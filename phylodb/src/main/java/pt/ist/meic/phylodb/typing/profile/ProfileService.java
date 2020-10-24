@@ -15,6 +15,7 @@ import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.utils.service.BatchService;
 import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -31,7 +32,7 @@ import java.util.function.Predicate;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
+public class ProfileService extends BatchService<Profile, Profile.PrimaryKey> {
 
 	@Value("${application.missing}")
 	private String missing;
@@ -59,7 +60,7 @@ public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Profile.PrimaryKey>>> getProfilesEntities(String projectId, String datasetId, int page, int limit) {
-		return profileRepository.findAllEntities(page, limit, projectId, datasetId);
+		return getAllEntities(page, limit, projectId, datasetId);
 	}
 
 	/**
@@ -73,7 +74,7 @@ public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Pair<Schema, List<Profile>>> getProfiles(String projectId, String datasetId, int page, int limit) {
-		return profileRepository.findAll(page, limit, projectId, datasetId)
+		return getAll(page, limit, projectId, datasetId)
 				.flatMap(p -> schemaRepository.find(new Dataset.PrimaryKey(projectId, datasetId)).map(s -> new Pair<>(s, p)));
 	}
 
@@ -88,7 +89,7 @@ public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Profile> getProfile(String projectId, String datasetId, String profileId, long version) {
-		return profileRepository.find(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
+		return get(new Profile.PrimaryKey(projectId, datasetId, profileId), version);
 	}
 
 	/**
@@ -112,7 +113,7 @@ public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
 		if (loci.size() != alleles.size())
 			return false;
 		profile = profile.updateReferences(schema, missing, authorized);
-		return verifyAlleles(profile.getAllelesReferences()) && profileRepository.save(profile);
+		return verifyAlleles(profile.getAllelesReferences()) && save(profile);
 	}
 
 	/**
@@ -125,7 +126,7 @@ public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
 	 */
 	@Transactional
 	public boolean deleteProfile(String projectId, String datasetId, String profileId) {
-		return profileRepository.remove(new Profile.PrimaryKey(projectId, datasetId, profileId));
+		return remove(new Profile.PrimaryKey(projectId, datasetId, profileId));
 	}
 
 	/**
@@ -175,13 +176,43 @@ public class ProfileService extends pt.ist.meic.phylodb.utils.service.Service {
 			}
 			invalids.add(profile.getPrimaryKey().getId());
 		}
-		return profileRepository.saveAll(toSave) ?
+		return saveAll(toSave) ?
 				Optional.of(new Pair<>(parsed.getValue().toArray(new Integer[0]), invalids.toArray(new String[0]))) :
 				Optional.empty();
 	}
 
 	private boolean verifyAlleles(List<VersionedEntity<Allele.PrimaryKey>> references) {
 		return !alleleRepository.anyMissing(references) && !references.stream().allMatch(Objects::isNull);
+	}
+
+	@Override
+	protected Optional<List<Profile>> getAll(int page, int limit, Object... params) {
+		return profileRepository.findAll(page, limit, params[0], params[1]);
+	}
+
+	@Override
+	protected boolean saveAll(List<Profile> entities) {
+		return profileRepository.saveAll(entities);
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<Profile.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return profileRepository.findAllEntities(page, limit, params[0], params[1]);
+	}
+
+	@Override
+	protected Optional<Profile> get(Profile.PrimaryKey key, long version) {
+		return profileRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Profile entity) {
+		return profileRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Profile.PrimaryKey key) {
+		return profileRepository.remove(key);
 	}
 
 }

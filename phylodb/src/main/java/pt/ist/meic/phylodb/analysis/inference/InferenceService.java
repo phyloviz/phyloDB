@@ -14,6 +14,7 @@ import pt.ist.meic.phylodb.typing.profile.ProfileRepository;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
 import pt.ist.meic.phylodb.utils.service.Entity;
 import pt.ist.meic.phylodb.utils.service.Pair;
+import pt.ist.meic.phylodb.utils.service.UnversionedEntityService;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ import java.util.stream.Stream;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class InferenceService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class InferenceService extends UnversionedEntityService<Inference, Inference.PrimaryKey> {
 
 	private DatasetRepository datasetRepository;
 	private ProfileRepository profileRepository;
@@ -52,7 +53,7 @@ public class InferenceService extends pt.ist.meic.phylodb.utils.service.Service 
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<Entity<Inference.PrimaryKey>>> getInferences(String projectId, String datasetId, int page, int limit) {
-		return inferenceRepository.findAllEntities(page, limit, projectId, datasetId);
+		return getAllEntities(page, limit, projectId, datasetId);
 	}
 
 	/**
@@ -65,7 +66,7 @@ public class InferenceService extends pt.ist.meic.phylodb.utils.service.Service 
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Inference> getInference(String projectId, String datasetId, String id) {
-		return inferenceRepository.find(new Inference.PrimaryKey(projectId, datasetId, id));
+		return get(new Inference.PrimaryKey(projectId, datasetId, id));
 	}
 
 	/**
@@ -100,7 +101,7 @@ public class InferenceService extends pt.ist.meic.phylodb.utils.service.Service 
 		if (edges.size() == 0 || profileRepository.anyMissing(profiles))
 			return Optional.empty();
 		UUID id = UUID.randomUUID();
-		inferenceRepository.save(new Inference(projectId, datasetId, id.toString(), InferenceAlgorithm.valueOf(algorithm.toUpperCase()), edges));
+		save(new Inference(projectId, datasetId, id.toString(), InferenceAlgorithm.valueOf(algorithm.toUpperCase()), edges));
 		return Optional.of(id.toString());
 	}
 
@@ -114,7 +115,27 @@ public class InferenceService extends pt.ist.meic.phylodb.utils.service.Service 
 	 */
 	@Transactional
 	public boolean deleteInference(String projectId, String datasetId, String id) {
-		return inferenceRepository.remove(new Inference.PrimaryKey(projectId, datasetId, id));
+		return remove(new Inference.PrimaryKey(projectId, datasetId, id));
+	}
+
+	@Override
+	protected Optional<List<Entity<Inference.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return inferenceRepository.findAllEntities(page, limit, params[0], params[1]);
+	}
+
+	@Override
+	protected Optional<Inference> get(Inference.PrimaryKey key) {
+		return inferenceRepository.find(key);
+	}
+
+	@Override
+	protected boolean save(Inference entity) {
+		return inferenceRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Inference.PrimaryKey key) {
+		return inferenceRepository.remove(key);
 	}
 
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class UserService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class UserService extends VersionedEntityService<User, User.PrimaryKey> {
 
 	private UserRepository userRepository;
 
@@ -31,7 +32,7 @@ public class UserService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<User.PrimaryKey>>> getUsers(int page, int limit) {
-		return userRepository.findAllEntities(page, limit);
+		return getAllEntities(page, limit);
 	}
 
 	/**
@@ -44,7 +45,7 @@ public class UserService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<User> getUser(String user, String provider, long version) {
-		return userRepository.find(new User.PrimaryKey(user, provider), version);
+		return get(new User.PrimaryKey(user, provider), version);
 	}
 
 	/**
@@ -57,7 +58,7 @@ public class UserService extends pt.ist.meic.phylodb.utils.service.Service  {
 	public boolean updateUser(User user) {
 		if (user == null || !userRepository.exists(user.getPrimaryKey()))
 			return false;
-		return userRepository.save(user);
+		return save(user);
 	}
 
 	/**
@@ -69,7 +70,7 @@ public class UserService extends pt.ist.meic.phylodb.utils.service.Service  {
 	public void createUser(User user) {
 		if (user == null || userRepository.exists(user.getPrimaryKey()))
 			return;
-		userRepository.save(user);
+		save(user);
 	}
 
 	/**
@@ -81,7 +82,27 @@ public class UserService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteUser(String user, String provider) {
-		return userRepository.remove(new User.PrimaryKey(user, provider));
+		return remove(new User.PrimaryKey(user, provider));
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<User.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return userRepository.findAllEntities(page, limit);
+	}
+
+	@Override
+	protected Optional<User> get(User.PrimaryKey key, long version) {
+		return userRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(User entity) {
+		return userRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(User.PrimaryKey key) {
+		return userRepository.remove(key);
 	}
 
 }

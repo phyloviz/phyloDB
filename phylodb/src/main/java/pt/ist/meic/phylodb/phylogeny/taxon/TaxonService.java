@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class TaxonService extends VersionedEntityService<Taxon, String> {
 
 	private TaxonRepository taxonRepository;
 
@@ -31,7 +32,7 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<String>>> getTaxons(int page, int limit) {
-		return taxonRepository.findAllEntities(page, limit);
+		return getAllEntities(page, limit);
 	}
 
 	/**
@@ -43,7 +44,7 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Taxon> getTaxon(String id, Long version) {
-		return taxonRepository.find(id, version);
+		return get(id, version);
 	}
 
 	/**
@@ -54,7 +55,7 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean saveTaxon(Taxon taxon) {
-		return taxonRepository.save(taxon);
+		return save(taxon);
 	}
 
 	/**
@@ -65,7 +66,27 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteTaxon(String id) {
-		return taxonRepository.remove(id);
+		return remove(id);
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<String>>> getAllEntities(int page, int limit, Object... params) {
+		return taxonRepository.findAllEntities(page, limit);
+	}
+
+	@Override
+	protected Optional<Taxon> get(String key, long version) {
+		return taxonRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Taxon entity) {
+		return taxonRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(String key) {
+		return taxonRepository.remove(key);
 	}
 
 }
