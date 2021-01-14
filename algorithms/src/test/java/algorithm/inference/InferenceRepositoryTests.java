@@ -61,6 +61,30 @@ public class InferenceRepositoryTests extends RepositoryTests {
 	}
 
 	@Test
+	public void read_matrix2Rows1ColumnWithDeprecated() throws IOException {
+		try (Transaction tx = database.beginTx()) {
+			arrange(tx, "inference", "ctx-2p-1a-d.cypher");
+			Matrix matrix  = repository.read(tx, PROJECT_ID, DATASET_ID);
+			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID)));
+			assertArrayEquals(new int[][] {{}, {1}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 1}, matrix.getIsolates());
+			tx.rollback();
+		}
+	}
+
+	@Test
+	public void read_matrix2Rows1ColumnWithVersionIsolate() throws IOException {
+		try (Transaction tx = database.beginTx()) {
+			arrange(tx, "inference", "ctx-2p-1a-vi.cypher");
+			Matrix matrix  = repository.read(tx, PROJECT_ID, DATASET_ID);
+			assertTrue(Arrays.asList(matrix.getIds()).containsAll(Arrays.asList(PROFILE1_ID, PROFILE2_ID)));
+			assertArrayEquals(new int[][] {{}, {1}}, matrix.getDistances());
+			assertArrayEquals(new int[] {0, 1}, matrix.getIsolates());
+			tx.rollback();
+		}
+	}
+
+	@Test
 	public void read_matrix2RowsNColumn() throws IOException {
 		try (Transaction tx = database.beginTx()) {
 			arrange(tx, "inference", "ctx-2p-na.cypher");

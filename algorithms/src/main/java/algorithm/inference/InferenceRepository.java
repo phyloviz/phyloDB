@@ -5,10 +5,7 @@ import algorithm.inference.model.Inference;
 import algorithm.inference.model.Matrix;
 import algorithm.utils.Repository;
 import algorithm.utils.type.*;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +29,7 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 		Node project = node(Project.LABEL, projectId, tx);
 		Node dataset = related(project, Relation.CONTAINS, Direction.OUTGOING, Dataset.LABEL, datasetId);
 		List<Node> profiles = related(dataset, Relation.CONTAINS, Direction.OUTGOING, Profile.LABEL)
+				.filter(n -> !((boolean) n.getProperty("deprecated")))
 				.collect(Collectors.toList());
 		Node detail = detail(profiles.get(0));
 		int loci = Math.toIntExact((long) relationships(detail, Relation.HAS, Direction.OUTGOING)
@@ -44,7 +42,9 @@ public class InferenceRepository extends Repository<Inference, Matrix> {
 		String[][] alleles = new String[lines][loci];
 		IntStream.range(0, lines)
 				.peek(i -> ids[i] = (String) profiles.get(i).getProperty(Profile.ID))
-				.peek(i -> isolates[i] = Math.toIntExact(relationships(profiles.get(i), Relation.HAS, Direction.INCOMING).count()))
+				.peek(i -> isolates[i] = Math.toIntExact(relationships(profiles.get(i), Relation.HAS, Direction.INCOMING)
+						.map(r -> r.getStartNode().getSingleRelationship(RelationshipType.withName(Relation.CONTAINS_DETAILS.name()), Direction.INCOMING))
+						.filter(r -> r.getProperty("to", null) == null && !((boolean) r.getStartNode().getProperty("deprecated"))).count()))
 				.forEach(i -> relationships(detail(profiles.get(i)), Relation.HAS, Direction.OUTGOING)
 						.map(r -> new Object[]{Math.toIntExact((long) r.getProperty(Allele.PART)), r.getEndNode().getProperty(Allele.ID)})
 						.forEach(p -> alleles[i][((int) p[0]) - 1] = (String) p[1]));
