@@ -42,7 +42,6 @@ public class VisualizationRepository extends UnversionedRepository<Visualization
 	protected Result get(Visualization.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(ds:Dataset {id: $})\n" +
 				"MATCH (ds)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: $, id: $}]->(c:Coordinate)\n" +
-				"WHERE h.deprecated = false\n" +
 				"WITH pj, ds, h.inferenceId as inferenceId, p, h, c\n" +
 				"ORDER BY pj.id, ds.id, inferenceId, size(h.id), h.id, h.component, p.id, c.x, c.y\n" +
 				"RETURN pj.id as projectId, ds.id as datasetId, inferenceId as inferenceId, h.id as id, h.deprecated as deprecated, h.algorithm as algorithm,\n" +

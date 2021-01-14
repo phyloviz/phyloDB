@@ -5,7 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="165b53e7-f478-4579-ae97-db99dea7449b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/main/java/algorithm/inference/InferenceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/inference/InferenceRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/algorithm/inference/InferenceRepositoryTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-2p-1a.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-2p-1a.cypher" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-2p-na.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-2p-na.cypher" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-np-1a.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-np-1a.cypher" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-np-na-m.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-np-na-m.cypher" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-np-na.cypher" beforeDir="false" afterPath="$PROJECT_DIR$/../algorithms/src/test/java/resources/inference/ctx-np-na.cypher" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/visualization/VisualizationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/project/ProjectRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/security/project/ProjectRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/unit/security/project/ProjectRepositoryTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pt/ist/meic/phylodb/unit/security/project/ProjectRepositoryTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +85,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="extract.method.default.visibility" value="private" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../algorithms" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -121,6 +132,53 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ProjectRepositoryTests.find" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.unit.security.project.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit.security.project" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.unit.security.project.ProjectRepositoryTests" />
+      <option name="METHOD_NAME" value="find(java.lang.String,long,[Lpt.ist.meic.phylodb.security.project.model.Project;,pt.ist.meic.phylodb.security.project.model.Project)" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProjectRepositoryTests.findAll" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.unit.security.project.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit.security.project" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.unit.security.project.ProjectRepositoryTests" />
+      <option name="METHOD_NAME" value="findAll(int,[Lpt.ist.meic.phylodb.security.project.model.Project;,java.util.List)" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VisualizationRepositoryTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="phylodb.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pt.ist.meic.phylodb.unit.analysis.visualization.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit.analysis.visualization" />
+      <option name="MAIN_CLASS_NAME" value="pt.ist.meic.phylodb.unit.analysis.visualization.VisualizationRepositoryTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="pt.ist.meic.phylodb.unit in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="phylodb.test" />
       <extension name="coverage">
@@ -135,62 +193,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="pt.ist.meic.phylodb.unit.analysis in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.unit.analysis.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit.analysis" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="pt.ist.meic.phylodb.unit.phylogeny in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.unit.phylogeny.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit.phylogeny" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="pt.ist.meic.phylodb.unit.typing in phylodb.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="phylodb.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="pt.ist.meic.phylodb.unit.typing.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="pt.ist.meic.phylodb.unit.typing" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <list>
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit.analysis in phylodb.test" />
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit.phylogeny in phylodb.test" />
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit.typing in phylodb.test" />
-      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
       <item itemvalue="Application.PhylodbApplication" />
+      <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
+      <item itemvalue="JUnit.VisualizationRepositoryTests" />
+      <item itemvalue="JUnit.ProjectRepositoryTests.find" />
+      <item itemvalue="JUnit.ProjectRepositoryTests.findAll" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.PhylodbApplication" />
         <item itemvalue="JUnit.pt.ist.meic.phylodb.unit in phylodb.test" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb.unit.typing in phylodb.test" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb.unit.phylogeny in phylodb.test" />
-        <item itemvalue="JUnit.pt.ist.meic.phylodb.unit.analysis in phylodb.test" />
+        <item itemvalue="JUnit.ProjectRepositoryTests.findAll" />
+        <item itemvalue="JUnit.ProjectRepositoryTests.find" />
+        <item itemvalue="JUnit.VisualizationRepositoryTests" />
       </list>
     </recent_temporary>
   </component>
@@ -220,22 +236,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="-1506" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601908045610">
-      <screen x="-1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="-1506" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908045610" />
     <state x="574" y="67" width="388" height="437" key="#com.intellij.ide.util.MemberChooser" timestamp="1603562827186">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="574" y="67" width="388" height="437" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1603562827186" />
-    <state x="-1230" y="296" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1601908039751">
-      <screen x="-1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="-1230" y="296" key="#com.intellij.ide.util.PackageChooserDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908039751" />
-    <state x="-1231" y="310" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1601908026602">
-      <screen x="-1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="-1231" y="310" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908026602" />
     <state x="590" y="339" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1603562179128">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -244,34 +248,42 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="0" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.824@0.0.1536.824" timestamp="1603550378392" />
-    <state x="-1357" y="190" key="#pt.ist.meic.phylodb.unit_in_phylodb.test" timestamp="1601907851852">
-      <screen x="-1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="-1357" y="190" key="#pt.ist.meic.phylodb.unit_in_phylodb.test/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601907851852" />
     <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1609877186783">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1609877186783" />
-    <state width="1493" height="171" key="GridCell.Tab.0.bottom" timestamp="1609883917538">
+    <state width="1493" height="238" key="GridCell.Tab.0.bottom" timestamp="1610643967370">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.bottom/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047925" />
-    <state width="1493" height="171" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1609883917538" />
-    <state width="1493" height="171" key="GridCell.Tab.0.center" timestamp="1609883917538">
+    <state width="1493" height="238" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1610643967370" />
+    <state width="1493" height="238" key="GridCell.Tab.0.center" timestamp="1610643967370">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.center/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047925" />
-    <state width="1493" height="171" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1609883917538" />
-    <state width="1493" height="171" key="GridCell.Tab.0.left" timestamp="1609883917538">
+    <state width="1493" height="238" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1610643967370" />
+    <state width="1493" height="238" key="GridCell.Tab.0.left" timestamp="1610643967370">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.left/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047924" />
-    <state width="1493" height="171" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1609883917538" />
-    <state width="1493" height="171" key="GridCell.Tab.0.right" timestamp="1609883917538">
+    <state width="1493" height="238" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1610643967370" />
+    <state width="1493" height="238" key="GridCell.Tab.0.right" timestamp="1610643967370">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1877" height="319" key="GridCell.Tab.0.right/0.0.1536.824/-1920.0.1920.1040@-1920.0.1920.1040" timestamp="1601908047925" />
-    <state width="1493" height="171" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1609883917538" />
+    <state width="1493" height="238" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1610643967370" />
+    <state width="1493" height="246" key="GridCell.Tab.1.bottom" timestamp="1610641688920">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="246" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1610641688920" />
+    <state width="1493" height="246" key="GridCell.Tab.1.center" timestamp="1610641688919">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="246" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1610641688919" />
+    <state width="1493" height="246" key="GridCell.Tab.1.left" timestamp="1610641688919">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="246" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1610641688919" />
+    <state width="1493" height="246" key="GridCell.Tab.1.right" timestamp="1610641688920">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="246" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1610641688920" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -285,6 +297,21 @@
           <url>file://$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/test/TestController.java</url>
           <line>37</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/analysis/inference/InferenceRepository.java</url>
+          <line>69</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileRepository.java</url>
+          <line>71</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/pt/ist/meic/phylodb/typing/profile/ProfileService.java</url>
+          <line>91</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
