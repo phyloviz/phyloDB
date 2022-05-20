@@ -1,0 +1,2 @@
+id	isolate	country	continent	ST
+1	AU13161	USA	North America	102

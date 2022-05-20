@@ -1,0 +1,4 @@
+BEGIN TREES;
+	Tree result = (aaaaa)a(a:2);
+	abc
+END;
