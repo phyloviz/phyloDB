@@ -139,11 +139,12 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Project[] findAll() {
-		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
+		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
+				"OPTIONAL MATCH (pd)-[:HAS]->(u:User)\n" +
 				"WITH p, r, pd, u\n" +
 				"ORDER BY p.id, u.id, u.provider\n" +
 				"RETURN p.id as id, p.deprecated as deprecated, r.version as version, " +
-				"pd.name as name, pd.type as type, pd.description as description, collect(DISTINCT {id : u.id, provider: u.provider}) as users\n" +
+				"pd.name as name, pd.type as type, pd.description as description, [user in collect(DISTINCT {id : u.id, provider: u.provider}) WHERE user.id is not null] as users\n" +
 				"ORDER BY p.id, r.version";
 		Result result = query(new Query(statement));
 		if (result == null) return new Project[0];
