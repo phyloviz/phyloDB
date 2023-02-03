@@ -9,24 +9,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A GetTaxonsOutputModel is the output model representation of a set of {@link Taxon taxons}
+ * A GetTaxaOutputModel is the output model representation of a set of {@link Taxon taxa}
  * <p>
- * A GetTaxonsOutputModel is constituted by the {@link #taxons} field that contains the resumed information of each taxon.
+ * A GetTaxaOutputModel is constituted by the {@link #taxa} field that contains the resumed information of each taxon.
  * Each resumed information is represented by an {@link TaxonOutputModel.Resumed} object.
  */
-public class GetTaxonsOutputModel implements OutputModel {
+public class GetTaxaOutputModel implements OutputModel {
 
-	private final List<TaxonOutputModel.Resumed> taxons;
+	private final List<TaxonOutputModel.Resumed> taxa;
 
-	public GetTaxonsOutputModel(List<VersionedEntity<String>> entities) {
-		this.taxons = entities.stream()
+	public GetTaxaOutputModel(List<VersionedEntity<String>> entities) {
+		this.taxa = entities.stream()
 				.map(TaxonOutputModel.Resumed::new)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public ResponseEntity<List<TaxonOutputModel.Resumed>> toResponseEntity() {
-		return ResponseEntity.status(HttpStatus.OK).body(taxons);
+		return ResponseEntity.status(HttpStatus.OK).body(taxa);
 	}
 
 }

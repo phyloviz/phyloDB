@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Class that contains operations to manage taxons
+ * Class that contains operations to manage taxa
  * <p>
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
@@ -24,14 +24,14 @@ public class TaxonService extends VersionedEntityService<Taxon, String> {
 	}
 
 	/**
-	 * Operation to retrieve the resumed information of the requested taxons
+	 * Operation to retrieve the resumed information of the requested taxa
 	 *
 	 * @param page  number of the page to retrieve
-	 * @param limit number of taxons to retrieve by page
+	 * @param limit number of taxa to retrieve by page
 	 * @return an {@link Optional} with a {@link List} of {@link VersionedEntity<String>}, which is the resumed information of each taxon
 	 */
 	@Transactional(readOnly = true)
-	public Optional<List<VersionedEntity<String>>> getTaxons(int page, int limit) {
+	public Optional<List<VersionedEntity<String>>> getTaxa(int page, int limit) {
 		return getAllEntities(page, limit);
 	}
 

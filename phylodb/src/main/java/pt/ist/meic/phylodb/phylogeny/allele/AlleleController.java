@@ -33,7 +33,7 @@ import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
  * The endpoints responsibility is to parse the input, call the respective service, and to format the resulting output.
  */
 @RestController
-@RequestMapping("/taxons/{taxon}/loci/{locus}/alleles")
+@RequestMapping("/taxa/{taxon}/loci/{locus}/alleles")
 public class AlleleController extends Controller {
 
 	@Value("${application.limits.files.fasta.line}")
