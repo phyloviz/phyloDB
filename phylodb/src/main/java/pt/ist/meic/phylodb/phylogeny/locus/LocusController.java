@@ -24,7 +24,7 @@ import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
  * The endpoints responsibility is to parse the input, call the respective service, and to format the resulting output.
  */
 @RestController
-@RequestMapping("/taxons/{taxon}/loci")
+@RequestMapping("/taxa/{taxon}/loci")
 public class LocusController extends Controller {
 
 	private LocusService service;

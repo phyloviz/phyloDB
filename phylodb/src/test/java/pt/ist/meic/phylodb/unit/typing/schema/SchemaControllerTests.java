@@ -36,7 +36,7 @@ public class SchemaControllerTests extends ControllerTestsContext {
 	private static final String TAXONID = TAXON1.getPrimaryKey();
 
 	private static Stream<Arguments> getSchemas_params() {
-		String uri = "/taxons/%s/schemas";
+		String uri = "/taxa/%s/schemas";
 		List<VersionedEntity<Schema.PrimaryKey>> loci = new ArrayList<VersionedEntity<Schema.PrimaryKey>>() {{
 			add(new VersionedEntity<>(SCHEMA1.getPrimaryKey(), SCHEMA1.getVersion(), SCHEMA1.isDeprecated()));
 			add(new VersionedEntity<>(SCHEMA2.getPrimaryKey(), SCHEMA2.getVersion(), SCHEMA2.isDeprecated()));
@@ -54,7 +54,7 @@ public class SchemaControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> getSchema_params() {
-		String uri = "/taxons/%s/schemas/%s";
+		String uri = "/taxa/%s/schemas/%s";
 		Schema.PrimaryKey key = SCHEMA1.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, TAXONID, key.getId())).param("version", "1"),
 				req2 = get(String.format(uri, TAXONID, key.getId()));
@@ -65,7 +65,7 @@ public class SchemaControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> saveSchema_params() {
-		String uri = "/taxons/%s/schemas/%s";
+		String uri = "/taxa/%s/schemas/%s";
 		Schema.PrimaryKey key = SCHEMA1.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, TAXONID, key.getId()));
 		SchemaInputModel input1 = new SchemaInputModel(TAXONID, key.getId(), Method.MLST.getName(), null, new String[]{LOCUS1.getPrimaryKey().getId(), LOCUS2.getPrimaryKey().getId()}),
@@ -77,7 +77,7 @@ public class SchemaControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> deleteSchema_params() {
-		String uri = "/taxons/%s/schemas/%s";
+		String uri = "/taxa/%s/schemas/%s";
 		Locus locus = new Locus(TAXONID, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = delete(String.format(uri, TAXONID, key.getId()));

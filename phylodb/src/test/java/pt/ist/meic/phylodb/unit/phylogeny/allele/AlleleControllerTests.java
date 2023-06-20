@@ -42,7 +42,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	private static final String PROJECTID = PROJECT1.getPrimaryKey();
 
 	private static Stream<Arguments> getAllelesList_params() {
-		String uri = "/taxons/%s/loci/%s/alleles";
+		String uri = "/taxa/%s/loci/%s/alleles";
 		List<VersionedEntity<Allele.PrimaryKey>> alleles1 = new ArrayList<VersionedEntity<Allele.PrimaryKey>>() {{
 			add(new VersionedEntity<>(new Allele.PrimaryKey(TAXONID, LOCUSID, "id", null), 1, false));
 		}};
@@ -70,7 +70,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> getAllelesFile_params() {
-		String uri = "/taxons/%s/loci/%s/alleles/files";
+		String uri = "/taxa/%s/loci/%s/alleles/files";
 		List<Allele> alleles1 = new ArrayList<Allele>() {{
 			add(new Allele(TAXONID, LOCUSID, "id", null, null));
 		}};
@@ -88,7 +88,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> getAllele_params() {
-		String uri = "/taxons/%s/loci/%s/alleles/%s";
+		String uri = "/taxa/%s/loci/%s/alleles/%s";
 		Allele allele1 = new Allele(TAXONID, LOCUSID, "id1", "description", null);
 		Allele allele2 = new Allele(TAXONID, LOCUSID, "id2", "description", PROJECTID);
 		Allele.PrimaryKey key1 = allele1.getPrimaryKey();
@@ -108,7 +108,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> saveAllele_params() {
-		String uri = "/taxons/%s/loci/%s/alleles/%s";
+		String uri = "/taxa/%s/loci/%s/alleles/%s";
 		Allele allele = new Allele(TAXONID, LOCUSID, "id", "description", null);
 		Allele.PrimaryKey key = allele.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, TAXONID, LOCUSID, key.getId())),
@@ -125,7 +125,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> putAlleles_params() {
-		String uri = "/taxons/%s/loci/%s/alleles/files";
+		String uri = "/taxa/%s/loci/%s/alleles/files";
 		MockMultipartFile file = new MockMultipartFile("file", "", "text/plain", "b".getBytes());
 		MockMultipartHttpServletRequestBuilder req1 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file),
 				req2 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file),
@@ -156,7 +156,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> postAlleles_params() {
-		String uri = "/taxons/%s/loci/%s/alleles/files";
+		String uri = "/taxa/%s/loci/%s/alleles/files";
 		MockMultipartFile file = new MockMultipartFile("file", "", "text/plain", "bytes".getBytes());
 		MockHttpServletRequestBuilder req1 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file),
 				req2 = multipart(String.format(uri, TAXONID, LOCUSID)).file(file).param("project", PROJECTID),
@@ -174,7 +174,7 @@ public class AlleleControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> deleteAllele_params() {
-		String uri = "/taxons/%s/loci/%s/alleles/%s";
+		String uri = "/taxa/%s/loci/%s/alleles/%s";
 		Allele allele = new Allele(TAXONID, LOCUSID, "id", "description", null);
 		Allele.PrimaryKey key = allele.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = delete(String.format(uri, TAXONID, LOCUSID, key.getId()));

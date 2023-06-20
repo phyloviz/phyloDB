@@ -7,7 +7,7 @@ import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
-import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonsOutputModel;
+import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxaOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.security.authorization.Authorized;
@@ -16,12 +16,12 @@ import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 
 /**
- * Class that contains the endpoints to manage taxons
+ * Class that contains the endpoints to manage taxa
  * <p>
  * The endpoints responsibility is to parse the input, call the respective service, and to format the resulting output.
  */
 @RestController
-@RequestMapping("/taxons")
+@RequestMapping("/taxa")
 public class TaxonController extends Controller {
 
 	private TaxonService service;
@@ -31,19 +31,19 @@ public class TaxonController extends Controller {
 	}
 
 	/**
-	 * Endpoint to retrieve the specified page of {@link Taxon taxons}.
+	 * Endpoint to retrieve the specified page of {@link Taxon taxa}.
 	 * <p>
 	 * Returns the page with resumed information of each taxon. It requires the user to
 	 * be authenticated.
 	 *
 	 * @param page number of the page to retrieve
-	 * @return a {@link ResponseEntity<GetTaxonsOutputModel>} representing the specified taxons page or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
+	 * @return a {@link ResponseEntity<GetTaxaOutputModel>} representing the specified taxa page or a {@link ResponseEntity<ErrorOutputModel>} if it couldn't perform the operation
 	 */
 	@GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getTaxons(
+	public ResponseEntity<?> getTaxa(
 			@RequestParam(value = "page", defaultValue = "0") int page
 	) {
-		return getAllJson(l -> service.getTaxons(page, l), GetTaxonsOutputModel::new);
+		return getAllJson(l -> service.getTaxa(page, l), GetTaxaOutputModel::new);
 	}
 
 	/**

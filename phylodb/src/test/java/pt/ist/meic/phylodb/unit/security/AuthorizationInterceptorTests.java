@@ -54,7 +54,7 @@ public class AuthorizationInterceptorTests extends Context {
 		HandlerMethod handler1 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("saveTaxon", String.class, TaxonInputModel.class));
 		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, String.class, AlleleInputModel.class));
 		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, String.class, int.class));
-		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxons", int.class));
+		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxa", int.class));
 		HandlerMethod handler5 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("postInference", String.class, String.class, String.class, String.class, MultipartFile.class));
 		HandlerMethod handler6 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("getInferences", String.class, String.class, int.class));
 		return Stream.of(Arguments.of(request(userKey, Role.ADMIN, null), response, handler1, null, true),

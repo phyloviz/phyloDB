@@ -31,25 +31,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 public class TaxonControllerTests extends ControllerTestsContext {
 
-	private static Stream<Arguments> getTaxons_params() {
-		String uri = "/taxons";
-		List<VersionedEntity<String>> taxons = new ArrayList<VersionedEntity<String>>() {{
+	private static Stream<Arguments> getTaxa_params() {
+		String uri = "/taxa";
+		List<VersionedEntity<String>> taxa = new ArrayList<VersionedEntity<String>>() {{
 			add(new VersionedEntity<>("id", 1, false));
 		}};
 		MockHttpServletRequestBuilder req1 = get(uri).param("page", "0"),
 				req2 = get(uri), req3 = get(uri).param("page", "-10");
-		List<TaxonOutputModel> result = taxons.stream()
+		List<TaxonOutputModel> result = taxa.stream()
 				.map(TaxonOutputModel::new)
 				.collect(Collectors.toList());
-		return Stream.of(Arguments.of(req1, taxons, HttpStatus.OK, result, null),
+		return Stream.of(Arguments.of(req1, taxa, HttpStatus.OK, result, null),
 				Arguments.of(req1, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
-				Arguments.of(req2, taxons, HttpStatus.OK, result, null),
+				Arguments.of(req2, taxa, HttpStatus.OK, result, null),
 				Arguments.of(req2, Collections.emptyList(), HttpStatus.OK, Collections.emptyList(), null),
 				Arguments.of(req3, null, HttpStatus.BAD_REQUEST, null, new ErrorOutputModel(Problem.BAD_REQUEST.getMessage())));
 	}
 
 	private static Stream<Arguments> getTaxon_params() {
-		String uri = "/taxons/%s";
+		String uri = "/taxa/%s";
 		Taxon taxon = new Taxon("id", "description");
 		String key = taxon.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, key)).param("version", "1"),
@@ -61,7 +61,7 @@ public class TaxonControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> saveTaxon_params() {
-		String uri = "/taxons/%s";
+		String uri = "/taxa/%s";
 		Taxon taxon = new Taxon("id", "description");
 		String key = taxon.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, key));
@@ -74,7 +74,7 @@ public class TaxonControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> deleteTaxon_params() {
-		String uri = "/taxons/%s";
+		String uri = "/taxa/%s";
 		Taxon taxon = new Taxon("id", "description");
 		String key = taxon.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = delete(String.format(uri, key));
@@ -90,9 +90,9 @@ public class TaxonControllerTests extends ControllerTestsContext {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getTaxons_params")
-	public void getTaxons(MockHttpServletRequestBuilder req, List<VersionedEntity<String>> taxons, HttpStatus expectedStatus, List<TaxonOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(taxonService.getTaxons(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxons));
+	@MethodSource("getTaxa_params")
+	public void getTaxa(MockHttpServletRequestBuilder req, List<VersionedEntity<String>> taxa, HttpStatus expectedStatus, List<TaxonOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
+		Mockito.when(taxonService.getTaxa(anyInt(), anyInt())).thenReturn(Optional.ofNullable(taxa));
 		MockHttpServletResponse result = executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {
