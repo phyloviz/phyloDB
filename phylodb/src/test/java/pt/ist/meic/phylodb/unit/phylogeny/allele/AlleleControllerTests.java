@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.phylogeny.allele;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,7 +13,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.formatters.dataset.allele.FastaFormatter;
@@ -26,6 +24,8 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleOutputModel;
 import pt.ist.meic.phylodb.phylogeny.allele.model.GetAlleleOutputModel;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;

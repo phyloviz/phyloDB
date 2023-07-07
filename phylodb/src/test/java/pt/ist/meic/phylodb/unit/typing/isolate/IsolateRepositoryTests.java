@@ -5,10 +5,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -232,14 +232,14 @@ public class IsolateRepositoryTests extends RepositoryTestsContext {
 			Query query = new Query("MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE p.deprecated = false AND d.deprecated = false\n", key.getProjectId(), key.getDatasetId());
 			String statement = "MERGE (d)-[:CONTAINS]->(i:Isolate {id: $}) SET i.deprecated = $ WITH d, i\n" +
 					"OPTIONAL MATCH (i)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH d, i, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (i)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(id:IsolateDetails {description: $})\n";
 			query.appendQuery(statement).addParameter(key.getId(), isolate.isDeprecated(), isolate.getDescription());
 			if (isolate.getProfile() != null) {
 				statement = "WITH d, id\n" +
 						"MATCH (d)-[:CONTAINS]->(p:Profile {id: $})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-						"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+						"WHERE p.deprecated = false AND r.to IS NULL\n" +
 						"CREATE (id)-[:HAS {version: r.version}]->(p)\n";
 				query.appendQuery(statement).addParameter(isolate.getProfile().getPrimaryKey().getId());
 			}

@@ -28,7 +28,7 @@ public class LocusRepository extends VersionedRepository<Locus, Locus.PrimaryKey
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
-				"WHERE t.deprecated = false AND l.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE t.deprecated = false AND l.deprecated = false AND r.to IS NULL\n" +
 				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY t.id, size(l.id), l.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
@@ -36,7 +36,7 @@ public class LocusRepository extends VersionedRepository<Locus, Locus.PrimaryKey
 
 	@Override
 	protected Result get(Locus.PrimaryKey key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
 				"WHERE " + where + "\n" +
 				"RETURN t.id as taxonId, l.id as id, l.deprecated as deprecated, r.version as version,\n" +
@@ -73,7 +73,7 @@ public class LocusRepository extends VersionedRepository<Locus, Locus.PrimaryKey
 				"WHERE t.deprecated = false\n" +
 				"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = false WITH l\n" +
 				"OPTIONAL MATCH (l)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $})";
 		execute(new Query(statement, locus.getPrimaryKey().getTaxonId(), locus.getPrimaryKey().getId(), locus.getDescription()));

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
@@ -19,6 +18,7 @@ import pt.ist.meic.phylodb.phylogeny.taxon.model.GetTaxonOutputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonOutputModel;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;

@@ -5,11 +5,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.typing.Method;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -212,7 +212,7 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 
 	private void put(Schema schema) {
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
-				"WHERE NOT EXISTS(r.to)\n" +
+				"WHERE r.to IS NULL\n" +
 				"WITH t, s, r, sd, collect(l.id) as loci\n" +
 				"SET s.deprecated = $, r.to = datetime() WITH t, s, r.version + 1 as v\n" +
 				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(sd:SchemaDetails {description: $})\n" +
@@ -226,7 +226,7 @@ public class SchemaRepositoryTests extends RepositoryTestsContext {
 		List<String> ids = schema.getLociIds();
 		for (int i = 0; i < ids.size(); i++) {
 			query.appendQuery("MATCH (t)-[:CONTAINS]->(l%s:Locus {id: $})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
-					"WHERE l%s.deprecated = false AND NOT EXISTS(r.to)\n" +
+					"WHERE l%s.deprecated = false AND r.to IS NULL\n" +
 					"CREATE (sd)-[:HAS {part: %s, version: r.version}]->(l%s) WITH sd, t\n", i, i, i + 1, i)
 					.addParameter(ids.get(i));
 		}

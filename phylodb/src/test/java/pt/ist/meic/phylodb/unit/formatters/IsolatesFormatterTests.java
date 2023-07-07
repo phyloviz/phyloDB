@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.formatters;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import pt.ist.meic.phylodb.io.formatters.dataset.isolate.IsolatesFormatter;
 import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;

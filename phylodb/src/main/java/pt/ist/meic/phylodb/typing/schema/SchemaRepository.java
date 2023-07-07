@@ -34,7 +34,7 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema)\n" +
-				"WHERE s.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE s.deprecated = false AND r.to IS NULL\n" +
 				"WITH t, s, r, sd, collect(DISTINCT {taxon: t.id, id: l.id, deprecated: l.deprecated, version: h.version}) as lociIds\n" +
 				"RETURN t.id as taxonId, s.id as id, s.type as type, s.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY t.id, size(s.id), s.id SKIP $ LIMIT $";
@@ -43,7 +43,7 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 
 	@Override
 	protected Result get(Schema.PrimaryKey key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
 				"WHERE " + where + " WITH t, s, r, sd, l, h\n" +
 				"ORDER BY h.part\n" +
@@ -111,7 +111,7 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 		if (taxonId == null || lociIds == null || lociIds.length == 0)
 			return Optional.empty();
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {type: $})\n" +
-				"WHERE s.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE s.deprecated = false AND r.to IS NULL\n" +
 				"WITH t, s, r, sd\n";
 		Query query = new Query(statement, taxonId, type.getName());
 		for (int i = 0; i < lociIds.length; i++) {
@@ -139,7 +139,7 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 		if (key == null)
 			return Optional.empty();
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h1:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-				"WHERE NOT EXISTS(r1.to) AND r2.version = h1.version\n" +
+				"WHERE r1.to IS NULL AND r2.version = h1.version\n" +
 				"MATCH (sd)-[h2:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)  WITH t, s, r2, sd, h2, l\n" +
 				"ORDER BY h2.part\n" +
 				"WITH t, s, r2, sd, collect(DISTINCT {id: l.id, deprecated: l.deprecated, version: h2.version}) as lociIds\n" +
@@ -157,7 +157,7 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 				"WITH t, sd\n" +
 				"UNWIND $ as param\n" +
 				"MATCH (t)-[:CONTAINS]->(l:Locus {id: param.id})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
-				"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE l.deprecated = false AND r.to IS NULL\n" +
 				"CREATE (sd)-[:HAS {part: param.part, version: r.version}]->(l)";
 		List<VersionedEntity<Locus.PrimaryKey>> loci = schema.getLociReferences();
 		Query query = new Query(statement, schema.getPrimaryKey().getId(), schema.getType().getName(), schema.getDescription(), schema.getPrimaryKey().getTaxonId(),
@@ -173,14 +173,14 @@ public class SchemaRepository extends VersionedRepository<Schema, Schema.Primary
 
 	private void put(Schema schema) {
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus)<-[h:HAS]-(sd:SchemaDetails)<-[r:CONTAINS_DETAILS]-(s:Schema {id: $})\n" +
-				"WHERE NOT EXISTS(r.to)\n" +
+				"WHERE r.to IS NULL\n" +
 				"WITH t, s, r, sd, collect(l.id) as loci\n" +
 				"SET s.deprecated = false, r.to = datetime() WITH t, s, r.version + 1 as v\n" +
 				"CREATE (s)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(sd:SchemaDetails {description: $})\n" +
 				"WITH t, sd\n" +
 				"UNWIND $ as param\n" +
 				"MATCH (t)-[:CONTAINS]->(l:Locus {id: param.id})-[r:CONTAINS_DETAILS]->(:LocusDetails)\n" +
-				"WHERE l.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE l.deprecated = false AND r.to IS NULL\n" +
 				"CREATE (sd)-[:HAS {part: param.part, version: r.version}]->(l)";
 		List<VersionedEntity<Locus.PrimaryKey>> loci = schema.getLociReferences();
 		Query query = new Query(statement, schema.getPrimaryKey().getTaxonId(), schema.getPrimaryKey().getId(), schema.getDescription(),

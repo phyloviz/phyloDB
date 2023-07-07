@@ -23,7 +23,7 @@ public class TaxonRepository extends VersionedRepository<Taxon, String> {
 	@Override
 	protected Result getAllEntities(int page, int limit, Object... filters) {
 		String statement = "MATCH (t:Taxon)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
-				"WHERE t.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE t.deprecated = false AND r.to IS NULL\n" +
 				"RETURN t.id as id, t.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY size(t.id), t.id SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
@@ -31,7 +31,7 @@ public class TaxonRepository extends VersionedRepository<Taxon, String> {
 
 	@Override
 	protected Result get(String key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
 				"WHERE " + where + "\n" +
 				"RETURN t.id as id, t.deprecated as deprecated, r.version as version,\n" +
@@ -65,7 +65,7 @@ public class TaxonRepository extends VersionedRepository<Taxon, String> {
 	protected void store(Taxon taxon) {
 		String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = false WITH t\n" +
 				"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $})";
 		execute(new Query(statement, taxon.getPrimaryKey(), taxon.getDescription()));

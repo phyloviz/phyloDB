@@ -26,7 +26,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		if (filters == null || filters.length != 3)
 			return null;
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false AND NOT EXISTS(r.to)";
+				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false AND r.to IS NULL";
 		Object[] params = new Object[]{filters[0], filters[1], page, limit};
 		if (filters[2] != null) {
 			params = new Object[]{filters[0], filters[1], filters[2], page, limit};
@@ -46,7 +46,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 		if (filters == null || filters.length != 3)
 			return null;
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false AND NOT EXISTS(r.to)";
+				"WHERE t.deprecated = false AND l.deprecated = false AND a.deprecated = false AND r.to IS NULL";
 		Object[] params = new Object[]{filters[0], filters[1], page, limit};
 		if (filters[2] != null) {
 			params = new Object[]{filters[0], filters[1], filters[2], page, limit};
@@ -63,7 +63,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 
 	@Override
 	protected Result get(Allele.PrimaryKey key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (t:Taxon {id: $})-[:CONTAINS]->(l:Locus {id: $})-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
 				"WHERE " + where;
 		if (key.getProjectId() != null) {
@@ -188,7 +188,7 @@ public class AlleleRepository extends BatchRepository<Allele, Allele.PrimaryKey>
 				"SET a.deprecated = false\n" +
 				"WITH a, sequence\n" +
 				"OPTIONAL MATCH (a)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH a, sequence, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (a)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ad:AlleleDetails {sequence: sequence})";
 	}

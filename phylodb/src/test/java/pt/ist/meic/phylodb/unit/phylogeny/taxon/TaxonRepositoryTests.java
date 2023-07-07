@@ -4,8 +4,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -104,7 +104,7 @@ public class TaxonRepositoryTests extends RepositoryTestsContext {
 		for (Taxon taxon : taxa) {
 			String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = $ WITH t\n" +
 					"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $}) WITH t\n" +
 					"CREATE (p)-[:CONTAINS]->(l:Locus {deprecated: false})-[:CONTAINS]->(:Allele {deprecated: false})";

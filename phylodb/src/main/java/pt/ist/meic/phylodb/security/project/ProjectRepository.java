@@ -29,7 +29,7 @@ public class ProjectRepository extends VersionedRepository<Project, String> {
 			return null;
 		User.PrimaryKey id = (User.PrimaryKey) filters[0];
 		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
-				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE p.deprecated = false AND r.to IS NULL\n" +
 				"OPTIONAL MATCH (pd)-[:HAS]->(u:User)\n" +
 				"WITH p, r, pd, collect(DISTINCT {id: u.id, provider: u.provider}) as users\n" +
 				"WHERE {id: $, provider: $} IN users OR pd.type = \"public\"\n" +
@@ -40,7 +40,7 @@ public class ProjectRepository extends VersionedRepository<Project, String> {
 
 	@Override
 	protected Result get(String key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (p:Project {id: $})-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
 				"WHERE " + where + "\n" +
 				"OPTIONAL MATCH (pd)-[:HAS]->(u:User)\n" +
@@ -82,7 +82,7 @@ public class ProjectRepository extends VersionedRepository<Project, String> {
 	protected void store(Project project) {
 		String statement = "MERGE (p:Project {id: $}) SET p.deprecated = false WITH p\n" +
 				"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH p, COALESCE(r.version, 0) + 1 as v\n" +
 				"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProjectDetails {name: $, type: $, description: $})\n" +
 				"WITH pd\n" +

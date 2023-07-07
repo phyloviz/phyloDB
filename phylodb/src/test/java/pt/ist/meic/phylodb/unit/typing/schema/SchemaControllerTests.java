@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
@@ -21,6 +20,7 @@ import pt.ist.meic.phylodb.typing.schema.model.GetSchemaOutputModel;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaInputModel;
 import pt.ist.meic.phylodb.typing.schema.model.SchemaOutputModel;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
