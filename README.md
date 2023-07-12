@@ -11,4 +11,4 @@ The [wiki](https://github.com/phyloviz/phyloDB/wiki) of this project provides do
 * Bruno Lourenço (Developer)
 * Miguel Coimbra (Developer, Maintainer)
 * Cátia Vaz (Supervisor, Maintainer) (cvaz at cc.isel.ipl.pt)
-* Alexandre Francisco (Supervisor Maintainer) (aplf at cc.isel.ipl.pt)
+* Alexandre Francisco (Supervisor Maintainer) (aplf at ist.utl.pt)
