@@ -1,14 +1,13 @@
 #!/bin/bash
 
-fn_exists() {
-  # appended double quote is an ugly trick to make sure we do get a string -- if $1 is not a known command, type does not output anything
-  [ `type -t $1`"" == 'function' ]
-}
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+SCRIPT_NAME=$(basename "$0")
 
 Help()
 {
     # Display Help
-    echo "Usage: ./configure.sh [options]"
+    echo "Usage: ./$SCRIPT_NAME [options]"
     echo "Description: Configure and build the phylodb code JAR."
     echo ""
     echo ""
@@ -27,6 +26,7 @@ VERBOSE_MODE=false
 while getopts :csvh flag
 do
     case "${flag}" in
+        c) CHECK_VERSIONS=true;;
         s) SKIP_REBUILD_JARS=true;;
         v) VERBOSE_MODE=true;;
         h) #display Help
@@ -35,17 +35,14 @@ do
     esac
 done
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-SCRIPT_NAME=$(basename "$0")
-
 source "$SCRIPT_DIR/../util.sh"
 if [ $CHECK_VERSIONS = true ]; then
     check_java
     check_gradle
 fi
 
-PHYLODB_VERSION=$(cat build.gradle | grep "version" | cut -d'=' -f2 | cut -d'<' -f1 | head -n 3 | tail -n 1 | tr -d \'\ )
-PHYLODB_NAME="phylodb"
+PHYLODB_NAME=$(get_phylodb_name)
+PHYLODB_VERSION=$(get_phylodb_version)
 PHYLODB_DIR="$SCRIPT_DIR"
 PHYLODB_JAR_BASE_NAME="$PHYLODB_NAME-$PHYLODB_VERSION.jar"
 PHYLODB_JAR="$PHYLODB_DIR/build/libs/$PHYLODB_JAR_BASE_NAME"

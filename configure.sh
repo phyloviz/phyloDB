@@ -34,5 +34,16 @@ check_java
 check_maven
 check_gradle
 
-. "algorithms/configure.sh"
-. "phylodb/configure.sh"
+pushd "algorithms"
+. "configure.sh"
+popd
+
+pushd "phylodb"
+. "configure.sh"
+popd
+
+check_docker
+
+pushd "docker"
+. "build-docker.sh"
+popd

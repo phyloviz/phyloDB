@@ -1,14 +1,12 @@
 #!/bin/bash
 
-fn_exists() {
-  # appended double quote is an ugly trick to make sure we do get a string -- if $1 is not a known command, type does not output anything
-  [ `type -t $1`"" == 'function' ]
-}
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_NAME=$(basename "$0")
 
 Help()
 {
     # Display Help
-    echo "Usage: ./configure.sh [options]"
+    echo "Usage: ./$SCRIPT_NAME [options]"
     echo "Description: Configure and build the algorithms code JAR."
     echo ""
     echo ""
@@ -39,17 +37,14 @@ do
     esac
 done
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-SCRIPT_NAME=$(basename "$0")
-
 source "$SCRIPT_DIR/../util.sh"
 if [ $CHECK_VERSIONS = true ]; then
     check_java
     check_maven
 fi
 
-ALGO_VERSION=$(cat pom.xml | grep "version" | cut -d'>' -f2 | cut -d'<' -f1 | head -n 1)
-ALGO_NAME="algorithms"
+ALGO_NAME=$(get_algorithms_name)
+ALGO_VERSION=$(get_algorithms_version)
 ALGO_DIR="$SCRIPT_DIR"
 ALGO_JAR_BASE_NAME="$ALGO_NAME-$ALGO_VERSION.jar"
 ALGO_JAR="$ALGO_DIR/target/$ALGO_JAR_BASE_NAME"
