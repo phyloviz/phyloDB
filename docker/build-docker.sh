@@ -173,16 +173,11 @@ fi
 # Build the Docker image.
 PHYLODB_NAME=$(get_phylodb_name)
 echo "[$SCRIPT_NAME][INFO] - Building Docker image '$PHYLODB_NAME'."
-#pushd "$PROJ_ROOT/$PHYLODB_NAME"
-
-#pushd "$PROJ_ROOT/docker"
 
 # We are checking if 'buildx' is available, and if not, defaulting to the 
 # deprecated 'docker build' for backwards compatibility.
 DOCKER_BUILD_COMMAND=$(get_docker_build_command)
 echo "[$SCRIPT_NAME][INFO] - Docker build command: '$DOCKER_BUILD_COMMAND'."
-
-
 
 DOCKERFILE_PATH="$PROJ_ROOT/docker/Dockerfile"
 
@@ -199,8 +194,6 @@ else
         docker $DOCKER_BUILD_COMMAND --build-arg phylodb_version=$PHYLODB_VERSION --quiet -t $PHYLODB_NAME -f $DOCKERFILE_PATH .
     fi
 fi
-
-#popd
 
 # Return to the initial directory when this script was called.
 popd

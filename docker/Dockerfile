@@ -4,7 +4,6 @@ FROM openjdk:11
 # See: https://docs.docker.com/engine/reference/builder/#arg
 ARG phylodb_version
 
-#COPY ../phylodb/build/libs/phylodb-$phylodb_version.jar app.jar
 COPY phylodb/build/libs/phylodb-$phylodb_version.jar app.jar
 
 ENTRYPOINT ["java","-jar","/app.jar"]

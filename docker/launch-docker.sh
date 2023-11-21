@@ -86,11 +86,4 @@ cat $SCHEMA_QUERY_FILE | docker exec --interactive docker_db_1 sh -c "cypher-she
 DATA_QUERY_FILE="$PROJ_ROOT/scripts/init/init_data.cypher"
 cat $DATA_QUERY_FILE | docker exec --interactive docker_db_1 sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
 
-# Create admin user in Neo4j.
-#TODO: run the .cypher file from this script using docker exec.
-
-# Insert some data in Neo4j.
-#TODO: run the .cypher file from this script using docker exec.
-
-
 popd

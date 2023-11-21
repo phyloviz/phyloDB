@@ -40,7 +40,6 @@ PROJ_ROOT="$SCRIPT_DIR/.."
 
 pushd "$PROJ_ROOT"
 
-echo "> Stopping phyloDB Docker database container..."
 PHYLODB_DB_CONTAINER_NAME="docker_db_1"
 echo "[$SCRIPT_NAME][INFO] - Stopping 'phylodb' image container $PHYLODB_DB_CONTAINER_NAME"
 docker container stop $PHYLODB_DB_CONTAINER_NAME

@@ -96,6 +96,12 @@ check_docker() {
         exit 1
     fi
 
+    if ! command -v docker-compose &> /dev/null
+    then
+        echo "[$SCRIPT_NAME][ERROR] - 'docker-compose' could not be found. Please install it. Exiting."
+        exit 1
+    fi
+
 }
 export -f check_docker
 
@@ -143,7 +149,8 @@ export -f get_phylodb_version
 
 get_latest_stable_neo4j_version() {
     NEO4J_APOC_URL="https://github.com/neo4j/apoc/releases/latest"
-    # Based on: https://stackoverflow.com/a/5300429
+    
+    # Need to go through URL redirect. Based on: https://stackoverflow.com/a/5300429
     NEO4J_LATEST_APOC_URL=$(curl "$NEO4J_APOC_URL" -s -L -I -o /dev/null -w '%{url_effective}')
     NEO4J_LATEST_VERSION=$(echo "$NEO4J_LATEST_APOC_URL" | awk -F/ '{print $NF}')
     echo "$NEO4J_LATEST_VERSION"
