@@ -7,6 +7,16 @@
     <artifactId>algorithms</artifactId>
     <version>1.0</version>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <neo4j.version>4.1.0</neo4j.version>
+        <neo4j.driver.version>4.1.1</neo4j.driver.version>
+        <junit.version>4.12</junit.version>
+        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
+        <maven.shade.plugin.version>2.4.1</maven.shade.plugin.version>
+        <java.target>11</java.target>
+    </properties>
+
     <packaging>jar</packaging>
     <name>Neo4j Phylogenitcs Algorithms</name>
 
@@ -14,7 +24,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>4.1.0</version>
+            <version>${neo4j.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -22,21 +32,21 @@
         <dependency>
             <groupId>org.neo4j.test</groupId>
             <artifactId>neo4j-harness</artifactId>
-            <version>4.1.0</version>
+            <version>${neo4j.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
-            <version>4.1.1</version>
+            <version>${neo4j.driver.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -45,15 +55,15 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>${java.target}</source>
+                    <target>${java.target}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>${maven.shade.plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

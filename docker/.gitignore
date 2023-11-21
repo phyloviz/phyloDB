@@ -1,0 +1,7 @@
+!.gitkeep
+
+!instance/app/.gitkeep
+
+!instance/db/data/.gitkeep
+!instance/db/logs/.gitkeep
+!instance/db/plugins/.gitkeep
