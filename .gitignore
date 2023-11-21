@@ -53,6 +53,14 @@ cmake-build-*/
 # File-based project format
 *.iws
 
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
 # IntelliJ
 out/
 
