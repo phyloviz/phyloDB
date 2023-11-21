@@ -44,7 +44,7 @@ if [ $CHECK_VERSIONS = true ]; then
     check_gradle
 fi
 
-PHYLODB_VERSION="1.2.0"
+PHYLODB_VERSION=$(cat build.gradle | grep "version" | cut -d'=' -f2 | cut -d'<' -f1 | head -n 3 | tail -n 1 | tr -d \'\ )
 PHYLODB_NAME="phylodb"
 PHYLODB_DIR="$SCRIPT_DIR"
 PHYLODB_JAR_BASE_NAME="$PHYLODB_NAME-$PHYLODB_VERSION.jar"

@@ -48,8 +48,7 @@ if [ $CHECK_VERSIONS = true ]; then
     check_maven
 fi
 
-
-ALGO_VERSION="1.0"
+ALGO_VERSION=$(cat pom.xml | grep "version" | cut -d'>' -f2 | cut -d'<' -f1 | head -n 1)
 ALGO_NAME="algorithms"
 ALGO_DIR="$SCRIPT_DIR"
 ALGO_JAR_BASE_NAME="$ALGO_NAME-$ALGO_VERSION.jar"
