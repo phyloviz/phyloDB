@@ -2,6 +2,8 @@ package pt.ist.meic.phylodb.typing.dataset;
 
 import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
@@ -15,8 +17,11 @@ import java.util.Map;
  * Class that contains the implementation of the {@link VersionedRepository} for datasets
  */
 @Repository
+@Import({ Session.class })
 public class DatasetRepository extends VersionedRepository<Dataset, Dataset.PrimaryKey> {
 
+
+	@Autowired
 	public DatasetRepository(Session session) {
 		super(session);
 	}

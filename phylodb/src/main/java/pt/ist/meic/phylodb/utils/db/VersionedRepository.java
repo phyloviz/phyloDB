@@ -22,6 +22,7 @@ public abstract class VersionedRepository<E, K> extends EntityRepository<E, K> {
 	public static final long CURRENT_VERSION_VALUE = -1;
 	public static final String CURRENT_VERSION = "" + CURRENT_VERSION_VALUE;
 
+
 	protected VersionedRepository(Session session) {
 		super(session);
 	}

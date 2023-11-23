@@ -6,9 +6,13 @@ plugins {
 
 version = '1.2.0'
 group = 'pt.ist.meic'
+description = "PhyloDB Docker Container App"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+	toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 repositories {
@@ -17,15 +21,23 @@ repositories {
 
 dependencies {
 
-    compileOnly 'org.neo4j:neo4j-ogm-core:4.0.8'
-    compileOnly 'org.neo4j:neo4j-ogm-bolt-driver:4.0.8'
+	implementation 'org.neo4j:neo4j-ogm-core:4.0.8'
+    implementation 'org.neo4j:neo4j-ogm-bolt-driver:4.0.8'
 
 	// https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api
-	compileOnly group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
+	implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.0.0'
 	// https://mvnrepository.com/artifact/org.springframework/spring-core
-	compileOnly group: 'org.springframework', name: 'spring-core', version: '6.1.0'
+	implementation group: 'org.springframework', name: 'spring-core', version: '6.1.0'
 	// https://mvnrepository.com/artifact/org.springframework/spring-web
-	compileOnly group: 'org.springframework', name: 'spring-web', version: '6.1.0'
+	implementation group: 'org.springframework', name: 'spring-web', version: '6.1.0'
+
+	api group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.37'
+	api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.0'
+	api group: 'com.google.api-client', name: 'google-api-client', version: '2.2.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	testImplementation group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
 	testImplementation group: 'org.springframework', name: 'spring-core', version: '6.1.0'
@@ -41,14 +53,10 @@ dependencies {
 
 	testImplementation('org.junit.jupiter:junit-jupiter')
 	testImplementation('org.neo4j:neo4j-ogm-core:4.0.8')
+	testImplementation('org.neo4j:neo4j-ogm-bolt-driver:4.0.8')
 	testImplementation group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.37'
 
-	api group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.37'
-	api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.0'
-	api group: 'com.google.api-client', name: 'google-api-client', version: '2.2.0'
-
-	implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
-	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	
 }
 
 test {
