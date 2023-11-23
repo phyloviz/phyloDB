@@ -134,14 +134,18 @@ get_algorithms_version() {
 export -f get_algorithms_version
 
 get_phylodb_name() {
-    echo "phylodb"
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    pushd "$SCRIPT_DIR/phylodb"
+    PHYLODB_NAME=$(cat settings.gradle | cut -d' ' -f3 | cut -d "'" -f2)
+    popd
+    echo "$PHYLODB_NAME"
 }
 export -f get_phylodb_name
 
 get_phylodb_version() {
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
     pushd "$SCRIPT_DIR/phylodb"
-    PHYLODB_VERSION=$(cat build.gradle | grep "version" | cut -d'=' -f2 | cut -d'<' -f1 | head -n 3 | tail -n 1 | tr -d \'\ )
+    PHYLODB_VERSION=$(cat build.gradle | grep "version = " | cut -d'=' -f2 | cut -d"'" -f2)
     popd
     echo "$PHYLODB_VERSION"
 }

@@ -2,8 +2,12 @@ package pt.ist.meic.phylodb.performance;
 
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import pt.ist.meic.phylodb.utils.DbUtils;
 
+@ExtendWith(SpringExtension.class)
 public class AlgorithmBenchmarks extends Benchmarks {
 
 	@Test

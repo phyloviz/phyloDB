@@ -19,7 +19,7 @@ import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.utils.controller.Controller;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static pt.ist.meic.phylodb.utils.db.VersionedRepository.CURRENT_VERSION;
 

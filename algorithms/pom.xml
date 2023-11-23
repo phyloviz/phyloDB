@@ -9,12 +9,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>4.1.0</neo4j.version>
-        <neo4j.driver.version>4.1.1</neo4j.driver.version>
-        <junit.version>4.12</junit.version>
-        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
-        <maven.shade.plugin.version>2.4.1</maven.shade.plugin.version>
-        <java.target>11</java.target>
+        <!--<neo4j.version>4.1.0</neo4j.version>-->
+        <neo4j.version>5.13.0</neo4j.version>
+        <!--<neo4j.driver.version>4.1.1</neo4j.driver.version>-->
+        <neo4j.driver.version>5.13.0</neo4j.driver.version>
+        <!--<junit.version>4.12</junit.version>-->
+        <junit.version>4.13.2</junit.version>
+        <!--<maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>-->
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <!--<maven.shade.plugin.version>2.4.1</maven.shade.plugin.version>-->
+        <maven.shade.plugin.version>3.5.1</maven.shade.plugin.version>
+        <!--<java.target>11</java.target>-->
+        <java.target>17</java.target>
     </properties>
 
     <packaging>jar</packaging>
@@ -57,8 +63,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${java.target}</source>
-                    <target>${java.target}</target>
+                    <!--<source>${java.target}</source>-->
+                    <!--<target>${java.target}</target>-->
+                    <release>${java.target}</release>
                 </configuration>
             </plugin>
             <plugin>
