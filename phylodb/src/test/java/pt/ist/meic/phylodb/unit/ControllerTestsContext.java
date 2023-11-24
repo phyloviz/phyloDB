@@ -14,7 +14,7 @@ import pt.ist.meic.phylodb.job.JobService;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleService;
 import pt.ist.meic.phylodb.phylogeny.locus.LocusService;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonService;
-import pt.ist.meic.phylodb.security.authentication.AuthenticationInterceptor;
+import pt.ist.meic.phylodb.security.authentication.phyloviz.PHYLOViZInterceptor;
 import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.security.project.ProjectService;
 import pt.ist.meic.phylodb.security.user.UserService;
@@ -49,7 +49,7 @@ public abstract class ControllerTestsContext extends Context {
 	}
 
 	@MockBean
-	protected AuthenticationInterceptor authenticationInterceptor;
+	protected PHYLOViZInterceptor authenticationInterceptor;
 	@MockBean
 	protected AuthorizationInterceptor authorizationInterceptor;
 	@MockBean
@@ -76,6 +76,5 @@ public abstract class ControllerTestsContext extends Context {
 	protected VisualizationService visualizationService;
 	@MockBean
 	protected JobService jobService;
-
 
 }
