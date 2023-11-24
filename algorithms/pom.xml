@@ -14,7 +14,7 @@
         <junit.version>4.12</junit.version>
         <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
         <maven.shade.plugin.version>2.4.1</maven.shade.plugin.version>
-        <java.target>11</java.target>
+        <java.target>17</java.target>
     </properties>
 
     <packaging>jar</packaging>
