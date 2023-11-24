@@ -1,7 +1,6 @@
 # About phyloDB
 This project provides a framework for large scale phylogenetic analysis in the form of a Web API, a graph oriented database ([Neo4j](https://neo4j.com/)), and a plugin for the latter. The goal of this project is to allow the representation of large phylogenetic networks and trees, as well as ancillary data, support queries on such data, and the deployment of algorithms for inferring/detecting patterns and for computing visualizations. It started being developed in the scope of a master thesis for IST (Instituto Superior Técnico). The unit tests and benchmarks developed are available in the [test folder](https://github.com/phyloviz/phyloDB/tree/master/phylodb/src/test/java/pt/ist/meic/phylodb) of the code.
 
-The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage). The [Wiki](https://github.com/phyloviz/phyloDB/wiki) provides an overview of detailed installation steps, the purpose and usage of phyloDB.
 
 # Requirements
 
@@ -31,7 +30,7 @@ For Linux/UNIX systems, please ensure that a `docker` user group exists in your 
     ./build-docker.sh # fetch latest stable Neo4j APOC libraries and build the phyloDB Docker image.
 
 At this point, if no issue has occurred, the build process will be at [step four of the Wiki guide](https://github.com/phyloviz/phyloDB/wiki/Initialization-scripts-in-the-database-container).
-
+The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage). As previously mentioned, the deployment steps present in the wiki can be skiped to step 4 if you have done the previous steps that automatize steps 1 to 3.
 
 ### Easy launch
 
@@ -56,6 +55,9 @@ The container files themselves are excluded from this repository through `phyloD
 Again, you should be in directory `phyloDB.git/docker`.
 
     ./stop-docker.sh
+
+### More documentation
+The [Wiki](https://github.com/phyloviz/phyloDB/wiki) provides an overview of detailed installation steps, the purpose and usage of phyloDB.
 
 # Architectural View
  
