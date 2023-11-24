@@ -57,12 +57,12 @@ export -f check_maven
 
 # Check presence of Gradle.
 check_gradle() {
-    if ! command -v gradle &> /dev/null
+    if ! command -v ./phylodb/gradlew &> /dev/null
     then
         echo "[$SCRIPT_NAME][ERROR] - 'gradle' could not be found. Please install it. Exiting."
         exit 1
     else
-        GRADLE_VERSION=$(gradle -v | grep Gradle | cut -d' ' -f2)
+        GRADLE_VERSION=$(./phylodb/gradlew -v | grep Gradle | cut -d' ' -f2)
         echo "[$SCRIPT_NAME][INFO] - Gradle version: $GRADLE_VERSION."
     fi
 }

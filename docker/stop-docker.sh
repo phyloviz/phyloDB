@@ -40,11 +40,11 @@ PROJ_ROOT="$SCRIPT_DIR/.."
 
 pushd "$PROJ_ROOT"
 
-PHYLODB_DB_CONTAINER_NAME="docker_db_1"
+PHYLODB_DB_CONTAINER_NAME="docker-db-1"
 echo "[$SCRIPT_NAME][INFO] - Stopping 'phylodb' image container $PHYLODB_DB_CONTAINER_NAME"
 docker container stop $PHYLODB_DB_CONTAINER_NAME
 
-PHYLODB_APP_CONTAINER_NAME="docker_app_1"
+PHYLODB_APP_CONTAINER_NAME="docker-app-1"
 echo "[$SCRIPT_NAME][INFO] - Stopping 'neo4j:5.13.0' image container $PHYLODB_APP_CONTAINER_NAME"
 docker container stop $PHYLODB_APP_CONTAINER_NAME
 

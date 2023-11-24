@@ -51,9 +51,9 @@ if [ ! -f "$PHYLODB_JAR" ] || [ $SKIP_REBUILD_JARS = false ] ; then
     echo "[$SCRIPT_NAME][INFO] - Building $PHYLODB_NAME: $PHYLODB_JAR."
     pushd "$PHYLODB_DIR"
     if [ $VERBOSE_MODE = true ]; then
-        gradle bootJar -i
+        ./gradlew bootJar -i
     else
-        gradle bootJar -i > "$PHYLODB_DIR/build.log" 2>&1
+        ./gradlew bootJar -i > "$PHYLODB_DIR/build.log" 2>&1
     fi
     popd
 else
