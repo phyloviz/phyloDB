@@ -32,6 +32,18 @@ For Linux/UNIX systems, please ensure that a `docker` user group exists in your 
 At this point, if no issue has occurred, the build process will be at [step four of the Wiki guide](https://github.com/phyloviz/phyloDB/wiki/Initialization-scripts-in-the-database-container).
 The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage). As previously mentioned, the deployment steps present in the wiki can be skiped to step 4 if you have done the previous steps that automatize steps 1 to 3.
 
+### Testing
+
+A prestine Neo4j instance should be running for testing.
+
+Unit tests:
+
+    ./gradlew test --tests pt.ist.meic.phylodb.unit*
+
+Performance tests:
+
+    ./gradlew test --tests pt.ist.meic.phylodb.performance*
+
 ### Easy launch
 
 After performing the build steps, the phylodb Docker containers may be launched (you should be in directory `phyloDB.git/docker`):
