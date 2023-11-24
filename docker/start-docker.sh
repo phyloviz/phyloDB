@@ -57,7 +57,11 @@ else
       DB_CONTAINER_IS_RUNNING=true
 fi
 
-NEO4J_LATEST_VERSION=$(get_latest_stable_neo4j_version)
+ALGORITHMS_POM_NEO4J_VERSION=$(get_algorithms_neo4j_version)
+
+NEO4J_LATEST_VERSION="$ALGORITHMS_POM_NEO4J_VERSION"
+
+#NEO4J_LATEST_VERSION=$(get_latest_stable_neo4j_version)
 
 
 

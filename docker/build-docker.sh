@@ -13,6 +13,7 @@ Help()
     echo "Options:"
     echo "-c     Check tool versions."
     echo "-d     Download JAR files even if they already exist."
+    echo "-f     Fall back to the Neo4j version in ../algorithms/pom.xml."
     echo "-u     Upload the image to the Docker repository."
     echo "-v     Verbose mode."
     echo "-h     Print this Help."
@@ -100,7 +101,11 @@ fi
 # Neo4j APOC 5 information:
 # https://neo4j.com/docs/apoc/5/installation/
 
-NEO4J_LATEST_VERSION=$(get_latest_stable_neo4j_version)
+ALGORITHMS_POM_NEO4J_VERSION=$(get_algorithms_neo4j_version)
+
+NEO4J_LATEST_VERSION="$ALGORITHMS_POM_NEO4J_VERSION"
+
+#NEO4J_LATEST_VERSION=$(get_latest_stable_neo4j_version)
 
 # Neo4j APOC extended JAR "apoc-VERSION-extended.jar" available here:
 # https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/tag/5.13.0

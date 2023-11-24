@@ -34,7 +34,10 @@ check_java () {
     fi
     JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{print $1$2}')
     if [ "$JAVA_VERSION" -ge 18 ] ; then
-        echo "[$SCRIPT_NAME][INFO] - Java version: $JAVA_VERSION."
+        echo "[$SCRIPT_NAME][INFO] - Java version: $JAVA_VERSION (found in \$PATH)."
+        JAVA_HOME_VERSION=$($JAVA_HOME/bin/java -version 2>&1 | awk -F '"' '/version/ {print $2}' | awk -F '.' '{print $1$2}')
+        printf "[$SCRIPT_NAME][INFO] - JAVA_HOME (used by Maven and Gradle in this repository):\n\t$JAVA_HOME\n\tJava version: $JAVA_HOME_VERSION\n"
+        
     else
         echo "[$SCRIPT_NAME][ERROR] - Java version must be greater or equal to 8. Exiting."
         exit 1
@@ -57,16 +60,65 @@ export -f check_maven
 
 # Check presence of Gradle.
 check_gradle() {
-    if ! command -v ./phylodb/gradlew &> /dev/null
-    then
-        echo "[$SCRIPT_NAME][ERROR] - 'gradle' could not be found. Please install it. Exiting."
+    if [ "$#" -gt 2 ]; then
+        echo "[$SCRIPT_NAME][ERROR] - function 'check_gradle' takes at most 1 argument. Exiting." 
         exit 1
+    fi
+
+    #echo $1
+
+    if [ "$1" = "-g" ]; then
+        if ! command -v gradle &> /dev/null
+        then
+            echo "[$SCRIPT_NAME][INFO] - 'gradle' not found on path, defaulting to repository 'gradlew'."
+            if ! command -v ./phylodb/gradlew &> /dev/null
+            then
+                echo "[$SCRIPT_NAME][ERROR] - 'gradlew' could not be found on the repository. There should be a 'phyloDB-official.git/phylodb/gradlew'. Exiting."
+                exit 1
+            else
+                GRADLE_VERSION=$(./phylodb/gradlew -v | grep Gradle | cut -d' ' -f2)
+                echo "[$SCRIPT_NAME][INFO] - Gradle version ('gradlew' from repository): $GRADLE_VERSION."
+            fi
+        else
+            GRADLE_VERSION=$(gradle -v | grep Gradle | cut -d' ' -f2)
+            echo "[$SCRIPT_NAME][INFO] - Gradle version (found \$PATH): $GRADLE_VERSION."
+        fi
     else
+        
         GRADLE_VERSION=$(./phylodb/gradlew -v | grep Gradle | cut -d' ' -f2)
-        echo "[$SCRIPT_NAME][INFO] - Gradle version: $GRADLE_VERSION."
+        echo "[$SCRIPT_NAME][INFO] - Gradle version ('gradlew' from repository): $GRADLE_VERSION."
     fi
 }
 export -f check_gradle
+
+get_gradle_binary() {
+    if [ "$#" -gt 2 ]; then
+        echo "[$SCRIPT_NAME][ERROR] - function 'get_gradle_binary' takes at most 1 argument. Exiting." 
+        exit 1
+    fi
+
+    if [ "$1" = "-g" ]; then
+        if command -v gradle &> /dev/null
+        then
+            echo "gradle"
+        else
+            echo "[$SCRIPT_NAME][INFO] - 'gradle' not found on path, defaulting to repository 'gradlew'."
+            if ! command -v ./phylodb/gradlew &> /dev/null
+            then
+                echo "[$SCRIPT_NAME][ERROR] - 'gradlew' could not be found on the repository. There should be a 'phyloDB-official.git/phylodb/gradlew'. Exiting."
+                exit 1
+            else
+                REPO_GRADLEW_PATH="$(pwd)/gradlew"
+                echo "$REPO_GRADLEW_PATH"
+            fi
+        fi
+        
+    else
+        REPO_GRADLEW_PATH="$(pwd)/gradlew"
+        echo "$REPO_GRADLEW_PATH"
+    fi
+}
+export -f get_gradle_binary
 
 # Check presence of Docker.
 check_docker() {
@@ -123,6 +175,15 @@ get_algorithms_name() {
     echo "$ALGO_NAME"
 }
 export -f get_algorithms_name
+
+get_algorithms_neo4j_version() {
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    pushd "$SCRIPT_DIR/algorithms"
+    ALGORITHMS_POM_NEO4J_VERSION=$(cat pom.xml | grep "neo4j.version" | head -n 1 | cut -d'>' -f2 | cut -d'<' -f1)
+    popd
+    echo "$ALGORITHMS_POM_NEO4J_VERSION"
+}
+export -f get_algorithms_neo4j_version
 
 get_algorithms_version() {
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )

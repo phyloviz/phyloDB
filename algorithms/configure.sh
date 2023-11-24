@@ -50,8 +50,17 @@ ALGO_JAR_BASE_NAME="$ALGO_NAME-$ALGO_VERSION.jar"
 ALGO_JAR="$ALGO_DIR/target/$ALGO_JAR_BASE_NAME"
 
 if [ ! -f "$ALGO_JAR" ] || [ $SKIP_REBUILD_JARS = false ] ; then
-    echo "[$SCRIPT_NAME][INFO] - Building $ALGO_NAME: $ALGO_JAR."
+    
     pushd "$ALGO_DIR"
+
+    # Check if the JAR exists and remove it to ensure it is built.
+    if [ -f "$ALGO_JAR" ] ; then
+        echo "[$SCRIPT_NAME][INFO] - Removing previous $ALGO_JAR."
+        rm "$ALGO_JAR"
+    fi
+
+    printf "[$SCRIPT_NAME][INFO] - Building $ALGO_NAME:\n\t$ALGO_JAR\n"
+
     if [ $RUN_MVN_TESTS = true ]; then
         if [ $VERBOSE_MODE = true ]; then
             mvn package 

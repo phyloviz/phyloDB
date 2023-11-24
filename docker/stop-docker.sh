@@ -36,16 +36,28 @@ if [ $CHECK_VERSIONS = true ]; then
     check_docker
 fi
 
+ALGORITHMS_POM_NEO4J_VERSION=$(get_algorithms_neo4j_version)
+
+NEO4J_LATEST_VERSION="$ALGORITHMS_POM_NEO4J_VERSION"
+
+#NEO4J_LATEST_VERSION=$(get_latest_stable_neo4j_version)
+
+
+PHYLODB_NAME=$(get_phylodb_name)
+
 PROJ_ROOT="$SCRIPT_DIR/.."
 
 pushd "$PROJ_ROOT"
 
-PHYLODB_DB_CONTAINER_NAME="docker-db-1"
-echo "[$SCRIPT_NAME][INFO] - Stopping 'phylodb' image container $PHYLODB_DB_CONTAINER_NAME"
+
+#PHYLODB_DB_CONTAINER_NAME="$PHYLODB_NAME:latest"
+PHYLODB_DB_CONTAINER_NAME="docker_db_1"
+echo "[$SCRIPT_NAME][INFO] - Stopping '$PHYLODB_NAME' image container $PHYLODB_DB_CONTAINER_NAME"
 docker container stop $PHYLODB_DB_CONTAINER_NAME
 
-PHYLODB_APP_CONTAINER_NAME="docker-app-1"
-echo "[$SCRIPT_NAME][INFO] - Stopping 'neo4j:5.13.0' image container $PHYLODB_APP_CONTAINER_NAME"
+#PHYLODB_APP_CONTAINER_NAME="neo4j:$NEO4J_LATEST_VERSION-community"
+PHYLODB_APP_CONTAINER_NAME="docker_app_1"
+echo "[$SCRIPT_NAME][INFO] - Stopping 'neo4j:$NEO4J_LATEST_VERSION' image container $PHYLODB_APP_CONTAINER_NAME"
 docker container stop $PHYLODB_APP_CONTAINER_NAME
 
 popd
