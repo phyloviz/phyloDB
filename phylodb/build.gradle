@@ -18,7 +18,8 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 
-	testImplementation group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.19'
+	testImplementation group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.19'
+	testAnnotationProcessor group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version:'1.19'
 
 	api group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.19'
 	api group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.0'
