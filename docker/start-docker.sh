@@ -84,10 +84,10 @@ fi
 
 # Initialize Neo4j PhyloDB schema (creates indices and properties).
 SCHEMA_QUERY_FILE="$PROJ_ROOT/scripts/init/init_schema.cypher"
-cat $SCHEMA_QUERY_FILE | docker exec --interactive docker_db_1 sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
+cat $SCHEMA_QUERY_FILE | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
 
 # Initialize Neo4j PhyloDB data.
 DATA_QUERY_FILE="$PROJ_ROOT/scripts/init/init_data.cypher"
-cat $DATA_QUERY_FILE | docker exec --interactive docker_db_1 sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
+cat $DATA_QUERY_FILE | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
 
 popd

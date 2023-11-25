@@ -40,8 +40,8 @@ After performing the build steps, the phylodb Docker containers may be launched 
 
 This will launch the following containers:
 
-- **docker-app-1**: contains the phyloDB server logic.
-- **docker-db-1**: contains the Neo4j database where project data is stored.
+- **phylodb-app**: contains the phyloDB server logic.
+- **phylodb-neo4j**: contains the Neo4j database where project data is stored.
 
 The Docker container internal files will be mapped to the directory `phyloDB.git/docker/instance` in your local machine:
 
