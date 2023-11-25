@@ -1,0 +1,51 @@
+name: phyloDB CI tests
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      neo4j:
+        image: neo4j:5.13.0-community
+        env:
+          NEO4J_AUTH: neo4j/password
+          NEO4J_dbms_memory_pagecache_size: 1G
+          NEO4J_dbms.memory.heap.initial_size: 2G
+          NEO4J_dbms_memory_heap_max__size: 2G
+          NEO4J_dbms_security_procedures_unrestricted: apoc.*,algorithms.*
+          NEO4J_dbms_security_procedures_whitelist: apoc.*,algorithms.*
+          NEO4J_dbms_connector_bolt_advertised__address: localhost:7687
+          NEO4JLABS_PLUGINS: '["apoc", "apoc-extended"]'
+        volumes:
+          - /home/runner/work/phyloDB/instance/plugins:/var/lib/neo4j/plugins
+        ports:
+          - 7687:7687
+        options: --name neo4j
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Build and test
+      run: |
+        cd algorithms
+        mvn -q package
+        sudo cp target/algorithms-1.0.jar /home/runner/work/phyloDB/instance/plugins
+        sudo ls -l /home/runner/work/phyloDB/instance/plugins
+        docker restart neo4j
+        mvn -q test
+        cd ../phylodb
+        ./gradlew test --tests pt.ist.meic.phylodb.unit*
