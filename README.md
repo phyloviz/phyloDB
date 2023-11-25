@@ -68,7 +68,8 @@ Unit tests:
 Performance tests:
 
     cd phylodb
-    ./gradlew test --tests pt.ist.meic.phylodb.performance*
+    ./gradlew test --tests pt.ist.meic.phylodb.performance.AlgorithmBenchmarks
+    ./gradlew test --tests pt.ist.meic.phylodb.performance.OperationBenchmarks
 
 Algorithm module tests (a Neo4j instance is not required):
 
