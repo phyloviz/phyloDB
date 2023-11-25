@@ -78,7 +78,7 @@ Algorithm module tests (a Neo4j instance is not required):
 
 
 # More documentation
-The [Wiki](https://github.com/phyloviz/phyloDB/wiki) provides an overview of detailed installation steps, the purpose and usage of phyloDB.
+The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage).
 
 # Architectural View
  
