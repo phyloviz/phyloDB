@@ -60,7 +60,7 @@ Again, you should be in directory `phyloDB.git/docker`.
 
 A prestine Neo4j instance should be running for testing.
 
-Unit tests:
+Unit tests (also in the [CI workflow](https://github.com/phyloviz/phyloDB/blob/master/.github/workflows/test.yml)):
 
     cd phylodb
     ./gradlew test --tests pt.ist.meic.phylodb.unit*
