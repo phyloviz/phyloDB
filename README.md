@@ -7,7 +7,7 @@ This project provides a framework for large scale phylogenetic analysis in the f
 # Requirements
 
 The following software tools must be available in your system as they will be called by our scripts.
-- Java Development Kit 8 or greater (`java` and `javac`)
+- Java Development Kit 17 or greater (`java` and `javac`)
 - [Maven](https://maven.apache.org/install.html) (`mvn`)
 - [Gradle](https://gradle.org/install/) (`gradle`)
 - [Docker](https://www.docker.com/get-started/) (`docker`, `docker-compose` and preferably the `docker buildx` command)
@@ -62,7 +62,7 @@ Again, you should be in directory `phyloDB.git/docker`.
 
 ### Testing
 
-A prestine Neo4j instance should be running for testing.
+A pristine Neo4j instance should be running for testing.
 
 Unit tests (also in the [CI workflow](https://github.com/phyloviz/phyloDB/blob/master/.github/workflows/test.yml)):
 
