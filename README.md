@@ -1,3 +1,5 @@
+[![phyloDB CI tests](https://github.com/phyloviz/phyloDB/actions/workflows/test.yml/badge.svg)](https://github.com/phyloviz/phyloDB/actions/workflows/test.yml)
+
 # About phyloDB
 This project provides a framework for large scale phylogenetic analysis in the form of a Web API, a graph oriented database ([Neo4j](https://neo4j.com/)), and a plugin for the latter. The goal of this project is to allow the representation of large phylogenetic networks and trees, as well as ancillary data, support queries on such data, and the deployment of algorithms for inferring/detecting patterns and for computing visualizations. It started being developed in the scope of a master thesis at IST (Instituto Superior Técnico). The unit tests and benchmarks developed are available in the [test folder](https://github.com/phyloviz/phyloDB/tree/master/phylodb/src/test/java/pt/ist/meic/phylodb).
 
@@ -23,6 +25,8 @@ For Linux/UNIX systems, please ensure that a `docker` user group exists in your 
     git clone https://github.com/phyloviz/phyloDB.git phyloDB.git
 
 ### Building
+
+Note that you might have to adjust the file [`application.properties`](https://github.com/phyloviz/phyloDB/blob/master/phylodb/src/main/resources/application.properties), in particular the Neo4j bolt connection. 
 
     cd phyloDB.git
     ./configure.sh # build phyloDB's JAR files.
