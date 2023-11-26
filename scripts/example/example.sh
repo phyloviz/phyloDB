@@ -1,7 +1,7 @@
 # API REQUEST EXAMPLES
 
 # Access https://developers.google.com/oauthplayground/ with the account that
-# you added as admin in 'scripts/init/init_data.cypher', an click in 'Authorize
+# you added as admin in 'scripts/init/init_data.cypher', and click in 'Authorize
 # APIs' with the scope 'https://www.googleapis.com/auth/userinfo.email'. Or
 # select it in list.
 #
@@ -50,7 +50,7 @@ for x in locus1 locus2 locus3 locus4 locus5 locus6 locus7; do
     }";
 done
 
-Load alleles:
+# Load alleles:
 for x in 1 2 3 4 5 6 7; do
   curl -v --location --request POST "http://localhost:8080/taxa/bbacilliformis/loci/locus${x}/alleles/files?provider=google" \
     --header 'Content-Type: multipart/form-data' \
@@ -58,7 +58,7 @@ for x in 1 2 3 4 5 6 7; do
     --form "file=@profiles_${x}.txt" ;
 done
 
-#List alleles:
+# List alleles:
 for x in 1 2 3 4 5 6 7; do
   echo -n "Alleles[locus${x}]: "
   curl --location --request GET "http://localhost:8080/taxa/bbacilliformis/loci/locus${x}/alleles?provider=google" \
@@ -137,7 +137,7 @@ curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datas
   --header "Authorization: Bearer $TOKEN" \
   --form 'file=@profiles.txt'
 
-#List profiles:
+# List profiles:
 echo -n "Profiles: "
 curl --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/profiles?provider=google" \
   --header "Authorization: Bearer $TOKEN"
@@ -159,7 +159,7 @@ curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/jobs?
     \"parameters\": [\"$DATASET\", 3]
   }"
 
-#List inferences:
+# List inferences:
 echo -n "Inferences: "
 curl --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences?provider=google" \
   --header "Authorization: Bearer $TOKEN"
