@@ -82,6 +82,10 @@ fi
 # Passing file contents to Neo4j container cypher via 'cat':
 # https://neo4j.com/docs/operations-manual/current/docker/operations/
 
+echo "[$SCRIPT_NAME][INFO] - waiting for containers..."
+sleep 30
+echo "[$SCRIPT_NAME][INFO] - initializing data..."
+
 # Initialize Neo4j PhyloDB schema (creates indices and properties).
 SCHEMA_QUERY_FILE="$PROJ_ROOT/scripts/init/init_schema.cypher"
 cat $SCHEMA_QUERY_FILE | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
@@ -89,5 +93,7 @@ cat $SCHEMA_QUERY_FILE | docker exec --interactive phylodb-neo4j sh -c "cypher-s
 # Initialize Neo4j PhyloDB data.
 DATA_QUERY_FILE="$PROJ_ROOT/scripts/init/init_data.cypher"
 cat $DATA_QUERY_FILE | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password" >/dev/null 2>&1
+
+echo "[$SCRIPT_NAME][INFO] - done."
 
 popd

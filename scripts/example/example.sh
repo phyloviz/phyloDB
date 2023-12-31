@@ -156,23 +156,9 @@ curl -v --location --request POST 'http://localhost:8080/projects?provider=googl
     "users": [{"id": "aplf@tecnico.pt", "provider": "google"}]
   }'
 
-
-if [ -z "$PROJECT" ]; then cat << EOF
-Error: PROJECT is not defined. Please follow these steps:
-
-# TODO
-#
-# Then, execute
-#
-# > export PROJECT="YOUR_PROJECT_ID"
-#
-# and run this script again.
-EOF
-  exit 1
-else
-  echo "ok PROJECT is defined."
-fi
-
+# Set the project id.
+PROJECT=$(curl -s --location --request GET 'http://localhost:8080/projects?provider=google' --header "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['id'])")
+echo "Project: $PROJECT"
 
 log_checkpoint "List all datasets:"
 echo -n "Datasets: "
@@ -190,21 +176,9 @@ curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datas
 	  "description": "Example dataset"
   }'
 
-if [ -z "$DATASET" ]; then cat << EOF
-Error: DATASET is not defined. Please follow these steps:
-
-# TODO
-#
-# Then, execute
-#
-# > export DATASET="YOUR_DATASET_ID"
-#
-# and run this script again.
-EOF
-  exit 1
-else
-  echo "ok DATASET is defined."
-fi
+# Set dataset id:
+DATASET=$(curl -s --location --request GET "http://localhost:8080/projects/$PROJECT/datasets?provider=google" --header "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['id'])")
+echo "Dataset: $DATASET"
 
 log_checkpoint "Load profiles:"
 curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/profiles/files?provider=google" \
@@ -239,7 +213,7 @@ echo -n "Inferences: "
 curl --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences?provider=google" \
   --header "Authorization: Bearer $TOKEN"
 echo
-INFERENCE="CHANGE_ME"
+INFERENCE=$(curl -s --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences?provider=google" --header "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['id'])")
 echo -n "Inference: "
 curl --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences/$INFERENCE?provider=google" \
   --header "Authorization: Bearer $TOKEN"
