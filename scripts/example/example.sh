@@ -1,6 +1,41 @@
 #!/bin/bash
 # API REQUEST EXAMPLES
 
+set -e
+
+cd "$(dirname "$0")"
+
+log_checkpoint() {
+  local message="$1"
+  echo
+  printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+  echo "$message"
+  printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+}
+
+log_checkpoint "Check server status:"
+URL="http://localhost:8080/"
+response="$(curl --write-out "%{http_code}" --silent --output /dev/null "$URL" || true)"
+if [ "$response" -eq 200 ] || [ "$response" -eq 301 ] || [ "$response" -eq 302 ]; then
+    echo "ok"
+else
+  cat << EOF
+Error: response ${response} at ${URL}. Please follow these steps:
+
+# From the root directory, run
+# > ./configure.sh
+#
+# and then
+# > ./docker/build-docker.sh
+# > ./docker/start-docker.sh
+EOF
+  exit 1
+fi
+
+
+if [ -z "$TOKEN" ]; then cat << EOF
+Error: TOKEN is not defined. Please follow these steps:
+
 # Access https://developers.google.com/oauthplayground/ with the account that
 # you added as admin in 'scripts/init/init_data.cypher', and click in 'Authorize
 # APIs' with the scope 'https://www.googleapis.com/auth/userinfo.email'. Or
@@ -8,8 +43,19 @@
 #
 # In step 2, click in 'Exchange authorization code for tokens' and copy your
 # own access token to the variable TOKEN below.
+#
+# Then, execute
+#
+# > export TOKEN="YOUR_ACCESS_TOKEN"
+#
+# and run this script again.
+EOF
+  exit 1
+else
+  echo "ok TOKEN is defined."
+fi
 
-TOKEN="CHANGE_ME"
+../init/make_init_data.cypher.sh
 
 # Let us try several requests:
 
@@ -110,8 +156,23 @@ curl -v --location --request POST 'http://localhost:8080/projects?provider=googl
     "users": [{"id": "aplf@tecnico.pt", "provider": "google"}]
   }'
 
-# Set the project id.
-PROJECT="CHANGE_ME"
+
+if [ -z "$PROJECT" ]; then cat << EOF
+Error: PROJECT is not defined. Please follow these steps:
+
+# TODO
+#
+# Then, execute
+#
+# > export PROJECT="YOUR_PROJECT_ID"
+#
+# and run this script again.
+EOF
+  exit 1
+else
+  echo "ok PROJECT is defined."
+fi
+
 
 # List all datasets:
 echo -n "Datasets: "
@@ -129,8 +190,21 @@ curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datas
 	  "description": "Example dataset"
   }'
 
-# Set dataset id:
-DATASET="CHANGE_ME"
+if [ -z "$DATASET" ]; then cat << EOF
+Error: DATASET is not defined. Please follow these steps:
+
+# TODO
+#
+# Then, execute
+#
+# > export DATASET="YOUR_DATASET_ID"
+#
+# and run this script again.
+EOF
+  exit 1
+else
+  echo "ok DATASET is defined."
+fi
 
 # Load profiles:
 curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/profiles/files?provider=google" \
