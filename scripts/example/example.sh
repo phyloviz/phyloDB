@@ -1,3 +1,4 @@
+#!/bin/bash
 # API REQUEST EXAMPLES
 
 # Access https://developers.google.com/oauthplayground/ with the account that
