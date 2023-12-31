@@ -5,11 +5,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
 import pt.ist.meic.phylodb.analysis.inference.model.Inference;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.Entity;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
@@ -102,9 +102,9 @@ public class InferenceRepositoryTests extends RepositoryTestsContext {
 					"WITH d, $ as treeId, $ as algorithm, $ as deprecated\n" +
 					"UNWIND $ as edge\n" +
 					"MATCH (d)-[:CONTAINS]->(p1:Profile {id: edge.from})-[r1:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-					"WHERE NOT EXISTS(r1.to)\n" +
+					"WHERE r1.to IS NULL\n" +
 					"MATCH (d)-[:CONTAINS]->(p2:Profile {id: edge.to})-[r2:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-					"WHERE NOT EXISTS(r2.to)\n" +
+					"WHERE r2.to IS NULL\n" +
 					"CREATE (p1)-[:DISTANCES {id: treeId, deprecated: deprecated, algorithm: algorithm, fromVersion: r1.version, toVersion: r2.version, distance: edge.distance}]->(p2)";
 			Inference.PrimaryKey key = inference.getPrimaryKey();
 			Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), inference.getAlgorithm().getName(), inference.isDeprecated(),

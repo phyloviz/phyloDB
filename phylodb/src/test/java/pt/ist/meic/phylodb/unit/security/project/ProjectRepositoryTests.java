@@ -5,10 +5,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -110,7 +110,7 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 		for (Project project : projects) {
 			String statement = "MERGE (p:Project {id: $}) SET p.deprecated = $ WITH p\n" +
 					"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH p, COALESCE(r.version, 0) + 1 as v\n" +
 					"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProjectDetails {name: $, type: $, description: $}) WITH p, pd\n" +
 					"CREATE (:Allele {deprecated: false})<-[:CONTAINS]-(p)-[:CONTAINS]->(d:Dataset {deprecated: false})-[:CONTAINS]->(:Profile {deprecated: false})\n" +
@@ -139,11 +139,12 @@ public class ProjectRepositoryTests extends RepositoryTestsContext {
 	}
 
 	private Project[] findAll() {
-		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)-[:HAS]->(u:User)\n" +
+		String statement = "MATCH (p:Project)-[r:CONTAINS_DETAILS]->(pd:ProjectDetails)\n" +
+				"OPTIONAL MATCH (pd)-[:HAS]->(u:User)\n" +
 				"WITH p, r, pd, u\n" +
 				"ORDER BY p.id, u.id, u.provider\n" +
 				"RETURN p.id as id, p.deprecated as deprecated, r.version as version, " +
-				"pd.name as name, pd.type as type, pd.description as description, collect(DISTINCT {id : u.id, provider: u.provider}) as users\n" +
+				"pd.name as name, pd.type as type, pd.description as description, [user in collect(DISTINCT {id : u.id, provider: u.provider}) WHERE user.id is not null] as users\n" +
 				"ORDER BY p.id, r.version";
 		Result result = query(new Query(statement));
 		if (result == null) return new Project[0];

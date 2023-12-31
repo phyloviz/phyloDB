@@ -10,6 +10,7 @@ import pt.ist.meic.phylodb.typing.schema.SchemaRepository;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
 import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class DatasetService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class DatasetService extends VersionedEntityService<Dataset, Dataset.PrimaryKey> {
 
 	private DatasetRepository datasetRepository;
 	private SchemaRepository schemaRepository;
@@ -42,7 +43,7 @@ public class DatasetService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<VersionedEntity<Dataset.PrimaryKey>>> getDatasets(String projectId, int page, int limit) {
-		return datasetRepository.findAllEntities(page, limit, projectId);
+		return getAllEntities(page, limit, projectId);
 	}
 
 	/**
@@ -55,7 +56,7 @@ public class DatasetService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Dataset> getDataset(String projectId, String id, long version) {
-		return datasetRepository.find(new Dataset.PrimaryKey(projectId, id), version);
+		return get(new Dataset.PrimaryKey(projectId, id), version);
 	}
 
 	/**
@@ -80,7 +81,7 @@ public class DatasetService extends pt.ist.meic.phylodb.utils.service.Service  {
 			if (!schemaKey.equals(dbDataset.get().getSchema().getPrimaryKey()) && profiles.isPresent() && profiles.get().size() > 0)
 				return false;
 		}
-		return datasetRepository.save(dataset);
+		return save(dataset);
 	}
 
 	/**
@@ -92,7 +93,27 @@ public class DatasetService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteDataset(String projectId, String id) {
-		return datasetRepository.remove(new Dataset.PrimaryKey(projectId, id));
+		return remove(new Dataset.PrimaryKey(projectId, id));
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<Dataset.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return datasetRepository.findAllEntities(page, limit, params[0]);
+	}
+
+	@Override
+	protected Optional<Dataset> get(Dataset.PrimaryKey key, long version) {
+		return datasetRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Dataset entity) {
+		return datasetRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(Dataset.PrimaryKey key) {
+		return datasetRepository.remove(key);
 	}
 
 }

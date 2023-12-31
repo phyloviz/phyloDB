@@ -5,9 +5,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.typing.schema.model.Schema;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -114,11 +114,11 @@ public class DatasetRepositoryTests extends RepositoryTestsContext {
 			String statement = "MATCH (p:Project {id: $})\n" +
 					"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = $ WITH d\n" +
 					"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH d, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (d)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(dd:DatasetDetails {description: $}) WITH dd\n" +
 					"MATCH (s:Schema {id: $})-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
-					"WHERE NOT EXISTS(r.to)\n" +
+					"WHERE r.to IS NULL\n" +
 					"WITH dd, s, r, collect(l) as loci\n" +
 					"CREATE (dd)-[:HAS {version: r.version}]->(s)";
 			Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();

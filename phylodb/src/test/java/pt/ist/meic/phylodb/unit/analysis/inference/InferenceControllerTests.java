@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.analysis.inference.model.*;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
@@ -19,6 +18,7 @@ import pt.ist.meic.phylodb.io.formatters.analysis.TreeFormatter;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.utils.service.Entity;
 
 import java.util.*;

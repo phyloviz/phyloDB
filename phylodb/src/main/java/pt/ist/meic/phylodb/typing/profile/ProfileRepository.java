@@ -28,7 +28,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
-				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE p.deprecated = false AND r.to IS NULL\n" +
 				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated\n" +
 				"ORDER BY pj.id, d.id, size(p.id), p.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], page, limit));
@@ -39,7 +39,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 		if (filters == null || filters.length == 0)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
-				"WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE p.deprecated = false AND r.to IS NULL\n" +
 				"MATCH (pd)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"OPTIONAL MATCH (a)<-[:CONTAINS]-(pj2:Project)\n" +
 				"RETURN pj.id as projectId, d.id as datasetId, p.id as id, r.version as version, p.deprecated as deprecated,\n" +
@@ -50,7 +50,7 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 
 	@Override
 	protected Result get(Profile.PrimaryKey key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
 				"MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)-[h:HAS]->(a:Allele)<-[:CONTAINS]-(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
 				"WHERE " + where + "\n" +
@@ -107,14 +107,8 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 	@Override
 	protected void delete(Profile.PrimaryKey key) {
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(p:Profile {id: $})\n" +
-				"SET p.deprecated = true WITH d, p\n" +
-				"MATCH (d)-[:CONTAINS]->(p1:Profile)-[di:DISTANCES]->(p2:Profile)\n" +
-				"WHERE p1.id = p.id OR p2.id = p.id\n" +
-				"SET di.deprecated = true\n" +
-				"WITH d, di.id as analysis, collect(di) as ignored\n" +
-				"MATCH (d)-[:CONTAINS]->(p:Profile)-[h:HAS {inferenceId: analysis}]->(c:Coordinate)\n" +
-				"WHERE h.deprecated = false\n" +
-				"SET h.deprecated = true";
+				"WHERE pj.deprecated = false AND d.deprecated = false AND p.deprecated = false\n" +
+				"SET p.deprecated = true";
 		execute(new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId()));
 	}
 
@@ -157,21 +151,21 @@ public class ProfileRepository extends BatchRepository<Profile, Profile.PrimaryK
 				"WHERE d.deprecated = false\n" +
 				"MERGE (d)-[:CONTAINS]->(p:Profile {id: param.id}) SET p.deprecated = false WITH param, pj, d, p\n" +
 				"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH param, pj, d, p, COALESCE(r.version, 0) + 1 as v\n" +
 				"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProfileDetails {aka: param.aka})\n" +
 				"WITH param, pj, d, pd\n" +
 				"MATCH (d)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-				"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+				"WHERE r1.to IS NULL AND r2.version = h.version\n" +
 				"UNWIND param.alleles as n\n" +
 				"MATCH (sd)-[:HAS {part: n.part}]->(l:Locus)\n" +
 				"CALL apoc.do.when(param.project = TRUE,\n" +
 				"    \"MATCH (l)-[:CONTAINS]->(a:Allele {id: n.id})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-				"    WHERE NOT EXISTS(r.to) AND (a)<-[:CONTAINS]-(pj)\n" +
+				"    WHERE r.to IS NULL AND (a)<-[:CONTAINS]-(pj)\n" +
 				"    CREATE (pd)-[:HAS {version: r.version, part: n.part, total: n.total}]->(a)" +
 				"    RETURN TRUE\",\n" +
 				"    \"MATCH (l)-[:CONTAINS]->(a:Allele {id: n.id})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-				"    WHERE NOT EXISTS(r.to) AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
+				"    WHERE r.to IS NULL AND NOT (a)<-[:CONTAINS]-(:Project)\n" +
 				"    CREATE (pd)-[:HAS {version: r.version, part: n.part, total: n.total}]->(a)\n" +
 				"    RETURN TRUE\"\n" +
 				", {l: l, pd: pd, n: n, pj: pj}) YIELD value\n" +

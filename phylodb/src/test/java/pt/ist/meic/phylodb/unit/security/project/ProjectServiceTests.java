@@ -6,13 +6,16 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import pt.ist.meic.phylodb.unit.ServiceTestsContext;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,7 +68,7 @@ public class ProjectServiceTests extends ServiceTestsContext {
 	@MethodSource("getProjects_params")
 	public void getProjects(int page, List<VersionedEntity<String>> expected) {
 		Mockito.when(projectRepository.findAllEntities(anyInt(), anyInt(), any())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<VersionedEntity<String>>> result = projectService.getProjects(USER1.getPrimaryKey(), page, LIMIT);
+		Optional<List<VersionedEntity<String>>> result = projectService.getProjects(USER1.getPrimaryKey().getId(), USER1.getPrimaryKey().getProvider(), page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;

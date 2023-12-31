@@ -38,7 +38,7 @@ public class GoogleInterceptor extends AuthenticationInterceptor {
 
 	@Override
 	protected boolean isLastHandler() {
-		return true;
+		return false;
 	}
 
 }

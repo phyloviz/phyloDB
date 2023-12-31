@@ -12,19 +12,19 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
-import pt.ist.meic.phylodb.unit.Context;
 import pt.ist.meic.phylodb.analysis.inference.InferenceController;
 import pt.ist.meic.phylodb.phylogeny.allele.AlleleController;
 import pt.ist.meic.phylodb.phylogeny.allele.model.AlleleInputModel;
 import pt.ist.meic.phylodb.phylogeny.taxon.TaxonController;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.TaxonInputModel;
 import pt.ist.meic.phylodb.security.SecurityInterceptor;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.AuthorizationInterceptor;
 import pt.ist.meic.phylodb.security.authorization.Role;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.ProjectService;
 import pt.ist.meic.phylodb.security.project.model.Project;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.unit.Context;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ public class AuthorizationInterceptorTests extends Context {
 		HandlerMethod handler1 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("saveTaxon", String.class, TaxonInputModel.class));
 		HandlerMethod handler2 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("saveAllele", String.class, String.class, String.class, String.class, AlleleInputModel.class));
 		HandlerMethod handler3 = new HandlerMethod(new AlleleController(null), AlleleController.class.getMethod("getAlleles", String.class, String.class, String.class, int.class));
-		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxons", int.class));
+		HandlerMethod handler4 = new HandlerMethod(new TaxonController(null), TaxonController.class.getMethod("getTaxa", int.class));
 		HandlerMethod handler5 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("postInference", String.class, String.class, String.class, String.class, MultipartFile.class));
 		HandlerMethod handler6 = new HandlerMethod(new InferenceController(null), InferenceController.class.getMethod("getInferences", String.class, String.class, int.class));
 		return Stream.of(Arguments.of(request(userKey, Role.ADMIN, null), response, handler1, null, true),

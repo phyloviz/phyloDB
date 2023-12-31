@@ -91,9 +91,9 @@ public class InferenceRepository extends UnversionedRepository<Inference, Infere
 				"WITH d, $ as treeId, $ as algorithm\n" +
 				"UNWIND $ as edge\n" +
 				"MATCH (d)-[:CONTAINS]->(p1:Profile {id: edge.from})-[r1:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-				"WHERE NOT EXISTS(r1.to)\n" +
+				"WHERE r1.to IS NULL\n" +
 				"MATCH (d)-[:CONTAINS]->(p2:Profile {id: edge.to})-[r2:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-				"WHERE NOT EXISTS(r2.to)\n" +
+				"WHERE r2.to IS NULL\n" +
 				"CREATE (p1)-[:DISTANCES {id: treeId, deprecated: false, algorithm: algorithm, fromVersion: r1.version, toVersion: r2.version, distance: edge.distance}]->(p2)";
 		Inference.PrimaryKey key = analysis.getPrimaryKey();
 		Query query = new Query(statement, key.getProjectId(), key.getDatasetId(), key.getId(), analysis.getAlgorithm().getName(),

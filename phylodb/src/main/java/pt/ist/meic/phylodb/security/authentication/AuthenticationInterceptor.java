@@ -47,7 +47,7 @@ public abstract class AuthenticationInterceptor extends SecurityInterceptor {
 	public boolean handle(HttpServletRequest req, HttpServletResponse res, Object handler) {
 		String auth = req.getHeader(HttpHeaders.AUTHORIZATION);
 		if (!provider.equals(req.getParameter(PROVIDER)))
-			return !isLastHandler() || handleProblem(res, Problem.INVALID_REQUEST);
+			return !isLastHandler() || req.getAttribute(PROVIDER) != null || handleProblem(res, Problem.INVALID_REQUEST);
 		String[] authorization;
 		if (auth == null || !(authorization = auth.split(" "))[0].equals(AUTHENTICATION_SCHEME))
 			return handleProblem(res, Problem.INVALID_REQUEST);

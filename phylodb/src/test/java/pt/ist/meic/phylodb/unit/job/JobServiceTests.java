@@ -1,20 +1,20 @@
 package pt.ist.meic.phylodb.unit.job;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.analysis.Analysis;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.analysis.visualization.model.VisualizationAlgorithm;
 import pt.ist.meic.phylodb.job.model.Job;
 import pt.ist.meic.phylodb.job.model.JobRequest;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;

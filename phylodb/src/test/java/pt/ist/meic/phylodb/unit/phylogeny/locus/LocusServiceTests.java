@@ -6,8 +6,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
+import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;

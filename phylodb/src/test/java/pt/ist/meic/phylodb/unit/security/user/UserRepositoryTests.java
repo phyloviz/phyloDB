@@ -4,9 +4,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Role;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -112,7 +112,7 @@ public class UserRepositoryTests extends RepositoryTestsContext {
 		for (User user : users) {
 			String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = $ WITH u\n" +
 					"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
 			execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.isDeprecated(), user.getRole().getName()));

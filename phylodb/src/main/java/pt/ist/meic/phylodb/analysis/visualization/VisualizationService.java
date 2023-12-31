@@ -7,6 +7,7 @@ import pt.ist.meic.phylodb.analysis.visualization.model.Visualization;
 import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.typing.dataset.model.Dataset;
 import pt.ist.meic.phylodb.utils.service.Entity;
+import pt.ist.meic.phylodb.utils.service.UnversionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class VisualizationService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class VisualizationService extends UnversionedEntityService<Visualization, Visualization.PrimaryKey> {
 
 	private VisualizationRepository visualizationRepository;
 
@@ -37,7 +38,7 @@ public class VisualizationService extends pt.ist.meic.phylodb.utils.service.Serv
 	 */
 	@Transactional(readOnly = true)
 	public Optional<List<Entity<Visualization.PrimaryKey>>> getVisualizations(String projectId, String datasetId, String inferenceId, int page, int limit) {
-		return visualizationRepository.findAllEntities(page, limit, projectId, datasetId, inferenceId);
+		return getAllEntities(page, limit, projectId, datasetId, inferenceId);
 	}
 
 	/**
@@ -51,7 +52,7 @@ public class VisualizationService extends pt.ist.meic.phylodb.utils.service.Serv
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Visualization> getVisualization(String projectId, String datasetId, String inferenceId, String visualizationId) {
-		return visualizationRepository.find(new Visualization.PrimaryKey(projectId, datasetId, inferenceId, visualizationId));
+		return get(new Visualization.PrimaryKey(projectId, datasetId, inferenceId, visualizationId));
 	}
 
 	/**
@@ -65,7 +66,27 @@ public class VisualizationService extends pt.ist.meic.phylodb.utils.service.Serv
 	 */
 	@Transactional
 	public boolean deleteVisualization(String projectId, String datasetId, String inferenceId, String visualizationId) {
-		return visualizationRepository.remove(new Visualization.PrimaryKey(projectId, datasetId, inferenceId, visualizationId));
+		return remove(new Visualization.PrimaryKey(projectId, datasetId, inferenceId, visualizationId));
+	}
+
+	@Override
+	protected Optional<List<Entity<Visualization.PrimaryKey>>> getAllEntities(int page, int limit, Object... params) {
+		return visualizationRepository.findAllEntities(page, limit, params[0], params[1], params[2]);
+	}
+
+	@Override
+	protected Optional<Visualization> get(Visualization.PrimaryKey key) {
+		return visualizationRepository.find(key);
+	}
+
+	@Override
+	protected boolean save(Visualization entity) {
+		throw new RuntimeException("Not Implemented");
+	}
+
+	@Override
+	protected boolean remove(Visualization.PrimaryKey key) {
+		return visualizationRepository.remove(key);
 	}
 
 }

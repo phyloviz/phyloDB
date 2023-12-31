@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.job;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.analysis.Analysis;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.analysis.visualization.model.VisualizationAlgorithm;
@@ -23,6 +21,8 @@ import pt.ist.meic.phylodb.job.model.Job;
 import pt.ist.meic.phylodb.job.model.JobAcceptedOutputModel;
 import pt.ist.meic.phylodb.job.model.JobInputModel;
 import pt.ist.meic.phylodb.job.model.JobOutputModel;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
+import pt.ist.meic.phylodb.utils.service.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;

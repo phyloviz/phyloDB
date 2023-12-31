@@ -10,18 +10,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.CreatedOutputModel;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
 import pt.ist.meic.phylodb.io.output.OutputModel;
-import pt.ist.meic.phylodb.security.user.model.User;
 import pt.ist.meic.phylodb.security.authorization.Visibility;
 import pt.ist.meic.phylodb.security.project.model.GetProjectOutputModel;
 import pt.ist.meic.phylodb.security.project.model.Project;
 import pt.ist.meic.phylodb.security.project.model.ProjectInputModel;
 import pt.ist.meic.phylodb.security.project.model.ProjectOutputModel;
+import pt.ist.meic.phylodb.security.user.model.User;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
@@ -106,7 +106,7 @@ public class ProjectControllerTests extends ControllerTestsContext {
 	@ParameterizedTest
 	@MethodSource("getProjects_params")
 	public void getProjects(MockHttpServletRequestBuilder req, List<VersionedEntity<String>> projects, HttpStatus expectedStatus, List<ProjectOutputModel> expectedResult, ErrorOutputModel expectedError) throws Exception {
-		Mockito.when(projectService.getProjects(any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
+		Mockito.when(projectService.getProjects(any(), any(), anyInt(), anyInt())).thenReturn(Optional.ofNullable(projects));
 		MockHttpServletResponse result = executeRequest(req, MediaType.APPLICATION_JSON);
 		assertEquals(expectedStatus.value(), result.getStatus());
 		if (expectedStatus.is2xxSuccessful()) {

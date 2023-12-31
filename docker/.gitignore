@@ -1,0 +1,11 @@
+!.gitkeep
+
+!instance/app/.gitkeep
+
+!instance/db/data/.gitkeep
+!instance/db/logs/.gitkeep
+!instance/db/plugins/.gitkeep
+
+instance/db/data/*
+
+instance/app/logs/*

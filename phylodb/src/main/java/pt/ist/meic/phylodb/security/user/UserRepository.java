@@ -28,7 +28,7 @@ public class UserRepository extends VersionedRepository<User, User.PrimaryKey> {
 	@Override
 	protected Result getAllEntities(int page, int limit, Object... filters) {
 		String statement = "MATCH (u:User)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
-				"WHERE u.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE u.deprecated = false AND r.to IS NULL\n" +
 				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY size(u.id), u.id, size(u.provider), u.provider SKIP $ LIMIT $";
 		return query(new Query(statement, page, limit));
@@ -36,7 +36,7 @@ public class UserRepository extends VersionedRepository<User, User.PrimaryKey> {
 
 	@Override
 	protected Result get(User.PrimaryKey key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (u:User {id: $, provider: $})-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
 				"WHERE " + where + "\n" +
 				"RETURN u.id as id, u.provider as provider, u.deprecated as deprecated, r.version as version,\n" +
@@ -71,7 +71,7 @@ public class UserRepository extends VersionedRepository<User, User.PrimaryKey> {
 	protected void store(User user) {
 		String statement = "MERGE (u:User {id: $, provider: $}) SET u.deprecated = false WITH u\n" +
 				"OPTIONAL MATCH (u)-[r:CONTAINS_DETAILS]->(ud:UserDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH u, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (u)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ud:UserDetails {role: $})";
 		execute(new Query(statement, user.getPrimaryKey().getId(), user.getPrimaryKey().getProvider(), user.getRole().getName()));

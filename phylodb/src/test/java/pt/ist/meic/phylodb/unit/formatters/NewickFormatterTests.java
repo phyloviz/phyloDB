@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.formatters;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import pt.ist.meic.phylodb.analysis.inference.model.Edge;
 import pt.ist.meic.phylodb.io.formatters.analysis.NewickFormatter;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;

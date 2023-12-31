@@ -26,7 +26,7 @@ public class DatasetRepository extends VersionedRepository<Dataset, Dataset.Prim
 		if (filters == null || filters.length != 1)
 			return null;
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)\n" +
-				"WHERE p.deprecated = false AND d.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE p.deprecated = false AND d.deprecated = false AND r.to IS NULL\n" +
 				"RETURN p.id as projectId, d.id as datasetId, d.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY p.id, size(d.id), d.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], page, limit));
@@ -34,7 +34,7 @@ public class DatasetRepository extends VersionedRepository<Dataset, Dataset.Prim
 
 	@Override
 	protected Result get(Dataset.PrimaryKey id, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r1.to)" : "r1.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r1.to IS NULL" : "r1.version = $";
 		String statement = "MATCH (p:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
 				"WHERE r2.version = h.version AND " + where + "\n" +
 				"MATCH (sd)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon)\n" +
@@ -77,11 +77,11 @@ public class DatasetRepository extends VersionedRepository<Dataset, Dataset.Prim
 		String statement = "MATCH (p:Project {id: $})\n" +
 				"MERGE (p)-[:CONTAINS]->(d:Dataset {id : $}) SET d.deprecated = false WITH d\n" +
 				"OPTIONAL MATCH (d)-[r:CONTAINS_DETAILS]->(dd:DatasetDetails)" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH d, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (d)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(dd:DatasetDetails {description: $}) WITH dd\n" +
 				"MATCH (s:Schema {id: $})-[r:CONTAINS_DETAILS]->(sd:SchemaDetails)-[:HAS]->(l:Locus)<-[:CONTAINS]-(t:Taxon {id: $})\n" +
-				"WHERE NOT EXISTS(r.to)\n" +
+				"WHERE r.to IS NULL\n" +
 				"WITH dd, s, r, collect(l) as loci\n" +
 				"CREATE (dd)-[:HAS {version: r.version}]->(s)";
 		Schema.PrimaryKey schemaKey = dataset.getSchema().getPrimaryKey();

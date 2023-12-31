@@ -4,17 +4,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
+import pt.ist.meic.phylodb.utils.service.VersionedEntityService;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Class that contains operations to manage taxons
+ * Class that contains operations to manage taxa
  * <p>
  * The service responsibility is to guarantee that the database state is not compromised and verify all business rules.
  */
 @Service
-public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
+public class TaxonService extends VersionedEntityService<Taxon, String> {
 
 	private TaxonRepository taxonRepository;
 
@@ -23,15 +24,15 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	}
 
 	/**
-	 * Operation to retrieve the resumed information of the requested taxons
+	 * Operation to retrieve the resumed information of the requested taxa
 	 *
 	 * @param page  number of the page to retrieve
-	 * @param limit number of taxons to retrieve by page
+	 * @param limit number of taxa to retrieve by page
 	 * @return an {@link Optional} with a {@link List} of {@link VersionedEntity<String>}, which is the resumed information of each taxon
 	 */
 	@Transactional(readOnly = true)
-	public Optional<List<VersionedEntity<String>>> getTaxons(int page, int limit) {
-		return taxonRepository.findAllEntities(page, limit);
+	public Optional<List<VersionedEntity<String>>> getTaxa(int page, int limit) {
+		return getAllEntities(page, limit);
 	}
 
 	/**
@@ -43,7 +44,7 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<Taxon> getTaxon(String id, Long version) {
-		return taxonRepository.find(id, version);
+		return get(id, version);
 	}
 
 	/**
@@ -54,7 +55,7 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean saveTaxon(Taxon taxon) {
-		return taxonRepository.save(taxon);
+		return save(taxon);
 	}
 
 	/**
@@ -65,7 +66,27 @@ public class TaxonService extends pt.ist.meic.phylodb.utils.service.Service  {
 	 */
 	@Transactional
 	public boolean deleteTaxon(String id) {
-		return taxonRepository.remove(id);
+		return remove(id);
+	}
+
+	@Override
+	protected Optional<List<VersionedEntity<String>>> getAllEntities(int page, int limit, Object... params) {
+		return taxonRepository.findAllEntities(page, limit);
+	}
+
+	@Override
+	protected Optional<Taxon> get(String key, long version) {
+		return taxonRepository.find(key, version);
+	}
+
+	@Override
+	protected boolean save(Taxon entity) {
+		return taxonRepository.save(entity);
+	}
+
+	@Override
+	protected boolean remove(String key) {
+		return taxonRepository.remove(key);
 	}
 
 }

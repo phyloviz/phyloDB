@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.error.ErrorOutputModel;
 import pt.ist.meic.phylodb.error.Problem;
 import pt.ist.meic.phylodb.io.output.NoContentOutputModel;
@@ -19,6 +18,7 @@ import pt.ist.meic.phylodb.phylogeny.locus.model.GetLocusOutputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusInputModel;
 import pt.ist.meic.phylodb.phylogeny.locus.model.LocusOutputModel;
+import pt.ist.meic.phylodb.unit.ControllerTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
@@ -34,7 +34,7 @@ public class LocusControllerTests extends ControllerTestsContext {
 	private static final String TAXONID = TAXON1.getPrimaryKey();
 
 	private static Stream<Arguments> getLoci_params() {
-		String uri = "/taxons/%s/loci";
+		String uri = "/taxa/%s/loci";
 		List<VersionedEntity<Locus.PrimaryKey>> loci = new ArrayList<VersionedEntity<Locus.PrimaryKey>>() {{
 			add(new VersionedEntity<>(new Locus.PrimaryKey(TAXONID, "id"), 1, false));
 		}};
@@ -51,7 +51,7 @@ public class LocusControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> getLocus_params() {
-		String uri = "/taxons/%s/loci/%s";
+		String uri = "/taxa/%s/loci/%s";
 		Locus locus = new Locus(TAXONID, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = get(String.format(uri, TAXONID, key.getId())).param("version", "1"),
@@ -63,7 +63,7 @@ public class LocusControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> saveLocus_params() {
-		String uri = "/taxons/%s/loci/%s";
+		String uri = "/taxa/%s/loci/%s";
 		Locus locus = new Locus(TAXONID, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = put(String.format(uri, TAXONID, key.getId()));
@@ -76,7 +76,7 @@ public class LocusControllerTests extends ControllerTestsContext {
 	}
 
 	private static Stream<Arguments> deleteLocus_params() {
-		String uri = "/taxons/%s/loci/%s";
+		String uri = "/taxa/%s/loci/%s";
 		Locus locus = new Locus(TAXONID, "id", "description");
 		Locus.PrimaryKey key = locus.getPrimaryKey();
 		MockHttpServletRequestBuilder req1 = delete(String.format(uri, TAXONID, key.getId()));

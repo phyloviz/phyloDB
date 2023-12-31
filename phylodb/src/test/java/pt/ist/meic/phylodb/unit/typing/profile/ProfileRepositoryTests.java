@@ -5,11 +5,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.typing.profile.model.Profile;
-import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
@@ -242,18 +242,18 @@ public class ProfileRepositoryTests extends RepositoryTestsContext {
 			String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $}) WHERE pj.deprecated = false AND d.deprecated = false\n" +
 					"MERGE (d)-[:CONTAINS]->(p:Profile {id: $}) SET p.deprecated = $ WITH pj, d, p\n" +
 					"OPTIONAL MATCH (p)-[r:CONTAINS_DETAILS]->(pd:ProfileDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH pj, d, p, COALESCE(r.version, 0) + 1 as v\n" +
 					"CREATE (p)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(pd:ProfileDetails {aka: $})\n" +
 					"WITH pj, d, pd\n" +
 					"MATCH (d)-[r1:CONTAINS_DETAILS]->(dd:DatasetDetails)-[h:HAS]->(s:Schema)-[r2:CONTAINS_DETAILS]->(sd:SchemaDetails)\n" +
-					"WHERE NOT EXISTS(r1.to) AND r2.version = h.version\n" +
+					"WHERE r1.to IS NULL AND r2.version = h.version\n" +
 					"WITH pj, d, pd, sd\n";
 			Query query = new Query(statement);
 			query.addParameter(key.getProjectId(), key.getDatasetId(), key.getId(), profile.isDeprecated(), profile.getAka());
 			statement = "MATCH (sd)-[:HAS {part: %s}]->(l:Locus)\n" +
 					"MATCH (l)-[:CONTAINS]->(a:Allele {id: $})-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-					"WHERE NOT EXISTS(r.to) AND %s\n" +
+					"WHERE r.to IS NULL AND %s\n" +
 					"CREATE (pd)-[:HAS {version: r.version, part: %s, total: %s}]->(a)\n" +
 					"WITH pj, d, pd, sd\n";
 			List<VersionedEntity<Allele.PrimaryKey>> allelesIds = profile.getAllelesReferences();

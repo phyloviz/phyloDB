@@ -5,10 +5,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
-import pt.ist.meic.phylodb.utils.db.VersionedRepository;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
+import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.*;
@@ -126,7 +126,7 @@ public class LocusRepositoryTests extends RepositoryTestsContext {
 					"WHERE t.deprecated = false\n" +
 					"MERGE (t)-[:CONTAINS]->(l:Locus {id: $}) SET l.deprecated = $ WITH l\n" +
 					"OPTIONAL MATCH (l)-[r:CONTAINS_DETAILS]->(ld:LocusDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH l, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (l)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ld:LocusDetails {description: $}) WITH l\n" +
 					"CREATE (l)-[:CONTAINS]->(:Allele {deprecated: false})";

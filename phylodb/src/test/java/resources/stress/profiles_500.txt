@@ -1,4 +1,4 @@
-ST	locus1	locus2	locus3	locus4	locus5	locus7	locus7
+ST	locus1	locus2	locus3	locus4	locus5	locus6	locus7
 1	1	1	1	1	1	1	1
 2	1	1	4	1	18	13	18
 3	1	5	1	8	14	11	14

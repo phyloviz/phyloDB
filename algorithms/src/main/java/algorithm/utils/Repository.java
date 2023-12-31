@@ -61,7 +61,9 @@ public abstract class Repository<T, R> {
 	}
 
 	protected Stream<Relationship> relationships(Node node, Relation relationship, Direction direction) {
-		Iterable<Relationship> relationships = node.getRelationships(direction, RelationshipType.withName(relationship.name()));
+
+		ResourceIterable<Relationship> relationships = node.getRelationships(direction, RelationshipType.withName(relationship.name()));
+
 		return StreamSupport.stream(relationships.spliterator(), false);
 	}
 

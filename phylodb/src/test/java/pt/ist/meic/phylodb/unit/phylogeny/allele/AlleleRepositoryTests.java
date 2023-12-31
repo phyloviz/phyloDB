@@ -5,8 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.db.VersionedRepository;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
@@ -299,7 +299,7 @@ public class AlleleRepositoryTests extends RepositoryTestsContext {
 			Query query = new Query(statement, params);
 			String statement2 = "MERGE (l)-[:CONTAINS]->(a:Allele {id: $})" + project + " SET a.deprecated = $ WITH l, a\n" +
 					"OPTIONAL MATCH (a)-[r:CONTAINS_DETAILS]->(ad:AlleleDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH l, a, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (a)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(ad:AlleleDetails {sequence: $}) ";
 			query.appendQuery(statement2).addParameter(allele.getPrimaryKey().getId(), allele.isDeprecated(), allele.getSequence());

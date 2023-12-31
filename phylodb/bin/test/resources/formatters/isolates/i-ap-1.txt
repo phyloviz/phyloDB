@@ -1,0 +1,2 @@
+isolate	country	continent	ST (MLST)
+1	USA	North America	102

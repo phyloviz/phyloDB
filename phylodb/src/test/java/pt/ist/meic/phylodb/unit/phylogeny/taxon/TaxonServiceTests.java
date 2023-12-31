@@ -6,8 +6,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class TaxonServiceTests extends ServiceTestsContext {
 	private static final int LIMIT = 2;
 	private static final Taxon[] STATE = new Taxon[]{TAXON1, TAXON2};
 
-	private static Stream<Arguments> getTaxons_params() {
+	private static Stream<Arguments> getTaxa_params() {
 		VersionedEntity<String> state0 = new VersionedEntity<>(STATE[0].getPrimaryKey(), STATE[0].getVersion(), STATE[0].isDeprecated()),
 				state1 = new VersionedEntity<>(STATE[1].getPrimaryKey(), STATE[1].getVersion(), STATE[1].isDeprecated());
 		List<VersionedEntity<String>> expected1 = new ArrayList<VersionedEntity<String>>() {{
@@ -62,19 +62,19 @@ public class TaxonServiceTests extends ServiceTestsContext {
 	}
 
 	@ParameterizedTest
-	@MethodSource("getTaxons_params")
-	public void getTaxons(int page, List<VersionedEntity<String>> expected) {
+	@MethodSource("getTaxa_params")
+	public void getTaxa(int page, List<VersionedEntity<String>> expected) {
 		Mockito.when(taxonRepository.findAllEntities(anyInt(), anyInt())).thenReturn(Optional.ofNullable(expected));
-		Optional<List<VersionedEntity<String>>> result = taxonService.getTaxons(page, LIMIT);
+		Optional<List<VersionedEntity<String>>> result = taxonService.getTaxa(page, LIMIT);
 		if (expected == null && !result.isPresent()) {
 			assertTrue(true);
 			return;
 		}
 		assertNotNull(expected);
 		assertTrue(result.isPresent());
-		List<VersionedEntity<String>> taxons = result.get();
-		assertEquals(expected.size(), taxons.size());
-		assertEquals(expected, taxons);
+		List<VersionedEntity<String>> taxa = result.get();
+		assertEquals(expected.size(), taxa.size());
+		assertEquals(expected, taxa);
 	}
 
 	@ParameterizedTest

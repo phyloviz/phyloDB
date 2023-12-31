@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.typing.isolate;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,6 +11,7 @@ import pt.ist.meic.phylodb.typing.isolate.model.Ancillary;
 import pt.ist.meic.phylodb.typing.isolate.model.Isolate;
 import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.unit.formatters.IsolatesFormatterTests;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;

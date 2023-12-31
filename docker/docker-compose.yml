@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+    db:
+        # Debugging purposes. Stays running if there is an issue where the container
+        # crashes upon starting and it is needed to inspect files.
+        # entrypoint: ["sh", "-c", "sleep 2073600"]
+        user: ${USER}
+        image: neo4j:${NEO4J_VERSION}-community
+        container_name: phylodb-neo4j
+        ports:
+          - 7474:7474
+          - 7687:7687
+        volumes:
+          - ${DB_PATH}/data:/var/lib/neo4j/data
+          - ${DB_PATH}/logs:/var/lib/neo4j/logs
+          - ${DB_PATH}/plugins:/var/lib/neo4j/plugins
+        environment:
+          - NEO4J_AUTH=neo4j/password
+          - NEO4J_dbms_memory_pagecache_size=1G
+          - NEO4J_dbms.memory.heap.initial_size=2G
+          - NEO4J_dbms_memory_heap_max__size=2G
+          - NEO4J_dbms_security_procedures_unrestricted=apoc.*,algorithms.*
+          - NEO4J_dbms_security_procedures_whitelist=apoc.*,algorithms.*
+    app:
+        image: phylodb:latest
+        container_name: phylodb-app
+        ports:
+            - 8080:8080
+        volumes:
+            - ${APP_PATH}/logs:/logs

@@ -4,8 +4,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.phylogeny.taxon.model.Taxon;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
@@ -100,11 +100,11 @@ public class TaxonRepositoryTests extends RepositoryTestsContext {
 				Arguments.of(null, new Taxon[0], STATE, false));
 	}
 
-	private void store(Taxon[] taxons) {
-		for (Taxon taxon : taxons) {
+	private void store(Taxon[] taxa) {
+		for (Taxon taxon : taxa) {
 			String statement = "MERGE (t:Taxon {id: $}) SET t.deprecated = $ WITH t\n" +
 					"OPTIONAL MATCH (t)-[r:CONTAINS_DETAILS]->(td:TaxonDetails)\n" +
-					"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+					"WHERE r.to IS NULL SET r.to = datetime()\n" +
 					"WITH t, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 					"CREATE (t)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(td:TaxonDetails {description: $}) WITH t\n" +
 					"CREATE (p)-[:CONTAINS]->(l:Locus {deprecated: false})-[:CONTAINS]->(:Allele {deprecated: false})";
@@ -149,12 +149,12 @@ public class TaxonRepositoryTests extends RepositoryTestsContext {
 			return;
 		}
 		assertTrue(result.isPresent());
-		List<VersionedEntity<String>> taxons = result.get();
-		assertEquals(expected.size(), taxons.size());
+		List<VersionedEntity<String>> taxa = result.get();
+		assertEquals(expected.size(), taxa.size());
 		for (int i = 0; i < expected.size(); i++) {
-			assertEquals(expected.get(i).getPrimaryKey(), taxons.get(i).getPrimaryKey());
-			assertEquals(expected.get(i).getVersion(), taxons.get(i).getVersion());
-			assertEquals(expected.get(i).isDeprecated(), taxons.get(i).isDeprecated());
+			assertEquals(expected.get(i).getPrimaryKey(), taxa.get(i).getPrimaryKey());
+			assertEquals(expected.get(i).getVersion(), taxa.get(i).getVersion());
+			assertEquals(expected.get(i).isDeprecated(), taxa.get(i).isDeprecated());
 		}
 	}
 

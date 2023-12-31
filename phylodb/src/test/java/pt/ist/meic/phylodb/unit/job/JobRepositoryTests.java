@@ -6,11 +6,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.ogm.model.Result;
-import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.analysis.Analysis;
 import pt.ist.meic.phylodb.analysis.inference.model.InferenceAlgorithm;
 import pt.ist.meic.phylodb.analysis.visualization.model.VisualizationAlgorithm;
 import pt.ist.meic.phylodb.job.model.Job;
+import pt.ist.meic.phylodb.unit.RepositoryTestsContext;
 import pt.ist.meic.phylodb.utils.db.Query;
 
 import java.util.*;

@@ -1,6 +1,5 @@
 package pt.ist.meic.phylodb.unit.phylogeny.allele;
 
-import pt.ist.meic.phylodb.utils.service.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,6 +11,7 @@ import pt.ist.meic.phylodb.phylogeny.allele.model.Allele;
 import pt.ist.meic.phylodb.phylogeny.locus.model.Locus;
 import pt.ist.meic.phylodb.unit.ServiceTestsContext;
 import pt.ist.meic.phylodb.unit.formatters.FastaFormatterTests;
+import pt.ist.meic.phylodb.utils.service.Pair;
 import pt.ist.meic.phylodb.utils.service.VersionedEntity;
 
 import java.io.IOException;

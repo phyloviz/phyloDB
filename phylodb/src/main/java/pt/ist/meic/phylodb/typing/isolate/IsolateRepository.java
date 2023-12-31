@@ -29,7 +29,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 		if (filters == null || filters.length != 2)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
-				"WHERE pj.deprecated = false AND d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE pj.deprecated = false AND d.deprecated = false AND i.deprecated = false AND r.to IS NULL\n" +
 				"RETURN pj.id as projectId, d.id as datasetId, i.id as id, i.deprecated as deprecated, r.version as version\n" +
 				"ORDER BY pj.id, d.id, size(i.id), i.id SKIP $ LIMIT $";
 		return query(new Query(statement, filters[0], filters[1], page, limit));
@@ -40,7 +40,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 		if (filters == null || filters.length != 2)
 			return null;
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
-				"WHERE pj.deprecated = false AND d.deprecated = false AND i.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"WHERE pj.deprecated = false AND d.deprecated = false AND i.deprecated = false AND r.to IS NULL\n" +
 				"OPTIONAL MATCH (id)-[h:HAS]->(p:Profile)\n" +
 				"OPTIONAL MATCH (id)-[:HAS]->(a:Ancillary)\n" +
 				"WITH pj, d, r, i, id, h, p, a\n" +
@@ -55,7 +55,7 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 
 	@Override
 	protected Result get(Isolate.PrimaryKey key, long version) {
-		String where = version == CURRENT_VERSION_VALUE ? "NOT EXISTS(r.to)" : "r.version = $";
+		String where = version == CURRENT_VERSION_VALUE ? "r.to IS NULL" : "r.version = $";
 		String statement = "MATCH (pj:Project {id: $})-[:CONTAINS]->(d:Dataset {id: $})-[:CONTAINS]->(i:Isolate {id: $})-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
 				"WHERE " + where + "\n" +
 				"OPTIONAL MATCH (id)-[h:HAS]->(p:Profile)\n" +
@@ -128,13 +128,13 @@ public class IsolateRepository extends BatchRepository<Isolate, Isolate.PrimaryK
 				"WHERE p.deprecated = false AND d.deprecated = false\n" +
 				"MERGE (d)-[:CONTAINS]->(i:Isolate {id: param.id}) SET i.deprecated = false WITH param, d, i\n" +
 				"OPTIONAL MATCH (i)-[r:CONTAINS_DETAILS]->(id:IsolateDetails)\n" +
-				"WHERE NOT EXISTS(r.to) SET r.to = datetime()\n" +
+				"WHERE r.to IS NULL SET r.to = datetime()\n" +
 				"WITH param, d, i, COALESCE(MAX(r.version), 0) + 1 as v\n" +
 				"CREATE (i)-[:CONTAINS_DETAILS {from: datetime(), version: v}]->(id:IsolateDetails {description: param.description})\n" +
 				"WITH param, d, id\n" +
 				"CALL apoc.do.when(param.profile IS NOT NULL,\n" +
 				"    \"MATCH (d2)-[:CONTAINS]->(p:Profile {id: pid})-[r:CONTAINS_DETAILS]->(:ProfileDetails)\n" +
-				"    WHERE p.deprecated = false AND NOT EXISTS(r.to)\n" +
+				"    WHERE p.deprecated = false AND r.to IS NULL\n" +
 				"    CREATE (id2)-[:HAS {version: r.version}]->(p)\n" +
 				"    RETURN true\",\n" +
 				"    \"RETURN true\"\n" +
