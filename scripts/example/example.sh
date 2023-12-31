@@ -110,7 +110,8 @@ curl -v --location --request POST 'http://localhost:8080/projects?provider=googl
   }'
 
 # Set the project id.
-PROJECT="CHANGE_ME"
+PROJECT=$(curl -s --location --request GET 'http://localhost:8080/projects?provider=google' --header "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['id'])")
+echo "Project: $PROJECT"
 
 # List all datasets:
 echo -n "Datasets: "
@@ -129,7 +130,8 @@ curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datas
   }'
 
 # Set dataset id:
-DATASET="CHANGE_ME"
+DATASET=$(curl -s --location --request GET "http://localhost:8080/projects/$PROJECT/datasets?provider=google" --header "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['id'])")
+echo "Dataset: $DATASET"
 
 # Load profiles:
 curl -v --location --request POST "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/profiles/files?provider=google" \
@@ -164,7 +166,7 @@ echo -n "Inferences: "
 curl --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences?provider=google" \
   --header "Authorization: Bearer $TOKEN"
 echo
-INFERENCE="CHANGE_ME"
+INFERENCE=$(curl -s --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences?provider=google" --header "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['id'])")
 echo -n "Inference: "
 curl --location --request GET "http://localhost:8080/projects/$PROJECT/datasets/$DATASET/inferences/$INFERENCE?provider=google" \
   --header "Authorization: Bearer $TOKEN"
