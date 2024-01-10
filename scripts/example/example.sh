@@ -62,6 +62,8 @@ fi
 log_checkpoint "List all users:"
 curl -v --location --request GET 'http://localhost:8080/users?provider=google' --header "Authorization: Bearer $TOKEN"
 
+exit 0
+
 log_checkpoint "List all taxa"
 echo -n "Taxa: "
 curl --location --request GET 'http://localhost:8080/taxa?provider=google' --header "Authorization: Bearer $TOKEN"
