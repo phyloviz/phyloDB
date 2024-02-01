@@ -82,10 +82,10 @@ Algorithm module tests (a Neo4j instance is not required):
 
 ### Example
 
-An example is available at `phyloDB.git/scripts/example`.
-The script [`example.sh`](scripts/example.sh) illustrates the API use cases.
+An example is available at [`phyloDB.git/scripts/example`](scripts/example).
+The script [`example.sh`](scripts/example/example.sh) illustrates the API use cases.
 It is important that a Google account is registered as admin, and that you have a valid token.
-Check the initialization step in the [`example.sh`](scripts/example.sh) script, and the [template for data initialization](scripts/init/init_data.cypher).
+Check the initialization step in the [`example.sh`](scripts/example/example.sh) script, and the [template for data initialization](scripts/init/init_data.cypher).
 
 # More documentation
 The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage).
