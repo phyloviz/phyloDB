@@ -18,13 +18,11 @@ Configuration scripts will check if these are available.
 
 For Linux/UNIX systems, please ensure that a `docker` user group exists in your system and that the executing user belongs to it.
 
-## Building the JAR files, obtaining Neo4j extensions and building the Docker image
-
-### Cloning this repository
+## Cloning this repository
 
     git clone https://github.com/phyloviz/phyloDB.git phyloDB.git
 
-### Building
+## Building
 
 Note that you might have to adjust the file [`application.properties`](https://github.com/phyloviz/phyloDB/blob/master/phylodb/src/main/resources/application.properties), in particular the Neo4j bolt connection. 
 
@@ -36,7 +34,7 @@ Note that you might have to adjust the file [`application.properties`](https://g
 At this point, if no issue has occurred, the build process will be at [step four of the Wiki guide](https://github.com/phyloviz/phyloDB/wiki/Initialization-scripts-in-the-database-container).
 The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage). As previously mentioned, the deployment steps present in the wiki can be skiped to step 4 if you have done the previous steps that automatize steps 1 to 3.
 
-### Easy launch
+## Easy launch
 
 After performing the build steps, the phylodb Docker containers may be launched (you should be in directory `phyloDB.git/docker`):
 
@@ -54,13 +52,13 @@ The Docker container internal files will be mapped to the directory `phyloDB.git
 
 The container files themselves are excluded from this repository through `phyloDB.git/docker/.gitignore`.
 
-### Stopping the containers
+## Stopping the containers
 
 Again, you should be in directory `phyloDB.git/docker`.
 
     ./stop-docker.sh
 
-### Testing
+## Testing
 
 A pristine Neo4j instance should be running for testing.
 
@@ -80,7 +78,7 @@ Algorithm module tests (a Neo4j instance is not required):
     cd algorithms
     mvn test
 
-### Example
+## Example
 
 An example is available at [`phyloDB.git/scripts/example`](scripts/example).
 The script [`example.sh`](scripts/example/example.sh) illustrates the API use cases.
@@ -91,7 +89,7 @@ Check the initialization step in the [`example.sh`](scripts/example/example.sh) 
 The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage).
 
 # Architectural View
- 
+
 <img src=https://github.com/phyloviz/phyloDB/blob/master/wiki/images/client-server.png width=400 height=300>
 
 # Team
