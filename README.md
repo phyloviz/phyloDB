@@ -14,7 +14,7 @@ The following software tools must be available in your system as they will be ca
 
 Configuration scripts will check if these are available.
 
-# Configuration
+# Setup and testing
 
 For Linux/UNIX systems, please ensure that a `docker` user group exists in your system and that the executing user belongs to it.
 
@@ -80,6 +80,12 @@ Algorithm module tests (a Neo4j instance is not required):
     cd algorithms
     mvn test
 
+### Example
+
+An example is available at `phyloDB.git/scripts/example`.
+The script [`example.sh`](phyloDB.git/scripts/example.sh) illustrates the API use cases.
+It is important that a Google account is registered as admin, and that you have a valid token.
+Check the initialization step in the [`example.sh`](phyloDB.git/scripts/example.sh) script, and the [template for data initialization](phyloDB.git/scripts/init/init_data.cypher).
 
 # More documentation
 The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage).
