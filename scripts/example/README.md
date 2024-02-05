@@ -2,9 +2,9 @@
 
 ## Interaction with the API
 
-The script [`example.sh`](scripts/example/example.sh) illustrates the API use cases.
+The script [`example.sh`](example.sh) illustrates the API use cases.
 It is important that a Google account is registered as admin, and that you have a valid token.
-Check the initialization step in the [`example.sh`](scripts/example/example.sh) script, and/or the [template for data initialization](scripts/init/init_data.cypher).
+Check the initialization step in the [`example.sh`](example.sh) script, and/or the [template for data initialization](../init/init_data.cypher).
 
 ## Data loading
 
