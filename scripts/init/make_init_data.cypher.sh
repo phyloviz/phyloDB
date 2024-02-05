@@ -21,5 +21,8 @@ fi
 
 cat << EOF > init_data.cypher
 CALL apoc.cypher.runMany("MATCH(n) DETACH DELETE n;
-CREATE (:User {provider: 'google', id: '${USER_ID}', deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(:UserDetails {role: 'admin'})
+CREATE (:User {provider: 'google', id: '${USER_ID}', deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(:UserDetails {role: 'admin'});", {});
 EOF
+
+#cat init_data.cypher | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password"
+
