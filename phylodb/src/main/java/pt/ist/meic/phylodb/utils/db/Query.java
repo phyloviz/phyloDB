@@ -68,23 +68,18 @@ public class Query {
 		StringBuilder parameterized = new StringBuilder(parts[0]);
 		for (int i = 1; i < parts.length; i++)
 			parameterized.append(PLACEHOLDER).append(i).append(parts[i]);
-		System.out.println("=====================================");
-		System.out.println("Query:" + parameterized.toString() + ";");
 		return parameterized.toString() + ";";
 	}
 
 	/**
-	 * A map of ids and parameter which indicates to which query parameter, a
-	 * parameter belongs to
+	 * A map of ids and parameter which indicates to which query parameter, a parameter belongs to
 	 *
 	 * @return map of parameters
 	 */
 	public Map<String, Object> getParameters() {
 		Map<String, Object> params = new HashMap<>();
-		for (int i = 0; i < parameters.size(); i++) {
+		for (int i = 0; i < parameters.size(); i++)
 			params.put(String.valueOf(i + 1), parameters.get(i));
-			System.out.println("Parameters: " + String.valueOf(i + 1) + " -> " + parameters.get(i));
-		}
 		return params;
 	}
 

@@ -87,18 +87,18 @@ Check the initialization step in the [`example.sh`](scripts/example/example.sh) 
 
 To run the example,
 
-    export TOKEN="YOUR_TOKEN"
-    export USER_ID="YOUR_USER_ID"
-    git clone https://github.com/phyloviz/phyloDB.git phyloDB.git
-    cd phyloDB.git/
-    sed 's|#spring.data.neo4j.uri=bolt://phylodb-neo4j:7687|spring.data.neo4j.uri=bolt://phylodb-neo4j:7687|g' -i phylodb/bin/main/application.properties
-    sed 's|spring.data.neo4j.uri=bolt://localhost:7687|#spring.data.neo4j.uri=bolt://localhost:7687|g' -i phylodb/bin/main/application.properties
-    ./configure.sh
-    cd docker
-    ./build-docker.sh
-    ./start-docker.sh
-    cd ../scripts/example
-    echo y | ./example.sh
+   export TOKEN="YOUR_TOKEN"
+   export USER_ID="YOUR_USER_ID"
+   git clone https://github.com/phyloviz/phyloDB.git phyloDB.git
+   cd phyloDB.git/
+   sed 's|#spring.data.neo4j.uri=bolt://phylodb-neo4j:7687|spring.data.neo4j.uri=bolt://phylodb-neo4j:7687|g' -i phylodb/bin/main/application.properties
+   sed 's|spring.data.neo4j.uri=bolt://localhost:7687|#spring.data.neo4j.uri=bolt://localhost:7687|g' -i phylodb/bin/main/application.properties
+   ./configure.sh
+   cd docker
+   ./build-docker.sh
+   ./start-docker.sh
+   cd ../scripts/example
+   echo y | ./example.sh
 
 To generate `YOUR_TOKEN`, access <https://developers.google.com/oauthplayground/>, sign in, and click 'Authorize
 APIs' with the custom scope `https://www.googleapis.com/auth/userinfo.email`.
