@@ -32,3 +32,8 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+bootRun {
+	jvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED']
+}
+
