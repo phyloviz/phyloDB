@@ -24,5 +24,11 @@ CALL apoc.cypher.runMany("MATCH(n) DETACH DELETE n;
 CREATE (:User {provider: 'google', id: '${USER_ID}', deprecated: false})-[:CONTAINS_DETAILS {from: datetime(), version: 1}]->(:UserDetails {role: 'admin'});", {});
 EOF
 
-#cat init_data.cypher | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password"
+echo "Initialize phylodb-neo4j container with init_data.cypher?"
+echo "WARNING: Performs a potentially destructive full delete operation."
+read -p "Continue? (y/n):" user_input
 
+if [[ "$user_input" = y* ]]; then
+    echo "Initializing container with init_data.cypher..."
+    cat init_data.cypher | docker exec --interactive phylodb-neo4j sh -c "cypher-shell -u neo4j -p password"
+fi
