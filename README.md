@@ -85,6 +85,26 @@ The script [`example.sh`](scripts/example/example.sh) illustrates the API use ca
 It is important that a Google account is registered as admin, and that you have a valid token.
 Check the initialization step in the [`example.sh`](scripts/example/example.sh) script, and/or the [template for data initialization](scripts/init/init_data.cypher).
 
+To run the example,
+
+   export TOKEN="YOUR_TOKEN"
+   export USER_ID="YOUR_USER_ID"
+   git clone https://github.com/phyloviz/phyloDB.git phyloDB.git
+   cd phyloDB.git/
+   sed 's|#spring.data.neo4j.uri=bolt://phylodb-neo4j:7687|spring.data.neo4j.uri=bolt://phylodb-neo4j:7687|g' -i phylodb/bin/main/application.properties
+   sed 's|spring.data.neo4j.uri=bolt://localhost:7687|#spring.data.neo4j.uri=bolt://localhost:7687|g' -i phylodb/bin/main/application.properties
+   ./configure.sh
+   cd docker
+   ./build-docker.sh
+   ./start-docker.sh
+   cd ../scripts/example
+   echo y | ./example.sh
+
+To generate `YOUR_TOKEN`, access <https://developers.google.com/oauthplayground/>, sign in, and click 'Authorize
+APIs' with the custom scope `https://www.googleapis.com/auth/userinfo.email`.
+Click in 'Exchange authorization code for tokens' and use the provided 'Access token'.
+Use the account email associated with this token as `YOUR_USER_ID`.
+
 # More documentation
 The [Wiki](https://github.com/phyloviz/phyloDB/wiki) of this project documents several topics, namely archictecural views, deployment, authentication and API definition (usage).
 
